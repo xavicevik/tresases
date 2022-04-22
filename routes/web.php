@@ -4,6 +4,8 @@ use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
+use \App\Http\Controllers\UserController;
+use \App\Http\Controllers\PaisController;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -34,8 +36,15 @@ Route::middleware([
     })->name('dashboard');
 });
 
-Route::middleware(['auth:sanctum', 'verified',])->group(function () {
-    Route::get('/dashboard/users', function () {
-        return Inertia::render('Users/Index', ['users' => \App\Models\User::all()]);
-    })->name('users.index');
-});
+Route::resource('users', UserController::class)
+    ->middleware(['auth:sanctum', 'verified']);
+
+Route::get('/paises/departamentos', [PaisController::class, 'departamentos'])
+    ->middleware(['auth:sanctum', 'verified']);
+
+Route::get('/paises/ciudades', [PaisController::class, 'ciudades'])
+    ->middleware(['auth:sanctum', 'verified']);
+
+Route::resource('paises', PaisController::class)
+    ->middleware(['auth:sanctum', 'verified']);
+
