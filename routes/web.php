@@ -6,6 +6,7 @@ use Inertia\Inertia;
 
 use \App\Http\Controllers\UserController;
 use \App\Http\Controllers\PaisController;
+use \App\Http\Controllers\PuntoventaController;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -35,6 +36,16 @@ Route::middleware([
         return Inertia::render('Dashboard');
     })->name('dashboard');
 });
+
+
+Route::get('/puntoventas/buscarPuntoventas', [PuntoventaController::class, 'buscarPuntoventas'])
+    ->middleware(['auth:sanctum', 'verified']);
+
+Route::resource('/puntoventas', PuntoventaController::class)
+    ->middleware(['auth:sanctum', 'verified']);
+
+Route::get('/users/buscaUsers', [UserController::class, 'buscaUsers'])
+    ->middleware(['auth:sanctum', 'verified']);
 
 Route::resource('users', UserController::class)
     ->middleware(['auth:sanctum', 'verified']);

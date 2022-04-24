@@ -5,8 +5,6 @@
                 Lista de Usuarios
             </h2>
         </template>
-
-
         <div class="py-4">
             <div class="mx-auto 2xl:8">
                 <div class="bg-white overflow-hidden shadow-xl sm:rounded-lg">
@@ -32,10 +30,12 @@
                                     <div class="relative">
                                         <div class="absolute top-4 left-3">
                                             <i class="fa fa-search text-gray-400 z-20 hover:text-gray-500"></i> </div>
-                                        <input type="text" class="h-8 w-96 pl-4 pr-4 rounded-lg z-0 focus:shadow focus:outline-none" placeholder="Buscar...">
-                                        <div class="absolute top-2 right-2">
-                                            <Icon icon="fe:search" class="h-4" />
-                                        </div>
+                                        <input type="text" v-model="buscar" @keyup="getUsers(buscar,'detalle_users.num_documento')" class="h-8 w-96 pl-4 pr-4 rounded-lg z-0 focus:shadow focus:outline-none" placeholder="Buscar (Nombre, Email, Documento)">
+                                        <button @click="getUsers(buscar,'detalle_users.num_documento')">
+                                            <div class="absolute top-2 right-2">
+                                                <Icon icon="fe:search" class="h-4"  />
+                                            </div>
+                                        </button>
                                     </div>
                                 </div>
                             </div>
@@ -49,34 +49,156 @@
                         <div class="px-4 py-2 pb-8">
                             <table class="table-fixed w-full">
                                 <thead>
-                                <tr class="bg-gray-100 text-sm">
-                                    <th class="px-4 py-2">No DOC</th>
-                                    <th class="px-4 py-2">NOMBRE</th>
-                                    <th class="px-4 py-2">CELULAR</th>
-                                    <th class="px-4 py-2">CORREO</th>
-                                    <th class="px-4 py-2">CIUDAD</th>
-                                    <th class="px-4 py-2">PERFIL</th>
-                                    <th class="px-4 py-2">ACCIONES</th>
+                                <tr class="bg-gray-100">
+                                    <th class="px-4 py-2 text-xs font-bold w-1/12 hover:bg-blue-500 hover:text-gray-50 rounded-b">
+                                        <button @click="getUsers(buscar, 'detalle_users.num_documento')">
+                                            No DOC
+                                            <div v-show="sortBy == 'detalle_users.num_documento'">
+                                                <span v-show="!sortOrder">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                                                        <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+                                                    </svg>
+                                                </span>
+                                                <span v-show="sortOrder">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                                                      <path fill-rule="evenodd" d="M14.707 12.707a1 1 0 01-1.414 0L10 9.414l-3.293 3.293a1 1 0 01-1.414-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 010 1.414z" clip-rule="evenodd" />
+                                                    </svg>
+                                                </span>
+                                            </div>
+                                        </button>
+                                    </th>
+                                    <th class="px-4 py-2 text-xs font-bold  hover:bg-blue-500 hover:text-gray-50 rounded-b">
+                                        <button @click="getUsers(buscar, 'users.name')">
+                                            NOMBRE
+                                            <div v-show="sortBy == 'users.name'">
+                                                <span v-show="!sortOrder">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                                                        <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+                                                    </svg>
+                                                </span>
+                                                <span v-show="sortOrder">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                                                      <path fill-rule="evenodd" d="M14.707 12.707a1 1 0 01-1.414 0L10 9.414l-3.293 3.293a1 1 0 01-1.414-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 010 1.414z" clip-rule="evenodd" />
+                                                    </svg>
+                                                </span>
+                                            </div>
+                                        </button>
+                                    </th>
+                                    <th class="px-4 py-2 text-xs font-bold hover:bg-blue-500 hover:text-gray-50 rounded-b">
+                                        <button @click="getUsers(buscar, 'detalle_users.movil')">
+                                            CELULAR
+                                            <div v-show="sortBy == 'detalle_users.movil'">
+                                                <span v-show="!sortOrder">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                                                        <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+                                                    </svg>
+                                                </span>
+                                                <span v-show="sortOrder">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                                                      <path fill-rule="evenodd" d="M14.707 12.707a1 1 0 01-1.414 0L10 9.414l-3.293 3.293a1 1 0 01-1.414-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 010 1.414z" clip-rule="evenodd" />
+                                                    </svg>
+                                                </span>
+                                            </div>
+                                        </button>
+                                    </th>
+                                    <th class="px-4 py-2 text-xs font-bold hover:bg-blue-500 hover:text-gray-50 rounded-b">
+                                        <button @click="getUsers(buscar, 'users.email')">
+                                            CORREO
+                                            <div v-show="sortBy == 'users.email'">
+                                                <span v-show="!sortOrder">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                                                        <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+                                                    </svg>
+                                                </span>
+                                                <span v-show="sortOrder">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                                                      <path fill-rule="evenodd" d="M14.707 12.707a1 1 0 01-1.414 0L10 9.414l-3.293 3.293a1 1 0 01-1.414-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 010 1.414z" clip-rule="evenodd" />
+                                                    </svg>
+                                                </span>
+                                            </div>
+                                        </button>
+                                    </th>
+                                    <th class="px-4 py-2 text-xs font-bold hover:bg-blue-500 hover:text-gray-50 rounded-b">
+                                        <button @click="getUsers(buscar, 'ciudades.nombre')">
+                                            CIUDAD
+                                            <div v-show="sortBy == 'ciudades.nombre'">
+                                                <span v-show="!sortOrder">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                                                        <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+                                                    </svg>
+                                                </span>
+                                                <span v-show="sortOrder">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                                                      <path fill-rule="evenodd" d="M14.707 12.707a1 1 0 01-1.414 0L10 9.414l-3.293 3.293a1 1 0 01-1.414-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 010 1.414z" clip-rule="evenodd" />
+                                                    </svg>
+                                                </span>
+                                            </div>
+                                        </button>
+                                    </th>
+                                    <th class="px-4 py-2 text-xs font-bold w-1/8 hover:bg-blue-500 hover:text-gray-50 rounded-b">
+                                        <button @click="getUsers(buscar, 'roles.nombre')">
+                                            PERFIL
+                                            <div v-show="sortBy == 'roles.nombre'">
+                                                <span v-show="!sortOrder">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                                                        <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+                                                    </svg>
+                                                </span>
+                                                <span v-show="sortOrder">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                                                      <path fill-rule="evenodd" d="M14.707 12.707a1 1 0 01-1.414 0L10 9.414l-3.293 3.293a1 1 0 01-1.414-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 010 1.414z" clip-rule="evenodd" />
+                                                    </svg>
+                                                </span>
+                                            </div>
+                                        </button>
+                                    </th>
+                                    <th class="px-4 py-2 text-xs font-bold w-1/12 hover:bg-blue-500 hover:text-gray-50 rounded-b">
+                                        <button @click="getUsers(buscar, 'detalle_users.estado')">
+                                            ESTADO
+                                            <div v-show="sortBy == 'detalle_users.estado'">
+                                                <span v-show="!sortOrder">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                                                        <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+                                                    </svg>
+                                                </span>
+                                                <span v-show="sortOrder">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                                                      <path fill-rule="evenodd" d="M14.707 12.707a1 1 0 01-1.414 0L10 9.414l-3.293 3.293a1 1 0 01-1.414-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 010 1.414z" clip-rule="evenodd" />
+                                                    </svg>
+                                                </span>
+                                            </div>
+                                        </button>
+                                    </th>
+                                    <th class="px-4 py-2 text-xs font-bold w-1/12 hover:bg-blue-500 hover:text-gray-50 rounded-b">ACCIONES</th>
                                 </tr>
                                 </thead>
                                 <tbody>
-                                <tr v-for="user in users.data" :key="user.id">
-                                    <td class="border px-4 py-2">{{ user.documento }}</td>
-                                    <td class="border px-4 py-2">{{ user.nombre }}</td>
-                                    <td class="border px-4 py-2">{{ user.celular }}</td>
-                                    <td class="border px-4 py-2">{{ user.correo }}</td>
-                                    <td class="border px-4 py-2">{{ user.ciudad }}</td>
-                                    <td class="border px-4 py-2">{{ user.perfil }}</td>
-
-                                    <td class="border px-4 py-2 mx-auto">
-                                        <button @click="edit(user)" class="hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                                <tr v-if="existeUsers > 0" v-for="(user, id) in arrayUsers.data" :key="index">
+                                    <td class="border px-4 py-2 text-xs" v-text="user.documento"></td>
+                                    <td class="border px-4 py-2 text-xs" v-text="user.nombre"></td>
+                                    <td class="border px-4 py-2 text-xs" v-text="user.celular"></td>
+                                    <td class="border px-4 py-2 text-xs" v-text="user.correo"></td>
+                                    <td class="border px-4 py-2 text-xs" v-text="user.ciudad"></td>
+                                    <td class="border px-4 py-2 text-xs" v-text="user.perfil"></td>
+                                    <td class="border px-4 py-2 text-xs" v-if="user.estado">
+                                        <span
+                                            class="inline-flex px-2 text-xs font-semibold leading-5 text-green-800 bg-green-100 rounded-full">Activo
+                                        </span>
+                                    </td>
+                                    <td class="border px-4 py-2 text-xs" v-else>
+                                        <span
+                                            class="inline-flex px-2 text-xs font-semibold leading-5 text-red-800 bg-green-100 rounded-full">Inactivo
+                                        </span>
+                                    </td>
+                                    <td class="border px-1 py-1 mx-auto text-center flex items-center">
+                                        <button @click="edit(user)" class="hover:bg-blue-700 text-white font-bold rounded">
                                             <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 text-blue-400" fill="none"
                                                  viewBox="0 0 24 24" stroke="currentColor">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                       d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                                             </svg>
                                         </button>
-                                        <button @click="deleteRow(user.id)" class="hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
+                                        <button @click="deleteRow(user.id)" class="hover:bg-red-700 text-white font-bold rounded">
                                             <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 text-red-400" fill="none"
                                                  viewBox="0 0 24 24" stroke="currentColor">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -85,9 +207,12 @@
                                         </button>
                                     </td>
                                 </tr>
+                                <tr v-else>
+                                    <td class="border px-4 py-2 text-xs text-center" colspan="8"> La consulta no obtuvo datos</td>
+                                </tr>
                                 </tbody>
                             </table>
-                            <pagination class="mt-6" :links="users.links" />
+                            <pagination class="mt-6" :links="arrayUsers.links" />
                         </div>
                     </section>
                     <div class="fixed z-10 inset-0 overflow-y-auto ease-out duration-400" v-if="isOpen">
@@ -172,7 +297,7 @@ export default {
         Pagination,
     },
     props:{
-       users : Object,
+       users : [],
        errors: Object
     },
     data() {
@@ -188,6 +313,11 @@ export default {
                 title: null,
                 body: null,
             },
+            existeUsers: 1,
+            buscar: '',
+            arrayUsers: [],
+            sortOrder: 1,
+            sortBy: ''
         }
     },
     methods: {
@@ -221,6 +351,40 @@ export default {
             this.$inertia.post('/posts/' + data.id, data)
             this.reset();
             this.closeModal();
+        },
+        getUsers: async function (buscar, sortBy) {
+            this.buscar = buscar;
+
+            if (sortBy == this.sortBy){
+                this.sortOrder = !this.sortOrder;
+            }
+            let sortOrderdesc;
+            if (this.sortOrder){
+                sortOrderdesc = 'asc';
+            } else {
+                sortOrderdesc = 'desc';
+            }
+            this.sortBy = sortBy;
+
+            var url= '/users/buscaUsers';
+            axios.get(url, {
+                params: {
+                    buscar: this.buscar,
+                    sortBy: this.sortBy,
+                    sortOrder: sortOrderdesc
+                }
+            }).then((res) => {
+                var respuesta = res.data;
+                this.arrayUsers = respuesta.users;
+                console.log(this.arrayUsers);
+                console.log(url);
+
+                if (this.arrayUsers.data.length > 0) {
+                    this.existeUsers = 1;
+                } else {
+                    this.existeUsers = 0;
+                }
+            })
         },
         getPaises: function () {
             axios.get('/paises',).then((res) => {
@@ -275,10 +439,12 @@ export default {
         },
     },
     created: function () {
-        this.getPaises();
+        //this.getPaises();
+        console.log('Component mounted.')
+        this.arrayUsers = this.users;
     },
     mounted() {
-        console.log('Component mounted.')
+        console.log('Component mounted.');
     },
 }
 </script>

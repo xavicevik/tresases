@@ -18,4 +18,9 @@ class Pais extends Model
     {
         return $this->hasMany(Ciudad::class);
     }
+
+    public function puntoventa()
+    {
+        return $this->hasMany(Puntoventa::class, 'idpais', 'id');
+    }
 }
