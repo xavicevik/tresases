@@ -46,7 +46,6 @@ const logout = () => {
                                     <JetApplicationMark class="block h-9 w-auto" />
                                 </Link>
                             </div>
-
                             <!-- Navigation Links -->
                             <div class="hidden space-x-8 sm:-my-px sm:ml-10 sm:flex">
                                 <JetNavLink :href="route('dashboard')" :active="route().current('dashboard')">
@@ -54,6 +53,15 @@ const logout = () => {
                                 </JetNavLink>
                                 <JetNavLink :href="route('users.index')" :active="route().current('users.index')">
                                     Users
+                                </JetNavLink>
+                                <JetNavLink :href="route('rifas.index')" :active="route().current('rifas.index')">
+                                    Rifas
+                                </JetNavLink>
+                                <JetNavLink :href="route('puntoventas.index')" :active="route().current('puntoventas.index')">
+                                    Ventas
+                                </JetNavLink>
+                                <JetNavLink :href="route('users.index')" :active="route().current('transacciones.index')">
+                                    Transacciones
                                 </JetNavLink>
                             </div>
                         </div>

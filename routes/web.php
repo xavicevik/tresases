@@ -4,6 +4,13 @@ use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
+use \App\Http\Controllers\UserController;
+use \App\Http\Controllers\PaisController;
+use \App\Http\Controllers\PuntoventaController;
+use \App\Http\Controllers\RifaController;
+
+use \App\Models\Loteria;
+use \App\Models\Terminosycondiciones;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -24,18 +31,36 @@ Route::get('/', function () {
     ]);
 });
 
-Route::middleware([
-    'auth:sanctum',
-    config('jetstream.auth_session'),
-    'verified',
-])->group(function () {
+Route::middleware(['auth:sanctum', config('jetstream.auth_session'),'verified',])->group(function () {
     Route::get('/dashboard', function () {
         return Inertia::render('Dashboard');
     })->name('dashboard');
+
+    Route::get('/loterias', function () {
+        return ['loterias' => Loteria::all()];
+    })->name('loterias');
+
+    Route::get('/terminos', function () {
+        return ['terminos' => Terminosycondiciones::all()];
+    })->name('terminos');
+
+    Route::get('/users/buscaUsers', [UserController::class, 'buscaUsers'])
+        ->name('users.buscar');
+
+    Route::resource('users', UserController::class);
+
+    Route::resource('/puntoventas', PuntoventaController::class);
+
+    Route::get('/paises/departamentos', [PaisController::class, 'departamentos']);
+
+    Route::get('/paises/ciudades', [PaisController::class, 'ciudades']);
+
+    Route::resource('paises', PaisController::class);
+
+    Route::resource('rifas', RifaController::class);
+
 });
 
-Route::middleware(['auth:sanctum', 'verified',])->group(function () {
-    Route::get('/dashboard/users', function () {
-        return Inertia::render('Users/Index', ['users' => \App\Models\User::all()]);
-    })->name('users.index');
-});
+
+
+
