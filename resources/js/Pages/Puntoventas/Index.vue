@@ -1,5 +1,5 @@
 <template>
-    <AppLayout title="Usuarios">
+    <AppLayout title="Puntos de Venta">
         <template #header>
             <h2 class="font-semibold text-xl text-gray-800 leading-tight">
                 Lista de Puntos de Venta
@@ -19,13 +19,13 @@
                     </section>
                     <section>
                         <div class="flex justify-between mx-auto p-4">
-                            <div class="flex p-2 w-3">
+                            <div class="w-1/3">
                                 <h1 class="font-bold text-xl text-black-800 leading-tight">
                                     Puntos de Venta
                                 </h1>
                             </div>
 
-                            <div class="flex p-2 ">
+                            <div class="w-1/3">
                                 <div class="container flex justify-center items-center">
                                     <div class="relative">
                                         <div class="absolute top-4 left-3">
@@ -39,8 +39,8 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-auto">
-                                <button @click="openModal('registrar')" class="bg-blue-500 text-xs left-0 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded my-3">CREAR PUNTO DE VENTA</button>
+                            <div class="pr-2 w-1/3 text-center">
+                                <button @click="openModal('registrar')" class="bg-blue-500 text-xs  hover:bg-blue-700 text-white font-bold py-2 px-4 rounded ">CREAR PUNTO DE VENTA</button>
                             </div>
 
                         </div>
@@ -139,7 +139,7 @@
                                 </tr>
                                 </thead>
                                 <tbody>
-                                <tr v-if="existePunto > 0" v-for="(punto, id) in arrayPuntos.data" :key="id">
+                                <tr class="text-center" v-if="existePunto > 0" v-for="(punto, id) in arrayPuntos.data" :key="id">
                                     <td class="border px-4 py-2 text-sm" v-text="punto.codigo"></td>
                                     <td class="border px-4 py-2 text-sm" v-text="punto.nombre"></td>
                                     <td class="border px-4 py-2 text-sm" v-text="punto.descripcion"></td>
@@ -289,6 +289,7 @@
                                                     <div class="mb-4 w-2/3 pr-4">
                                                         <label class="block text-gray-700 text-sm font-bold mb-2">Nombre:</label>
                                                         <input v-model="form.nombre" type="text" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" placeholder="Nombre">
+                                                        <div v-if="$page.props.errors.nombre" class="text-red-500">{{ $page.props.errors.nombre }}</div>
                                                     </div>
                                                     <div class="mb-4 w-1/3 ">
                                                         <label class="block text-gray-700 text-sm font-bold mb-2">Dirección:</label>
@@ -405,12 +406,14 @@ export default {
     },
     data() {
         return {
+            ispage: true,
             pageX: 0,
             pageY: 0,
             uploadDragoverTracking: false,
             uploadDragoverEvent: false,
             tituloModal: '',
             form: {
+                id: null,
                 nombre: null,
                 direccion: null,
                 idpais: 0,
@@ -453,6 +456,7 @@ export default {
             switch (accion) {
                 case 'registrar':
                 {
+                    this.form.id = null;
                     this.tituloModal = 'Crear nuevo punto de venta';
                     this.form.nombre = null;
                     this.form.direccion = null;
@@ -470,6 +474,7 @@ export default {
                 }
                 case 'actualizar': {
                     this.tituloModal = 'Actualizar el punto de venta ' + data['nombre'];
+                    this.form.id = data['id'];
                     this.form.nombre = data['nombre'];
                     this.form.direccion = data['direccion'];
                     this.form.idpais = data['idpais'];
@@ -509,6 +514,7 @@ export default {
             return this.errorPunto;
         },
         reset: function () {
+            this.form.id =  null;
             this.tituloModal = 'Crear nuevo punto de venta';
             this.form.nombre = null;
             this.form.direccion = null;
@@ -527,8 +533,7 @@ export default {
             if (this.validarPunto()) {
                 return;
             }
-            console.log(data);
-            this.$inertia.post('/puntoventas', data)
+            this.$inertia.post('/puntoventas', data);
             this.reset();
             this.closeModal();
             this.editMode = false;
@@ -544,9 +549,21 @@ export default {
                 return;
             }
             data._method = 'PUT';
-            this.$inertia.post('/puntoventas/' + data.id, data)
-            this.reset();
-            this.closeModal();
+            axios.post('/puntoventas/' + data.id, data
+            ).then((res) => {
+                Swal.fire(
+                    'Actualización Puntos de venta',
+                    'El punto de venta se ha actualizado!',
+                    'success'
+                )
+                this.getPuntos('','puntos_ventas.nombre');
+                this.closeModal();
+                this.reset();
+                this.editMode = false;
+            }).catch(function (error) {
+                console.log(error);
+            });
+
         },
         getPuntos: async function (buscar, sortBy) {
             this.buscar = buscar;
@@ -561,15 +578,18 @@ export default {
                 sortOrderdesc = 'desc';
             }
             this.sortBy = sortBy;
+            this.ispage = true;
 
-            var url= '/puntoventas/buscarPuntoventas';
+            var url= '/puntoventas';
             axios.get(url, {
                 params: {
                     buscar: this.buscar,
                     sortBy: this.sortBy,
-                    sortOrder: sortOrderdesc
+                    sortOrder: sortOrderdesc,
+                    ispage: this.ispage
                 }
             }).then((res) => {
+                console.log(res.data);
                 var respuesta = res.data;
                 this.arrayPuntos = respuesta.puntoventas;
 

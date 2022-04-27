@@ -16,11 +16,16 @@ class Pais extends Model
 
     public function departamentos()
     {
-        return $this->hasMany(Ciudad::class);
+        return $this->hasMany(Ciudad::class, 'idpais', 'id');
     }
 
     public function puntoventa()
     {
         return $this->hasMany(Puntoventa::class, 'idpais', 'id');
+    }
+
+    public function rifas()
+    {
+        return $this->hasMany(Rifa::class, 'idpais', 'id');
     }
 }

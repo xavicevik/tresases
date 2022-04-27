@@ -7,6 +7,10 @@ use Inertia\Inertia;
 use \App\Http\Controllers\UserController;
 use \App\Http\Controllers\PaisController;
 use \App\Http\Controllers\PuntoventaController;
+use \App\Http\Controllers\RifaController;
+
+use \App\Models\Loteria;
+use \App\Models\Terminosycondiciones;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -27,35 +31,36 @@ Route::get('/', function () {
     ]);
 });
 
-Route::middleware([
-    'auth:sanctum',
-    config('jetstream.auth_session'),
-    'verified',
-])->group(function () {
+Route::middleware(['auth:sanctum', config('jetstream.auth_session'),'verified',])->group(function () {
     Route::get('/dashboard', function () {
         return Inertia::render('Dashboard');
     })->name('dashboard');
+
+    Route::get('/loterias', function () {
+        return ['loterias' => Loteria::all()];
+    })->name('loterias');
+
+    Route::get('/terminos', function () {
+        return ['terminos' => Terminosycondiciones::all()];
+    })->name('terminos');
+
+    Route::get('/users/buscaUsers', [UserController::class, 'buscaUsers'])
+        ->name('users.buscar');
+
+    Route::resource('users', UserController::class);
+
+    Route::resource('/puntoventas', PuntoventaController::class);
+
+    Route::get('/paises/departamentos', [PaisController::class, 'departamentos']);
+
+    Route::get('/paises/ciudades', [PaisController::class, 'ciudades']);
+
+    Route::resource('paises', PaisController::class);
+
+    Route::resource('rifas', RifaController::class);
+
 });
 
 
-Route::get('/puntoventas/buscarPuntoventas', [PuntoventaController::class, 'buscarPuntoventas'])
-    ->middleware(['auth:sanctum', 'verified']);
 
-Route::resource('/puntoventas', PuntoventaController::class)
-    ->middleware(['auth:sanctum', 'verified']);
-
-Route::get('/users/buscaUsers', [UserController::class, 'buscaUsers'])
-    ->middleware(['auth:sanctum', 'verified']);
-
-Route::resource('users', UserController::class)
-    ->middleware(['auth:sanctum', 'verified']);
-
-Route::get('/paises/departamentos', [PaisController::class, 'departamentos'])
-    ->middleware(['auth:sanctum', 'verified']);
-
-Route::get('/paises/ciudades', [PaisController::class, 'ciudades'])
-    ->middleware(['auth:sanctum', 'verified']);
-
-Route::resource('paises', PaisController::class)
-    ->middleware(['auth:sanctum', 'verified']);
 

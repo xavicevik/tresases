@@ -10,6 +10,7 @@ class Ciudad extends Model
     protected $table = 'ciudades';
     protected $fillable =[
         'idpais',
+        'idlocal',
         'iddepartamento',
         'nombre',
         'descripcion',

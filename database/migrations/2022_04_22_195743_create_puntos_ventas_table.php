@@ -24,11 +24,11 @@ return new class extends Migration
             $table->string('descripcion', 500);
             $table->string('url')>nullable(true);;
             $table->integer('idpais')->unsigned();
-            $table->foreign('idpais')->references('id')->on('paises');
+            $table->integer('idpais')->references('id')->on('paises');
             $table->integer('idciudad')->unsigned();
-            $table->foreign('idciudad')->references('id')->on('ciudades');
+            $table->integer('idciudad')->references('id')->on('ciudades');
             $table->integer('iddepartamento')->unsigned();
-            $table->foreign('iddepartamento')->references('id')->on('departamentos');
+            $table->integer('iddepartamento')->references('id')->on('departamentos');
             $table->timestamps();
         });
     }

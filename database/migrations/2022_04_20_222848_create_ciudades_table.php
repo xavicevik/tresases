@@ -15,6 +15,7 @@ return new class extends Migration
     {
         Schema::create('ciudades', function (Blueprint $table) {
             $table->integer('id')->unsigned();
+            $table->integer('idlocal')->unsigned();
             $table->integer('idpais')->unsigned();
             $table->foreign('idpais')->references('id')->on('paises');
             $table->integer('iddepartamento')->unsigned();

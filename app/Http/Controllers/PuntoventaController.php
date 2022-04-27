@@ -7,11 +7,14 @@ use App\Models\Puntoventa;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;;
+
+use Illuminate\Support\Facades\Validator;
 use Inertia\Inertia;
 
 class PuntoventaController extends Controller
 {
     const canPorPagina = 3;
+//config('jetstream.auth_session'),
     /**
      * Display a listing of the resource.
      *
@@ -20,26 +23,39 @@ class PuntoventaController extends Controller
     public function index(Request $request)
     {
         $buscar = $request->buscar;
-
-        if ($buscar == ''){
-            $puntoventas = Puntoventa::orderBy('id', 'desc')
-                                       ->with('pais')
-                                       ->with('departamento')
-                                       ->with('ciudad')
-                                       ->orderBy('id', 'desc')
-                                       ->paginate(self::canPorPagina);
+        if ($request->has('sortBy') && $request->sortBy <> ''){
+            $sortBy = $request->sortBy;
         } else {
-            $puntoventas = Puntoventa::orderBy('id', 'desc')
-                                       ->with('pais')
-                                       ->with('departamento')
-                                       ->with('ciudad')
-                                       ->where('puntos_ventas.nombre', 'like', '%'. $buscar . '%')
-                                       ->orWhere('puntos_ventas.codigo', 'like', '%'. $buscar . '%')
-                                       ->orderBy('id', 'desc')
-                                       ->paginate(self::canPorPagina);
+            $sortBy = 'id';
         }
 
-        return Inertia::render('Puntoventas/Index', ['puntoventas' => $puntoventas]);
+        if ($request->has('sortOrder') && $request->sortOrder <> ''){
+            $sortOrder = $request->sortOrder;
+        } else {
+            $sortOrder = 'desc';
+        }
+
+        if ($buscar == ''){
+            $puntoventas = Puntoventa::orderBy($sortBy, $sortOrder)
+                                      ->with('pais')
+                                      ->with('departamento')
+                                      ->with('ciudad')
+                                      ->paginate(self::canPorPagina);
+        } else {
+            $puntoventas = Puntoventa::orderBy($sortBy, $sortOrder)
+                                      ->with('pais')
+                                      ->with('departamento')
+                                      ->with('ciudad')
+                                      ->where('puntos_ventas.nombre', 'like', '%'. $buscar . '%')
+                                      ->orWhere('puntos_ventas.codigo', 'like', '%'. $buscar . '%')
+                                      ->paginate(self::canPorPagina);
+        }
+
+        if ($request->has('ispage') && $request->ispage){
+            return ['puntoventas' => $puntoventas];
+        } else {
+            return Inertia::render('Puntoventas/Index', ['puntoventas' => $puntoventas]);
+        }
     }
 
     public function buscarPuntoventas(Request $request)
@@ -172,8 +188,13 @@ class PuntoventaController extends Controller
     {
         $mensaje = '';
 
+        Validator::make($request->all(), [
+            'nombre' => ['required'],
+            'codigo' => ['required'],
+        ])->validate();
+
         if ($request->has('id')) {
-            Puntoventa::find($request->id)
+            Puntoventa::find($request->input('id'))
                 ->update($request->all());
             return redirect()->back()
                 ->with('message', 'El punto de venta ha sido actualizado');
