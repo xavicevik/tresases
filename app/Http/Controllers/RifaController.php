@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Loteria;
 use App\Models\Imagen;
+use App\Models\Promocional;
 use App\Models\Rifa;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Redirect;
@@ -16,7 +17,7 @@ use Inertia\Inertia;
 
 class RifaController extends Controller
 {
-    const canPorPagina = 3;
+    const canPorPagina = 10;
     /**
      * Display a listing of the resource.
      *
@@ -45,6 +46,8 @@ class RifaController extends Controller
                 ->with('ciudad')
                 ->with('loteria')
                 ->with('terminosycondiciones')
+                ->with('tiposerie')
+                ->with('promocionales')
                 ->paginate(self::canPorPagina);
         } else {
             $rifas = Rifa::orderBy($sortBy, $sortOrder)
@@ -53,6 +56,8 @@ class RifaController extends Controller
                 ->with('ciudad')
                 ->with('loteria')
                 ->with('terminosycondiciones')
+                ->with('tiposerie')
+                ->with('promocionales')
                 ->where('nombre', 'like', '%'. $buscar . '%')
                 ->orWhere('nombre_tecnico', 'like', '%'. $buscar . '%')
                 ->paginate(self::canPorPagina);
@@ -64,6 +69,86 @@ class RifaController extends Controller
             return Inertia::render('Rifas/Index', ['rifas' => $rifas]);
         }
     }
+
+    public function getRifasActivas(Request $request)
+    {
+        $buscar = $request->buscar;
+        $filtro = $request->filtro;
+        $paginate = $request->paginate;
+        if (isset($request->page) and $request->page > 0){
+            $paginate = true;
+        }
+
+        if ($request->has('sortBy') && $request->sortBy <> ''){
+            $sortBy = $request->sortBy;
+        } else {
+            $sortBy = 'id';
+        }
+
+        if ($request->has('sortOrder') && $request->sortOrder <> ''){
+            $sortOrder = $request->sortOrder;
+        } else {
+            $sortOrder = 'desc';
+        }
+
+        $mytime= Carbon::now('America/Bogota');
+
+        if ($paginate) {
+            if ($buscar == ''){
+                $rifas = Rifa::orderBy($sortBy, $sortOrder)
+                    ->with('pais')
+                    ->with('departamento')
+                    ->with('ciudad')
+                    ->with('loteria')
+                    ->with('tiposerie')
+                    ->with('promocionales')
+                    ->where('estado', '=', '1')
+                    ->where('fechafin', '>', $mytime->toDateString())
+                    ->paginate(self::canPorPagina);
+            } else {
+                $rifas = Rifa::orderBy($sortBy, $sortOrder)
+                        ->with('pais')
+                        ->with('departamento')
+                        ->with('ciudad')
+                        ->with('loteria')
+                        ->with('tiposerie')
+                        ->with('promocionales')
+                        ->where('estado', '=', '1')
+                        ->where('fechafin', '>', $mytime->toDateString())
+                        ->where($filtro, 'like', '%'. $buscar . '%')
+                        ->paginate(self::canPorPagina);
+            }
+        } else {
+            if ($buscar == ''){
+                $rifas = Rifa::orderBy($sortBy, $sortOrder)
+                    ->with('pais')
+                    ->with('departamento')
+                    ->with('ciudad')
+                    ->with('loteria')
+                    ->with('tiposerie')
+                    ->with('promocionales')
+                    ->where('estado', '=', '1')
+                    ->where('fechafin', '>', $mytime->toDateString())
+                    ->get();
+            } else {
+                $rifas = Rifa::orderBy($sortBy, $sortOrder)
+                        ->with('pais')
+                        ->with('departamento')
+                        ->with('ciudad')
+                        ->with('loteria')
+                        ->with('tiposerie')
+                        ->with('promocionales')
+                        ->where('estado', '=', '1')
+                        ->where('fechafin', '>', $mytime->toDateString())
+                        ->where($filtro, 'like', '%'. $buscar . '%')
+                    >get();
+            }
+        }
+
+        return ['rifas' => $rifas];
+    }
+
+
 
     /**
      * Show the form for creating a new resource.
@@ -158,8 +243,26 @@ class RifaController extends Controller
             $rifa->urlimagen2 = $request->urlimagen2;
             $rifa->urlimagen1 = $request->urlimagen1;
             $rifa->idterminos = $request->idterminos;
+            $rifa->idserie = $request->idserie;
+            $rifa->serie = $request->serie;
+            $rifa->serieoculta = $request->serieoculta;
             $rifa->idcreador = Auth::user()->id;
             $rifa->save();
+
+            $promocionales = $request->promocionales;
+
+            if (isset($promocionales) && sizeof($promocionales) > 0) {
+                foreach($promocionales as $ep=>$det)
+                {
+                    $promocional = new Promocional();
+                    $promocional->idrifa = $rifa->id;
+                    $promocional->idloteria = $det['idloteria'];
+                    $promocional->fecha = $det['fecha'];
+                    $promocional->premio = $det['premio'];
+                    $promocional->cifras = $rifa->cifras;
+                    $promocional->save();
+                }
+            }
 
             if(isset($request->files)){
                 $files = $request->files;
@@ -200,6 +303,61 @@ class RifaController extends Controller
         return redirect()->back()
             ->with('message', $mensaje);
     }
+
+    public function copy(Request $request)
+    {
+        try{
+            DB::beginTransaction();
+
+            $rifaold = Rifa::find($request->input('id'));
+            $rifa = $rifaold->replicate();
+
+            if ($request->isOculta) {
+                $rifa->serieoculta = $request->serieoculta;
+            } else {
+                $rifa->idserie = $request->tiposeriedestino;
+                $rifa->serie = $request->seriedestino;
+            }
+            $rifa->idcreador = Auth::user()->id;
+            $rifa->save();
+
+            $promocionales = Promocional::where('idrifa', $rifaold->id)
+                                          ->get();
+
+            if (isset($promocionales) && sizeof($promocionales) > 0) {
+                foreach($promocionales as $ep=>$det)
+                {
+                    $promocional = $det->replicate();
+                    $promocional->idrifa = $rifa->id;
+                    $promocional->save();
+                }
+            }
+
+            $imagenes = Imagen::where('idorigen', $rifaold->id)
+                               ->get();
+
+            if (isset($imagenes) && sizeof($imagenes) > 0) {
+                foreach($imagenes as $ep=>$det)
+                {
+                    $imagen = $det->replicate();
+                    $imagen->idorigen = $rifa->id;
+                    $imagen->save();
+                }
+            }
+
+            DB::commit();
+
+            $mensaje = 'La Rifa se ha creado exitosamente';
+        } catch (Throwable $e){
+            DB::rollBack();
+            $codigo = -1;
+            $mensaje = 'Se ha presentado un error creando la rifa';
+        }
+
+        return redirect()->back()
+            ->with('message', $mensaje);
+    }
+
 
     /**
      * Display the specified resource.

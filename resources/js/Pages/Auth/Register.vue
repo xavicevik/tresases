@@ -9,8 +9,11 @@ import JetLabel from '@/Jetstream/Label.vue';
 import JetValidationErrors from '@/Jetstream/ValidationErrors.vue';
 
 const form = useForm({
-    name: '',
-    email: '',
+    nombre: '',
+    apellido: '',
+    idrol: 0,
+    correo: '',
+    username: '',
     password: '',
     password_confirmation: '',
     terms: false,
@@ -35,24 +38,47 @@ const submit = () => {
 
         <form @submit.prevent="submit">
             <div>
-                <JetLabel for="name" value="Name" />
+                <JetLabel for="name" value="Nombre" />
                 <JetInput
                     id="name"
-                    v-model="form.name"
+                    v-model="form.nombre"
                     type="text"
                     class="mt-1 block w-full"
                     required
                     autofocus
-                    autocomplete="name"
+                    autocomplete="nombre"
+                />
+            </div>
+            <div>
+                <JetLabel for="apellido" value="Apellido" />
+                <JetInput
+                    id="apellido"
+                    v-model="form.apellido"
+                    type="text"
+                    class="mt-1 block w-full"
+                    required
+                    autofocus
+                    autocomplete="apellido"
                 />
             </div>
 
             <div class="mt-4">
-                <JetLabel for="email" value="Email" />
+            <JetLabel for="correo" value="Correo" />
+            <JetInput
+                id="correo"
+                v-model="form.correo"
+                type="email"
+                class="mt-1 block w-full"
+                required
+            />
+            </div>
+
+            <div class="mt-4">
+                <JetLabel for="username" value="Username" />
                 <JetInput
-                    id="email"
-                    v-model="form.email"
-                    type="email"
+                    id="username"
+                    v-model="form.username"
+                    type="text"
                     class="mt-1 block w-full"
                     required
                 />
@@ -82,6 +108,22 @@ const submit = () => {
                 />
             </div>
 
+            <div class="mt-4">
+                <JetLabel for="idrol" value="Rol" />
+                <select
+                    id="idrol"
+                    v-model="form.idrol"
+                    type="text"
+                    class="block w-full rounded-lg text-gray-700 text-sm"
+                    required
+                    autocomplete="rol"
+                >
+                    <option value="3" >Distribuidor</option>
+                    <option value="4" >Mayorista</option>
+                    <option value="4" >Vendedor</option>
+                </select>
+            </div>
+
             <div v-if="$page.props.jetstream.hasTermsAndPrivacyPolicyFeature" class="mt-4">
                 <JetLabel for="terms">
                     <div class="flex items-center">
@@ -96,11 +138,11 @@ const submit = () => {
 
             <div class="flex items-center justify-end mt-4">
                 <Link :href="route('login')" class="underline text-sm text-gray-600 hover:text-gray-900">
-                    Already registered?
+                    Ya está registrado?
                 </Link>
 
                 <JetButton class="ml-4" :class="{ 'opacity-25': form.processing }" :disabled="form.processing">
-                    Register
+                    Registrar
                 </JetButton>
             </div>
         </form>

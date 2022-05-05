@@ -8,8 +8,14 @@ use \App\Http\Controllers\UserController;
 use \App\Http\Controllers\PaisController;
 use \App\Http\Controllers\PuntoventaController;
 use \App\Http\Controllers\RifaController;
+use \App\Http\Controllers\NumeroreservadoController;
+use \App\Http\Controllers\SerieController;
+use \App\Http\Controllers\MasterController;
+use \App\Http\Controllers\VentaController;
+use \App\Http\Controllers\EmpresaController;
 
 use \App\Models\Loteria;
+use \App\Models\Rol;
 use \App\Models\Terminosycondiciones;
 /*
 |--------------------------------------------------------------------------
@@ -21,7 +27,7 @@ use \App\Models\Terminosycondiciones;
 | contains the "web" middleware group. Now create something great!
 |
 */
-
+/*
 Route::get('/', function () {
     return Inertia::render('Welcome', [
         'canLogin' => Route::has('login'),
@@ -30,6 +36,25 @@ Route::get('/', function () {
         'phpVersion' => PHP_VERSION,
     ]);
 });
+*/
+Route::group(['middleware'=>['guest']],function(){
+
+    Route::get('/', function () {
+        return Inertia::render('Auth/Login', [
+            'canLogin' => Route::has('login'),
+            'canRegister' => Route::has('register'),
+        ]);
+    });
+
+    Route::post('/', function () {
+        return Inertia::render('Auth/Login', [
+            'canLogin' => Route::has('login'),
+            'canRegister' => Route::has('register')
+        ]);
+    });
+});
+
+
 
 Route::middleware(['auth:sanctum', config('jetstream.auth_session'),'verified',])->group(function () {
     Route::get('/dashboard', function () {
@@ -44,12 +69,16 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'),'verified',]
         return ['terminos' => Terminosycondiciones::all()];
     })->name('terminos');
 
-    Route::get('/users/buscaUsers', [UserController::class, 'buscaUsers'])
-        ->name('users.buscar');
+    Route::get('/users/getClientes', [UserController::class, 'getClientes'])
+        ->name('users.clientes');
+
+    Route::resource('series', SerieController::class);
+
+    Route::get('/users/getVendedoresActivos', [UserController::class, 'getVendedoresActivos'])->name('users.getVendedoresActivos');
 
     Route::resource('users', UserController::class);
 
-    Route::resource('/puntoventas', PuntoventaController::class);
+   // Route::resource('/puntoventas', PuntoventaController::class);
 
     Route::get('/paises/departamentos', [PaisController::class, 'departamentos']);
 
@@ -57,7 +86,27 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'),'verified',]
 
     Route::resource('paises', PaisController::class);
 
+    Route::post('/rifas/copy', [RifaController::class, 'copy'])->name('rifas.copy');
+    Route::get('/rifas/getRifasActivas', [RifaController::class, 'getRifasActivas'])->name('rifas.getRifasActivas');
+
+
     Route::resource('rifas', RifaController::class);
+
+
+    Route::get('/numerosreservados', [NumeroreservadoController::class, 'index'])->name('numerosreservados.index');
+
+    Route::resource('numerosreservados', NumeroreservadoController::class);
+    Route::resource('ventas', VentaController::class);
+
+    Route::get('/master/index', [MasterController::class, 'rolesIndex'])->name('master.index');
+    Route::get('/master/paises', [MasterController::class, 'paisesIndex'])->name('master.paises');
+    Route::get('/master/empresas', [MasterController::class, 'empresasIndex'])->name('master.empresas');
+    Route::get('/master/series', [MasterController::class, 'seriesIndex'])->name('master.series');
+    Route::get('/master/terminos', [MasterController::class, 'terminosIndex'])->name('master.terminos');
+    Route::get('/master/tiposdoc', [MasterController::class, 'tipodocIndex'])->name('master.tiposdoc');
+    Route::get('/master/puntoventas', [PuntoventaController::class, 'index'])->name('master.puntosventa');
+    Route::get('/master/tiposdoc', [MasterController::class, 'tipodocIndex'])->name('master.tiposdoc');
+
 
 });
 

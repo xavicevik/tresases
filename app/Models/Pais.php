@@ -11,12 +11,13 @@ class Pais extends Model
     protected $fillable =[
         'nombre',
         'zona',
-        'descripcion'
+        'descripcion',
+        'moneda'
     ];
 
     public function departamentos()
     {
-        return $this->hasMany(Ciudad::class, 'idpais', 'id');
+        return $this->hasMany(Departamento::class, 'idpais');
     }
 
     public function puntoventa()

@@ -396,7 +396,10 @@ export default {
         Toggle
     },
     props:{
-        puntoventas : [],
+        puntoventas : {
+            data: [],
+            links: []
+        },
         errors: Object
     },
     computed: {
@@ -434,7 +437,10 @@ export default {
             isOpen: false,
             existePunto: 1,
             buscar: '',
-            arrayPuntos: [],
+            arrayPuntos: {
+                data: [],
+                links: []
+            },
             sortOrder: 1,
             sortBy: '',
             errorPunto: 0,
@@ -703,7 +709,6 @@ export default {
         },
     },
     created: function () {
-        //this.getPaises();
         console.log(this.puntoventas);
         this.arrayPuntos = this.puntoventas;
     },

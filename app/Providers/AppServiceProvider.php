@@ -2,9 +2,15 @@
 
 namespace App\Providers;
 
+use App\Models\Empresa;
+use http\Client\Curl\User;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Session;
 use Inertia\Inertia;
+use App\Models\Menu;
+
+use \Illuminate\Contracts\Auth\StatefulGuard;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -36,7 +42,21 @@ class AppServiceProvider extends ServiceProvider
         Inertia::share('flash', function () {
             return [
                 'message' => Session::get('message'),
+                'status' => Session::get('status'),
+                'error' => Session::get('error'),
             ];
+        });
+
+        Inertia::share('userall', function () {
+            $empresa = Empresa::where('id', '=', Auth::user()->idempresa)->get();
+
+            return [
+                $empresa
+            ];
+        });
+
+        view()->composer('welcome', function($view) {
+            $view->with('menus', Menu::menus());
         });
     }
 }

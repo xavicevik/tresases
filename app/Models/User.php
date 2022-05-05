@@ -26,7 +26,9 @@ class User extends Authenticatable
      * @var string[]
      */
     protected $fillable = [
-        'name', 'email', 'password',
+        'nombre', 'correo', 'username','password', 'apellido', 'idtipos_documento', 'idrol', 'estado',
+        'documento', 'direccion', 'indicativo', 'idpais', 'iddepartamento', 'idciudad', 'observaciones',
+        'telefono', 'movil', 'isnatural', 'camaracomercio', 'rut', 'url', 'idempresa'
     ];
 
     /**
@@ -59,8 +61,34 @@ class User extends Authenticatable
         'profile_photo_url',
     ];
 
-    public function detalle()
-    {
-        return $this->belongsTo(DetalleUser::class);
+    public function scopeUserApp($query) {
+        return $query->where('idrol', '<>', '2')->where('idrol', '<>', '1');
     }
+
+    public function empresa(){
+        return $this->belongsTo(Empresa::class, 'idempresa');
+    }
+
+    public function rol()
+    {
+        return $this->belongsTo(Rol::class, 'idrol');
+    }
+
+    public function tipodocumento()
+    {
+        return $this->belongsTo(TiposDocumento::class, 'idtipos_documento');
+    }
+
+    public function pais(){
+        return $this->belongsTo(Pais::class, 'idpais');
+    }
+
+    public function departamento(){
+        return $this->belongsTo(Departamento::class, 'iddepartamento');
+    }
+
+    public function ciudad(){
+        return $this->belongsTo(Ciudad::class, 'idciudad');
+    }
+
 }

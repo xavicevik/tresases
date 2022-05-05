@@ -5,6 +5,7 @@ import { createInertiaApp } from '@inertiajs/inertia-vue3';
 import { InertiaProgress } from '@inertiajs/progress';
 import Datepicker from '@vuepic/vue-datepicker';
 import '@vuepic/vue-datepicker/dist/main.css'
+import Submenu from '@/Components/Submenu';
 
 const appName = window.document.getElementsByTagName('title')[0]?.innerText || 'Laravel';
 
@@ -16,6 +17,7 @@ createInertiaApp({
             .use(plugin)
             .mixin({ methods: { route } })
             .component('Datepicker', Datepicker)
+            .component('Submenu', Submenu)
             .mount(el);
     },
 });

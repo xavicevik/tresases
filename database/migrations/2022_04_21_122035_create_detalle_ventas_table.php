@@ -17,11 +17,14 @@ return new class extends Migration
             $table->increments('id');
             $table->integer('idventa')->unsigned();
             $table->foreign('idventa')->references('id')->on('ventas');
+            $table->foreignId('idboleta')->unsigned();
+            $table->foreign('idboleta')->references('id')->on('boletas');
             $table->decimal('valor', 10, 2);
             $table->decimal('impuesto', 10, 2);
             $table->decimal('comision', 10, 2);
             $table->decimal('valortotal', 10, 2);
             $table->string('numero', 100);
+            $table->string('serie', 100);
             $table->integer('cantidad');
             $table->boolean('estado')->default(1);
             $table->timestamps();
