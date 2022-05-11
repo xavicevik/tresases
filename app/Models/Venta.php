@@ -27,6 +27,35 @@ class Venta extends Model
         return $query->where('estado', '1');
     }
 
+    public function scopeUseIndex(Builder $query, string $index): Builder
+    {
+        $table = $this->getTable();
+
+        return $this->tableIndexExists($index)
+            ? $query->from(DB::raw("`$table` USE INDEX(`$index`)"))
+            : $query;
+    }
+
+    public function scopeForceIndex(Builder $query, string $index): Builder
+    {
+        $table = $this->getTable();
+
+        return $this->tableIndexExists($index)
+            ? $query->from(DB::raw("`$table` FORCE INDEX(`$index`)"))
+            : $query;
+    }
+
+    private function tableIndexExists(string $index): boolean
+    {
+        $table = $this->getTable();
+        $index = strtolower($index);
+        $indices = Schema::getConnection()
+            ->getDoctrineSchemaManager()
+            ->listTableIndexes($table);
+
+        return array_key_exists($index, $indices);
+    }
+
     public function puntoventa(){
         return $this->belongsTo(Puntoventa::class, 'idpuntoventa');
     }
@@ -42,4 +71,6 @@ class Venta extends Model
     public function vendedor(){
         return $this->belongsTo(User::class, 'idvendedor');
     }
+
+
 }

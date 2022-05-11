@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Boleta;
 use App\Models\Loteria;
 use App\Models\Imagen;
 use App\Models\Promocional;
@@ -291,6 +292,8 @@ class RifaController extends Controller
                 }
             }
 
+            $this->crearBoleteria($rifa->id, $rifa->cifras, $rifa->serie);
+
             DB::commit();
 
             $mensaje = 'La Rifa se ha creado exitosamente';
@@ -302,6 +305,23 @@ class RifaController extends Controller
 
         return redirect()->back()
             ->with('message', $mensaje);
+    }
+
+    public function crearBoleteria($idrifa, $cifras, $serie) {
+
+        $cantboletas = pow(10, $cifras);
+
+        for($i = 0; $i < $cantboletas; $i++) {
+            $boleta = new Boleta();
+            $boleta->idrifa = $idrifa;
+            $boleta->codigo = $idrifa.$i.rand(1000000000, 9999999999);
+            $boleta->estado = 1;
+            $boleta->serie = $serie;
+            $boleta->numero = str_pad(strval($i), $cifras,"0", STR_PAD_LEFT );
+            $boleta->save();
+        }
+
+        return ['status' => 'Terminado'];
     }
 
     public function copy(Request $request)

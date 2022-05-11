@@ -13,6 +13,7 @@ use \App\Http\Controllers\SerieController;
 use \App\Http\Controllers\MasterController;
 use \App\Http\Controllers\VentaController;
 use \App\Http\Controllers\EmpresaController;
+use \App\Http\Controllers\CartController;
 
 use \App\Models\Loteria;
 use \App\Models\Rol;
@@ -76,6 +77,8 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'),'verified',]
 
     Route::get('/users/getVendedoresActivos', [UserController::class, 'getVendedoresActivos'])->name('users.getVendedoresActivos');
 
+    Route::get('/users/getClientesActivos', [UserController::class, 'getClientesActivos'])->name('users.getClientesActivos');
+
     Route::resource('users', UserController::class);
 
    // Route::resource('/puntoventas', PuntoventaController::class);
@@ -96,7 +99,13 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'),'verified',]
     Route::get('/numerosreservados', [NumeroreservadoController::class, 'index'])->name('numerosreservados.index');
 
     Route::resource('numerosreservados', NumeroreservadoController::class);
+
+
+    Route::get('/ventas/valBoletaLibre', [VentaController::class, 'valBoletaLibre'])->name('ventas.valBoletaLibre');
+    Route::get('/ventas/getRandBoletaLibre', [VentaController::class, 'getRandBoletaLibre'])->name('ventas.getRandBoletaLibre');
+
     Route::resource('ventas', VentaController::class);
+    Route::resource('/cart', CartController::class);
 
     Route::get('/master/index', [MasterController::class, 'rolesIndex'])->name('master.index');
     Route::get('/master/paises', [MasterController::class, 'paisesIndex'])->name('master.paises');
@@ -106,6 +115,7 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'),'verified',]
     Route::get('/master/tiposdoc', [MasterController::class, 'tipodocIndex'])->name('master.tiposdoc');
     Route::get('/master/puntoventas', [PuntoventaController::class, 'index'])->name('master.puntosventa');
     Route::get('/master/tiposdoc', [MasterController::class, 'tipodocIndex'])->name('master.tiposdoc');
+    Route::get('/master/tiposdocsearch', [MasterController::class, 'tipodocSearch'])->name('master.tiposdocsearch');
 
 
 });

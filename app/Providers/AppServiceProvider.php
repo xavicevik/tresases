@@ -47,6 +47,7 @@ class AppServiceProvider extends ServiceProvider
             ];
         });
 
+        /*
         Inertia::share('userall', function () {
             $empresa = Empresa::where('id', '=', Auth::user()->idempresa)->get();
 
@@ -54,9 +55,6 @@ class AppServiceProvider extends ServiceProvider
                 $empresa
             ];
         });
-
-        view()->composer('welcome', function($view) {
-            $view->with('menus', Menu::menus());
-        });
+        */
     }
 }

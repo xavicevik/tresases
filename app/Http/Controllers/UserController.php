@@ -188,6 +188,69 @@ class UserController extends Controller
         return ['users' => $users];
     }
     */
+    public function getClientesActivos(Request $request)
+    {
+        $buscar = $request->buscar;
+        $filtro = $request->filtro;
+        $paginate = $request->paginate;
+        if (isset($request->page) and $request->page > 0){
+            $paginate = true;
+        }
+
+        if ($request->has('sortBy') && $request->sortBy <> ''){
+            $sortBy = $request->sortBy;
+        } else {
+            $sortBy = 'id';
+        }
+
+        if ($request->has('sortOrder') && $request->sortOrder <> ''){
+            $sortOrder = $request->sortOrder;
+        } else {
+            $sortOrder = 'desc';
+        }
+
+        $mytime= Carbon::now('America/Bogota');
+
+        if ($paginate) {
+            if ($buscar == ''){
+                $users = User::orderBy($sortBy, $sortOrder)
+                    ->with('tipodocumento')
+                    ->with('ciudad')
+                    ->where('estado', '=', '1')
+                    ->where('idrol', '=', '2')
+                    ->paginate(self::canPorPagina);
+            } else {
+                $users = User::orderBy($sortBy, $sortOrder)
+                    ->with('tipodocumento')
+                    ->with('ciudad')
+                    ->where('estado', '=', '1')
+                    ->where('idrol', '=', '2')
+                    ->where($filtro, 'like', '%'. $buscar . '%')
+                    ->paginate(self::canPorPagina);
+            }
+        } else {
+            if ($buscar == ''){
+                $users = User::orderBy($sortBy, $sortOrder)
+                        ->with('tipodocumento')
+                        ->with('ciudad')
+                        ->where('estado', '=', '1')
+                        ->where('idrol', '=', '2')
+                    ->where('fechafin', '>', $mytime->toDateString())
+                    ->get();
+            } else {
+                $users = User::orderBy($sortBy, $sortOrder)
+                        ->with('tipodocumento')
+                        ->with('ciudad')
+                        ->where('estado', '=', '1')
+                        ->where('idrol', '=', '2')
+                        ->where('fechafin', '>', $mytime->toDateString())
+                        ->where($filtro, 'like', '%'. $buscar . '%')
+                    >get();
+            }
+        }
+
+        return ['clientes' => $users];
+    }
 
     /**
      * Show the form for creating a new resource.

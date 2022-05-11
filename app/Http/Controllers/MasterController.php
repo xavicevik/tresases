@@ -236,6 +236,35 @@ class MasterController extends Controller
         }
     }
 
+    public function tipodocSearch(Request $request)
+    {
+        //if (!$request->ajax()) return redirect('/');
+        $buscar = $request->buscar;
+        if ($request->has('sortBy') && $request->sortBy <> ''){
+            $sortBy = $request->sortBy;
+        } else {
+            $sortBy = 'id';
+        }
+
+        if ($request->has('sortOrder') && $request->sortOrder <> ''){
+            $sortOrder = $request->sortOrder;
+        } else {
+            $sortOrder = 'desc';
+        }
+
+        if ($buscar == ''){
+            $tipos = TiposDocumento::orderBy($sortBy, $sortOrder)
+                                    ->get();
+        } else {
+            $tipos = TiposDocumento::orderBy($sortBy, $sortOrder)
+                                    ->where('nombre', 'like', '%'. $buscar . '%')
+                                    ->get();
+        }
+
+        return ['data' => $tipos];
+
+    }
+
 
 
 }

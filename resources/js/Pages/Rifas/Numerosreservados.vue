@@ -316,7 +316,7 @@
                                                 </div>
                                                  <div class="flex py-1 w-full">
                                                      <div class="mb-4 w-full">
-                                                         <label class="block text-gray-700 text-sm font-bold mb-2">Subir arhivo por lotes</label>
+                                                         <label class="block text-gray-700 text-sm font-bold mb-2">Subir archivo por lotes</label>
                                                          <input type="file" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" placeholder="Seleccione archivo">
                                                          <div v-if="$page.props.errors.file" class="text-red-500">{{ $page.props.errors.file }}</div>
                                                      </div>
