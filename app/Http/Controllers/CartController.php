@@ -47,7 +47,8 @@ class CartController extends Controller
                 'serie' => $request->serie,
                 'descripcion' => $request->descripcion,
                 'idrifa' => $request->idrifa,
-                'numero' => $request->numero
+                'numero' => $request->numero,
+                'codigo' => $request->codigo
             ),
             'associatedModel' => Boleta::class
         ));
@@ -67,6 +68,20 @@ class CartController extends Controller
         $items = \Cart::getContent();
 
         return ['cart' => $items];
+    }
+
+    public function validarId(Request $request)
+    {
+        $status = 0;
+        $items = \Cart::session(Auth::user()->id)->get($request->iditem);
+
+        if (is_null($items)) {
+            $status = 0;
+        } else {
+            $status = 1;
+        }
+
+        return ['cart' => $status];
     }
 
     /**
@@ -100,7 +115,9 @@ class CartController extends Controller
      */
     public function destroy($cart)
     {
-        Cart::remove($cart);
+        \Cart::session(Auth::user()->id);
+        \Cart::remove($cart);
+
         return back();
     }
 }

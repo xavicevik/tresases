@@ -46,20 +46,6 @@
                                 <button @click="openModal('registrar')" class="bg-blue-500 text-xs  hover:bg-blue-700 text-white font-bold py-2 px-4 rounded ">CREAR USUARIO</button>
                             </div>
                         </div>
-
-                        <div class="flex justify-left mx-auto ml-4 p-2 space-x-4">
-                            <div class="flex pr-1 w-1/12 text-center">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                                </svg>
-                                <Link :href="route('numerosreservados.index')" class="text-xs hover:text-blue-700 text-blue-400 font-bold py-1 px-1 rounded ">
-                                    Perfil
-                                </Link>
-
-
-                            </div>
-
-                        </div>
                     </section>
                     <!-- Fin Encabezado y titulo -->
                     <!-- Tabla de contenido -->
@@ -170,7 +156,7 @@
                                             </div>
                                         </button>
                                     </th>
-                                    <th class="lg:px-4 md:px-1 mx-auto py-2 text-sm font-bold lg:w-1/12 md:w-1/11 hover:bg-blue-500 hover:text-gray-50 rounded-b">ACCIONES</th>
+                                    <th class="lg:px-4 md:px-1 mx-auto py-2 text-sm font-bold lg:w-1/12 md:w-1/11 hover:bg-blue-500 hover:text-gray-50 rounded-b">Acciones</th>
                                 </tr>
                                 </thead>
                                 <tbody>
@@ -225,6 +211,187 @@
                     </section>
                     <!-- Fin Tabla de contenido -->
 
+                    <!-- Ventana modal Detalles -->
+                    <section> <!-- Ventana modal -->
+                        <div class="fixed z-10 inset-0 overflow-y-auto ease-out duration-400" v-if="isOpen">
+                            <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+
+                                <div class="fixed inset-0 transition-opacity">
+                                    <div class="absolute inset-0 bg-gray-500 opacity-75"></div>
+                                </div>
+                                <!-- This element is to trick the browser into centering the modal contents. -->
+                                <span class="hidden sm:inline-block sm:align-middle sm:h-screen"></span>
+                                <div class="inline-block lg:w-8/12 align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:w-full" role="dialog" aria-modal="true" aria-labelledby="modal-headline">
+                                    <div class="">
+                                        <h2 v-text="tituloModal" class="text-sm font-bold text-gray-900 px-4 py-4"></h2>
+                                    </div>
+                                    <form>
+                                        <div class="bg-white px-4 pt-2 pb-4 sm:p-6 sm:pb-4">
+                                            <div class="">
+                                                <section>
+                                                    <div class="mt-2 grid grid-cols-1 gap-y-6 sm:grid-cols-3 sm:gap-x-4">
+                                                        <div>
+                                                            <label class="block text-sm font-medium text-gray-700">Nombre</label>
+                                                            <div class="mt-1">
+                                                                <input type="text" :disabled="editMode" :class="{'bg-blue-100' : editMode}" v-model="form.nombre" autocomplete="given-name" class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                                                                <div v-if="$page.props.errors.nombre" class="text-red-500">{{ $page.props.errors.nombre }}</div>
+                                                            </div>
+                                                        </div>
+
+                                                        <div>
+                                                            <label class="block text-sm font-medium text-gray-700">Apellido</label>
+                                                            <div class="mt-1">
+                                                                <input type="text" :disabled="editMode" :class="{'bg-blue-100' : editMode}" v-model="form.apellido" autocomplete="family-name" class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                                                                <div v-if="$page.props.errors.apellido" class="text-red-500">{{ $page.props.errors.apellido }}</div>
+                                                            </div>
+                                                        </div>
+
+                                                        <div>
+                                                            <label class="block text-sm font-medium text-gray-700">Correo</label>
+                                                            <div class="mt-1">
+                                                                <input type="text" :disabled="editMode" :class="{'bg-blue-100' : editMode}" v-model="form.correo" autocomplete="street-address" class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                                                                <div v-if="$page.props.errors.correo" class="text-red-500">{{ $page.props.errors.correo }}</div>
+                                                            </div>
+                                                        </div>
+                                                        <div>
+                                                            <label class="block text-sm font-medium text-gray-700">Movil</label>
+                                                            <div class="mt-1">
+                                                                <input type="text" :disabled="editMode" :class="{'bg-blue-100' : editMode}" v-model="form.movil" autocomplete="street-address" class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                                                                <div v-if="$page.props.errors.movil" class="text-red-500">{{ $page.props.errors.movil }}</div>
+                                                            </div>
+                                                        </div>
+
+                                                        <div>
+                                                            <label class="block text-sm font-medium text-gray-700">Tipo documento</label>
+                                                            <div class="mt-1">
+                                                                <select :disabled="editMode" :class="{'bg-blue-100' : editMode}" class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" v-model="form.idtipos_documento">
+                                                                    <option value="0" >Seleccione</option>
+                                                                    <option v-for="tipodoc in arrayTiposdocumento" :key="tipodoc.id" :value="tipodoc.id" v-text="tipodoc.nombre_corto"></option>
+                                                                </select>
+                                                                <div v-if="$page.props.errors.idtipos_documento" class="text-red-500">{{ $page.props.errors.idtipos_documento }}</div>
+                                                            </div>
+                                                        </div>
+
+                                                        <div>
+                                                            <label class="block text-sm font-medium text-gray-700">Documento</label>
+                                                            <div class="mt-1">
+                                                                <input type="text" :disabled="editMode" :class="{'bg-blue-100' : editMode}" v-model="form.documento" autocomplete="postal-code" class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                                                                <div v-if="$page.props.errors.documento" class="text-red-500">{{ $page.props.errors.documento }}</div>
+                                                            </div>
+                                                        </div>
+
+                                                        <div>
+                                                            <label class="block text-sm font-medium text-gray-700">Username</label>
+                                                            <div class="mt-1">
+                                                                <input type="text" :disabled="editMode" :class="{'bg-blue-100' : editMode}" v-model="form.username" autocomplete="postal-code" class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                                                                <div v-if="$page.props.errors.username" class="text-red-500">{{ $page.props.errors.username }}</div>
+                                                            </div>
+                                                        </div>
+
+                                                        <div>
+                                                            <label class="block text-sm font-medium text-gray-700">Password</label>
+                                                            <div class="mt-1">
+                                                                <input type="password" :disabled="editMode" :class="{'bg-blue-100' : editMode}" v-model="form.password" autocomplete="postal-code" class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                                                                <div v-if="$page.props.errors.password" class="text-red-500">{{ $page.props.errors.password }}</div>
+                                                            </div>
+                                                        </div>
+
+                                                        <div>
+                                                            <label class="block text-sm font-medium text-gray-700">Teléfono</label>
+                                                            <div class="mt-1">
+                                                                <input type="text" :disabled="editMode" :class="{'bg-blue-100' : editMode}" v-model="form.telefono" autocomplete="postal-code" class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                                                                <div v-if="$page.props.errors.telefono" class="text-red-500">{{ $page.props.errors.telefono }}</div>
+                                                            </div>
+                                                        </div>
+
+                                                        <div>
+                                                            <label class="block text-sm font-medium text-gray-700">País</label>
+                                                            <div class="mt-1">
+                                                                <select :disabled="editMode" :class="{'bg-blue-100' : editMode}" class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" v-model="form.idpais" @change="getDepartamentos()">
+                                                                    <option value="0" >Seleccione País</option>
+                                                                    <option v-for="pais in arrayPaises" :key="pais.id" :value="pais.id" v-text="pais.nombre"></option>
+                                                                </select>
+                                                                <div v-if="$page.props.errors.idpais" class="text-red-500">{{ $page.props.errors.idpais }}</div>
+                                                            </div>
+                                                        </div>
+                                                        <div>
+                                                            <label class="block text-sm font-medium text-gray-700">Departamento</label>
+                                                            <div class="mt-1">
+                                                                <select :disabled="editMode" :class="{'bg-blue-100' : editMode}" class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" v-model="form.iddepartamento" @change="getCiudades">
+                                                                    <option value="0" >Seleccione departamento</option>
+                                                                    <option v-for="departamento in arrayDepartamentos" :key="departamento.id" :value="departamento.id" v-text="departamento.nombre"></option>
+                                                                </select>
+                                                                <div v-if="$page.props.errors.iddepartamento" class="text-red-500">{{ $page.props.errors.iddepartamento }}</div>
+                                                            </div>
+                                                        </div>
+                                                        <div>
+                                                            <label class="block text-sm font-medium text-gray-700">Ciudad</label>
+                                                            <div class="mt-1">
+                                                                <select :disabled="editMode" :class="{'bg-blue-100' : editMode}" class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" v-model="form.idciudad">
+                                                                    <option value="0" >Seleccione Ciudad</option>
+                                                                    <option v-for="ciudad in arrayCiudades" :key="ciudad.id" :value="ciudad.id" v-text="ciudad.nombre"></option>
+                                                                </select>
+                                                                <div v-if="$page.props.errors.idciudad" class="text-red-500">{{ $page.props.errors.idciudad }}</div>
+                                                            </div>
+                                                        </div>
+                                                        <div>
+                                                            <label class="block text-sm font-medium text-gray-700">Dirección</label>
+                                                            <div class="mt-1">
+                                                                <input type="email" :disabled="editMode" :class="{'bg-blue-100' : editMode}" v-model="form.direccion" autocomplete="email" class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                                                                <div v-if="$page.props.errors.direccion" class="text-red-500">{{ $page.props.errors.direccion }}</div>
+                                                            </div>
+                                                        </div>
+
+                                                        <div>
+                                                            <label class="block text-sm font-medium text-gray-700">Rol</label>
+                                                            <div class="mt-1">
+                                                                <select :disabled="editMode" @change="getEmpresas()" :class="{'bg-blue-100' : editMode}" class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" v-model="form.idrol">
+                                                                    <option value="0" >Seleccione Rol</option>
+                                                                    <option v-for="rol in arrayRoles" :key="rol.id" :value="rol.id" v-text="rol.nombre"></option>
+                                                                </select>
+                                                                <div v-if="$page.props.errors.idrol" class="text-red-500">{{ $page.props.errors.idrol }}</div>
+                                                            </div>
+                                                        </div>
+
+                                                        <div>
+                                                            <label class="block text-sm font-medium text-gray-700">Empresa</label>
+                                                            <div class="mt-1">
+                                                                <select :disabled="editMode" :class="{'bg-blue-100' : editMode}" class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" v-model="form.idempresa">
+                                                                    <option value="0" >Seleccione empresa</option>
+                                                                    <option v-for="empresa in arrayEmpresas" :key="empresa.id" :value="empresa.id" v-text="empresa.razon_social"></option>
+                                                                </select>
+                                                                <div v-if="$page.props.errors.idempresa" class="text-red-500">{{ $page.props.errors.idempresa }}</div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </section>
+                                            </div>
+                                        </div>
+                                        <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+                                            <span class="flex w-full rounded-md shadow-sm sm:ml-3 sm:w-auto">
+                                              <button v-show="!editMode" @click="save(form)" wire:click.prevent="store()" type="button" class="inline-flex justify-center w-full rounded-md border border-transparent px-4 py-2 bg-green-600 text-base leading-6 font-medium text-white shadow-sm hover:bg-green-500 focus:outline-none focus:border-green-700 focus:shadow-outline-green transition ease-in-out duration-150 sm:text-sm sm:leading-5" >
+                                                Guardar
+                                              </button>
+                                            </span>
+                                            <span class="flex w-full rounded-md shadow-sm sm:ml-3 sm:w-auto">
+                                              <button v-show="editMode" @click="update(form)" wire:click.prevent="store()" type="button" class="inline-flex justify-center w-full rounded-md border border-transparent px-4 py-2 bg-green-600 text-base leading-6 font-medium text-white shadow-sm hover:bg-green-500 focus:outline-none focus:border-green-700 focus:shadow-outline-green transition ease-in-out duration-150 sm:text-sm sm:leading-5" >
+                                                Actualizar
+                                              </button>
+                                            </span>
+                                            <span class="mt-3 flex w-full rounded-md shadow-sm sm:mt-0 sm:w-auto">
+
+                                          <button @click="closeModal()" type="button" class="inline-flex justify-center w-full rounded-md border border-gray-300 px-4 py-2 bg-white text-base leading-6 font-medium text-gray-700 shadow-sm hover:text-gray-500 focus:outline-none focus:border-blue-300 focus:shadow-outline-blue transition ease-in-out duration-150 sm:text-sm sm:leading-5">
+                                            Cancelar
+                                          </button>
+                                        </span>
+                                        </div>
+                                    </form>
+
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+                    <!-- Fin Ventana modal Detalles -->
 
 
                 </div>
@@ -300,12 +467,10 @@ export default {
             pageY1: 0,
             uploadDragoverTracking1: false,
             uploadDragoverEvent1: false,
-
             pageX2: 0,
             pageY2: 0,
             uploadDragoverTracking2: false,
             uploadDragoverEvent2: false,
-
             tituloModal: '',
             form: {
                 id: null,
@@ -324,7 +489,7 @@ export default {
                 idpais: 0,
                 observaciones: null,
                 movil: null,
-                isnatural: null,
+                isnatural: 0,
                 camaracomercio: false,
                 rut: false,
                 url: false,
@@ -333,7 +498,8 @@ export default {
             arrayDepartamentos: [],
             arrayCiudades: [],
             arrayRoles: [],
-            arrayTiposdocumentos: [],
+            arrayTiposdocumento: [],
+            arrayEmpresas: [],
             editMode: false,
             verMode: false,
             isOpen: false,
@@ -346,7 +512,8 @@ export default {
             sortOrder: 1,
             sortBy: '',
             errorusers: 0,
-            errorMostrarMsjrifa: []
+            errorMostrarMsjrifa: [],
+            activetab: '1',
         }
     },
     methods: {
@@ -378,110 +545,39 @@ export default {
         },
         openModal: function (accion, data = []) {
             this.isOpen = true;
-            //this.getPaises();
-            //this.getLoterias();
-            //this.getTerminos();
 
             switch (accion) {
                 case 'registrar':
                 {
-                    this.tituloModal = 'Crear nuevo rifa de venta';
-                    this.form.id = null;
-                    this.form.titulo = null;
-                    this.form.resolucion = null;
-                    this.form.estado = false;
-                    this.form.nombre = null;
-                    this.form.descripcion = null;
-                    this.form.nombre_tecnico = null;
-                    this.form.resumen = null;
-                    this.form.url = null;
-                    this.form.idloteria = 0;
+                    //this.form = [];
+                    this.tituloModal = 'Crear nuevo Usuario';
                     this.form.idpais = 0;
                     this.form.iddepartamento = 0;
                     this.form.idciudad = 0;
-                    this.form.cifras = 0;
-                    this.form.precio = 0;
-                    this.form.fechainicio = null;
-                    this.form.fechafin = null;
-                    this.form.promocional = null;
-                    this.form.publicar = null;
-                    this.form.destacada = null;
-                    this.form.principal = null;
-                    this.form.urlimagen2 = null;
-                    this.form.urlimagen1 = null;
-                    this.form.idterminos = 0;
-                    this.form.idcreador = 0;
-                    this.form.files1 = [];
-                    this.form.files2 = [];
-                    break;
-                }
-                case 'ver':
-                {
-
-                    this.tituloModal = 'Detalle  del usuario ' +  data['nombre'];
-                    this.form = data;
-                    /*
-                    this.form.id = data['id'];
-                    this.form.titulo = data['titulo'];
-                    this.form.resolucion = data['resolucion'];
-                    this.form.estado = data['estado'];
-                    this.form.nombre = data['nombre'];
-                    this.form.descripcion = data['descripcion'];
-                    this.form.nombre_tecnico = data['nombre_tecnico'];
-                    this.form.resumen = data['resumen'];
-                    this.form.url = data['url'];
-                    this.form.idloteria = data['idloteria'];
-                    this.form.idpais = data['idpais'];
-                    this.form.iddepartamento = data['iddepartamento'];
-                    this.form.idciudad = data['idciudad'];
-                    this.form.cifras = data['cifras'];
-                    this.form.precio = data['precio'];
-                    this.form.fechainicio = data['fechainicio'];
-                    this.form.fechafin = data['fechafin'];
-                    this.form.promocional = data['promocional'];
-                    this.form.publicar = data['publicar'];
-                    this.form.destacada = data['principal'];
-                    this.form.principal = data['principal'];
-                    this.form.urlimagen2 = data['urlimagen2'];
-                    this.form.urlimagen1 = data['urlimagen1'];
-                    this.form.idterminos = data['idterminos'];
-                    this.form.idcreador = data['idcreador'];
-                    this.form.files1 = [];
-                    this.form.files2 = [];
-                    this.getDepartamentos();
+                    this.form.idtipos_documento = 0;
+                    this.form.idrol = 0;
+                    this.form.idempresa = 0;
+                    this.getRoles();
+                    this.getPaises();
                     this.getCiudades();
-                     */
+                    this.getDepartamentos();
+                    this.getTiposdocumento();
                     break;
                 }
                 case 'actualizar': {
-                    this.tituloModal = 'Actualizar el rifa de venta ' + data['nombre'];
+                    this.tituloModal = 'Actualizar el punto de venta ' + data['nombre'];
                     this.form.id = data['id'];
-                    this.form.titulo = data['titulo'];
-                    this.form.resolucion = data['resolucion'];
-                    this.form.estado = data['estado'];
                     this.form.nombre = data['nombre'];
-                    this.form.descripcion = data['descripcion'];
-                    this.form.nombre_tecnico = data['nombre_tecnico'];
-                    this.form.resumen = data['resumen'];
-                    this.form.url = data['url'];
-                    this.form.idloteria = data['idloteria'];
+                    this.form.direccion = data['direccion'];
                     this.form.idpais = data['idpais'];
                     this.form.iddepartamento = data['iddepartamento'];
                     this.form.idciudad = data['idciudad'];
-                    this.form.cifras = data['cifras'];
-                    this.form.precio = data['precio'];
-                    this.form.fechainicio = data['fechainicio'];
-                    this.form.fechafin = data['fechafin'];
-                    this.form.promocional = data['promocional'];
-                    this.form.publicar = data['publicar'];
-                    this.form.destacada = data['principal'];
-                    this.form.principal = data['principal'];
-                    this.form.urlimagen2 = data['urlimagen2'];
-                    this.form.urlimagen1 = data['urlimagen1'];
-                    this.form.idterminos = data['idterminos'];
-                    this.form.idcreador = data['idcreador'];
-                    this.form.files1 = [];
-                    this.form.files2 = [];
+                    this.form.latitud = data['latitud'];
+                    this.form.altitud = data['altitud'];
+                    this.form.codigo = data['codigo'];
+                    this.form.descripcion = data['descripcion'];
+                    this.form.url = data['url'];
+                    this.form.estado = data['estado'];
                     this.getDepartamentos();
                     this.getCiudades();
                     break;
@@ -526,14 +622,18 @@ export default {
             this.form.files2 = [];
         },
         save: function (data) {
-            data.fechainicio = this.dateTimeFull(data.fechainicio);
-            data.fechafin = this.dateTimeFull(data.fechafin);
-            console.log(data);
-            this.$inertia.post('/rifas', data, {
+            this.$inertia.post('/users', data, {
                 onBefore: (visit) => { console.log('onBefore');},
                 onStart: (visit) => {console.log('onStart');},
                 onProgress: (progress) => {console.log('onProgress');},
                 onSuccess: (page) => {
+                    Swal.fire({
+                        position: 'top-end',
+                        icon: 'success',
+                        title: 'El usuario se ha creado',
+                        showConfirmButton: false,
+                        timer: 1500
+                    })
                     this.reset();
                     this.closeModal();
                     this.getUsers('','nombre');
@@ -581,7 +681,7 @@ export default {
             });
 
         },
-        getUsers: async function (buscar, sortBy) {
+        getUsers: function (buscar, sortBy) {
             this.buscar = buscar;
 
             if (sortBy == this.sortBy){
@@ -596,7 +696,7 @@ export default {
             this.sortBy = sortBy;
             this.ispage = true;
 
-            var url= '/rifas';
+            var url= '/users';
             axios.get(url, {
                 params: {
                     buscar: this.buscar,
@@ -607,7 +707,7 @@ export default {
             }).then((res) => {
                 console.log(res.data);
                 var respuesta = res.data;
-                this.arrayUsers = respuesta.rifas;
+                this.arrayUsers = respuesta.users;
 
                 if (this.arrayUsers.data.length > 0) {
                     this.existeuser = 1;
@@ -644,6 +744,15 @@ export default {
                 console.log(res.data.departamentos)
             })
         },
+        getEmpresas: function () {
+            axios.get('/master/getEmpresas', {
+                params: {
+                    idrol: this.form.idrol
+                }
+            }).then((res) => {
+                this.arrayEmpresas = res.data.data;
+            })
+        },
         getCiudades: function () {
             axios.get('/paises/ciudades', {
                 params: {
@@ -653,6 +762,19 @@ export default {
             }).then((res) => {
                 this.arrayCiudades = res.data.ciudades;
                 console.log(res.data.ciudades)
+            })
+        },
+        getTiposdocumento: function () {
+            axios.get('/master/tiposdocsearch',).then((res) => {
+                this.arrayTiposdocumento = res.data.data;
+                console.log(res.data.data)
+            })
+        },
+        getRoles: async function () {
+            var url= '/master/getRoles';
+            axios.get(url).then((res) => {
+                var respuesta = res.data;
+                this.arrayRoles = respuesta.data;
             })
         },
         deleteRow: function (data) {
@@ -764,10 +886,7 @@ export default {
         },
     },
     created: function () {
-        //this.getPaises();
         this.arrayUsers = this.users;
-        console.log(this.users);
-        //this.openModal('registrar')
     },
     mounted() {
         console.log('Component mounted.');

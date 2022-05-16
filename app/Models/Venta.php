@@ -19,6 +19,7 @@ class Venta extends Model
         'idcliente',
         'idpuntoventa',
         'fechaventa',
+        'comprobante',
         'estado',
         'transaccion',
     ];
@@ -60,16 +61,16 @@ class Venta extends Model
         return $this->belongsTo(Puntoventa::class, 'idpuntoventa');
     }
 
-    public function rifa(){
-        return $this->belongsTo(Rifa::class, 'idrifa');
-    }
-
     public function cliente(){
         return $this->belongsTo(User::class, 'idcliente');
     }
 
     public function vendedor(){
         return $this->belongsTo(User::class, 'idvendedor');
+    }
+
+    public function detalles() {
+        return $this->hasMany(Detalleventa::class, 'idventa');
     }
 
 

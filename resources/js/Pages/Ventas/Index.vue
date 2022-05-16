@@ -17,55 +17,49 @@
                                     Buscar Ventas
                                 </h1>
                             </div>
-                            <div class="pr-2 w-1/3 text-center">
+                            <div v-if="$can('ventas-create')" class="pr-2 w-1/3 text-center">
                                 <Link :href="route('ventas.create')" class="bg-blue-500 text-xs  hover:bg-blue-700 text-white font-bold py-2 px-4 rounded ">Nueva venta</Link>
                             </div>
                         </div>
                         <div>
-                            <div class="flex px-2">
-                                <div class="container flex justify-center items-center">
-                                    <div class="relative">
-                                        <div class="absolute top-4 left-3">
-                                            <i class="fa fa-search text-gray-400 z-20 hover:text-gray-500"></i> </div>
-                                        <input type="text" v-model="buscar" @keyup="getData(buscar,'nombre')" class="h-8 w-96 pl-4 pr-4 rounded-lg z-0 focus:shadow focus:outline-none" placeholder="Buscar">
-                                        <button @click="getData(buscar,'nombre')">
-                                            <div class="absolute top-2 right-2">
-                                                <Icon icon="fe:search" class="h-4"  />
-                                            </div>
-                                        </button>
+                            <div class="container flex justify-center items-center px-4 py-2">
+                                <div class="w-1/3 px-4">
+                                    <label class="block text-sm font-medium text-gray-700">Rifa</label>
+                                    <div class="mt-1">
+                                        <input type="text"  autocomplete="family-name" class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
                                     </div>
-                                    <div class="relative">
-                                        <div class="absolute top-4 left-3">
-                                            <i class="fa fa-search text-gray-400 z-20 hover:text-gray-500"></i> </div>
-                                        <input type="text" v-model="buscar" @keyup="getData(buscar,'nombre')" class="h-8 w-96 pl-4 pr-4 rounded-lg z-0 focus:shadow focus:outline-none" placeholder="Buscar">
-                                        <button @click="getData(buscar,'nombre')">
-                                            <div class="absolute top-2 right-2">
-                                                <Icon icon="fe:search" class="h-4"  />
-                                            </div>
-                                        </button>
+                                </div>
+                                <div class="w-1/3 px-4">
+                                    <label class="block text-sm font-medium text-gray-700">Vendedor</label>
+                                    <div class="mt-1">
+                                        <input type="text"  autocomplete="family-name" class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                                    </div>
+                                </div>
+                                <div class="w-1/3 px-4">
+                                    <label class="block text-sm font-medium text-gray-700">Cliente</label>
+                                    <div class="mt-1">
+                                        <input type="text"  autocomplete="family-name" class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
                                     </div>
                                 </div>
                             </div>
 
-                            <div class="flex px-4">
-                                <div class="mb-4 w-1/3 px-2">
+                            <div class="container flex justify-center items-center px-4 py-2">
+                                <div class="mb-4 w-1/3 px-4">
                                     <Datepicker  required  autoApply placeholder="Fecha inicio" class="border border-gray-700 rounded w-full text-gray-700 leading-tight focus:outline-none focus:shadow-outline"/>
                                     <div v-if="$page.props.errors.fechainicio" class="text-red-500">{{ $page.props.errors.fechainicio }}</div>
                                 </div>
 
-                                <div class="mb-4 w-1/3 px-2">
+                                <div class="mb-4 w-1/3 px-4">
                                     <Datepicker  required autoApply placeholder="Fecha fin"  class="border border-gray-700 rounded w-full text-gray-700 leading-tight focus:outline-none focus:shadow-outline"/>
                                     <div v-if="$page.props.errors.fechafin" class="text-red-500">{{ $page.props.errors.fechafin }}</div>
+                                </div>
+                                <div class="mb-4 w-1/3 px-4 mx-auto items-center">
+                                    <Link :href="route('ventas.create')" class="mx-auto bg-green-500 text-xs  hover:bg-green-700 text-white font-bold py-2 px-4 rounded ">Buscar</Link>
                                 </div>
 
                             </div>
                         </div>
                     </section>
-
-                    <!-- Inicia SubMenu -->
-                    <submenu></submenu>
-                    <!-- Fin Sub Menu -->
-
                     <!-- Fin Encabezado y titulo -->
                     <!-- Tabla de contenido -->
                     <section>
@@ -98,7 +92,7 @@
                                 </thead>
                                 <tbody>
                                 <tr class="text-center" text-sm v-if="existedata > 0" v-for="(dato, id) in arrayData.data" :key="id">
-                                    <td class="border px-1 py-2 text-sm truncate" v-text="dato.rifa.nombre"></td>
+                                    <td class="border px-1 py-2 text-sm truncate" >xxx</td>
                                     <td class="border px-1 py-2 text-sm truncate" v-text="dato.valorventa"></td>
                                     <td class="border px-1 py-2 text-sm truncate" v-text="dato.vendedor.nombre"></td>
                                     <td class="border px-1 py-2 text-sm truncate" v-text="dato.cliente.nombre"></td>

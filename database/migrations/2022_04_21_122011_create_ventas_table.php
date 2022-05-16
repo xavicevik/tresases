@@ -15,8 +15,6 @@ return new class extends Migration
     {
         Schema::create('ventas', function (Blueprint $table) {
             $table->increments('id');
-            $table->integer('idrifa')->unsigned();
-            $table->foreign('idrifa')->references('id')->on('rifas');
             $table->decimal('valorventa', 10, 2);
             $table->decimal('impuesto', 10, 2);
             $table->decimal('comision', 10, 2);
@@ -29,8 +27,9 @@ return new class extends Migration
             $table->foreignId('idpuntoventa')->unsigned();
             //$table->foreign('idpuntoventa')->references('id')->on('puntosventas');
             $table->dateTime('fechaventa');
+            $table->string('comprobante', 250)->nullable(true);
             $table->boolean('estado')->default(1);
-            $table->integer('transaccion')->nullable();
+            $table->integer('transaccion')->nullable(true);
             $table->timestamps();
         });
     }

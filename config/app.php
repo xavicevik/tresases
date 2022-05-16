@@ -167,7 +167,7 @@ return [
         Illuminate\View\ViewServiceProvider::class,
 
         Darryldecode\Cart\CartServiceProvider::class,
-
+        Spatie\Permission\PermissionServiceProvider::class,
 
         /*
          * Package Service Providers...

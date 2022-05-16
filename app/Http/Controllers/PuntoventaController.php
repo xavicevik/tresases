@@ -40,12 +40,14 @@ class PuntoventaController extends Controller
                                       ->with('pais')
                                       ->with('departamento')
                                       ->with('ciudad')
+                                      ->with('empresa')
                                       ->paginate(self::canPorPagina);
         } else {
             $puntoventas = Puntoventa::orderBy($sortBy, $sortOrder)
                                       ->with('pais')
                                       ->with('departamento')
                                       ->with('ciudad')
+                                      ->with('empresa')
                                       ->where('nombre', 'like', '%'. $buscar . '%')
                                       ->orWhere('codigo', 'like', '%'. $buscar . '%')
                                       ->paginate(self::canPorPagina);
@@ -69,12 +71,14 @@ class PuntoventaController extends Controller
                 ->with('pais')
                 ->with('departamento')
                 ->with('ciudad')
+                ->with('empresa')
                 ->paginate(self::canPorPagina);
         } else {
             $puntoventas = Puntoventa::orderBy($sortBy, $sortOrder)
                 ->with('pais')
                 ->with('departamento')
                 ->with('ciudad')
+                ->with('empresa')
                 ->where('puntos_ventas.nombre', 'like', '%'. $buscar . '%')
                 ->orWhere('puntos_ventas.codigo', 'like', '%'. $buscar . '%')
                 ->paginate(self::canPorPagina);

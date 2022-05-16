@@ -19,6 +19,8 @@ return new class extends Migration
             $table->foreign('idventa')->references('id')->on('ventas');
             $table->foreignId('idboleta')->unsigned();
             $table->foreign('idboleta')->references('id')->on('boletas');
+            $table->increments('idrifa')->unsigned();
+            $table->foreign('idrifa')->references('id')->on('rifas');
             $table->decimal('valor', 10, 2);
             $table->decimal('impuesto', 10, 2);
             $table->decimal('comision', 10, 2);

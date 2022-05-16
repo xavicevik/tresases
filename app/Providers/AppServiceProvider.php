@@ -46,15 +46,28 @@ class AppServiceProvider extends ServiceProvider
                 'error' => Session::get('error'),
             ];
         });
-
-        /*
+/*
         Inertia::share('userall', function () {
-            $empresa = Empresa::where('id', '=', Auth::user()->idempresa)->get();
+            $empresa = Auth::user()? Empresa::where('id', Auth::user()->idempresa)->get(): (object) [];
 
             return [
-                $empresa
+                'empresa' => $empresa,
+                'puntoventa' => Session::get('puntodeventa')
             ];
         });
-        */
+
+        Inertia::share('cart', function () {
+            if (Auth::user()) {
+                \Cart::session(Auth::user()->id);
+                $items = \Cart::getContent();
+            } else {
+                $items = (object) [];
+            }
+
+            return [
+                'cart' => $items,
+            ];
+        });
+*/
     }
 }

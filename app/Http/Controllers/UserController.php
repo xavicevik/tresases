@@ -4,12 +4,14 @@ namespace App\Http\Controllers;
 
 use App\Models\Rifa;
 use App\Models\User;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 use Inertia\Inertia;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
-
+use Laravel\Jetstream\Jetstream;
 
 
 class UserController extends Controller
@@ -47,7 +49,6 @@ class UserController extends Controller
         } else {
             $users = User::UserApp()
                         ->orderBy($sortBy, $sortOrder)
-                        ->scopeNoClientes()
                         ->with('ciudad')
                         ->with('rol')
                         ->with('tipodocumento')
@@ -270,7 +271,39 @@ class UserController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        Validator::make($request->all(), [
+            'nombre' => ['required', 'string', 'max:255'],
+            'apellido' => ['required', 'string', 'max:255'],
+            'correo' => ['required', 'string', 'email', 'max:255'],
+            'telefono' => ['required', 'string', 'max:255'],
+            'documento' => ['required', 'string', 'max:255'],
+            'documento' => ['required', 'string', 'max:255'],
+            'idtipos_documento' => 'required|numeric|gt:0',
+            'idpais' => 'required|numeric|gt:0',
+            'iddepartamento' => 'required|numeric|gt:0',
+            'idciudad' => 'required|numeric|gt:0',
+            'idrol' => 'required|numeric|gt:0',
+            'idempresa' => 'required|numeric|gt:0',
+        ],
+        [
+            'nombre.required' => 'Ingrese el nombre',
+            'apellido.required' => 'Ingrese el apellido',
+            'correo.required' => 'Ingrese el correo',
+            'telefono.required' => 'Ingrese el teléfono celular',
+            'documento.required' => 'Ingrese el número de identificacion',
+            'idtipos_documento.gt' => 'Seleccione una tipo de documento',
+            'idpais.gt' => 'Seleccione un País',
+            'iddepartamento.gt' => 'Seleccione un Departamento',
+            'idrol.gt' => 'Seleccione una Ciudad',
+            'idciudad.gt' => 'Seleccione un Rol',
+            'idempresa.gt' => 'Seleccione una Empresa',
+        ])->validate();
+
+        $user = User::create($request->all());
+        $user->password = Hash::make($user->password);
+        $user->saveOrFail();
+
+        return redirect()->back()->with('message', 'Cliente creado satisfactoriamente');
     }
 
     /**

@@ -10,11 +10,15 @@ use App\Models\Terminosycondiciones;
 use App\Models\TiposDocumento;
 use Illuminate\Http\Request;
 
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
+use Spatie\Permission\Models\Permission;
+use Spatie\Permission\Models\Role;
 
 class MasterController extends Controller
 {
-    const canPorPagina = 5;
+    const canPorPagina = 10;
     /**
      * Display a listing of the resource.
      *
@@ -37,11 +41,11 @@ class MasterController extends Controller
         }
 
         if ($buscar == ''){
-            $roles = Rol::orderBy($sortBy, $sortOrder)
+            $roles = Role::orderBy($sortBy, $sortOrder)
                         ->paginate(self::canPorPagina);
         } else {
-            $roles = Rol::orderBy($sortBy, $sortOrder)
-                        ->where('nombre', 'like', '%'. $buscar . '%')
+            $roles = Role::orderBy($sortBy, $sortOrder)
+                        ->where('name', 'like', '%'. $buscar . '%')
                         ->paginate(self::canPorPagina);
         }
 
@@ -50,6 +54,59 @@ class MasterController extends Controller
         } else {
             return Inertia::render('Masters/RolesIndex', ['data' => $roles]);
         }
+    }
+
+    public function rolesshow(Request $request)
+    {
+        $role = Role::find($request->id);
+        $rolePermissions = Permission::join("role_has_permissions", "role_has_permissions.permission_id", "=", "permissions.id")
+            ->where("role_has_permissions.role_id", $request->id)->paginate(3);
+
+        return ['role' => $role, 'rolePermissions' => $rolePermissions];
+    }
+
+    public function rolesedit(Request $request)
+    {
+        $role = Role::find($request->id);
+        $permission = Permission::paginate(100);
+        $rolePermissions = DB::table("role_has_permissions")->where("role_has_permissions.role_id", $request->id)
+            ->pluck('role_has_permissions.permission_id', 'role_has_permissions.permission_id')
+            ->all();
+
+        $rolepermtemp = [];
+        if ($rolePermissions) {
+            foreach ($rolePermissions as $p) {
+                $rolepermtemp[] = $p;
+            }
+        }
+
+        return ['role' => $role,
+                'permission' => $permission,
+                'rolePermissions' => $rolePermissions,
+                'rolePermissionsjson'=> $rolepermtemp
+                ];
+    }
+
+    /**
+     * Update the specified resource in storage.
+     *
+     * @param \Illuminate\Http\Request $request
+     * @param int $id
+     * @return \Illuminate\Http\Response
+     */
+    public function rolesupdate(Request $request)
+    {
+        $this->validate($request, [
+            'name' => 'required',
+            'permission' => 'required',
+        ]);
+
+        $role = Role::find($request->id);
+        $role->name = $request->name;
+        $role->save();
+        $role->syncPermissions($request->permission);
+
+        return redirect()->route('roles.index')->with('success', 'Role updated successfully');
     }
 
     public function paisesIndex(Request $request)
@@ -265,6 +322,39 @@ class MasterController extends Controller
 
     }
 
+    public function getRoles(Request $request)
+    {
+        if(Auth::user()->idrol == 1) {
+            $roles = Rol::all();
+        } else {
+            $roles = Rol::where('id', '<>', 1)->get();
+        }
+        return ['data' => $roles];
+    }
 
+    public function getEmpresas(Request $request)
+    {
+        switch ($request->idrol) {
+            case 1:
+                $empresas = Empresa::where('id', 3)->get();
+                break;
+            case 2:
+                $empresas = Empresa::where('id', 3)->get();
+                break;
+            case 3:
+                $empresas = Empresa::where('idtipoempresa', 2)->get();
+                break;
+            case 4:
+                $empresas = Empresa::where('idtipoempresa',  1)->get();
+                break;
+            case 5:
+                $empresas = Empresa::where('idtipoempresa', 3)->get();
+                break;
+            default:
+                $empresas = Empresa::all();
+                break;
+        }
+        return ['data' => $empresas];
+    }
 
 }

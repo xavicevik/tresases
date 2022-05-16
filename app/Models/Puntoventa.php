@@ -33,4 +33,8 @@ class Puntoventa extends Model
     public function ciudad(){
         return $this->belongsTo(Ciudad::class, 'idciudad');
     }
+
+    public function empresa(){
+        return $this->belongsTo(Empresa::class, 'idempresa');
+    }
 }

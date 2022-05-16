@@ -11,6 +11,7 @@ class Detalleventa extends Model
     protected $fillable =[
         'idventa',
         'idboleta',
+        'idrifa',
         'valor',
         'impuesto',
         'comision',
@@ -31,6 +32,10 @@ class Detalleventa extends Model
 
     public function boleta(){
         return $this->belongsTo(Boleta::class, 'idboleta');
+    }
+
+    public function rifa(){
+        return $this->belongsTo(Rifa::class, 'idrifa');
     }
 
 }

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Jobs\CrearBoletasJob;
 use App\Models\Boleta;
 use App\Models\Loteria;
 use App\Models\Imagen;
@@ -292,7 +293,8 @@ class RifaController extends Controller
                 }
             }
 
-            $this->crearBoleteria($rifa->id, $rifa->cifras, $rifa->serie);
+            //$this->crearBoleteria($rifa->id, $rifa->cifras, $rifa->serie);
+            CrearBoletasJob::dispatch($rifa->id, $rifa->cifras, $rifa->serie);
 
             DB::commit();
 

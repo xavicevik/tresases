@@ -71,4 +71,7 @@ class Empresa extends Model
         return $this->belongsTo(Pais::class, 'idpais');
     }
 
+    public function puntosventa() {
+        return $this->hasMany(Puntoventa::class, 'idempresa');
+    }
 }

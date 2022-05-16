@@ -7,6 +7,8 @@ import Datepicker from '@vuepic/vue-datepicker';
 import '@vuepic/vue-datepicker/dist/main.css'
 import Submenu from '@/Components/Submenu';
 
+import Permissions from "./mixins/Permissions";
+
 const appName = window.document.getElementsByTagName('title')[0]?.innerText || 'Laravel';
 
 createInertiaApp({
@@ -18,6 +20,7 @@ createInertiaApp({
             .mixin({ methods: { route } })
             .component('Datepicker', Datepicker)
             .component('Submenu', Submenu)
+            .mixin(Permissions)
             .mount(el);
     },
 });

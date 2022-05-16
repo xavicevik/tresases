@@ -29,6 +29,8 @@ return new class extends Migration
             $table->integer('idciudad')->references('id')->on('ciudades');
             $table->integer('iddepartamento')->unsigned();
             $table->integer('iddepartamento')->references('id')->on('departamentos');
+            $table->integer('idempresa')->unsigned();
+            $table->integer('idempresa')->references('id')->on('empresas');
             $table->timestamps();
         });
     }
