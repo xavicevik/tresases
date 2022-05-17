@@ -18,8 +18,9 @@ return new class extends Migration
             $table->string('nombre', 50);
             $table->string('zona', 50)->nullable();
             $table->string('descripcion', 100);
+            $table->string('moneda', 5)->nullable(true);
         });
-        DB::table('paises')->insert(array('id'=>'1','nombre'=>'Colombia', 'zona'=>'LATAM', 'descripcion' => 'Colombia'));
+        DB::table('paises')->insert(array('id'=>'1','nombre'=>'Colombia', 'zona'=>'LATAM', 'descripcion' => 'Colombia', 'moneda' => '$'));
     }
 
     /**

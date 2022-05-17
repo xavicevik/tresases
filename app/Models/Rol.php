@@ -13,9 +13,13 @@ class Rol extends Model
     protected $fillable = ['nombre','descripcion','estado'];
     public $timestamps = false;
 
+    public function scopeActive($query) {
+        return $query->where('estado', '1');
+    }
+
     public function users()
     {
-        return $this->hasMany('App\Models\User');
+        return $this->hasMany(User::class);
     }
 
 }

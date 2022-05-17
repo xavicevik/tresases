@@ -5,7 +5,7 @@
                 Lista de rifas
             </h2>
         </template>
-        <div class="py-4 px-10">
+        <div class="py-4 lg:px-8 md:px-6 sm:px-2">
             <div class="mx-auto 2xl:8">
                 <div class="bg-white overflow-hidden shadow-xl sm:rounded-lg">
                     <!-- Mensajes Flash -->
@@ -47,17 +47,31 @@
                             </div>
 
                         </div>
+
+                        <div class="flex justify-left mx-auto ml-4 p-2 space-x-4">
+                            <div class="flex pr-1 w-1/12 text-center">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                </svg>
+                                <Link :href="route('numerosreservados.index')" class="text-xs hover:text-blue-700 text-blue-400 font-bold py-1 px-1 rounded ">
+                                    Reservas
+                                </Link>
+
+
+                            </div>
+
+                        </div>
                     </section>
                     <!-- Fin Encabezado y titulo -->
                     <!-- Tabla de contenido -->
                     <section>
-                        <div class="px-4 py-2 pb-6">
+                        <div class="lg:px-4 md:px-2 sm:px-0 py-2 pb-6">
                             <table class="table-fixed w-full">
                                 <thead>
                                 <tr class="bg-gray-100">
-                                    <th class="px-4 py-2 text-sm font-bold  hover:bg-blue-500 hover:text-gray-50 rounded-b">
+                                    <th class="px-4 py-2 w-1/12 text-sm font-bold hover:bg-blue-500 hover:text-gray-50 rounded-b">
                                         <button @click="getRifas(buscar, 'loteria.nombre')" class="font-bold">
-                                            LOTERIA
+                                            Loteria
                                             <div v-show="sortBy == 'loteria.nombre'">
                                                 <span v-show="!sortOrder">
                                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
@@ -72,9 +86,43 @@
                                             </div>
                                         </button>
                                     </th>
-                                    <th class="px-4 py-2 text-sm font-bold  hover:bg-blue-500 hover:text-gray-50 rounded-b">
+                                    <th class="px-4 py-2 w-1/12 text-sm font-bold hover:bg-blue-500 hover:text-gray-50 rounded-b">
+                                        <button @click="getRifas(buscar, 'loteria.nombre')" class="font-bold">
+                                            Oculta
+                                            <div v-show="sortBy == 'loteria.nombre'">
+                                                <span v-show="!sortOrder">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                                                        <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+                                                    </svg>
+                                                </span>
+                                                <span v-show="sortOrder">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                                                      <path fill-rule="evenodd" d="M14.707 12.707a1 1 0 01-1.414 0L10 9.414l-3.293 3.293a1 1 0 01-1.414-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 010 1.414z" clip-rule="evenodd" />
+                                                    </svg>
+                                                </span>
+                                            </div>
+                                        </button>
+                                    </th>
+                                    <th class="px-4 py-2 w-1/12 text-sm font-bold hover:bg-blue-500 hover:text-gray-50 rounded-b">
+                                        <button @click="getRifas(buscar, 'serie')" class="font-bold">
+                                            Serie
+                                            <div v-show="sortBy == 'serie'">
+                                                <span v-show="!sortOrder">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                                                        <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+                                                    </svg>
+                                                </span>
+                                                <span v-show="sortOrder">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                                                      <path fill-rule="evenodd" d="M14.707 12.707a1 1 0 01-1.414 0L10 9.414l-3.293 3.293a1 1 0 01-1.414-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 010 1.414z" clip-rule="evenodd" />
+                                                    </svg>
+                                                </span>
+                                            </div>
+                                        </button>
+                                    </th>
+                                    <th class="px-4 py-2 text-sm font-bold hover:bg-blue-500 hover:text-gray-50 rounded-b">
                                         <button @click="getRifas(buscar, 'rifas.nombre_tecnico')" class="font-bold">
-                                            NOMBRE
+                                            Nombre
                                             <div v-show="sortBy == 'rifas.nombre_tecnico'">
                                                 <span v-show="!sortOrder">
                                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
@@ -89,9 +137,9 @@
                                             </div>
                                         </button>
                                     </th>
-                                    <th class="px-4 py-2 text-sm font-bold hover:bg-blue-500 hover:text-gray-50 rounded-b">
+                                    <th class="px-4 py-2 text-sm w-1/12 font-bold hover:bg-blue-500 hover:text-gray-50 rounded-b">
                                         <button @click="getRifas(buscar, 'rifas.cifras')" class="font-bold">
-                                            CIFRAS
+                                            Cifras
                                             <div v-show="sortBy == 'rifas.cifras'">
                                                 <span v-show="!sortOrder">
                                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
@@ -106,9 +154,9 @@
                                             </div>
                                         </button>
                                     </th>
-                                    <th class="px-4 py-2 text-sm font-bold hover:bg-blue-500 hover:text-gray-50 rounded-b">
+                                    <th class="px-4 py-2 text-sm w-2/12 font-bold hover:bg-blue-500 hover:text-gray-50 rounded-b">
                                         <button @click="getRifas(buscar, 'ciudad.precio')" class="font-bold">
-                                            PRECIO BOLETA
+                                            Precio Boleta
                                             <div v-show="sortBy == 'ciudad.precio'">
                                                 <span v-show="!sortOrder">
                                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
@@ -125,7 +173,7 @@
                                     </th>
                                     <th class="px-4 py-2 text-sm font-bold w-1/12 hover:bg-blue-500 hover:text-gray-50 rounded-b">
                                         <button @click="getRifas(buscar, 'rifas.fechainicio')" class="font-bold">
-                                            FECHA INICIO
+                                            Inicio
                                             <div v-show="sortBy == 'rifas.fechainicio'">
                                                 <span v-show="!sortOrder">
                                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
@@ -142,7 +190,7 @@
                                     </th>
                                     <th class="px-4 py-2 text-sm font-bold w-1/12 hover:bg-blue-500 hover:text-gray-50 rounded-b">
                                         <button @click="getRifas(buscar, 'rifas.fechafin')" class="font-bold">
-                                            FECHA FIN
+                                            Fin
                                             <div v-show="sortBy == 'rifas.fechafin'">
                                                 <span v-show="!sortOrder">
                                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
@@ -159,7 +207,7 @@
                                     </th>
                                     <th class="px-4 py-2 text-sm font-bold w-1/12 hover:bg-blue-500 hover:text-gray-50 rounded-b">
                                         <button @click="getRifas(buscar, 'rifas.estado')" class="font-bold">
-                                            ESTADO
+                                            Estado
                                             <div v-show="sortBy == 'rifas.estado'">
                                                 <span v-show="!sortOrder">
                                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
@@ -174,25 +222,29 @@
                                             </div>
                                         </button>
                                     </th>
-                                    <th class="px-4 py-2 text-sm font-bold w-1/12 hover:bg-blue-500 hover:text-gray-50 rounded-b">ACCIONES</th>
+                                    <th class="lg:px-4 md:px-1 mx-auto py-2 text-sm font-bold lg:w-1/12 md:w-1/11 hover:bg-blue-500 hover:text-gray-50 rounded-b">
+                                        Acciones
+                                    </th>
                                 </tr>
                                 </thead>
                                 <tbody>
                                 <tr class="text-center" text-sm v-if="existerifa > 0" v-for="(rifa, id) in arrayRifas.data" :key="id">
-                                    <td class="border px-4 py-2 text-sm" v-text="rifa.loteria.nombre"></td>
-                                    <td class="border px-4 py-2 text-sm" v-text="rifa.nombre_tecnico"></td>
-                                    <td class="border px-4 py-2 text-sm" v-text="rifa.cifras"></td>
-                                    <td class="border px-4 py-2 text-sm" v-text="formatPrice(rifa.precio)"></td>
-                                    <td class="border px-4 py-2 text-sm" v-text="dateTime(rifa.fechainicio)"></td>
-                                    <td class="border px-4 py-2 text-sm" v-text="dateTime(rifa.fechafin)"></td>
-                                    <td class="border px-4 py-2 text-sm" v-if="rifa.estado">
-                                        <span
-                                            class="inline-flex px-2 text-sm font-semibold leading-5 text-green-800 bg-green-100 rounded-full">Activo
+                                    <td class="border px-1 py-2 text-sm truncate" v-text="rifa.loteria.nombre"></td>
+                                    <td class="border px-1 py-2 text-sm truncate" v-text="rifa.serieoculta"></td>
+                                    <td class="border px-1 py-2 text-sm truncate" v-text="rifa.serie"></td>
+                                    <td class="border px-1 py-2 text-sm truncate" v-text="rifa.nombre_tecnico"></td>
+                                    <td class="border px-1 py-2 text-sm truncate" v-text="rifa.cifras"></td>
+                                    <td class="border px-1 py-2 text-sm truncate" v-text="formatPrice(rifa.precio)"></td>
+                                    <td class="border px-1 py-2 text-sm truncate" v-text="dateTime(rifa.fechainicio)"></td>
+                                    <td class="border px-1 py-2 text-sm truncate" v-text="dateTime(rifa.fechafin)"></td>
+                                    <td class="border px-2 py-2 text-sm truncate" v-if="rifa.estado">
+                                        <span class="inline-flex px-2 text-sm font-semibold leading-5 text-green-800 bg-green-100 rounded-full">
+                                            Activo
                                         </span>
                                     </td>
-                                    <td class="border px-4 py-2 text-sm" v-else>
-                                        <span
-                                            class="inline-flex px-2 text-xs font-semibold leading-5 text-red-800 bg-red-100 rounded-full">Inactivo
+                                    <td class="border px-2 py-2 text-sm" v-else>
+                                        <span class="inline-flex px-2 text-xs font-semibold leading-5 text-red-800 bg-red-100 rounded-full">
+                                            Inactivo
                                         </span>
                                     </td>
                                     <td class="border px-1 py-1 mx-auto text-center flex items-center">
@@ -202,6 +254,13 @@
                                                 <path stroke-linecap="round" stroke-linejoin="round" d="M10 21h7a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v11m0 5l4.879-4.879m0 0a3 3 0 104.243-4.242 3 3 0 00-4.243 4.242z" />
                                             </svg>
                                         </button>
+                                        <button @click="copiar(rifa)" class="hover:bg-green-700 text-purple-800 font-bold rounded" fill="none"
+                                                viewBox="0 0 24 24" stroke="currentColor">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" />
+                                            </svg>
+                                        </button>
+
                                         <button @click="edit(rifa)" class="hover:bg-blue-700 text-white font-bold rounded">
                                             <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 text-blue-400" fill="none"
                                                  viewBox="0 0 24 24" stroke="currentColor">
@@ -435,15 +494,38 @@
                                             <!-- Formulario -->
                                             <section>
                                                 <div class="flex py-1">
-                                                    <div class="mb-4 w-2/3 pr-4">
+                                                    <div class="mb-4 w-2/4 pr-1">
                                                         <label class="block text-gray-700 text-sm font-bold mb-2">Titulo</label>
                                                         <input v-model="form.titulo" type="text" :disabled="verMode" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" placeholder="Titulo">
                                                         <div v-if="$page.props.errors.titulo" class="text-red-500">{{ $page.props.errors.titulo }}</div>
                                                     </div>
-                                                    <div class="mb-4 w-1/3 ">
+                                                    <div class="mb-4 w-2/12 px-1">
                                                         <label class="block text-gray-700 text-sm font-bold mb-2">Resolucion</label>
                                                         <input v-model="form.resolucion" type="text" :disabled="verMode" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" placeholder="Resolución" >
                                                         <div v-if="$page.props.errors.resolucion" class="text-red-500">{{ $page.props.errors.resolucion }}</div>
+                                                    </div>
+                                                    <div v-if="verMode" class="mb-4 w-2/12 px-1">
+                                                        <label class="block text-gray-700 text-sm font-bold mb-2">Tiene serie?</label>
+                                                        <div class="mx-auto self-center">
+                                                            <Toggle v-model="isSerie" />
+                                                        </div>
+                                                    </div>
+                                                    <div v-else class="mb-4 w-2/12 px-1">
+                                                        <label class="block text-gray-700 text-sm font-bold mb-2">Tipo serie</label>
+                                                        <select @change="actTipoSerie()" class="block w-full rounded-lg text-gray-700 text-sm"  v-model="tiposerie">
+                                                            <option v-for="serie in arraySeries" :key="serie.id" :value="serie" v-text="serie.nombre"></option>
+                                                        </select>
+                                                    </div>
+                                                    <div v-show="tiposerie.id != 1 && isSerie" class="mb-4 w-2/12 pl-1">
+                                                        <label class="block text-gray-700 text-sm font-bold mb-2">Serie</label>
+
+                                                        <input v-if="isNumeric" v-model="form.serie" type="text" :disabled="verMode || (tiposerie.id == 1)" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" placeholder="Serie" >
+
+                                                        <select v-else class="block w-full py-2 px-3 rounded-lg text-gray-700 text-sm" :disabled="verMode" v-model="form.serie">
+                                                            <option v-for="serie in tiposseriestxt" :key="serie" :value="serie" v-text="serie"></option>
+                                                        </select>
+
+                                                        <div v-if="$page.props.errors.serie" class="text-red-500">{{ $page.props.errors.serie }}</div>
                                                     </div>
                                                 </div>
                                                 <div class="flex py-1">
@@ -492,8 +574,16 @@
                                                 <div class="flex py-1">
                                                     <div class="mb-4 w-1/2 pr-2">
                                                         <label class="block text-gray-700 text-sm font-bold mb-2">Cifras</label>
-                                                        <input v-model="form.cifras" type="text" :disabled="verMode" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" placeholder="Cifras">
+                                                        <input v-model="form.cifras" @keyup="actualizarRangos()" type="text" :disabled="verMode" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" placeholder="Cifras">
                                                         <div v-if="$page.props.errors.cifras" class="text-red-500">{{ $page.props.errors.cifras }}</div>
+                                                    </div>
+                                                    <div class="mb-4 w-1/2 pr-2">
+                                                        <label class="block text-gray-700 text-sm font-bold mb-2">Rango</label>
+                                                        <input v-model="rango" type="text" disabled class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" placeholder="Cifras">
+                                                    </div>
+                                                    <div class="mb-4 w-1/2 pr-2">
+                                                        <label class="block text-gray-700 text-sm font-bold mb-2">Cantidad boletas</label>
+                                                        <input v-model="cantboletas" type="text" disabled class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" placeholder="Cifras">
                                                     </div>
                                                     <div class="mb-4 w-1/2 pr-2">
                                                         <label class="block text-gray-700 text-sm font-bold mb-2">Precio boleta</label>
@@ -522,6 +612,44 @@
                                                         <Toggle v-model="form.promocional" :disabled="verMode"/>
                                                     </div>
                                                 </div>
+                                                <!-- seccion de promocionales -->
+                                                <section v-show="form.promocional" class="bg-green-200 rounded-md px-8">
+                                                    <div class="flex py-1 px-2">
+                                                        <div class="mb-4 w-3/12">
+                                                            <label class="block text-gray-700 text-xs font-bold mb-2">Premio</label>
+                                                            <input v-show="!verMode" v-model="premiopromo" type="text" :disabled="verMode" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" placeholder="Premio">
+                                                        </div>
+                                                        <div class="mb-4 w-3/12 px-2">
+                                                            <label class="block text-gray-700 text-xs font-bold mb-2">Fecha</label>
+                                                            <Datepicker v-show="!verMode" v-model="fechapromo" :disabled="verMode"  autoApply placeholder="Fecha inicio" class="border border-gray-700 rounded w-full text-gray-700 leading-tight focus:outline-none focus:shadow-outline"/>
+                                                        </div>
+                                                        <div class="mb-4 w-3/12 px-2">
+                                                            <label class="block text-gray-700 text-xs font-bold mb-2">Lotería</label>
+                                                            <select v-show="!verMode" class="block w-full rounded-lg text-gray-700 text-sm" :disabled="verMode" v-model="idloteriapromo">
+                                                                <option value="0" >Seleccione lotería</option>
+                                                                <option v-for="loteria in arrayLoterias" :key="loteria.id" :value="loteria.id" v-text="loteria.nombre"></option>
+                                                            </select>
+                                                        </div>
+                                                        <div class="mx-auto w-1/12 px-2 self-center">
+                                                                <svg xmlns="http://www.w3.org/2000/svg" @click="agregarPromocional()" class="mx-auto h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                                                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                                                                </svg>
+                                                         </div>
+                                                    </div>
+                                                </section>
+                                                <section v-show="form.promocionales.length" class="bg-blue-200 rounded-md px-12">
+                                                    <tr v-for="(promo, index) in form.promocionales" :key="promo.id" class="flex py-1 px-6 border">
+                                                        <td class="mb-4 w-3/12 px-2" v-text="promo.premio"></td>
+                                                        <td class="mb-4 w-3/12 px-2" v-text="promo.fecha"></td>
+                                                        <td class="mb-4 w-3/12 px-2" v-text="promo.idloteria"></td>
+                                                        <td v-show="!verMode" class="mx-auto w-1/12 px-2 self-center">
+                                                                <svg xmlns="http://www.w3.org/2000/svg" @click="eliminarPromo(index)" class="mx-auto h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                                                    <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                                                </svg>
+                                                        </td>
+                                                    </tr>
+                                                </section>
+                                                <!-- Fin de promocionales -->
                                                 <div class="flex py-1">
                                                     <div class="mb-4 w-1/2 text-center mx-auto">
                                                         <label class="block text-gray-700 text-sm font-bold mb-2">Publicar (NO):</label>
@@ -579,6 +707,156 @@
                         </div>
                     </section>
                     <!-- Fin Ventana modal -->
+                    <!-- Ventana modal 2 -->
+                    <section>
+                        <div class="fixed z-10 inset-0 overflow-y-auto ease-out duration-400" v-if="isOpenModal2">
+                            <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+
+                                <div class="fixed inset-0 transition-opacity">
+                                    <div class="absolute inset-0 bg-gray-500 opacity-75"></div>
+                                </div>
+                                <!-- This element is to trick the browser into centering the modal contents. -->
+                                <span class="hidden sm:inline-block sm:align-middle sm:h-screen"></span>​
+
+
+                                <!-- Contenido modal -->
+                                <div class="inline-block lg:w-6/12 align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:w-full" role="dialog" aria-modal="true" aria-labelledby="modal-headline">
+                                    <div class="">
+                                        <h2 v-text="tituloModal2" class="text-xl font-bold text-gray-900 px-4 py-2"></h2>
+                                    </div>
+                                    <!-- Inicio Form -->
+                                    <form>
+                                        <div class="bg-white px-4 pt-2 pb-2 sm:p-6 sm:pb-4">
+                                            <div class="">
+                                                <!-- Mensajes Flash -->
+                                                <section>
+                                                    <section>
+                                                        <div v-show="errorrifa" mx-auto class="bg-red-300 border-t-4 border-red-500 rounded-b text-gray-900 px-4 py-2 shadow-md my-3" role="alert" >
+                                                            <div class="text-sm mx-auto text-gray-50 text-center">
+                                                                <div v-for="error in errorMostrarMsjrifa" :key="error" v-text="error">
+
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </section>
+                                                </section>
+                                                <!-- Fin Mensajes Flash -->
+                                                <!-- Formulario -->
+                                                <section>
+                                                    <div class="">
+                                                        <h2 class="text-xl font-bold text-gray-900 px-4 py-2">Datos de Origen</h2>
+                                                    </div>
+                                                    <div class="py-1">
+                                                        <div class="mb-4 w-full pr-1">
+                                                            <label class="block text-gray-700 text-sm font-bold mb-2">Rifa Origen</label>
+                                                            <input v-model="form.titulo" type="text" disabled class="bg-blue-50 shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" placeholder="Titulo">
+                                                        </div>
+                                                    </div>
+                                                    <div class="flex py-1">
+                                                        <div class="mb-4 w-1/2 pr-1">
+                                                            <label class="block text-gray-700 text-sm font-bold mb-2">Nombre Técnico</label>
+                                                            <input v-model="form.nombre_tecnico" type="text" disabled class="bg-blue-50 shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" placeholder="Nombre técnico">
+                                                        </div>
+                                                        <div class="mb-4 w-1/2 px-1">
+                                                            <label class="block text-gray-700 text-sm font-bold mb-2">Resolucion</label>
+                                                            <input v-model="form.resolucion" type="text" disabled class="bg-blue-50 shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" placeholder="Resolución" >
+                                                        </div>
+                                                    </div>
+                                                    <div class="flex py-1">
+                                                        <div class="mb-4 w-1/3 px-1">
+                                                            <label class="block text-gray-700 text-sm font-bold mb-2">Tipo de Serie</label>
+                                                            <select @change="actTipoSerie()" disabled class="bg-blue-50 block w-full rounded-lg text-gray-700 text-sm"  v-model="tiposerie">
+                                                                <option v-for="serie in arraySeries" :key="serie.id" :value="serie" v-text="serie.nombre"></option>
+                                                            </select>
+                                                        </div>
+                                                        <div class="mb-4 w-1/3 pl-1">
+                                                            <label class="block text-gray-700 text-sm font-bold mb-2">Serie</label>
+
+                                                            <input v-if="isNumeric" disabled v-model="form.serie" type="text" class="bg-blue-50 shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" placeholder="-" >
+
+                                                            <select v-else class="bg-blue-50 block w-full py-2 px-3 rounded-lg text-gray-700 text-sm" disabled v-model="form.serie">
+                                                                <option v-for="serie in tiposseriestxt" :key="serie" :value="serie" v-text="serie"></option>
+                                                            </select>
+
+                                                        </div>
+                                                        <div class="mb-4 w-1/3 pl-1">
+                                                            <label class="block text-gray-700 text-sm font-bold mb-2">Serie Oculta</label>
+                                                            <input disabled v-model="form.serieoculta" type="text" class="bg-blue-50 shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" placeholder="Serie" >
+                                                        </div>
+                                                    </div>
+                                                    <div class="">
+                                                        <h2 class="text-xl font-bold text-gray-900 px-4 py-2">Datos de destino</h2>
+                                                    </div>
+                                                    <div class="flex flex-wrap mx-auto py-4">
+                                                        <div class="flex items-center mr-4">
+                                                            <input @change="selSerieOculta()" type="radio" value="1" v-model="copiaserie" class="w-4 h-4 text-red-600 border-gray-300 focus:ring-red-500 focus:ring-2 ">
+                                                            <label class="ml-2 text-sm font-medium ">Serie Oculta</label>
+                                                        </div>
+                                                        <div class="flex items-center mr-4">
+                                                            <input @change="selSerieOculta()" type="radio" value="0" v-model="copiaserie" class="w-4 h-4 text-green-600 border-gray-300 focus:ring-green-500 dark:ring-offset-gray-800 ">
+                                                            <label class="ml-2 text-sm font-medium ">Serie No Oculta</label>
+                                                        </div>
+                                                    </div>
+                                                    <div v-if="copiaserie == 1" class="flex py-1">
+                                                        <div class="mb-4 w-1/2 px-1">
+                                                            <label class="block text-gray-700 text-sm font-bold mb-2">Tipo de Serie</label>
+                                                            <select disabled class="block w-full rounded-lg text-gray-700 text-sm" >
+                                                                <option value="0">Numerica</option>
+                                                            </select>
+                                                        </div>
+                                                        <div class="mb-4 w-1/2 pl-1">
+                                                            <label class="block text-gray-700 text-sm font-bold mb-2">Serie</label>
+                                                            <input v-model="seriedestinooculta" type="text" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" placeholder="Serie" >
+
+                                                            <div v-if="$page.props.errors.serie" class="text-red-500">{{ $page.props.errors.serie }}</div>
+                                                        </div>
+                                                    </div>
+                                                    <div v-else class="flex py-1">
+                                                        <div class="mb-4 w-1/2 px-1">
+                                                            <label class="block text-gray-700 text-sm font-bold mb-2">Tipo de Serie</label>
+                                                            <select @change="actTipoSeriecopia()" :disabled="tiposerie.id != 1" class="block w-full rounded-lg text-gray-700 text-sm"  v-model="tiposeriedestino">
+                                                                <option v-for="serie in arraySeries" :key="serie.id" :value="serie" v-text="serie.nombre"></option>
+                                                            </select>
+                                                        </div>
+                                                        <div class="mb-4 w-1/2 pl-1">
+                                                            <label class="block text-gray-700 text-sm font-bold mb-2">Serie</label>
+
+                                                            <input v-if="isNumericcopia" v-model="seriedestino" type="text" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" placeholder="Serie" >
+
+                                                            <select v-else class="block w-full py-2 px-3 rounded-lg text-gray-700 text-sm" :disabled="verMode" v-model="seriedestino">
+                                                                <option v-for="serie in tiposseriestxtdst" :key="serie" :value="serie" v-text="serie"></option>
+                                                            </select>
+
+                                                            <div v-if="$page.props.errors.serie" class="text-red-500">{{ $page.props.errors.serie }}</div>
+                                                        </div>
+                                                    </div>
+                                                </section>
+                                                <!-- Fin formulario -->
+                                            </div>
+                                        </div>
+                                        <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+                                            <span class="flex w-full rounded-md shadow-sm sm:ml-3 sm:w-auto">
+                                              <button v-show="!editMode && !verMode" @click="copy(form)" wire:click.prevent="store()" type="button" class="inline-flex justify-center w-full rounded-md border border-transparent px-4 py-2 bg-green-600 text-base leading-6 font-medium text-white shadow-sm hover:bg-green-500 focus:outline-none focus:border-green-700 focus:shadow-outline-green transition ease-in-out duration-150 sm:text-sm sm:leading-5" >
+                                                Crear serie
+                                              </button>
+                                            </span>
+
+                                            <span class="mt-3 flex w-full rounded-md shadow-sm sm:mt-0 sm:w-auto">
+
+                                                <button @click="closeModal2()" type="button" class="inline-flex justify-center w-full rounded-md border border-gray-300 px-4 py-2 bg-white text-base leading-6 font-medium text-gray-700 shadow-sm hover:text-gray-500 focus:outline-none focus:border-blue-300 focus:shadow-outline-blue transition ease-in-out duration-150 sm:text-sm sm:leading-5">
+                                                Cancelar
+                                          </button>
+                                        </span>
+                                        </div>
+                                    </form>
+                                    <!-- Fin form -->
+                                </div>
+                                <!-- Fin Contenido modal -->
+
+                            </div>
+                        </div>
+                    </section>
+                    <!-- Fin ventana modal 2 -->
                 </div>
             </div>
         </div>
@@ -598,21 +876,27 @@ import Button from "../../Jetstream/Button";
 import moment from 'moment'
 import { QuillEditor } from '@vueup/vue-quill';
 import '@vueup/vue-quill/dist/vue-quill.snow.css';
-import { ref, onMounted } from 'vue';
 
 import { Money3Component } from 'v-money3'
+
+import { Head, Link } from '@inertiajs/inertia-vue3';
+import JetNavLink from '@/Jetstream/NavLink.vue';
+import NavLink from "../../Jetstream/NavLink";
 
 
 export default {
 
     components: {
+        NavLink,
         Button,
         AppLayout,
         Icon,
         Pagination,
         Toggle,
         QuillEditor,
-        money3: Money3Component
+        JetNavLink,
+        Link,
+        money3: Money3Component,
 
     },
     props:{
@@ -679,27 +963,85 @@ export default {
                 urlimagen2: null,
                 idterminos: 0,
                 idcreador: 0,
+                serieoculta: 1,
+                serie: null,
+                idserie: 0,
+                promocionales: [],
                 files1: [],
-                files2: []
+                files2: [],
             },
             arrayPaises: [],
             arrayDepartamentos: [],
             arrayCiudades: [],
             arrayLoterias: [],
             arrayTerminos: [],
+            arraySeries: [],
             editMode: false,
             verMode: false,
             isOpen: false,
+            isOpenModal2: false,
             existerifa: 1,
             buscar: '',
             arrayRifas: [],
             sortOrder: 1,
             sortBy: '',
+            rango: null,
+            cantboletas: 0,
             errorrifa: 0,
-            errorMostrarMsjrifa: []
+            isNumeric: 1,
+            isNumericcopia: 1,
+            errorMostrarMsjrifa: [],
+            idloteriapromo: 0,
+            premiopromo: null,
+            fechapromo: null,
+            tiposseriestxt: [],
+            tiposseriestxtdst: [],
+            isSerie: false,
+            tiposerie: {
+                id: 0,
+                nombre: null,
+                cifras: 0,
+                detalle: null
+            },
+            copiaserie: 0,
+            tiposeriedestino: [],
+            seriedestino: 0,
+            seriedestinooculta: 0,
         }
     },
     methods: {
+        selSerieOculta: function (){
+            if (this.copiaserie == 1) {
+                this.seriedestinooculta = this.form.serieoculta + 1;
+            }
+        },
+        actTipoSerie: function (){
+            if (this.tiposerie.cifras > 0) {
+                this.isNumeric = true;
+            } else {
+                this.isNumeric = false;
+                this.form.serie = null;
+                this.tiposseriestxt = this.tiposerie.detalle.split('|');
+            }
+        },
+        actTipoSeriecopia: function (){
+            if (this.tiposeriedestino.cifras > 0) {
+                this.isNumericcopia = true;
+            } else {
+                this.isNumericcopia = false;
+                this.seriedestino = null;
+                this.tiposseriestxtdst = this.tiposeriedestino.detalle.split('|');
+            }
+        },
+        actualizarRangos() {
+            let rango = null;
+            let cantidad = 0;
+
+            cantidad = Math.pow(10, this.form.cifras);
+            rango = String(0).padStart(this.form.cifras, '0') + ' - ' + (cantidad-1);
+            this.cantboletas = cantidad;
+            this.rango = rango;
+        },
         formatPrice(value) {
             let val = (value/1).toFixed(0).replace('.', ',')
             return '$ '+ val.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".")
@@ -722,11 +1064,12 @@ export default {
             this.getPaises();
             this.getLoterias();
             this.getTerminos();
+            this.getSeries();
 
             switch (accion) {
                 case 'registrar':
                 {
-                    this.tituloModal = 'Crear nuevo rifa de venta';
+                    this.tituloModal = 'Crear nueva rifa';
                     this.form.id = null;
                     this.form.titulo = null;
                     this.form.resolucion = null;
@@ -740,7 +1083,7 @@ export default {
                     this.form.idpais = 0;
                     this.form.iddepartamento = 0;
                     this.form.idciudad = 0;
-                    this.form.cifras = 0;
+                    this.form.cifras = null;
                     this.form.precio = 0;
                     this.form.fechainicio = null;
                     this.form.fechafin = null;
@@ -752,8 +1095,14 @@ export default {
                     this.form.urlimagen1 = null;
                     this.form.idterminos = 0;
                     this.form.idcreador = 0;
+                    this.form.serieoculta = 1;
+                    this.form.serie = null;
+                    this.form.idserie = 1;
+                    this.form.promocionales = [];
                     this.form.files1 = [];
                     this.form.files2 = [];
+                    this.tiposerie.id = 1;
+                    this.isSerie = true;
                     break;
                 }
                 case 'ver':
@@ -784,14 +1133,24 @@ export default {
                     this.form.urlimagen1 = data['urlimagen1'];
                     this.form.idterminos = data['idterminos'];
                     this.form.idcreador = data['idcreador'];
+                    this.form.serieoculta = data['serieoculta'];
+                    this.form.serie = data['serie'];
+                    this.form.idserie = data['idserie'];
+                    this.form.promocionales = data['promocionales'];
                     this.form.files1 = [];
                     this.form.files2 = [];
+                    if (data['idserie'] != 1){
+                        this.isSerie = true;
+                    } else {
+                        this.isSerie = false;
+                    }
                     this.getDepartamentos();
                     this.getCiudades();
+                    this.actualizarRangos();
                     break;
                 }
                 case 'actualizar': {
-                    this.tituloModal = 'Actualizar el rifa de venta ' + data['nombre'];
+                    this.tituloModal = 'Actualizar el rifa' + data['nombre_tecnico'];
                     this.form.id = data['id'];
                     this.form.titulo = data['titulo'];
                     this.form.resolucion = data['resolucion'];
@@ -817,14 +1176,45 @@ export default {
                     this.form.urlimagen1 = data['urlimagen1'];
                     this.form.idterminos = data['idterminos'];
                     this.form.idcreador = data['idcreador'];
+                    this.form.serieoculta = data['serieoculta'];
+                    this.form.serie = data['serie'];
+                    this.form.idserie = data['idserie'];
+                    this.form.promocionales = data['promocionales'];
                     this.form.files1 = [];
                     this.form.files2 = [];
+                    this.tiposerie = data['tiposerie'];
+                    if (data['idserie'] != 1){
+                        this.isSerie = true;
+                    } else {
+                        this.isSerie = false;
+                    }
                     this.getDepartamentos();
                     this.getCiudades();
+                    this.actualizarRangos();
                     break;
                 }
             }
         },
+        openModal2: function (accion, data = []) {
+            this.isOpenModal2 = true;
+            this.tituloModal = 'Crear nueva serie' + data['nombre_tecnico'];
+            this.form.id = data['id'];
+            this.form.titulo = data['titulo'];
+            this.form.nombre_tecnico = data['nombre_tecnico'];
+            this.form.resolucion = data['resolucion'];
+            this.form.serie = data['serie'];
+            this.form.idserie = data['idserie'];
+            this.tiposerie = data['tiposerie'];
+            if (data['idserie'] != 1){
+                this.isSerie = true;
+            } else {
+                this.isSerie = false;
+            }
+            this.tiposeriedestino = this.tiposerie;
+            this.getSeries();
+            this.actTipoSeriecopia();
+        },
+
         closeModal: function () {
             this.isOpen = false;
             this.reset();
@@ -832,21 +1222,12 @@ export default {
             this.verMode  = false;
             this.$page.props.errors = [];
         },
-        validarrifa(){
-            this.errorrifa=0;
-            this.errorMostrarMsjrifa =[];
-
-            if (this.form.idpais == 0) this.errorMostrarMsjrifa.push("Seleccione un pais.");
-            if (this.form.iddepartamento == 0) this.errorMostrarMsjrifa.push("Seleccione un departamento.");
-            if (this.form.idciudad == 0) this.errorMostrarMsjrifa.push("Seleccione una ciudad.");
-            if (!this.form.nombre) this.errorMostrarMsjrifa.push("El nombre del rifa de venta no puede estar vacío.");
-            if (!this.form.direccion) this.errorMostrarMsjrifa.push("Se requiere una dirección para el rifa de venta");
-            if (!this.form.codigo) this.errorMostrarMsjrifa.push("El codigo del rifa de venta no puede estar vacio");
-            if (!this.form.descripcion) this.errorMostrarMsjrifa.push("Por favor ingrese una descripción");
-
-            if (this.errorMostrarMsjrifa.length) this.errorrifa = 1;
-
-            return this.errorrifa;
+        closeModal2: function () {
+            this.isOpenModal2 = false;
+            this.reset2();
+            this.editMode = false;
+            this.verMode  = false;
+            this.$page.props.errors = [];
         },
         reset: function () {
             this.tituloModal = 'Crear nuevo rifa de venta';
@@ -875,21 +1256,43 @@ export default {
             this.form.urlimagen1 = null;
             this.form.idterminos = 0;
             this.form.idcreador = 0;
+            this.form.serieoculta = 1;
+            this.form.serie = null;
+            this.form.idserie = 1;
+            this.form.promocionales = [];
             this.form.files1 = [];
             this.form.files2 = [];
+        },
+        reset2: function () {
+            this.reset();
+            this.seriedestino = null;
+            this.seriedestinooculta = null;
+            this.copiaserie = 0;
+            this.tiposeriedestino = [];
         },
         save: function (data) {
             data.fechainicio = this.dateTimeFull(data.fechainicio);
             data.fechafin = this.dateTimeFull(data.fechafin);
+            data.idserie = this.tiposerie.id;
+            if (this.tiposerie.id == 1){
+                data.serie = null;
+            }
             console.log(data);
             this.$inertia.post('/rifas', data, {
                 onBefore: (visit) => { console.log('onBefore');},
                 onStart: (visit) => {console.log('onStart');},
                 onProgress: (progress) => {console.log('onProgress');},
                 onSuccess: (page) => {
+                    Swal.fire({
+                        position: 'top-end',
+                        icon: 'success',
+                        title: 'La rifa se ha creado',
+                        showConfirmButton: false,
+                        timer: 1500
+                    })
                     this.reset();
                     this.closeModal();
-                    this.getRifas('','rifas.nombre');
+                    this.getRifas('','rifas.nombre_tecnico');
                     this.editMode = false;
                 },
                 onError: (errors) => {console.log('onError');},
@@ -898,6 +1301,84 @@ export default {
             });
 
         },
+        copy: function (data) {
+            console.log('inicia save');
+            data.idserie = this.tiposerie.id;
+            if (this.tiposerie.id == 1){
+                data.serie = null;
+            }
+
+            let isSave = false;
+
+            if (this.copiaserie == 1) {
+                console.log('serie oculta');
+                if (this.form.serieoculta == this.seriedestinooculta) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'La nueva serie debe ser diferente a la actual',
+                        showConfirmButton: true,
+                    })
+                } else if (!Number.isInteger(this.seriedestinooculta)){
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'La nueva serie debe ser un número entero',
+                        showConfirmButton: true,
+                    })
+                } else {
+                    data.isOculta = true;
+                    data.serieoculta = this.seriedestinooculta;
+                    this.isSave= true;
+                }
+            } else {
+                if (this.tiposeriedestino == 1) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Debe seleecionar el tipo de serie',
+                        showConfirmButton: true,
+                    })
+                } else {
+                    if (this.seriedestino == '' || this.seriedestino == 0 || this.seriedestino == null) {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Por favor ingrese o selecciones un valor para la nueva serie',
+                            showConfirmButton: true,
+                        })
+                    } else {
+                        data.isOculta = false;
+                        data.seriedestino = this.seriedestino;
+                        data.tiposeriedestino = this.tiposeriedestino.id;
+                        this.isSave = true;
+                    }
+
+                }
+            }
+
+            if (this.isSave) {
+
+                this.$inertia.post('/rifas/copy', data, {
+                    onBefore: (visit) => { console.log('onBefore');},
+                    onStart: (visit) => {console.log('onStart');},
+                    onProgress: (progress) => {console.log('onProgress');},
+                    onSuccess: (page) => {
+                        Swal.fire({
+                            position: 'top-end',
+                            icon: 'success',
+                            title: 'La rifa se ha creado',
+                            showConfirmButton: false,
+                            timer: 1500
+                        })
+                        this.reset2();
+                        this.closeModal2();
+                        this.getRifas('','rifas.id');
+                        this.editMode = false;
+                    },
+                    onError: (errors) => {console.log('onError');},
+                    onCancel: () => {console.log('onCancel');},
+                    onFinish: visit => {console.log('onFinish');},
+                });
+            }
+        },
+
         edit: function (data) {
             //this.form = Object.assign({}, data);
             this.editMode = true;
@@ -908,21 +1389,29 @@ export default {
             this.verMode = true;
             this.openModal('ver', data);
         },
+        copiar: function (data) {
+            this.openModal2('copiar', data);
+        },
         update: function (data) {
             data.fechainicio = this.dateTimeFull(data.fechainicio);
             data.fechafin = this.dateTimeFull(data.fechafin);
-            console.log(data);
+            data.idserie = this.tiposerie.id;
+            if (this.tiposerie.id == 1){
+                data.serie = null;
+            }
             data._method = 'PUT';
             this.$inertia.post('/rifas/'  + data.id, data, {
                 onBefore: (visit) => { console.log('onBefore');},
                 onStart: (visit) => {console.log('onStart');},
                 onProgress: (progress) => {console.log('onProgress');},
                 onSuccess: (page) => {
-                    Swal.fire(
-                        'Actualización rifa',
-                        'El rifa se ha actualizado!',
-                        'success'
-                    )
+                    Swal.fire({
+                        position: 'top-end',
+                        icon: 'success',
+                        title: 'La rifa se ha actualizado',
+                        showConfirmButton: false,
+                        timer: 1500
+                    })
                     this.getRifas('','rifas.nombre');
                     this.closeModal();
                     this.reset();
@@ -997,6 +1486,13 @@ export default {
                 console.log(res.data.departamentos)
             })
         },
+        getSeries: function () {
+            axios.get('/series', {
+            }).then((res) => {
+                this.arraySeries = res.data.tiposerie;
+                console.log(res.data.tiposerie)
+            })
+        },
         getCiudades: function () {
             axios.get('/paises/ciudades', {
                 params: {
@@ -1046,6 +1542,24 @@ export default {
 
         },
 
+        eliminarPromo(index){
+            this.form.promocionales.splice(index, 1);
+        },
+        agregarPromocional(){
+            if(this.premiopromo == '' || this.fechapromo == '' || this.idloteriapromo == 0){
+            }
+            else{
+                    this.form.promocionales.push({
+                        premio: this.premiopromo,
+                        fecha: this.dateTimeFull(this.fechapromo),
+                        idloteria: this.idloteriapromo
+                    });
+                this.premiopromo = '';
+                this.fechapromo = "";
+                this.idloteriapromo = 0;
+            }
+        },
+
         onUploadDragoverEvent2(e) {
             this.uploadDragoverEvent2 = true;
             this.uploadDragoverTracking2 = true;
@@ -1072,7 +1586,7 @@ export default {
             return false;
         },
         removeFile2(file) {
-            this.form.files1 = this.form.files1.filter(f => {
+            this.form.files2 = this.form.files2.filter(f => {
                 return f != file;
             });
         },

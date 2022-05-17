@@ -13,8 +13,8 @@ use Inertia\Inertia;
 
 class PuntoventaController extends Controller
 {
-    const canPorPagina = 3;
-//config('jetstream.auth_session'),
+    const canPorPagina = 5;
+
     /**
      * Display a listing of the resource.
      *
@@ -40,21 +40,23 @@ class PuntoventaController extends Controller
                                       ->with('pais')
                                       ->with('departamento')
                                       ->with('ciudad')
+                                      ->with('empresa')
                                       ->paginate(self::canPorPagina);
         } else {
             $puntoventas = Puntoventa::orderBy($sortBy, $sortOrder)
                                       ->with('pais')
                                       ->with('departamento')
                                       ->with('ciudad')
-                                      ->where('puntos_ventas.nombre', 'like', '%'. $buscar . '%')
-                                      ->orWhere('puntos_ventas.codigo', 'like', '%'. $buscar . '%')
+                                      ->with('empresa')
+                                      ->where('nombre', 'like', '%'. $buscar . '%')
+                                      ->orWhere('codigo', 'like', '%'. $buscar . '%')
                                       ->paginate(self::canPorPagina);
         }
 
         if ($request->has('ispage') && $request->ispage){
             return ['puntoventas' => $puntoventas];
         } else {
-            return Inertia::render('Puntoventas/Index', ['puntoventas' => $puntoventas]);
+            return Inertia::render('Ventas/Puntoventas', ['puntoventas' => $puntoventas]);
         }
     }
 
@@ -69,12 +71,14 @@ class PuntoventaController extends Controller
                 ->with('pais')
                 ->with('departamento')
                 ->with('ciudad')
+                ->with('empresa')
                 ->paginate(self::canPorPagina);
         } else {
             $puntoventas = Puntoventa::orderBy($sortBy, $sortOrder)
                 ->with('pais')
                 ->with('departamento')
                 ->with('ciudad')
+                ->with('empresa')
                 ->where('puntos_ventas.nombre', 'like', '%'. $buscar . '%')
                 ->orWhere('puntos_ventas.codigo', 'like', '%'. $buscar . '%')
                 ->paginate(self::canPorPagina);

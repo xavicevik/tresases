@@ -2,7 +2,10 @@
 
 namespace App\Http\Middleware;
 
+use App\Models\Empresa;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Session;
 use Inertia\Middleware;
 
 class HandleInertiaRequests extends Middleware
@@ -37,7 +40,33 @@ class HandleInertiaRequests extends Middleware
     public function share(Request $request): array
     {
         return array_merge(parent::share($request), [
-            //
+            'auth' => function () use ($request) {
+                $permissions = [];
+                if (Auth::user()) {
+                    foreach (Auth::user()->getAllPermissions() as $permission) {
+                        $permissions[] = $permission->name;
+                    }
+                }
+
+                return [
+                    'user' => $request->user() ? : null,
+                    'empresa' => $request->user()? Empresa::where('id', Auth::user()->idempresa)->get(): (object) [],
+                    'puntoventa' => Session::get('puntodeventa')? : null,
+                    'permissions' => json_encode($permissions)
+                ];
+            },
+            'cart' => function () use ($request) {
+                if ($request->user()) {
+                    \Cart::session(Auth::user()->id);
+                    $items = \Cart::getContent();
+                } else {
+                    $items = (object) [];
+                }
+
+                return [
+                    'cart' => $items,
+                ];
+            },
         ]);
     }
 }

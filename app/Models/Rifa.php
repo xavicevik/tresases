@@ -32,9 +32,18 @@ class Rifa extends Model
         'urlimagen1',
         'urlimagen2',
         'idterminos',
-        'idcreador'
+        'idcreador',
+        'serieoculta',
+        'serie',
+        'idserie'
     ];
 
+    public function scopeActive($query) {
+        return $query->where('estado', '1');
+    }
+    public function promocionales() {
+        return $this->hasMany(Promocional::class, 'idrifa');
+    }
     public function pais(){
         return $this->belongsTo(Pais::class, 'idpais');
     }
@@ -59,7 +68,7 @@ class Rifa extends Model
         return $this->belongsTo(User::class, 'idcreador');
     }
 
-    public function detalleuser(){
-        return $this->belongsTo(DetalleUser::class, 'idcreador');
+    public function tiposerie(){
+        return $this->belongsTo(Serie::class, 'idserie');
     }
 }

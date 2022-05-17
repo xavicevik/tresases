@@ -52,8 +52,8 @@
                                 <tr class="bg-gray-100">
                                     <th class="px-4 py-2 text-sm font-bold w-1/12 hover:bg-blue-500 hover:text-gray-50 rounded-b">
                                         <button @click="getPuntos(buscar, 'puntos_ventas.codigo')" class="font-bold">
-                                            CODIGO
-                                            <div v-show="sortBy == 'puntos_ventas.codigo'">
+                                            Empresa
+                                            <div v-show="sortBy == 'puntos_ventas.empresa.nombre'">
                                                 <span v-show="!sortOrder">
                                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
                                                         <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
@@ -69,7 +69,7 @@
                                     </th>
                                     <th class="px-4 py-2 text-sm font-bold  hover:bg-blue-500 hover:text-gray-50 rounded-b">
                                         <button @click="getPuntos(buscar, 'puntos_ventas.nombre')" class="font-bold">
-                                            NOMBRE
+                                            Nombre
                                             <div v-show="sortBy == 'puntos_ventas.nombre'">
                                                 <span v-show="!sortOrder">
                                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
@@ -86,7 +86,7 @@
                                     </th>
                                     <th class="px-4 py-2 text-sm font-bold hover:bg-blue-500 hover:text-gray-50 rounded-b">
                                         <button @click="getPuntos(buscar, 'puntos_ventas.descripcion')" class="font-bold">
-                                            DESCRIPCION
+                                            Descripción
                                             <div v-show="sortBy == 'puntos_ventas.descripcion'">
                                                 <span v-show="!sortOrder">
                                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
@@ -103,7 +103,7 @@
                                     </th>
                                     <th class="px-4 py-2 text-sm font-bold hover:bg-blue-500 hover:text-gray-50 rounded-b">
                                         <button @click="getPuntos(buscar, 'ciudad.nombre')" class="font-bold">
-                                            CIUDAD
+                                            Ciudad
                                             <div v-show="sortBy == 'ciudad.nombre'">
                                                 <span v-show="!sortOrder">
                                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
@@ -120,7 +120,7 @@
                                     </th>
                                     <th class="px-4 py-2 text-sm font-bold w-1/12 hover:bg-blue-500 hover:text-gray-50 rounded-b">
                                         <button @click="getPuntos(buscar, 'puntos_ventas.estado')" class="font-bold">
-                                            ESTADO
+                                            Estado
                                             <div v-show="sortBy == 'puntos_ventas.estado'">
                                                 <span v-show="!sortOrder">
                                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
@@ -140,7 +140,7 @@
                                 </thead>
                                 <tbody>
                                 <tr class="text-center" v-if="existePunto > 0" v-for="(punto, id) in arrayPuntos.data" :key="id">
-                                    <td class="border px-4 py-2 text-sm" v-text="punto.codigo"></td>
+                                    <td class="border px-4 py-2 text-sm" v-text="punto.empresa.razon_social"></td>
                                     <td class="border px-4 py-2 text-sm" v-text="punto.nombre"></td>
                                     <td class="border px-4 py-2 text-sm" v-text="punto.descripcion"></td>
                                     <td class="border px-4 py-2 text-sm" v-text="punto.ciudad.nombre"></td>
@@ -396,7 +396,10 @@ export default {
         Toggle
     },
     props:{
-        puntoventas : [],
+        puntoventas : {
+            data: [],
+            links: []
+        },
         errors: Object
     },
     computed: {
@@ -434,7 +437,10 @@ export default {
             isOpen: false,
             existePunto: 1,
             buscar: '',
-            arrayPuntos: [],
+            arrayPuntos: {
+                data: [],
+                links: []
+            },
             sortOrder: 1,
             sortBy: '',
             errorPunto: 0,
@@ -703,7 +709,6 @@ export default {
         },
     },
     created: function () {
-        //this.getPaises();
         console.log(this.puntoventas);
         this.arrayPuntos = this.puntoventas;
     },

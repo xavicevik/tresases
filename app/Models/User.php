@@ -10,6 +10,11 @@ use Laravel\Fortify\TwoFactorAuthenticatable;
 use Laravel\Jetstream\HasProfilePhoto;
 use Laravel\Jetstream\HasTeams;
 use Laravel\Sanctum\HasApiTokens;
+use Spatie\Permission\Traits\HasRoles;
+use Spatie\Permission\Models\Permission;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Database\Eloquent\Casts\Attribute;
+
 
 class User extends Authenticatable
 {
@@ -19,6 +24,7 @@ class User extends Authenticatable
     use HasTeams;
     use Notifiable;
     use TwoFactorAuthenticatable;
+    use HasRoles;
 
     /**
      * The attributes that are mass assignable.
@@ -26,7 +32,9 @@ class User extends Authenticatable
      * @var string[]
      */
     protected $fillable = [
-        'name', 'email', 'password',
+        'nombre', 'correo', 'username','password', 'apellido', 'idtipos_documento', 'idrol', 'estado',
+        'documento', 'direccion', 'indicativo', 'idpais', 'iddepartamento', 'idciudad', 'observaciones',
+        'telefono', 'movil', 'isnatural', 'camaracomercio', 'rut', 'url', 'idempresa'
     ];
 
     /**
@@ -59,8 +67,43 @@ class User extends Authenticatable
         'profile_photo_url',
     ];
 
-    public function detalle()
+    public function scopeUserApp($query) {
+        return $query->where('idrol', '<>', '2')->where('idrol', '<>', '1');
+    }
+
+    public function empresa(){
+        return $this->belongsTo(Empresa::class, 'idempresa');
+    }
+
+    public function rol()
     {
-        return $this->belongsTo(DetalleUser::class);
+        return $this->belongsTo(Rol::class, 'idrol');
+    }
+
+    public function tipodocumento()
+    {
+        return $this->belongsTo(TiposDocumento::class, 'idtipos_documento');
+    }
+
+    public function pais(){
+        return $this->belongsTo(Pais::class, 'idpais');
+    }
+
+    public function departamento(){
+        return $this->belongsTo(Departamento::class, 'iddepartamento');
+    }
+
+    public function ciudad(){
+        return $this->belongsTo(Ciudad::class, 'idciudad');
+    }
+
+    public function AllPermissions(): Attribute {
+        $permissions = [];
+        foreach ($this->getAllPermissions() as $permission) {
+                $permissions[] = $permission->name;
+        }
+        return Attribute::make (
+            get: fn () => $permissions,
+        );
     }
 }
