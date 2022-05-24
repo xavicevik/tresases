@@ -106,4 +106,10 @@ class User extends Authenticatable
             get: fn () => $permissions,
         );
     }
+
+    public function FullName(): Attribute {
+        return Attribute::make (
+            get: fn () => $this->nombre.' '.$this->apellido,
+        );
+    }
 }

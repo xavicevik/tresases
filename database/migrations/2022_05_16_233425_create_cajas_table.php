@@ -21,7 +21,7 @@ return new class extends Migration
             $table->foreign('idpuntoventa')->references('id')->on('puntos_ventas');
             $table->decimal('montoapertura', 10, 2);
             $table->decimal('montocierre', 10, 2);
-            $table->timestamp('fechaapertura');
+            $table->timestamp('fechaapertura')->nullable(true);
             $table->timestamp('fechacierre')->nullable(true);
             $table->boolean('estado')->default(false);
             $table->timestamps();
