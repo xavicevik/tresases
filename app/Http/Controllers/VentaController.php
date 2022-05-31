@@ -4,12 +4,17 @@ namespace App\Http\Controllers;
 
 use App\Jobs\SendEmailJob;
 use App\Models\Boleta;
+use App\Models\Caja;
+use App\Models\Comision;
+use App\Models\Confcomision;
 use App\Models\Detalleventa;
 use App\Models\Loteria;
 use App\Models\Imagen;
+use App\Models\Pago;
 use App\Models\Promoboleta;
 use App\Models\Promocional;
 use App\Models\Rifa;
+use App\Models\Transaccion;
 use App\Models\User;
 use App\Models\Venta;
 use Darryldecode\Cart\Cart;
@@ -42,6 +47,9 @@ class VentaController extends Controller
     }
 
     const canPorPagina = 10;
+    const debito = 'DB';
+    const credito = 'CR';
+    const pago = 'PA';
     /**
      * Display a listing of the resource.
      *
@@ -49,13 +57,13 @@ class VentaController extends Controller
      */
     public function index(Request $request)
     {
+        $filtros = json_decode($request->filtros);
 
-        //if (!$request->ajax()) return redirect('/');
         $buscar = $request->buscar;
         if ($request->has('sortBy') && $request->sortBy <> ''){
             $sortBy = $request->sortBy;
         } else {
-            $sortBy = 'id';
+            $sortBy = 'ventas.id';
         }
 
         if ($request->has('sortOrder') && $request->sortOrder <> ''){
@@ -64,7 +72,7 @@ class VentaController extends Controller
             $sortOrder = 'desc';
         }
 
-        if ($buscar == ''){
+        if (is_null($filtros)){
             $ventas = Venta::orderBy($sortBy, $sortOrder)
                             ->with('puntoventa')
                             ->with('cliente')
@@ -74,10 +82,41 @@ class VentaController extends Controller
             $ventas = Venta::orderBy($sortBy, $sortOrder)
                             ->with('puntoventa')
                             ->with('cliente')
-                            ->with('vendedor')
-                            ->where('nombre', 'like', '%'. $buscar . '%')
-                            ->orWhere('nombre_tecnico', 'like', '%'. $buscar . '%')
-                            ->paginate(self::canPorPagina);
+                            ->with('vendedor');
+
+            if(!is_null($filtros->fechainicio) && $filtros->fechainicio <> '') {
+                $ventas = $ventas->where('ventas.created_at', '>=', $filtros->fechainicio);
+            }
+            if(!is_null($filtros->fechafin) && $filtros->fechafin <> '') {
+                $ventas = $ventas->where('ventas.created_at', '<=', $filtros->fechafin);
+            }
+            if(!is_null($filtros->cliente) && $filtros->cliente <> '') {
+                $ventas = $ventas->join('users as t1', 'ventas.idcliente', '=', 't1.id')
+                    ->where('t1.nombre', 'like', '%'.$filtros->cliente.'%')
+                    ->orWhere('t1.apellido', 'like', '%'.$filtros->cliente.'%');
+            }
+            if(!is_null($filtros->vendedor) && $filtros->vendedor <> '') {
+                $ventas = $ventas->join('users as t2', 'ventas.idvendedor', '=', 't2.id')
+                    ->where('t2.nombre', 'like', '%'.$filtros->vendedor.'%')
+                    ->orWhere('t2.apellido', 'like', '%'.$filtros->vendedor.'%');
+            }
+            if(!is_null($filtros->venta) && $filtros->venta <> '') {
+                $ventas = $ventas->where('ventas.id', 'like', '%'.$filtros->venta.'%');
+            }
+            if(!is_null($filtros->puntoventa) && $filtros->puntoventa <> '') {
+                $ventas = $ventas->join('puntos_ventas', 'ventas.idpuntoventa', '=', 'puntos_ventas.id')
+                    ->where('puntos_ventas.nombre', 'like', '%'.$filtros->puntoventa.'%');
+            }
+            if(!is_null($filtros->comprobante)) {
+                $ventas = $ventas->where('comprobante', 'like', '%'.$filtros->comprobante.'%');
+            }
+            if(!is_null($filtros->rifa)) {
+                $ventas = $ventas->join('rifas', 'ventas.idrifa', '=', 'rifas.id')
+                    ->where('rifas.nombre_tecnico', 'like', '%'.$filtros->rifa.'%')
+                    ->select('ventas.*');
+            }
+
+            $ventas = $ventas->select('ventas.*')->paginate(self::canPorPagina);
         }
 
         //$this->authorizeResource(User::class);
@@ -87,6 +126,24 @@ class VentaController extends Controller
         } else {
             return Inertia::render('Ventas/Index', ['data' => $ventas]);
         }
+    }
+
+    public function getDetalles(Request $request)
+    {
+        $detalle = Detalleventa::where('idventa', $request->id)
+                        ->with('rifa')
+                        ->paginate(self::canPorPagina);
+
+       return ['data' => $detalle];
+    }
+
+    public function getComisiones(Request $request)
+    {
+        $comisiones = Comision::where('idventa', $request->id)
+            ->with('configuracion')
+            ->get();
+
+        return ['data' => $comisiones];
     }
 
     public function sumary(Request $request)
@@ -105,7 +162,21 @@ class VentaController extends Controller
 
     public function create(Request $request)
     {
+        $mytime= Carbon::now('America/Bogota')->format('Y-m-d');
 
+        if (Auth::user()->idrol == 5) {
+            $caja = Caja::where('idvendedor', Auth::user()->id)
+                        ->where('estado', 1)
+                        ->where('fechaapertura', '>=', $mytime)
+                        ->where('fechacierre', null)
+                        ->first();
+
+            if (is_null($caja)) {
+                return redirect()->route('cajas.index', ['estado' => '1']);
+            } else {
+                return Inertia::render('Ventas/Venta',  ['estado' => '0']);
+            }
+        }
         return Inertia::render('Ventas/Venta');
     }
 
@@ -204,9 +275,78 @@ class VentaController extends Controller
             \Cart::clear();
             \Cart::session(Auth::user()->id)->clear();
 
+            //return redirect()->route('enviar', ['notificacion' => $venta->id]);
+
+            switch ($request->paymentmethod) {
+                case 1:
+                    $concepto = 4;
+                    $descripcion = 'Pago con tarjeta crédito/debito';
+                    break;
+                case 2:
+                    $concepto = 6;
+                    $descripcion = 'Pago con transferencia';
+                    break;
+                case 3:
+                    $concepto = 2;
+                    $descripcion = 'Pago en efectivo';
+                    break;
+                default:
+                    $concepto = 0;
+                    $descripcion = '';
+                    break;
+            }
+            $signo = self::debito;
+            $impuesto = 0;
+
+            $transaccion = new Transaccion();
+            $transaccion->idusuarioori = $request->idcliente;
+            $transaccion->idusuariodest = Auth::user()->id;
+            $transaccion->idconcepto = $concepto;
+            $transaccion->origen = 'Fisico';
+            $transaccion->destino = 'Digital';
+            $transaccion->signo = $signo;
+            $transaccion->valor = $request->valorpagar;
+            $transaccion->impuesto = $impuesto;
+            $transaccion->descripcion = $descripcion;
+            $transaccion->soporte = $request->comprobante;
+            $transaccion->mes = $mytime->month;
+            $transaccion->ano = $mytime->year;
+            $transaccion->save();
+
+            $pago = new Pago();
+            $pago->idventa = $venta->id;
+            $pago->valortotal = $request->valorpagar;
+            $pago->idcliente = $venta->idcliente;
+            $pago->idvendedor = Auth::user()->id;
+            $pago->saldo = $venta->valortotal - $request->valorpagar;
+            $pago->canal = 'Fisico';
+            $pago->descripcion = $descripcion;
+            $pago->tipo = 'Pago';
+            $pago->soporte = $request->comprobante;
+            $pago->idtransaccion = $transaccion->id;
+            $pago->idpuntoventa = $request->idpuntoventa;
+            $pago->idcaja = $request->session()->get('caja', 0)[0];
+            $pago->save();
+
+            $concomision = Confcomision::join('users as t1', 'confcomisiones.idvendedor', '=', 't1.idempresa')
+                                        ->select('confcomisiones.*')
+                                        ->where('t1.id', $venta->idvendedor)
+                                        ->first();
+            $comision = new Comision();
+            $comision->idventa = $venta->id;
+            $comision->idconfiguracion = $concomision->id;
+            $comision->valorventa = $venta->valortotal;
+            $comision->comisionmayorista = $venta->valortotal * ($concomision->comisionmayorista/100);
+            $comision->comisiondistribuidor = $venta->valortotal * ($concomision->comisiondistribuidor/100);
+            $comision->comisionvendedor = $venta->valortotal * ($concomision->comisionvendedor/100);
+            $comision->estado = true;
+            $comision->save();
+
             DB::commit();
 
-            //return redirect()->route('enviar', ['notificacion' => $venta->id]);
+            $subject = "TresAses - Venta # ".$venta->id;
+            $for = $venta['cliente']->correo;
+            $url = $request->url;
 
             $data = Venta::where('id', $venta->id)
                 ->with('detalles.boleta')
@@ -214,15 +354,12 @@ class VentaController extends Controller
                 ->with('cliente')
                 ->with('vendedor')
                 ->get();
-            $venta = $data[0];
-
-            $subject = "TresAses - Venta #".$request->idventa;
-            $for = $venta['cliente']->correo;
-            $url = $request->url;
+            $ventamail = $data[0];
 
             $data = array(
-                'data'     => $venta,
-                'subject'  => $subject
+                'data'     => $ventamail,
+                'subject'  => $subject,
+                'for'      => $for,
             );
 
             SendEmailJob::dispatch($data);
@@ -283,7 +420,6 @@ class VentaController extends Controller
         }
 
         return ['boleta' => $boleta];
-
     }
 
     public function reportpdf(Request $request)

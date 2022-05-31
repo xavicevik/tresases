@@ -55,7 +55,7 @@
                                                     <div class="relative">
                                                         <div class="absolute top-4 left-3">
                                                             <i class="fa fa-search text-gray-400 z-20 hover:text-gray-500"></i> </div>
-                                                        <input type="text" v-model="form.numero" @keypress.enter="valBoletaLibre(form.numero, form.idrifa.id, form.idrifa.cifras)" class="h-8 w-96 pl-4 pr-4 rounded-lg z-0 focus:shadow focus:outline-none" :placeholder="'Buscar (' + form.rangoinicial?form.rangoinicial : '' + ' - ' + form.rangofinal +')'">
+                                                        <money3 v-bind="configMoney2" v-model="form.numero" @keypress.enter="valBoletaLibre(form.numero, form.idrifa.id, form.idrifa.cifras)" class="h-8 w-96 pl-4 pr-4 rounded-lg z-0 focus:shadow focus:outline-none" :placeholder="'Buscar (' + form.rangoinicial?form.rangoinicial : '' + ' - ' + form.rangofinal +')'"></money3>
                                                         <a @click="valBoletaLibre(form.numero, form.idrifa.id, form.idrifa.cifras)">
                                                             <div class="absolute top-2 right-2">
                                                                 <Icon icon="fe:search" class="h-4"  />
@@ -242,13 +242,17 @@
                                             <dl class="border-t border-gray-200 py-6 px-4 space-y-6 sm:px-6">
                                                 <div class="flex items-center justify-between border-t border-gray-200 pt-6">
                                                     <dt class="text-base font-medium font-bold">Total</dt>
-                                                    <dd class="text-base font-medium text-gray-900 font-bold">{{ calcularSubtotal }}</dd>
+                                                    <dd class="text-base font-medium text-gray-900 font-bold">{{ formatPrice(calcularSubtotal) }}</dd>
                                                 </div>
                                             </dl>
-                                            <div class="w-1/3 mx-auto justify-items-center pb-4">
+                                            <div class="flex w-10/12 mx-auto justify-items-center pb-4">
                                                 <label class="block text-sm font-medium font-bold text-gray-700">Comprobante de pago</label>
-                                                <div class="mt-1">
+                                                <div class="mt-1 px-2">
                                                     <input type="text" v-model="form.comprobante" autocomplete="family-name" class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                                                </div>
+                                                <label class="block text-sm font-medium font-bold text-gray-700">Valor a pagar</label>
+                                                <div class="mt-1 px-2">
+                                                    <money3 v-bind="configMoney" v-model="form.valorpagar" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"></money3>
                                                 </div>
                                             </div>
                                         </div>
@@ -886,7 +890,8 @@ export default {
             }
             this.total = this.formatPrice(total)
             this.totalnoparseado = total;
-            return this.formatPrice(total);
+            this.form.valorpagar = total;
+            return (total);
         },
 
     },
@@ -922,6 +927,7 @@ export default {
                    loteria: [],
                    promocionales: [],
                    tiposerie: [],
+                   cifras: 0
                 },
                 cliente: {
                     nombre: null,
@@ -938,8 +944,8 @@ export default {
                 },
                 numero: null,
                 estado: false,
-                rangoinicial: null,
-                rangofinal: null,
+                rangoinicial: 0,
+                rangofinal: 0,
                 idvendedor: 0,
                 idcliente: 0,
                 fecha: null,
@@ -955,8 +961,24 @@ export default {
                 },
                 promocionales: [],
                 comprobante: null,
-                paymentmethod: 0
+                paymentmethod: 0,
+                valorpagar: 0,
             },
+            configMoney2: {
+                masked: true,
+                prefix: '',
+                suffix: '',
+                thousands: '',
+                decimal: '',
+                precision: 0,
+                disableNegative: true,
+                disabled: false,
+                min: 0,
+                max: 0,
+                allowBlank: false,
+                minimumNumberOfCharacters: 0,
+            },
+
             editMode: false,
             verMode: false,
             isOpen: false,
@@ -996,7 +1018,6 @@ export default {
         }
     },
     methods: {
-
         cambiarPage: function (url = '') {
             axios.get(url, {
                 params: {
@@ -1042,6 +1063,9 @@ export default {
                 this.form.rangofinal = rangofinal.toString();
                 this.form.numero = null;
             }
+            this.configMoney2.min = this.form.rangoinicial;
+            this.configMoney2.max = this.form.rangofinal;
+            this.configMoney2.minimumNumberOfCharacters = this.form.idrifa.cifras;
 
         },
         selectNumero: async function(tipo) {
@@ -1245,6 +1269,8 @@ export default {
         },
         onSelectCliente: function(data){
             this.form.cliente = data;
+            this.getDepartamentos();
+            this.getCiudades();
             this.form.metacliente = data.tipodocumento.nombre_corto + ' ' + data.documento + ' - ' + data.nombre + ' ' + data.apellido
                                         + ' Tel: ' + data.movil + ' (' + data.ciudad.nombre + ')';
             this.isNewCliente = false;
@@ -1499,55 +1525,86 @@ export default {
         },
         validatePago:function() {
             console.log("onComplete");
-            var data = {
-                cart: [],
-                valortotal: 0,
-                idcliente: 0,
-                cantidad: 0,
-                idpuntoventa: 0,
-                fechaventa: null,
-                comprobante: null,
-                nombre: null,
-                correo: null,
-                telefono: null,
-                documento: null
-            };
-            data.valortotal = this.totalnoparseado;
-            data.cantidad = Object.keys(this.cart).length;
-            data.idcliente = this.form.cliente.id;
-            data.idpuntoventa = this.$page.props.auth.puntoventa[0].id;
-            data.fechaventa = this.dateTimeFull(Date.now());
-            data.comprobante = this.form.comprobante;
-            data.nombre = this.form.cliente.nombre + ' ' + this.form.cliente.apellido;
-            data.correo = this.form.cliente.correo;
-            data.telefono = this.form.cliente.telefono;
-            data.movil = this.form.cliente.telefono;
-            data.documento = this.form.cliente.documento;
-
-            console.log(data.idpuntoventa);
-
-            this.$inertia.post('/ventas', data, {
-                onBefore: (visit) => { console.log('onBefore');},
-                onStart: (visit) => {console.log('onStart');},
-                onProgress: (progress) => {console.log('onProgress');},
-                onSuccess: (page, data) => {
+            if (this.form.valorpagar > this.totalnoparseado) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'El valor a pagar es superior al total',
+                    showConfirmButton: false,
+                    timer: 1500,
+                })
+            } else {
+                if (this.form.valorpagar < this.totalnoparseado) {
                     Swal.fire({
-                        //position: 'top-end',
-                        icon: 'success',
-                        title: 'La venta se ha realizado exitosamente',
-                        showConfirmButton: true,
+                        icon: 'warning',
+                        title: 'Se realizará un pago parcial del total',
+                        showConfirmButton: false,
                         timer: 1500,
                     })
-                    window.open('/ventas/reportpdf?id=' + page.props.flash.message, '_blank');
-                    this.isComplete = true;
-                    //this.form = [];
-                    this.cart = [];
-                    //this.reset();
-                },
-                onError: (errors) => {console.log('onError');},
-                onCancel: () => {console.log('onCancel');},
-                onFinish: visit => {console.log('onFinish');},
-            });
+                }
+                Swal.fire({
+                    title: 'Confirmar pago',
+                    text: "Completar la venta!",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'Si, comprar!'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        var data = {
+                            cart: [],
+                            valortotal: 0.0,
+                            idcliente: 0,
+                            cantidad: 0,
+                            idpuntoventa: 0,
+                            fechaventa: null,
+                            comprobante: null,
+                            nombre: null,
+                            correo: null,
+                            telefono: null,
+                            documento: null,
+                            paymentmethod: null,
+                            valorpagar: 0.0
+                        };
+                        data.valortotal = this.totalnoparseado;
+                        data.cantidad = Object.keys(this.cart).length;
+                        data.idcliente = this.form.cliente.id;
+                        data.idpuntoventa = this.$page.props.auth.puntoventa[0].id;
+                        data.fechaventa = this.dateTimeFull(Date.now());
+                        data.comprobante = this.form.comprobante;
+                        data.nombre = this.form.cliente.nombre + ' ' + this.form.cliente.apellido;
+                        data.correo = this.form.cliente.correo;
+                        data.telefono = this.form.cliente.telefono;
+                        data.movil = this.form.cliente.telefono;
+                        data.documento = this.form.cliente.documento;
+                        data.paymentmethod = this.form.paymentmethod;
+                        data.valorpagar = this.form.valorpagar;
+
+                        this.$inertia.post('/ventas', data, {
+                            onBefore: (visit) => { console.log('onBefore');},
+                            onStart: (visit) => {console.log('onStart');},
+                            onProgress: (progress) => {console.log('onProgress');},
+                            onSuccess: (page, data) => {
+                                Swal.fire({
+                                    //position: 'top-end',
+                                    icon: 'success',
+                                    title: 'La venta se ha realizado exitosamente',
+                                    showConfirmButton: true,
+                                    timer: 1500,
+                                })
+                                window.open('/ventas/reportpdf?id=' + page.props.flash.message, '_blank');
+                                this.isComplete = true;
+                                //this.form = [];
+                                this.cart = [];
+                                //this.reset();
+                            },
+                            onError: (errors) => {console.log('onError');},
+                            onCancel: () => {console.log('onCancel');},
+                            onFinish: visit => {console.log('onFinish');},
+                        });
+                    }
+                })
+            }
         },
         onValidateCliente: function(isValid, tabIndex){
             console.log('registrar cart');
@@ -1662,7 +1719,6 @@ export default {
     created: function () {
         this.getCart();
         this.getPaises();
-        this.getDepartamentos();
         this.getClientes();
         this.getTiposdocumento();
     },

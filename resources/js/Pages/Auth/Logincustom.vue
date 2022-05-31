@@ -7,16 +7,19 @@ import JetInput from '@/Jetstream/Input.vue';
 import JetCheckbox from '@/Jetstream/Checkbox.vue';
 import JetLabel from '@/Jetstream/Label.vue';
 import JetValidationErrors from '@/Jetstream/ValidationErrors.vue';
+import { usePage } from '@inertiajs/inertia-vue3'
 
 defineProps({
     canResetPassword: Boolean,
     status: String,
+    _token: String
 });
 
 const form = useForm({
     username: '',
     password: '',
     remember: false,
+    _token: usePage().props.value._token,
 });
 
 const submit = () => {
@@ -41,6 +44,14 @@ const submit = () => {
 
         <div v-if="status" class="mb-4 font-medium text-sm text-green-600">
             {{ status }}
+        </div>
+
+        <div mx-auto class="bg-teal-100 border-t-4 border-teal-500 rounded-b text-teal-900 px-4 py-3 shadow-md my-3" role="alert" v-show="$page.props.flash.message">
+            <div class="flex">
+                <div>
+                    <p class="text-sm">{{ $page.props.flash.message }}</p>
+                </div>
+            </div>
         </div>
 
         <form @submit.prevent="submit">
@@ -71,7 +82,7 @@ const submit = () => {
             <div class="block mt-4">
                 <label class="flex items-center">
                     <JetCheckbox v-model:checked="form.remember" name="remember" />
-                    <span class="ml-2 text-sm text-gray-600">Remember me</span>
+                    <span class="ml-2 text-sm text-gray-600">Recordarme</span>
                 </label>
             </div>
 

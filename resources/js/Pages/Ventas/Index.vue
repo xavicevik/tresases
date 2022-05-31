@@ -1,5 +1,5 @@
 <template>
-    <AppLayout title="Numerosreservados">
+    <AppLayout title="Ventas">
         <template #header>
             <h2 class="font-semibold text-xl text-gray-800 leading-tight">
                 Lista de Ventas
@@ -21,44 +21,65 @@
                                 <Link :href="route('ventas.create')" class="bg-blue-500 text-xs  hover:bg-blue-700 text-white font-bold py-2 px-4 rounded ">Nueva venta</Link>
                             </div>
                         </div>
-                        <div>
-                            <div class="container flex justify-center items-center px-4 py-2">
-                                <div class="w-1/3 px-4">
-                                    <label class="block text-sm font-medium text-gray-700">Rifa</label>
-                                    <div class="mt-1">
-                                        <input type="text"  autocomplete="family-name" class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+
+
+                        <section>
+                            <div class="px-4">
+                                <form>
+                                    <div class="grid xl:grid-cols-2 xl:gap-6">
+                                        <div class="relative z-0 w-full mb-4 group">
+                                            <input type="text" v-model="form.venta" class="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border-blue-600 peer" placeholder=" " required />
+                                            <label class="peer-focus:font-medium absolute text-sm text-gray-500 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:left-0 peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6">
+                                                # Venta
+                                            </label>
+                                        </div>
+                                        <div class="relative z-0 w-full mb-4 group">
+                                            <input type="text" v-model="form.cliente" class="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border-blue-600 peer" placeholder=" " required />
+                                            <label class="peer-focus:font-medium absolute text-sm text-gray-500 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:left-0 peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6">
+                                                Cliente
+                                            </label>
+                                        </div>
                                     </div>
-                                </div>
-                                <div class="w-1/3 px-4">
-                                    <label class="block text-sm font-medium text-gray-700">Vendedor</label>
-                                    <div class="mt-1">
-                                        <input type="text"  autocomplete="family-name" class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                                    <div class="grid xl:grid-cols-2 xl:gap-6">
+                                        <div class="relative z-0 w-full mb-4 group">
+                                            <input type="text" v-model="form.vendedor" class="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border-blue-600 peer" placeholder=" " required />
+                                            <label class="peer-focus:font-medium absolute text-sm text-gray-500 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:left-0 peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6">
+                                                Vendedor
+                                            </label>
+                                        </div>
+                                        <div class="relative z-0 w-full mb-4 group">
+                                            <input type="text" v-model="form.puntoventa" class="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border-blue-600 peer" placeholder=" " required />
+                                            <label class="peer-focus:font-medium absolute text-sm text-gray-500 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:left-0 peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6">
+                                                Punto de venta
+                                            </label>
+                                        </div>
                                     </div>
-                                </div>
-                                <div class="w-1/3 px-4">
-                                    <label class="block text-sm font-medium text-gray-700">Cliente</label>
-                                    <div class="mt-1">
-                                        <input type="text"  autocomplete="family-name" class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                                    <div class="grid xl:grid-cols-2 xl:gap-6">
+                                        <div class="relative z-0 w-full mb-4 group">
+                                            <input type="text" v-model="form.comprobante" class="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border-blue-600 peer" placeholder=" " required />
+                                            <label class="peer-focus:font-medium absolute text-sm text-gray-500 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:left-0 peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6">
+                                                Comprobante
+                                            </label>
+                                        </div>
+                                        <div class="relative z-0 w-full mb-4 group">
+                                            <input type="text" v-model="form.rifa" class="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border-blue-600 peer" placeholder=" " required />
+                                            <label class="peer-focus:font-medium absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:left-0 peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6">
+                                                Rifa
+                                            </label>
+                                        </div>
                                     </div>
-                                </div>
+                                    <div class="grid xl:grid-cols-2 xl:gap-6">
+                                        <div class="relative z-0 w-full mb-4 group">
+                                            <Datepicker v-model="form.fechainicio" autoApply placeholder="Fecha inicio" class="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 appearance-none focus:outline-none focus:ring-0 focus:border-blue-600 peer"/>
+                                        </div>
+                                        <div class="relative z-0 w-full mb-4 group">
+                                            <Datepicker v-model="form.fechafin" autoApply placeholder="Fecha fin" class="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 appearance-none focus:outline-none focus:ring-0 focus:border-blue-600 peer"/>
+                                        </div>
+                                    </div>
+                                    <button type="button" @click="getData(form)" class="mx-auto text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center">Buscar</button>
+                                </form>
                             </div>
-
-                            <div class="container flex justify-center items-center px-4 py-2">
-                                <div class="mb-4 w-1/3 px-4">
-                                    <Datepicker  required  autoApply placeholder="Fecha inicio" class="border border-gray-700 rounded w-full text-gray-700 leading-tight focus:outline-none focus:shadow-outline"/>
-                                    <div v-if="$page.props.errors.fechainicio" class="text-red-500">{{ $page.props.errors.fechainicio }}</div>
-                                </div>
-
-                                <div class="mb-4 w-1/3 px-4">
-                                    <Datepicker  required autoApply placeholder="Fecha fin"  class="border border-gray-700 rounded w-full text-gray-700 leading-tight focus:outline-none focus:shadow-outline"/>
-                                    <div v-if="$page.props.errors.fechafin" class="text-red-500">{{ $page.props.errors.fechafin }}</div>
-                                </div>
-                                <div class="mb-4 w-1/3 px-4 mx-auto items-center">
-                                    <Link :href="route('ventas.create')" class="mx-auto bg-green-500 text-xs  hover:bg-green-700 text-white font-bold py-2 px-4 rounded ">Buscar</Link>
-                                </div>
-
-                            </div>
-                        </div>
+                        </section>
                     </section>
                     <!-- Fin Encabezado y titulo -->
                     <!-- Tabla de contenido -->
@@ -68,7 +89,7 @@
                                 <thead>
                                 <tr class="bg-gray-100">
                                     <th class="px-4 py-2 w-2/12 text-sm font-bold hover:bg-blue-500 hover:text-gray-50 rounded-b">
-                                        Rifa
+                                        Id
                                     </th>
                                     <th class="px-4 py-2 w-2/12 text-sm font-bold hover:bg-blue-500 hover:text-gray-50 rounded-b">
                                         Valor venta
@@ -91,13 +112,13 @@
                                 </tr>
                                 </thead>
                                 <tbody>
-                                <tr class="text-center" text-sm v-if="existedata > 0" v-for="(dato, id) in arrayData.data" :key="id">
-                                    <td class="border px-1 py-2 text-sm truncate" >xxx</td>
-                                    <td class="border px-1 py-2 text-sm truncate" v-text="dato.valorventa"></td>
+                                <tr :class="dato.id === selectedRow ? 'bg-blue-200' : ''"  class="text-center hover:bg-blue-400" @click="rowSelect(dato.id); getDetalles(dato.id)" text-sm v-if="existedata > 0" v-for="(dato, id) in arrayData.data" :key="dato.id">
+                                    <td class="border px-1 py-2 text-sm truncate" v-text="dato.id"></td>
+                                    <td class="border px-1 py-2 text-sm truncate" v-text="formatPrice(dato.valorventa)"></td>
                                     <td class="border px-1 py-2 text-sm truncate" v-text="dato.vendedor.nombre"></td>
                                     <td class="border px-1 py-2 text-sm truncate" v-text="dato.cliente.nombre"></td>
                                     <td class="border px-1 py-2 text-sm truncate" v-text="dato.puntoventa.nombre"></td>
-                                    <td class="border px-1 py-2 text-sm truncate" v-text="dato.fecha"></td>
+                                    <td class="border px-1 py-2 text-sm truncate" v-text="dateTimeFull(dato.fechaventa)"></td>
                                     <td class="border px-2 py-2 text-sm truncate" v-if="dato.estado">
                                         <span class="inline-flex px-2 text-sm font-semibold leading-5 text-green-800 bg-green-100 rounded-full">
                                             Activo
@@ -132,6 +153,117 @@
                         </div>
                     </section>
                     <!-- Fin Tabla de contenido -->
+
+                    <!-- Tabla de contenido -->
+                    <section>
+                        <div class="lg:px-4 md:px-2 sm:px-0 py-2 pb-6 overflow-y-auto h-50">
+                            <h2 class="font-semibold text-xl text-gray-800 leading-tight">
+                                Detalle de la venta
+                            </h2>
+                            <table class="table-fixed w-full">
+                                <thead>
+                                <tr class="bg-gray-100">
+                                    <th class="px-4 py-2 w-2/12 text-sm font-bold hover:bg-blue-500 hover:text-gray-50 rounded-b">
+                                        Id
+                                    </th>
+                                    <th class="px-4 py-2 w-2/12 text-sm font-bold hover:bg-blue-500 hover:text-gray-50 rounded-b">
+                                        Venta
+                                    </th>
+                                    <th class="px-4 py-2 w-2/12 text-sm font-bold hover:bg-blue-500 hover:text-gray-50 rounded-b">
+                                        Boleta
+                                    </th>
+                                    <th class="px-4 py-2 text-sm font-bold w-2/12 hover:bg-blue-500 hover:text-gray-50 rounded-b">
+                                        Rifa
+                                    </th>
+                                    <th class="px-4 py-2 text-sm font-bold w-2/12 hover:bg-blue-500 hover:text-gray-50 rounded-b">
+                                        Valor
+                                    </th>
+                                    <th class="px-4 py-2 text-sm font-bold w-2/12 hover:bg-blue-500 hover:text-gray-50 rounded-b">
+                                        Fecha
+                                    </th>
+                                    <th class="px-4 py-2 text-sm font-bold w-2/12 hover:bg-blue-500 hover:text-gray-50 rounded-b">
+                                        Estado
+                                    </th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr class="text-center" text-sm v-if="arrayDetalles.data" v-for="(dato, id) in arrayDetalles.data" :key="id">
+                                    <td class="border px-1 py-2 text-sm truncate" v-text="dato.id"></td>
+                                    <td class="border px-1 py-2 text-sm truncate" v-text="dato.idventa"></td>
+                                    <td class="border px-1 py-2 text-sm truncate" v-text="dato.numero"></td>
+                                    <td class="border px-1 py-2 text-sm truncate" v-text="dato.rifa.nombre_tecnico"></td>
+                                    <td class="border px-1 py-2 text-sm truncate" v-text="formatPrice(dato.valor)"></td>
+                                    <td class="border px-1 py-2 text-sm truncate" v-text="dateTimeFull(dato.fechaventa)"></td>
+                                    <td class="border px-2 py-2 text-sm truncate" v-if="dato.estado">
+                                        <span class="inline-flex px-2 text-sm font-semibold leading-5 text-green-800 bg-green-100 rounded-full">
+                                            Activo
+                                        </span>
+                                    </td>
+                                    <td class="border px-2 py-2 text-sm" v-else>
+                                        <span class="inline-flex px-2 text-xs font-semibold leading-5 text-red-800 bg-red-100 rounded-full">
+                                            Inactivo
+                                        </span>
+                                    </td>
+                                </tr>
+                                <tr v-else>
+                                    <td class="border px-4 py-2 text-xs text-center" colspan="7"> La consulta no obtuvo datos</td>
+                                </tr>
+                                </tbody>
+                            </table>
+                            <section class="mt-6">
+                                <div v-if="arrayDetalles.links.length > 3">
+                                    <div class="flex flex-wrap -mb-1">
+                                        <template v-for="(link, p) in arrayDetalles.links" :key="p">
+                                            <div v-if="link.url === null" class="mr-1 mb-1 px-4 py-3 text-sm leading-4 text-gray-400 border rounded"
+                                                 v-html="link.label" />
+                                            <button  v-else
+                                                     class="mr-1 mb-1 px-4 py-3 text-sm leading-4 border rounded hover:bg-white focus:border-indigo-500 focus:text-indigo-500"
+                                                     :class="{ 'bg-blue-700 text-white': link.active }"
+                                                     v-on:click="cambiarPage(link.url)"
+                                                     v-html="link.label" />
+                                        </template>
+                                    </div>
+                                </div>
+                            </section>
+                        </div>
+                    </section>
+                    <!-- Fin Tabla de contenido -->
+
+                    <!-- Tabla de comisiones -->
+                    <section>
+                        <div class="lg:px-4 md:px-2 sm:px-0 py-2 pb-6 overflow-y-auto h-50">
+                            <h2 class="font-semibold text-xl text-gray-800 leading-tight">
+                                Detalle de las comisiones
+                            </h2>
+                            <table class="table-fixed w-full">
+                                <thead>
+                                <tr class="bg-gray-100">
+                                    <th class="px-4 py-2 w-2/12 text-sm font-bold hover:bg-blue-500 hover:text-gray-50 rounded-b">
+                                        Comisión Mayorista
+                                    </th>
+                                    <th class="px-4 py-2 w-2/12 text-sm font-bold hover:bg-blue-500 hover:text-gray-50 rounded-b">
+                                        Comisión Distribuidor
+                                    </th>
+                                    <th class="px-4 py-2 text-sm font-bold w-2/12 hover:bg-blue-500 hover:text-gray-50 rounded-b">
+                                        Comisión vendedor
+                                    </th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr class="text-center" text-sm v-if="arrayComision" v-for="(dato, id) in arrayComision" :key="id">
+                                    <td class="border px-1 py-2 text-sm truncate" v-text="formatPrice(dato.comisionmayorista)"></td>
+                                    <td class="border px-1 py-2 text-sm truncate" v-text="formatPrice(dato.comisiondistribuidor)"></td>
+                                    <td class="border px-1 py-2 text-sm truncate" v-text="formatPrice(dato.comisionvendedor)"></td>
+                                </tr>
+                                <tr v-else>
+                                    <td class="border px-4 py-2 text-xs text-center" colspan="3"> La consulta no obtuvo datos</td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </section>
+                    <!-- Fin Tabla de comisiones -->
+
                 </div>
             </div>
         </div>
@@ -182,6 +314,7 @@ export default {
     },
     data() {
         return {
+            selectedRow: null,
             configMoney: {
                 masked: false,
                 prefix: '$ ',
@@ -202,7 +335,22 @@ export default {
                 data: [],
                 links: []
             },
+            arrayDetalles: {
+                data: [],
+                links: []
+            },
+            arrayComision: [],
             editMode: false,
+            form: {
+                venta: null,
+                cliente: null,
+                vendedor: null,
+                comprobante: null,
+                puntoventa: null,
+                rifa: null,
+                fechainicio: null,
+                fechafin: null
+            },
             verMode: false,
             isOpen: false,
             buscar: '',
@@ -261,28 +409,60 @@ export default {
             this.verMode = true;
             this.openModal('ver', data);
         },
-        getData: async function (buscar = '', filtro = 'nombre', paginate = true) {
+        getData: function (filtros = [], sortBy = 'ventas.id') {
+            if (sortBy == this.sortBy){
+                this.sortOrder = !this.sortOrder;
+            }
+            let sortOrderdesc;
+            if (this.sortOrder){
+                sortOrderdesc = 'asc';
+            } else {
+                sortOrderdesc = 'desc';
+            }
+            this.sortBy = sortBy;
+            this.ispage = true;
 
             var url= '/ventas';
             axios.get(url, {
                 params: {
-                    buscar: buscar,
-                    filtro: filtro,
-                    paginate: paginate,
-                    ispage: true,
+                    filtros: filtros,
+                    sortBy: this.sortBy,
+                    sortOrder: sortOrderdesc,
+                    ispage: this.ispage
                 }
             }).then((res) => {
-                console.log(res.data);
+                console.log(res);
                 var respuesta = res.data;
                 this.arrayData = respuesta.data;
-
-                if (this.arrayData.data.length > 0) {
-                    this.existedata = 1;
-                } else {
-                    this.existedata = 0;
-                }
             })
         },
+        getDetalles: function (id) {
+            var url= '/ventas/getDetalles';
+            axios.get(url, {
+                params: {
+                    id: id,
+                }
+            }).then((res) => {
+                var respuesta = res.data;
+                this.arrayDetalles = respuesta.data;
+            })
+
+            var url= '/ventas/getComisiones';
+            axios.get(url, {
+                params: {
+                    id: id,
+                }
+            }).then((res) => {
+                console.log(res);
+                var respuesta = res.data;
+                this.arrayComision = respuesta.data;
+            })
+
+        },
+        rowSelect(idx) {
+            console.dir(idx)
+            this.selectedRow = idx;
+        }
     },
     created: function () {
         //this.getPaises();

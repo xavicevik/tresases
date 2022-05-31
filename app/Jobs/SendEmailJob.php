@@ -36,6 +36,6 @@ class SendEmailJob implements ShouldQueue
     {
         $email = new Notificaciones($this->details);
 
-        \Mail::to('javier.minotta.h@gmail.com')->send(new Notificaciones($this->details));
+        \Mail::to($this->details['for'])->send(new Notificaciones($this->details));
     }
 }

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Rifa;
+use App\Models\Rol;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Redirect;
@@ -12,11 +13,12 @@ use Inertia\Inertia;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use Laravel\Jetstream\Jetstream;
+use Spatie\Permission\Models\Role;
 
 
 class UserController extends Controller
 {
-    const canPorPagina = 5;
+    const canPorPagina = 10;
     /**
      * Display a listing of the resource.
      *
@@ -64,7 +66,7 @@ class UserController extends Controller
         if ($request->has('ispage') && $request->ispage){
             return ['users' => $users];
         } else {
-            return Inertia::render('Users/Index', ['users' => $users]);
+            return Inertia::render('Users/Index', ['users' => $users, '_token' => csrf_token()]);
         }
     }
 
@@ -299,9 +301,21 @@ class UserController extends Controller
             'idempresa.gt' => 'Seleccione una Empresa',
         ])->validate();
 
+        $mytime= Carbon::now('America/Bogota');
+
         $user = User::create($request->all());
+        if(!$request->cambiarpassword) {
+            $user->changedpassword = $mytime->toDateString();
+        } else {
+            $user->changedpassword = null;
+        }
         $user->password = Hash::make($user->password);
+        $user->estado = true;
+
         $user->saveOrFail();
+
+        $rol = Rol::where('id', $user->idrol)->first();
+        $user->assignRole($rol->nombre);
 
         return redirect()->back()->with('message', 'Cliente creado satisfactoriamente');
     }
@@ -337,7 +351,61 @@ class UserController extends Controller
      */
     public function update(Request $request, User $user)
     {
-        //
+        Validator::make($request->all(), [
+            'nombre' => ['required', 'string', 'max:255'],
+            'apellido' => ['required', 'string', 'max:255'],
+            'correo' => ['required', 'string', 'email', 'max:255'],
+            'telefono' => ['required', 'string', 'max:255'],
+            'documento' => ['required', 'string', 'max:255'],
+            'documento' => ['required', 'string', 'max:255'],
+            'idtipos_documento' => 'required|numeric|gt:0',
+            'idpais' => 'required|numeric|gt:0',
+            'iddepartamento' => 'required|numeric|gt:0',
+            'idciudad' => 'required|numeric|gt:0',
+            'idrol' => 'required|numeric|gt:0',
+            'idempresa' => 'required|numeric|gt:0',
+        ],
+            [
+                'nombre.required' => 'Ingrese el nombre',
+                'apellido.required' => 'Ingrese el apellido',
+                'correo.required' => 'Ingrese el correo',
+                'telefono.required' => 'Ingrese el teléfono celular',
+                'documento.required' => 'Ingrese el número de identificacion',
+                'idtipos_documento.gt' => 'Seleccione una tipo de documento',
+                'idpais.gt' => 'Seleccione un País',
+                'iddepartamento.gt' => 'Seleccione un Departamento',
+                'idrol.gt' => 'Seleccione una Ciudad',
+                'idciudad.gt' => 'Seleccione un Rol',
+                'idempresa.gt' => 'Seleccione una Empresa',
+            ])->validate();
+
+        $mytime= Carbon::now('America/Bogota');
+
+        $user = User::where('id', $request->id)->first();
+        $user->update([
+                              'nombre' => $request->nombre,
+                              'apellido' => $request->apellido,
+                              'username' => $request->username,
+                              'correo' => $request->correo,
+                              'movil' => $request->movil,
+                              'telefono' => $request->telefono,
+                              'direccion' => $request->direccion,
+                              'idpais' => $request->idpais,
+                              'iddepartamento' => $request->iddepartamento,
+                              'idciudad' => $request->idciudad,
+                              'idempresa' => $request->idempresa,
+                              'idrol' => $request->idrol,
+                              'idtipos_documento' => $request->idtipos_documento,
+                              'documento' => $request->documento,
+                              'changedpassword' => $request->cambiarpassword?null:$mytime->toDateString(),
+                          ]
+                      );
+        $user->saveOrFail();
+
+        $rol = Role::where('id', $user->idrol)->first();
+        $user->syncRoles($rol);
+
+        return redirect()->back()->with('message', 'Usuario modificado satisfactoriamente');
     }
 
     /**
@@ -346,8 +414,12 @@ class UserController extends Controller
      * @param  \App\Models\User  $user
      * @return \Illuminate\Http\Response
      */
-    public function destroy(User $user)
+    public function destroy(Request $request)
     {
-        //
+        $user = User::where('id', $request->id)->first();
+        $user->estado = !$user->estado;
+        $user->save();
+
+        return redirect()->back()->with('message', 'Usuario modificado satisfactoriamente');
     }
 }
