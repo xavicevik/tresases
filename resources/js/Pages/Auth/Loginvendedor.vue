@@ -7,18 +7,21 @@ import JetInput from '@/Jetstream/Input.vue';
 import JetCheckbox from '@/Jetstream/Checkbox.vue';
 import JetLabel from '@/Jetstream/Label.vue';
 import JetValidationErrors from '@/Jetstream/ValidationErrors.vue';
+import { usePage } from '@inertiajs/inertia-vue3'
 
 defineProps({
     canResetPassword: Boolean,
     status: String,
-    puntoventas: []
+    puntoventas: [],
+    _token: String
 });
 
 const form = useForm({
     username: '',
     password: '',
     remember: false,
-    puntodeventa: 0
+    puntodeventa: 0,
+    _token: usePage().props.value._token,
 });
 
 const submit = () => {
@@ -46,6 +49,8 @@ const submit = () => {
         </div>
 
         <form @submit.prevent="submit">
+            <input type="hidden" name="_token" value="<?php echo csrf_token(); ?>" />
+
             <div>
                 <JetLabel for="username" value="Nombre de Usuario" />
                 <JetInput
@@ -78,7 +83,7 @@ const submit = () => {
             </div>
 
             <div class="mt-4">
-                <JetLabel for="idrol" value="Rol" />
+                <JetLabel for="puntodeventa" value="Punto de venta" />
 
                 <select class="block w-full rounded-lg text-gray-700 text-sm"  v-model="form.puntodeventa">
                     <option value="0" >Seleccione un punto de venta</option>

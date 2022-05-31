@@ -5,11 +5,14 @@ namespace App\Http\Controllers;
 use App\Models\Caja;
 use App\Models\Historialcaja;
 use App\Models\Pago;
+use App\Models\Rol;
+use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Validator;
 use Inertia\Inertia;
 use Carbon\Carbon;
@@ -42,14 +45,21 @@ class CajaController extends Controller
 
         if ($buscar == ''){
             $cajas = Caja::orderBy($sortBy, $sortOrder)
-                ->with('vendedor')
-                ->with('puntoventa')
-                ->paginate(self::canPorPagina);
+                        ->leftJoin('users', 'cajas.idvendedor', '=', 'users.id')
+                        ->with('puntoventa')
+                        ->select('cajas.*', 'users.username');
         } else {
             $cajas = Caja::orderBy($sortBy, $sortOrder)
-                ->with('vendedor')
-                ->with('puntoventa')
-                ->paginate(self::canPorPagina);
+                        ->leftJoin('users', 'cajas.idvendedor', '=', 'users.id')
+                        ->with('puntoventa')
+                        ->select('cajas.*', 'users.username');
+        }
+
+        if (Auth::user()->idrol == 5) {
+            $cajas = $cajas->where('idpuntoventa', Session::get('puntodeventa'));
+            $cajas = $cajas->paginate(self::canPorPagina);
+        } else {
+            $cajas = $cajas->paginate(self::canPorPagina);
         }
 
         if ($request->has('ispage') && $request->ispage){
@@ -113,6 +123,7 @@ class CajaController extends Controller
         $cajas = Caja::where('id', $request->id)
                       ->firstOrFail();
         $cajas->estado = 1;
+        $cajas->idvendedor = Auth::user()->id;
         $cajas->montoapertura = $request->montoapertura;
         $cajas->fechaapertura = $mytime->toDateTimeString();
         $cajas->fechacierre = null;
@@ -131,7 +142,9 @@ class CajaController extends Controller
 
         $cajas = Caja::where('id', $request->id)
                       ->firstOrFail();
+        $vendedor = $cajas->idvendedor;
         $cajas->estado = 0;
+        $cajas->idvendedor = 0;
         $cajas->montocierre = $request->montocierre;
         $cajas->fechacierre = $mytime->toDateTimeString();;
         $cajas->save();
@@ -142,7 +155,7 @@ class CajaController extends Controller
 
         $histocaja = new Historialcaja();
         $histocaja->idcaja = $cajas->id;
-        $histocaja->idvendedor = $cajas->idvendedor;
+        $histocaja->idvendedor = $vendedor;
         $histocaja->idpuntoventa = $cajas->idpuntoventa;
         $histocaja->montoapertura = $cajas->montoapertura;
         $histocaja->montocierre = $cajas->montocierre;

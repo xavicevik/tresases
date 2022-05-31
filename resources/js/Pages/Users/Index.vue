@@ -233,7 +233,7 @@
                                                         <div>
                                                             <label class="block text-sm font-medium text-gray-700">Nombre</label>
                                                             <div class="mt-1">
-                                                                <input type="text" :disabled="editMode" :class="{'bg-blue-100' : editMode}" v-model="form.nombre" autocomplete="given-name" class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                                                                <input type="text" :disabled="verMode" :class="{'bg-blue-100' : verMode}" v-model="form.nombre" autocomplete="given-name" class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
                                                                 <div v-if="$page.props.errors.nombre" class="text-red-500">{{ $page.props.errors.nombre }}</div>
                                                             </div>
                                                         </div>
@@ -241,7 +241,7 @@
                                                         <div>
                                                             <label class="block text-sm font-medium text-gray-700">Apellido</label>
                                                             <div class="mt-1">
-                                                                <input type="text" :disabled="editMode" :class="{'bg-blue-100' : editMode}" v-model="form.apellido" autocomplete="family-name" class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                                                                <input type="text" :disabled="verMode" :class="{'bg-blue-100' : verMode}" v-model="form.apellido" autocomplete="family-name" class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
                                                                 <div v-if="$page.props.errors.apellido" class="text-red-500">{{ $page.props.errors.apellido }}</div>
                                                             </div>
                                                         </div>
@@ -249,14 +249,14 @@
                                                         <div>
                                                             <label class="block text-sm font-medium text-gray-700">Correo</label>
                                                             <div class="mt-1">
-                                                                <input type="text" :disabled="editMode" :class="{'bg-blue-100' : editMode}" v-model="form.correo" autocomplete="street-address" class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                                                                <input type="text" :disabled="verMode" :class="{'bg-blue-100' : verMode}" v-model="form.correo" autocomplete="street-address" class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
                                                                 <div v-if="$page.props.errors.correo" class="text-red-500">{{ $page.props.errors.correo }}</div>
                                                             </div>
                                                         </div>
                                                         <div>
                                                             <label class="block text-sm font-medium text-gray-700">Movil</label>
                                                             <div class="mt-1">
-                                                                <input type="text" :disabled="editMode" :class="{'bg-blue-100' : editMode}" v-model="form.movil" autocomplete="street-address" class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                                                                <input type="text" :disabled="verMode" :class="{'bg-blue-100' : verMode}" v-model="form.movil" autocomplete="street-address" class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
                                                                 <div v-if="$page.props.errors.movil" class="text-red-500">{{ $page.props.errors.movil }}</div>
                                                             </div>
                                                         </div>
@@ -264,7 +264,7 @@
                                                         <div>
                                                             <label class="block text-sm font-medium text-gray-700">Tipo documento</label>
                                                             <div class="mt-1">
-                                                                <select :disabled="editMode" :class="{'bg-blue-100' : editMode}" class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" v-model="form.idtipos_documento">
+                                                                <select :disabled="verMode" :class="{'bg-blue-100' : verMode}" class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" v-model="form.idtipos_documento">
                                                                     <option value="0" >Seleccione</option>
                                                                     <option v-for="tipodoc in arrayTiposdocumento" :key="tipodoc.id" :value="tipodoc.id" v-text="tipodoc.nombre_corto"></option>
                                                                 </select>
@@ -275,7 +275,7 @@
                                                         <div>
                                                             <label class="block text-sm font-medium text-gray-700">Documento</label>
                                                             <div class="mt-1">
-                                                                <input type="text" :disabled="editMode" :class="{'bg-blue-100' : editMode}" v-model="form.documento" autocomplete="postal-code" class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                                                                <input type="text" :verMode="editMode" :class="{'bg-blue-100' : verMode}" v-model="form.documento" autocomplete="postal-code" class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
                                                                 <div v-if="$page.props.errors.documento" class="text-red-500">{{ $page.props.errors.documento }}</div>
                                                             </div>
                                                         </div>
@@ -283,7 +283,7 @@
                                                         <div>
                                                             <label class="block text-sm font-medium text-gray-700">Username</label>
                                                             <div class="mt-1">
-                                                                <input type="text" :disabled="editMode" :class="{'bg-blue-100' : editMode}" v-model="form.username" autocomplete="postal-code" class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                                                                <input type="text" :disabled="verMode" :class="{'bg-blue-100' : verMode}" v-model="form.username" autocomplete="postal-code" class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
                                                                 <div v-if="$page.props.errors.username" class="text-red-500">{{ $page.props.errors.username }}</div>
                                                             </div>
                                                         </div>
@@ -291,15 +291,25 @@
                                                         <div>
                                                             <label class="block text-sm font-medium text-gray-700">Password</label>
                                                             <div class="mt-1">
-                                                                <input type="password" :disabled="editMode" :class="{'bg-blue-100' : editMode}" v-model="form.password" autocomplete="postal-code" class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                                                                <input type="password" :disabled="verMode" :class="{'bg-blue-100' : verMode}" v-model="form.password" autocomplete="postal-code" class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
                                                                 <div v-if="$page.props.errors.password" class="text-red-500">{{ $page.props.errors.password }}</div>
+
+                                                                <div class="flex items-center">
+                                                                    <input v-if="!verMode" checked v-model="form.cambiarpassword" type="checkbox" value="1" class="w-4 h-4 text-blue-600 bg-gray-100 rounded border-gray-300 focus:ring-blue-500 focus:ring-2">
+                                                                    <label v-if="!verMode" class="ml-2 text-sm font-medium text-gray-900">Solicitar cambio?</label>
+                                                                    <a href="#" @click="cambiarPass()" v-if="editMode">
+                                                                        <span class="ml-2 underline text-sm text-blue-600"> Cambiar Password</span>
+                                                                    </a>
+
+                                                                </div>
+
                                                             </div>
                                                         </div>
 
                                                         <div>
                                                             <label class="block text-sm font-medium text-gray-700">Teléfono</label>
                                                             <div class="mt-1">
-                                                                <input type="text" :disabled="editMode" :class="{'bg-blue-100' : editMode}" v-model="form.telefono" autocomplete="postal-code" class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                                                                <input type="text" :disabled="verMode" :class="{'bg-blue-100' : verMode}" v-model="form.telefono" autocomplete="postal-code" class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
                                                                 <div v-if="$page.props.errors.telefono" class="text-red-500">{{ $page.props.errors.telefono }}</div>
                                                             </div>
                                                         </div>
@@ -307,7 +317,7 @@
                                                         <div>
                                                             <label class="block text-sm font-medium text-gray-700">País</label>
                                                             <div class="mt-1">
-                                                                <select :disabled="editMode" :class="{'bg-blue-100' : editMode}" class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" v-model="form.idpais" @change="getDepartamentos()">
+                                                                <select :disabled="verMode" :class="{'bg-blue-100' : verMode}" class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" v-model="form.idpais" @change="getDepartamentos()">
                                                                     <option value="0" >Seleccione País</option>
                                                                     <option v-for="pais in arrayPaises" :key="pais.id" :value="pais.id" v-text="pais.nombre"></option>
                                                                 </select>
@@ -317,7 +327,7 @@
                                                         <div>
                                                             <label class="block text-sm font-medium text-gray-700">Departamento</label>
                                                             <div class="mt-1">
-                                                                <select :disabled="editMode" :class="{'bg-blue-100' : editMode}" class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" v-model="form.iddepartamento" @change="getCiudades">
+                                                                <select :disabled="verMode" :class="{'bg-blue-100' : verMode}" class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" v-model="form.iddepartamento" @change="getCiudades">
                                                                     <option value="0" >Seleccione departamento</option>
                                                                     <option v-for="departamento in arrayDepartamentos" :key="departamento.id" :value="departamento.id" v-text="departamento.nombre"></option>
                                                                 </select>
@@ -327,7 +337,7 @@
                                                         <div>
                                                             <label class="block text-sm font-medium text-gray-700">Ciudad</label>
                                                             <div class="mt-1">
-                                                                <select :disabled="editMode" :class="{'bg-blue-100' : editMode}" class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" v-model="form.idciudad">
+                                                                <select :disabled="verMode" :class="{'bg-blue-100' : verMode}" class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" v-model="form.idciudad">
                                                                     <option value="0" >Seleccione Ciudad</option>
                                                                     <option v-for="ciudad in arrayCiudades" :key="ciudad.id" :value="ciudad.id" v-text="ciudad.nombre"></option>
                                                                 </select>
@@ -337,7 +347,7 @@
                                                         <div>
                                                             <label class="block text-sm font-medium text-gray-700">Dirección</label>
                                                             <div class="mt-1">
-                                                                <input type="email" :disabled="editMode" :class="{'bg-blue-100' : editMode}" v-model="form.direccion" autocomplete="email" class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                                                                <input type="email" :disabled="verMode" :class="{'bg-blue-100' : verMode}" v-model="form.direccion" autocomplete="email" class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
                                                                 <div v-if="$page.props.errors.direccion" class="text-red-500">{{ $page.props.errors.direccion }}</div>
                                                             </div>
                                                         </div>
@@ -345,7 +355,7 @@
                                                         <div>
                                                             <label class="block text-sm font-medium text-gray-700">Rol</label>
                                                             <div class="mt-1">
-                                                                <select :disabled="editMode" @change="getEmpresas()" :class="{'bg-blue-100' : editMode}" class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" v-model="form.idrol">
+                                                                <select :disabled="verMode" @change="getEmpresas()" :class="{'bg-blue-100' : verMode}" class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" v-model="form.idrol">
                                                                     <option value="0" >Seleccione Rol</option>
                                                                     <option v-for="rol in arrayRoles" :key="rol.id" :value="rol.id" v-text="rol.nombre"></option>
                                                                 </select>
@@ -356,7 +366,7 @@
                                                         <div>
                                                             <label class="block text-sm font-medium text-gray-700">Empresa</label>
                                                             <div class="mt-1">
-                                                                <select :disabled="editMode" :class="{'bg-blue-100' : editMode}" class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" v-model="form.idempresa">
+                                                                <select :disabled="verMode" :class="{'bg-blue-100' : verMode}" class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" v-model="form.idempresa">
                                                                     <option value="0" >Seleccione empresa</option>
                                                                     <option v-for="empresa in arrayEmpresas" :key="empresa.id" :value="empresa.id" v-text="empresa.razon_social"></option>
                                                                 </select>
@@ -369,7 +379,7 @@
                                         </div>
                                         <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
                                             <span class="flex w-full rounded-md shadow-sm sm:ml-3 sm:w-auto">
-                                              <button v-show="!editMode" @click="save(form)" wire:click.prevent="store()" type="button" class="inline-flex justify-center w-full rounded-md border border-transparent px-4 py-2 bg-green-600 text-base leading-6 font-medium text-white shadow-sm hover:bg-green-500 focus:outline-none focus:border-green-700 focus:shadow-outline-green transition ease-in-out duration-150 sm:text-sm sm:leading-5" >
+                                              <button v-show="newMode" @click="save(form)" wire:click.prevent="store()" type="button" class="inline-flex justify-center w-full rounded-md border border-transparent px-4 py-2 bg-green-600 text-base leading-6 font-medium text-white shadow-sm hover:bg-green-500 focus:outline-none focus:border-green-700 focus:shadow-outline-green transition ease-in-out duration-150 sm:text-sm sm:leading-5" >
                                                 Guardar
                                               </button>
                                             </span>
@@ -392,6 +402,70 @@
                         </div>
                     </section>
                     <!-- Fin Ventana modal Detalles -->
+
+                    <!-- Ventana modal cambiar passwd -->
+                    <!-- Main modal -->
+                    <section> <!-- Ventana modal -->
+                        <div class="fixed z-10 inset-0 overflow-y-auto ease-out duration-400" v-if="isOpencambiopass">
+                            <div class="items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+
+                                <div class="fixed inset-0 transition-opacity">
+                                    <div class="absolute inset-0 bg-gray-500 opacity-75"></div>
+                                </div>
+
+                                <!-- This element is to trick the browser into centering the modal contents. -->
+                                <span class="hidden sm:inline-block sm:align-middle sm:h-screen"></span>
+                                <div class="inline-block lg:w-6/12 align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:w-full" role="dialog" aria-modal="true" aria-labelledby="modal-headline">
+                                    <button type="button" @click="isOpencambiopass = false" class="absolute top-3 right-2.5 text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center dark:hover:bg-gray-800 dark:hover:text-white" data-modal-toggle="authentication-modal">
+                                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg>
+                                    </button>
+                                    <div class="">
+                                        <h2 v-text="tituloModal" class="text-xl font-bold text-gray-900 px-4 py-4"></h2>
+                                    </div>
+                                    <form @submit.prevent="submit">
+                                        <div class="bg-white px-4 pt-2 pb-4 ">
+                                            <div class="">
+                                                <section>
+                                                    <div class="mt-2 grid gap-y-6 ">
+                                                        <div>
+                                                            <label class="block text-sm font-medium text-gray-700">Password</label>
+                                                            <div class="mt-1">
+                                                                <input type="password" v-model="formpasswd.password" autocomplete="given-name" class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                                                                <div v-if="$page.props.errors.updatePassword" class="text-red-500">{{ $page.props.errors.updatePassword }}</div>
+                                                            </div>
+                                                        </div>
+
+                                                        <div>
+                                                            <label class="block text-sm font-medium text-gray-700">Confirmar Password</label>
+                                                            <div class="mt-1">
+                                                                <input type="password" v-model="formpasswd.password_confirmation" autocomplete="given-name" class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                                                            </div>
+                                                        </div>
+
+                                                    </div>
+                                                </section>
+                                            </div>
+                                        </div>
+                                        <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+                                            <span class="flex w-full rounded-md shadow-sm sm:ml-3 sm:w-auto">
+                                              <button wire:click.prevent="updatePass()" @click="updatePass(formpasswd)" type="button" class="inline-flex justify-center w-full rounded-md border border-transparent px-4 py-2 bg-green-600 text-base leading-6 font-medium text-white shadow-sm hover:bg-green-500 focus:outline-none focus:border-green-700 focus:shadow-outline-green transition ease-in-out duration-150 sm:text-sm sm:leading-5" >
+                                                Cambiar password
+                                              </button>
+                                            </span>
+                                            <span class="mt-3 flex w-full rounded-md shadow-sm sm:mt-0 sm:w-auto">
+
+                                          <button @click="isOpencambiopass = false" type="button" class="inline-flex justify-center w-full rounded-md border border-gray-300 px-4 py-2 bg-white text-base leading-6 font-medium text-gray-700 shadow-sm hover:text-gray-500 focus:outline-none focus:border-blue-300 focus:shadow-outline-blue transition ease-in-out duration-150 sm:text-sm sm:leading-5">
+                                            Cancelar
+                                          </button>
+                                        </span>
+                                        </div>
+                                    </form>
+
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+                    <!-- Fin Ventana modal passwd -->
 
 
                 </div>
@@ -419,13 +493,15 @@ import { Money3Component } from 'v-money3'
 
 
 import { Inertia } from '@inertiajs/inertia';
-import { Head, Link } from '@inertiajs/inertia-vue3';
+import {Head, Link, usePage} from '@inertiajs/inertia-vue3';
 import JetNavLink from '@/Jetstream/NavLink.vue';
 import NavLink from "../../Jetstream/NavLink";
+import Input from "../../Jetstream/Input";
 
 export default {
 
     components: {
+        Input,
         NavLink,
         Button,
         AppLayout,
@@ -472,6 +548,12 @@ export default {
             uploadDragoverTracking2: false,
             uploadDragoverEvent2: false,
             tituloModal: '',
+            formpasswd: {
+                _token: usePage().props.value._token,
+                id: '',
+                password: '',
+                password_confirmation: '',
+            },
             form: {
                 id: null,
                 nombre: '',
@@ -493,6 +575,7 @@ export default {
                 camaracomercio: false,
                 rut: false,
                 url: false,
+                cambiarpassword: true
             },
             arrayPaises: [],
             arrayDepartamentos: [],
@@ -502,7 +585,9 @@ export default {
             arrayEmpresas: [],
             editMode: false,
             verMode: false,
+            newMode: false,
             isOpen: false,
+            isOpencambiopass: false,
             existeuser: 1,
             buscar: '',
             arrayUsers: {
@@ -543,13 +628,35 @@ export default {
             const file = e.target.files[0];
             this.url = URL.createObjectURL(file);
         },
+        cambiarPass: function(){
+            this.isOpencambiopass = true;
+        } ,
+        updatePass: function(data) {
+            this.$inertia.post('/change-passwordsu', data, {
+                onSuccess: (page) => {
+                    Swal.fire({
+                        position: 'top-end',
+                        icon: 'success',
+                        title: 'Se ha cambiado la contraseña',
+                        showConfirmButton: false,
+                        timer: 1500
+                    })
+                    this.formpasswd.id = 0;
+                    this.formpasswd.password = '';
+                    this.formpasswd.password_confirmation = '';
+                    this.isOpencambiopass = false;
+                    this.getUsers('','nombre');
+                    this.editMode = false;
+                    this.closeModal();
+                },
+            });
+        },
         openModal: function (accion, data = []) {
             this.isOpen = true;
 
             switch (accion) {
                 case 'registrar':
                 {
-                    //this.form = [];
                     this.tituloModal = 'Crear nuevo Usuario';
                     this.form.idpais = 0;
                     this.form.iddepartamento = 0;
@@ -562,26 +669,69 @@ export default {
                     this.getCiudades();
                     this.getDepartamentos();
                     this.getTiposdocumento();
+                    this.newMode = true;
+                    this.verMode = false;
+                    this.editMode = false;
                     break;
                 }
-                case 'actualizar': {
-                    this.tituloModal = 'Actualizar el punto de venta ' + data['nombre'];
-                    this.form.id = data['id'];
-                    this.form.nombre = data['nombre'];
-                    this.form.direccion = data['direccion'];
+                case 'ver': {
+                    this.tituloModal = 'Ver Usuario ' + data['username'];
                     this.form.idpais = data['idpais'];
                     this.form.iddepartamento = data['iddepartamento'];
                     this.form.idciudad = data['idciudad'];
-                    this.form.latitud = data['latitud'];
-                    this.form.altitud = data['altitud'];
-                    this.form.codigo = data['codigo'];
-                    this.form.descripcion = data['descripcion'];
-                    this.form.url = data['url'];
-                    this.form.estado = data['estado'];
-                    this.getDepartamentos();
+                    this.form.idtipos_documento = data['idtipos_documento'];
+                    this.form.idrol = data['idrol'];
+                    this.form.idempresa = data['idempresa'];
+                    this.form.nombre = data['nombre'];
+                    this.form.apellido = data['apellido'];
+                    this.form.correo = data['correo'];
+                    this.form.movil = data['movil'];
+                    this.form.documento = data['documento'];
+                    this.form.username = data['username'];
+                    this.form.direccion = data['direccion'];
+                    this.form.telefono = data['telefono'];
+                    this.getRoles();
+                    this.getPaises();
                     this.getCiudades();
+                    this.getDepartamentos();
+                    this.getTiposdocumento();
+                    this.getEmpresas();
+                    this.newMode = false;
+                    this.verMode = true;
+                    this.editMode = false;
+                    break;
                     break;
                 }
+                case 'actualizar': {
+                    this.form.id = data['id'];
+                    this.tituloModal = 'Actualizar Usuario ' + data['username'];
+                    this.form.idpais = data['idpais'];
+                    this.form.iddepartamento = data['iddepartamento'];
+                    this.form.idciudad = data['idciudad'];
+                    this.form.idtipos_documento = data['idtipos_documento'];
+                    this.form.idrol = data['idrol'];
+                    this.form.idempresa = data['idempresa'];
+                    this.form.nombre = data['nombre'];
+                    this.form.apellido = data['apellido'];
+                    this.form.correo = data['correo'];
+                    this.form.movil = data['movil'];
+                    this.form.documento = data['documento'];
+                    this.form.username = data['username'];
+                    this.form.direccion = data['direccion'];
+                    this.form.telefono = data['telefono'];
+                    this.getRoles();
+                    this.getPaises();
+                    this.getCiudades();
+                    this.getDepartamentos();
+                    this.getTiposdocumento();
+                    this.getEmpresas();
+                    this.newMode = false;
+                    this.verMode = false;
+                    this.editMode = true;
+                    break;
+                    break;
+                }
+
             }
         },
         closeModal: function () {
@@ -649,6 +799,7 @@ export default {
             //this.form = Object.assign({}, data);
             this.editMode = true;
             //console.log(this.form);
+            this.formpasswd.id = data['id'];
             this.openModal('actualizar', data);
         },
         ver: function (data) {
@@ -656,28 +807,24 @@ export default {
             this.openModal('ver', data);
         },
         update: function (data) {
-            data.fechainicio = this.dateTimeFull(data.fechainicio);
-            data.fechafin = this.dateTimeFull(data.fechafin);
             console.log(data);
             data._method = 'PUT';
-            this.$inertia.post('/rifas/'  + data.id, data, {
-                onBefore: (visit) => { console.log('onBefore');},
-                onStart: (visit) => {console.log('onStart');},
-                onProgress: (progress) => {console.log('onProgress');},
+            this.$inertia.post('/users/'  + data.id, data, {
                 onSuccess: (page) => {
-                    Swal.fire(
-                        'Actualización rifa',
-                        'El rifa se ha actualizado!',
-                        'success'
-                    )
+                    Swal.fire({
+                        position: 'top-end',
+                        icon: 'success',
+                        title: 'El usuario se ha actualizado!',
+                        showConfirmButton: false,
+                        timer: 1500
+                    })
                     this.getUsers('','nombre');
                     this.closeModal();
                     this.reset();
                     this.editMode = false;
+                    this.verMode = false;
+                    this.newMode = false;
                 },
-                onError: (errors) => {console.log('onError');},
-                onCancel: () => {console.log('onCancel');},
-                onFinish: visit => {console.log('onFinish');},
             });
 
         },
@@ -782,13 +929,13 @@ export default {
             let title = '';
             let html = '';
             if (data.estado) {
-                mensaje = 'Desea desactivar la rifa?';
-                title = 'Desactivada!';
-                html = 'La rifa ha sido desactivada con éxito.';
+                mensaje = 'Desea desactivar el usuario?';
+                title = 'Desactivado!';
+                html = 'El usuario ha sido desactivado con éxito';
             } else {
-                mensaje = 'Desea activar la rifa?';
-                title = 'Activada!';
-                html = 'La rifa ha sido activada con éxito.';
+                mensaje = 'Desea activar el usuario?';
+                title = 'Activado!';
+                html = 'El usuario ha sido activado con éxito.';
             }
             Swal.fire({
                 title: mensaje,
@@ -800,7 +947,7 @@ export default {
                 confirmButtonText: 'Si, Proceder!'
             }).then((result) => {
                 data._method = 'DELETE';
-                axios.post('/rifas/' + data.id, data)
+                axios.post('/users/' + data.id, data)
                     .then((res) => {
                         this.getUsers('','nombre');
                         Swal.fire(

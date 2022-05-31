@@ -386,13 +386,37 @@ export default {
                             </li>
                         </div>
                         <li>
-                            <Link v-if="$can('ventas-list')" :href="route('confcomisiones.index')" class="relative flex flex-row items-center h-11 focus:outline-none hover:bg-blue-800 dark:hover:bg-gray-600 text-white-600 hover:text-white-800 border-l-4 border-transparent hover:border-blue-500 dark:hover:border-gray-800 pr-6">
+                            <a v-if="$can('ventas-list')" href="#" @click="isMenuComision = !isMenuComision" class="relative flex flex-row items-center h-11 focus:outline-none hover:bg-blue-800 dark:hover:bg-gray-600 text-white-600 hover:text-white-800 border-l-4 border-transparent hover:border-blue-500 dark:hover:border-gray-800 pr-6">
                                 <span class="inline-flex justify-center items-center ml-4">
                                   <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"></path></svg>
                                 </span>
                                 <span class="ml-2 text-sm tracking-wide truncate">Comisiones</span>
-                            </Link>
+                            </a>
                         </li>
+                        <div v-show="isMenuComision && $can('ventas-list')" class="pl-8 bg-gray-700 text-white-600 hover:text-white-600">
+                            <li>
+                                <Link v-if="$can('ventas-list')" :href="route('comisiones.index')" :active="route().current('ventas.index')" class="relative flex flex-row items-center h-8 focus:outline-none  border-l-4 border-transparent hover:border-blue-500 dark:hover:border-gray-800 pr-6">
+                                <span class="inline-flex justify-center items-center ml-4">
+                                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                      <path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd" />
+                                  </svg>
+                                </span>
+                                    <span class="ml-2 text-sm tracking-wide truncate">Buscar</span>
+                                </Link>
+                            </li>
+                            <li>
+                                <Link v-if="$can('ventas-list')" :href="route('confcomisiones.index')" href="#" class="relative flex flex-row items-center h-8 focus:outline-none hover:bg-blue-800 dark:hover:bg-gray-600 text-white-600 hover:text-white-800 border-l-4 border-transparent hover:border-blue-500 dark:hover:border-gray-800 pr-6">
+                            <span class="inline-flex justify-center items-center ml-4">
+                              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z"></path></svg>
+                            </span>
+                                    <span class="ml-2 text-sm tracking-wide truncate">Configuración</span>
+                                </Link>
+                            </li>
+                        </div>
+
+
+
+
                     </ul>
                     <p class="mb-14 px-5 py-3 hidden md:block text-center text-xs">TresAses.com Copyright @2022</p>
                 </div>

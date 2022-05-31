@@ -55,7 +55,7 @@
                                                     <div class="relative">
                                                         <div class="absolute top-4 left-3">
                                                             <i class="fa fa-search text-gray-400 z-20 hover:text-gray-500"></i> </div>
-                                                        <input type="text" v-model="form.numero" @keypress.enter="valBoletaLibre(form.numero, form.idrifa.id, form.idrifa.cifras)" class="h-8 w-96 pl-4 pr-4 rounded-lg z-0 focus:shadow focus:outline-none" :placeholder="'Buscar (' + form.rangoinicial?form.rangoinicial : '' + ' - ' + form.rangofinal +')'">
+                                                        <money3 v-bind="configMoney2" v-model="form.numero" @keypress.enter="valBoletaLibre(form.numero, form.idrifa.id, form.idrifa.cifras)" class="h-8 w-96 pl-4 pr-4 rounded-lg z-0 focus:shadow focus:outline-none" :placeholder="'Buscar (' + form.rangoinicial?form.rangoinicial : '' + ' - ' + form.rangofinal +')'"></money3>
                                                         <a @click="valBoletaLibre(form.numero, form.idrifa.id, form.idrifa.cifras)">
                                                             <div class="absolute top-2 right-2">
                                                                 <Icon icon="fe:search" class="h-4"  />
@@ -927,6 +927,7 @@ export default {
                    loteria: [],
                    promocionales: [],
                    tiposerie: [],
+                   cifras: 0
                 },
                 cliente: {
                     nombre: null,
@@ -943,8 +944,8 @@ export default {
                 },
                 numero: null,
                 estado: false,
-                rangoinicial: null,
-                rangofinal: null,
+                rangoinicial: 0,
+                rangofinal: 0,
                 idvendedor: 0,
                 idcliente: 0,
                 fecha: null,
@@ -963,6 +964,21 @@ export default {
                 paymentmethod: 0,
                 valorpagar: 0,
             },
+            configMoney2: {
+                masked: true,
+                prefix: '',
+                suffix: '',
+                thousands: '',
+                decimal: '',
+                precision: 0,
+                disableNegative: true,
+                disabled: false,
+                min: 0,
+                max: 0,
+                allowBlank: false,
+                minimumNumberOfCharacters: 0,
+            },
+
             editMode: false,
             verMode: false,
             isOpen: false,
@@ -1002,7 +1018,6 @@ export default {
         }
     },
     methods: {
-
         cambiarPage: function (url = '') {
             axios.get(url, {
                 params: {
@@ -1048,6 +1063,9 @@ export default {
                 this.form.rangofinal = rangofinal.toString();
                 this.form.numero = null;
             }
+            this.configMoney2.min = this.form.rangoinicial;
+            this.configMoney2.max = this.form.rangofinal;
+            this.configMoney2.minimumNumberOfCharacters = this.form.idrifa.cifras;
 
         },
         selectNumero: async function(tipo) {

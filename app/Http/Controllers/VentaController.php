@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Jobs\SendEmailJob;
 use App\Models\Boleta;
 use App\Models\Caja;
+use App\Models\Comision;
+use App\Models\Confcomision;
 use App\Models\Detalleventa;
 use App\Models\Loteria;
 use App\Models\Imagen;
@@ -133,6 +135,15 @@ class VentaController extends Controller
                         ->paginate(self::canPorPagina);
 
        return ['data' => $detalle];
+    }
+
+    public function getComisiones(Request $request)
+    {
+        $comisiones = Comision::where('idventa', $request->id)
+            ->with('configuracion')
+            ->get();
+
+        return ['data' => $comisiones];
     }
 
     public function sumary(Request $request)
@@ -317,9 +328,23 @@ class VentaController extends Controller
             $pago->idcaja = $request->session()->get('caja', 0)[0];
             $pago->save();
 
+            $concomision = Confcomision::join('users as t1', 'confcomisiones.idvendedor', '=', 't1.idempresa')
+                                        ->select('confcomisiones.*')
+                                        ->where('t1.id', $venta->idvendedor)
+                                        ->first();
+            $comision = new Comision();
+            $comision->idventa = $venta->id;
+            $comision->idconfiguracion = $concomision->id;
+            $comision->valorventa = $venta->valortotal;
+            $comision->comisionmayorista = $venta->valortotal * ($concomision->comisionmayorista/100);
+            $comision->comisiondistribuidor = $venta->valortotal * ($concomision->comisiondistribuidor/100);
+            $comision->comisionvendedor = $venta->valortotal * ($concomision->comisionvendedor/100);
+            $comision->estado = true;
+            $comision->save();
+
             DB::commit();
 
-            $subject = "TresAses - Venta #".$request->idventa;
+            $subject = "TresAses - Venta # ".$venta->id;
             $for = $venta['cliente']->correo;
             $url = $request->url;
 
@@ -329,11 +354,12 @@ class VentaController extends Controller
                 ->with('cliente')
                 ->with('vendedor')
                 ->get();
-            $venta = $data[0];
+            $ventamail = $data[0];
 
             $data = array(
-                'data'     => $venta,
-                'subject'  => $subject
+                'data'     => $ventamail,
+                'subject'  => $subject,
+                'for'      => $for,
             );
 
             SendEmailJob::dispatch($data);
@@ -394,7 +420,6 @@ class VentaController extends Controller
         }
 
         return ['boleta' => $boleta];
-
     }
 
     public function reportpdf(Request $request)

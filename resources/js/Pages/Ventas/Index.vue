@@ -1,5 +1,5 @@
 <template>
-    <AppLayout title="Numerosreservados">
+    <AppLayout title="Ventas">
         <template #header>
             <h2 class="font-semibold text-xl text-gray-800 leading-tight">
                 Lista de Ventas
@@ -114,7 +114,7 @@
                                 <tbody>
                                 <tr :class="dato.id === selectedRow ? 'bg-blue-200' : ''"  class="text-center hover:bg-blue-400" @click="rowSelect(dato.id); getDetalles(dato.id)" text-sm v-if="existedata > 0" v-for="(dato, id) in arrayData.data" :key="dato.id">
                                     <td class="border px-1 py-2 text-sm truncate" v-text="dato.id"></td>
-                                    <td class="border px-1 py-2 text-sm truncate" v-text="dato.valorventa"></td>
+                                    <td class="border px-1 py-2 text-sm truncate" v-text="formatPrice(dato.valorventa)"></td>
                                     <td class="border px-1 py-2 text-sm truncate" v-text="dato.vendedor.nombre"></td>
                                     <td class="border px-1 py-2 text-sm truncate" v-text="dato.cliente.nombre"></td>
                                     <td class="border px-1 py-2 text-sm truncate" v-text="dato.puntoventa.nombre"></td>
@@ -192,7 +192,7 @@
                                     <td class="border px-1 py-2 text-sm truncate" v-text="dato.idventa"></td>
                                     <td class="border px-1 py-2 text-sm truncate" v-text="dato.numero"></td>
                                     <td class="border px-1 py-2 text-sm truncate" v-text="dato.rifa.nombre_tecnico"></td>
-                                    <td class="border px-1 py-2 text-sm truncate" v-text="dato.valor"></td>
+                                    <td class="border px-1 py-2 text-sm truncate" v-text="formatPrice(dato.valor)"></td>
                                     <td class="border px-1 py-2 text-sm truncate" v-text="dateTimeFull(dato.fechaventa)"></td>
                                     <td class="border px-2 py-2 text-sm truncate" v-if="dato.estado">
                                         <span class="inline-flex px-2 text-sm font-semibold leading-5 text-green-800 bg-green-100 rounded-full">
@@ -228,6 +228,42 @@
                         </div>
                     </section>
                     <!-- Fin Tabla de contenido -->
+
+                    <!-- Tabla de comisiones -->
+                    <section>
+                        <div class="lg:px-4 md:px-2 sm:px-0 py-2 pb-6 overflow-y-auto h-50">
+                            <h2 class="font-semibold text-xl text-gray-800 leading-tight">
+                                Detalle de las comisiones
+                            </h2>
+                            <table class="table-fixed w-full">
+                                <thead>
+                                <tr class="bg-gray-100">
+                                    <th class="px-4 py-2 w-2/12 text-sm font-bold hover:bg-blue-500 hover:text-gray-50 rounded-b">
+                                        Comisión Mayorista
+                                    </th>
+                                    <th class="px-4 py-2 w-2/12 text-sm font-bold hover:bg-blue-500 hover:text-gray-50 rounded-b">
+                                        Comisión Distribuidor
+                                    </th>
+                                    <th class="px-4 py-2 text-sm font-bold w-2/12 hover:bg-blue-500 hover:text-gray-50 rounded-b">
+                                        Comisión vendedor
+                                    </th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr class="text-center" text-sm v-if="arrayComision" v-for="(dato, id) in arrayComision" :key="id">
+                                    <td class="border px-1 py-2 text-sm truncate" v-text="formatPrice(dato.comisionmayorista)"></td>
+                                    <td class="border px-1 py-2 text-sm truncate" v-text="formatPrice(dato.comisiondistribuidor)"></td>
+                                    <td class="border px-1 py-2 text-sm truncate" v-text="formatPrice(dato.comisionvendedor)"></td>
+                                </tr>
+                                <tr v-else>
+                                    <td class="border px-4 py-2 text-xs text-center" colspan="3"> La consulta no obtuvo datos</td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </section>
+                    <!-- Fin Tabla de comisiones -->
+
                 </div>
             </div>
         </div>
@@ -303,6 +339,7 @@ export default {
                 data: [],
                 links: []
             },
+            arrayComision: [],
             editMode: false,
             form: {
                 venta: null,
@@ -400,8 +437,17 @@ export default {
             })
         },
         getDetalles: function (id) {
-            console.log('registo ' + id);
             var url= '/ventas/getDetalles';
+            axios.get(url, {
+                params: {
+                    id: id,
+                }
+            }).then((res) => {
+                var respuesta = res.data;
+                this.arrayDetalles = respuesta.data;
+            })
+
+            var url= '/ventas/getComisiones';
             axios.get(url, {
                 params: {
                     id: id,
@@ -409,8 +455,9 @@ export default {
             }).then((res) => {
                 console.log(res);
                 var respuesta = res.data;
-                this.arrayDetalles = respuesta.data;
+                this.arrayComision = respuesta.data;
             })
+
         },
         rowSelect(idx) {
             console.dir(idx)
