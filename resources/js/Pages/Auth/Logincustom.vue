@@ -42,10 +42,6 @@ const submit = () => {
 
         <JetValidationErrors class="mb-4" />
 
-        <div v-if="status" class="mb-4 font-medium text-sm text-green-600">
-            {{ status }}
-        </div>
-
         <div mx-auto class="bg-teal-100 border-t-4 border-teal-500 rounded-b text-teal-900 px-4 py-3 shadow-md my-3" role="alert" v-show="$page.props.flash.message">
             <div class="flex">
                 <div>
@@ -91,12 +87,8 @@ const submit = () => {
                     Olvido el passsword?
                 </Link>
 
-                <Link :href="route('register')" class="underline text-sm text-gray-600 hover:text-gray-900">
-                    Registrarse
-                </Link>
-
                 <JetButton class="ml-4" :class="{ 'opacity-25': form.processing }" :disabled="form.processing">
-                    Log in
+                    Ingresar
                 </JetButton>
             </div>
         </form>

@@ -309,7 +309,7 @@ class RifaController extends Controller
             ->with('message', $mensaje);
     }
 
-    public function crearBoleteria($idrifa, $cifras, $serie) {
+    public static function crearBoleteria($idrifa, $cifras, $serie) {
 
         $cantboletas = pow(10, $cifras);
 

@@ -3,7 +3,7 @@
 namespace App\Jobs;
 
 use App\Mail\Notificaciones;
-use App\Models\Rifa;
+use App\Http\Controllers\RifaController;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -36,6 +36,6 @@ class CrearBoletasJob implements ShouldQueue
      */
     public function handle()
     {
-        Rifa::crearBoleteria($this->id, $this->cifras, $this->serie);
+        RifaController::crearBoleteria($this->id, $this->cifras, $this->serie);
     }
 }

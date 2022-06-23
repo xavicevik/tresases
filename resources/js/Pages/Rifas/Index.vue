@@ -290,7 +290,7 @@
                     <!-- Fin Tabla de contenido -->
                     <!-- Ventana modal -->
                     <section>
-                        <div class="fixed z-10 inset-0 overflow-y-auto ease-out duration-400" v-if="isOpen">
+                        <div class="fixed z-10 inset-0 ease-out duration-400" v-if="isOpen">
                             <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
 
                                 <div class="fixed inset-0 transition-opacity">
@@ -300,9 +300,12 @@
                                 <span class="hidden sm:inline-block sm:align-middle sm:h-screen"></span>
 
                                 <!-- Contenido modal -->
-                                    <div class="inline-block lg:w-10/12 align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:w-full" role="dialog" aria-modal="true" aria-labelledby="modal-headline">
+                                    <div class="inline-block overflow-y-scroll h-screen pb-10 lg:w-10/12 align-bottom bg-white rounded-lg text-left shadow-xl transform transition-all sm:my-8 sm:align-middle sm:w-full" role="dialog" aria-modal="true" aria-labelledby="modal-headline">
+                                        <button type="button" @click="closeModal()" class="absolute top-3 right-2.5 text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center dark:hover:bg-gray-800 dark:hover:text-white" data-modal-toggle="authentication-modal">
+                                            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg>
+                                        </button>
                                     <div class="">
-                                        <h2 v-text="tituloModal" class="text-sm font-bold text-gray-900 px-4 py-2"></h2>
+                                        <h4 v-text="tituloModal" class="text-xl font-bold text-gray-900 px-4 py-2"></h4>
                                     </div>
                                     <!-- Inicio Form -->
                                     <form>
@@ -638,16 +641,24 @@
                                                     </div>
                                                 </section>
                                                 <section v-show="form.promocionales.length" class="bg-blue-200 rounded-md px-12">
-                                                    <tr v-for="(promo, index) in form.promocionales" :key="promo.id" class="flex py-1 px-6 border">
-                                                        <td class="mb-4 w-3/12 px-2" v-text="promo.premio"></td>
-                                                        <td class="mb-4 w-3/12 px-2" v-text="promo.fecha"></td>
-                                                        <td class="mb-4 w-3/12 px-2" v-text="promo.idloteria"></td>
-                                                        <td v-show="!verMode" class="mx-auto w-1/12 px-2 self-center">
-                                                                <svg xmlns="http://www.w3.org/2000/svg" @click="eliminarPromo(index)" class="mx-auto h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                                                    <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                                                                </svg>
-                                                        </td>
-                                                    </tr>
+                                                    <div v-for="(promo, index) in form.promocionales" :key="promo.id" class="flex py-1 px-2">
+                                                        <div class="mb-4 w-3/12">
+                                                            {{ promo.premio }}
+                                                        </div>
+                                                        <div class="mb-4 w-3/12 px-2">
+                                                            {{ promo.fecha }}
+                                                        </div>
+                                                        <div class="mb-4 w-3/12 px-2">
+                                                            {{ arrayLoterias[promo.idloteria - 1].nombre  }}
+                                                        </div>
+                                                        <div v-show="!verMode" class="mx-auto w-1/12 px-2 self-center">
+                                                            <svg xmlns="http://www.w3.org/2000/svg" @click="eliminarPromo(index)" class="mx-auto h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                                                <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                                            </svg>
+                                                        </div>
+                                                    </div>
+
+
                                                 </section>
                                                 <!-- Fin de promocionales -->
                                                 <div class="flex py-1">
@@ -1054,6 +1065,19 @@ export default {
         },
         cleanMessage: function () {
             this.$page.props.flash.message = '';
+        },
+        validarFechaPromo: function() {
+            console.log('cambiar');
+            let fechapromo = this.fechapromo; //moment(this.fechapromo).format('YYYY-MM-DD HH:MM:SS');
+            let fechaRifa = this.form.fechafin; //moment(this.form.fechafin).format('YYYY-MM-DD HH:MM:SS');
+            if (fechapromo >= fechaRifa) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'La fecha de la promoción no puede ser mayor a la de la rifa',
+                    showConfirmButton: false,
+                    timer: 1500
+                })
+            }
         },
         previewImage(e) {
             const file = e.target.files[0];
@@ -1549,14 +1573,23 @@ export default {
             if(this.premiopromo == '' || this.fechapromo == '' || this.idloteriapromo == 0){
             }
             else{
+                if (this.fechapromo >= this.form.fechafin) {
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'La fecha de la promoción no puede ser mayor a la de la rifa',
+                        showConfirmButton: true,
+                        timer: 2000
+                    })
+                } else {
                     this.form.promocionales.push({
                         premio: this.premiopromo,
                         fecha: this.dateTimeFull(this.fechapromo),
                         idloteria: this.idloteriapromo
                     });
-                this.premiopromo = '';
-                this.fechapromo = "";
-                this.idloteriapromo = 0;
+                    this.premiopromo = '';
+                    this.fechapromo = "";
+                    this.idloteriapromo = 0;
+                }
             }
         },
 

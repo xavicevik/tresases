@@ -21,7 +21,11 @@ class ResetUserPassword implements ResetsUserPasswords
     {
         Validator::make($input, [
             'password' => $this->passwordRules(),
-        ])->validate();
+        ],
+            [
+                'password.required' => 'El password no cumple con las políticas establecidas'
+            ]
+        )->validate();
 
         $user->forceFill([
             'password' => Hash::make($input['password']),
