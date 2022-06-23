@@ -103,9 +103,9 @@ export default {
                                         </div>
                                     </div>
                                 </div>
-                                <div class="absolute w-full  rounded-b border-t-0 z-10" v-show="isOpenCart">
-                                    <div class="shadow-xl w-64 overflow-y-auto h-80">
-                                        <div v-if="showCart" v-for="(dato, id) in showCart" :key="id" class="p-2 flex bg-white hover:bg-gray-400 cursor-pointer border-b border-gray-100" style="">
+                                <div class="absolute w-full rounded-b border-t-0 z-10" v-show="isOpenCart && Object.keys(showCart).length > 0">
+                                    <div class="shadow-xl w-64 overflow-y-auto h-80 bg-blue-100 rounded-md border-b border-gray-100">
+                                        <div v-if="showCart" v-for="(dato, id) in showCart" :key="id" class="p-2 flex bg-white hover:bg-gray-400 cursor-pointer border-b border-blue-400" style="">
                                             <div class="p-2 w-12">
                                                 <img :src="dato.attributes?'/storage/'+dato.attributes.url:''"  height="50" width="50" alt="img product"></div>
                                             <div class="flex-auto text-sm w-32">
@@ -176,7 +176,7 @@ export default {
                         </span>
                         <li class="px-5 md:block">
                             <div class="flex flex-row items-center h-8">
-                                <div class="text-sm font-light tracking-wide text-gray-400 uppercase">Main</div>
+                                <div class="text-sm font-light tracking-wide text-gray-400 uppercase">Principal</div>
                             </div>
                         </li>
                         <li>
@@ -313,7 +313,7 @@ export default {
                         </li>
                         <li class="px-5 hidden md:block">
                             <div class="flex flex-row items-center mt-5 h-8">
-                                <div class="text-sm font-light tracking-wide text-gray-400 uppercase">Settings</div>
+                                <div class="text-sm font-light tracking-wide text-gray-400 uppercase">Configuración</div>
                             </div>
                         </li>
                         <li>
@@ -337,7 +337,7 @@ export default {
                         </li>
                         <div v-show="isMenuConfig" class="pl-8 bg-gray-700 text-white-600 hover:text-white-600">
                             <li>
-                                <Link v-if="$can('ventas-list')" :href="route('master.paises')" class="relative flex flex-row items-center h-11 focus:outline-none  border-l-4 border-transparent hover:border-blue-500 dark:hover:border-gray-800 pr-6">
+                                <Link v-if="$can('ventas-list')" :href="route('master.paises')" class="relative flex flex-row items-center h-11 focus:outline-none hover:bg-blue-800 dark:hover:bg-gray-600 text-white-600 hover:text-white-800 border-l-4 border-transparent hover:border-blue-500 dark:hover:border-gray-800 pr-6">
                                 <span class="inline-flex justify-center items-center ml-4">
                                   <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z"></path></svg>
                                 </span>
@@ -418,7 +418,7 @@ export default {
 
 
                     </ul>
-                    <p class="mb-14 px-5 py-3 hidden md:block text-center text-xs">TresAses.com Copyright @2022</p>
+                    <p class="mb-14 px-5 py-3 hidden md:block text-center text-xs">ShoppingRed.com Copyright @2022</p>
                 </div>
             </div>
             <!-- ./Sidebar -->

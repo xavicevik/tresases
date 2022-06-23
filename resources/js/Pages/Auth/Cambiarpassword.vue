@@ -34,7 +34,7 @@ const submit = () => {
     form.transform(data => ({
         ...data,
         remember: form.remember ? 'on' : '',
-    })).post(route('changepassword.update'), {
+    })).post(route('changepass.update'), {
         onFinish: () => form.reset('password', 'password_confirmation'),
     });
 };

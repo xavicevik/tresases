@@ -15,7 +15,7 @@ return [
     |
     */
 
-    'name' => env('APP_NAME', 'Tresases'),
+    'name' => env('APP_NAME', 'ShoppingRed'),
 
     'regxpage' => env('MAX_CANT_REG_PAGE', 3),
 

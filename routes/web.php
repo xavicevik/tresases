@@ -55,8 +55,8 @@ Route::group(['middleware'=>['guest']],function(){
     Route::get('/loginvendedor', [LoginController::class, 'indexVendedor'])->name('loginvendedor.index');
     Route::post('/loginvendedor', [LoginController::class, 'authenticatevendedor'])->name('loginvendedor.authenticate');
 
-    Route::get('/change-password', [LoginController::class, 'changePassword'])->name('changepassword.index');
-    Route::post('/change-password', [LoginController::class, 'updatePassword'])->name('changepassword.update');
+    Route::get('/changepass', [LoginController::class, 'changePassword'])->name('changepass.index');
+    Route::post('/changepass', [LoginController::class, 'updatePassword'])->name('changepass.update');
 
 
     /*
@@ -83,9 +83,9 @@ Route::group(['middleware'=>['guest']],function(){
 
 Route::middleware(['auth:sanctum', config('jetstream.auth_session'),'verified',])->group(function () {
    // Route::group(['middleware' => ['changepassword']], function () {
-    Route::get('/change-password', [LoginController::class, 'changePassword'])->name('changepassword.index');
-    Route::post('/change-password', [LoginController::class, 'updatePassword'])->name('changepassword.update');
-    Route::post('/change-passwordsu', [LoginController::class, 'updatePasswordsu'])->name('changepassword.updatesu');
+    //Route::get('/changepass', [LoginController::class, 'changePassword'])->name('changepass.index');
+    //Route::post('/changepass', [LoginController::class, 'updatePassword'])->name('changepass.update');
+    //Route::post('/changepasssu', [LoginController::class, 'updatePasswordsu'])->name('changepass.updatesu');
 
 
 

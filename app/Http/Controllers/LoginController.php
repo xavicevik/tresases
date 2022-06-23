@@ -52,18 +52,31 @@ class LoginController extends Controller
         $credentials = $request->validate([
             'username' => ['required'],
             'password' => ['required'],
-        ]);
+        ],
+            [
+                'password.required' => 'El password no cumple con las políticas establecidas'
+            ]);
         $rol = User::where('username', $credentials['username'])
                     ->with('empresa.puntosventa')
                     ->first();
 
-        if (! is_null($rol) && !isset($rol->changedpassword)) {
+        if (! is_null($rol) && is_null($rol->changedpassword)) {
+            /*
+            return redirect()->route('changepass.index', [
+                'puntoventas' => $rol['empresa']['puntosventa'],
+                'username' => $request->username,
+                'password' => $request->password,
+                '_token' => $token
+            ]);
+
+            */
             return Inertia::render('Auth/Cambiarpassword', [
                 'puntoventas' => $rol['empresa']['puntosventa'],
                 'username' => $request->username,
                 'password' => $request->password,
                 '_token' => $token
             ]);
+
         }
 
         if (! is_null($rol) && $rol['idrol'] == 5) {
@@ -81,7 +94,7 @@ class LoginController extends Controller
         }
 
         return back()->withErrors([
-            'username' => 'The provided credentials do not match our records.',
+            'username' => 'Las credenciales ingresadas no corresponden con un usuario registrado',
         ])->onlyInput('username');
     }
 
@@ -100,7 +113,7 @@ class LoginController extends Controller
         }
 
         return back()->withErrors([
-            'username' => 'The provided credentials do not match our records.',
+            'username' => 'Las credenciales ingresadas no corresponden con un usuario registrado',
         ])->onlyInput('username');
     }
 
@@ -130,7 +143,12 @@ class LoginController extends Controller
         Validator::make($request->all(), [
             'current_password' => ['required', 'string'],
             'password' => $this->passwordRules(),
-        ])->after(function ($validator) use ($user, $input) {
+        ],
+            [
+                'password.required' => 'Ingrese el password',
+                'password.confirmed' => 'El password no es igual a su confirmación'
+            ]
+        )->after(function ($validator) use ($user, $input) {
             if (! isset($input->current_password) ) {
                 $validator->errors()->add('current_password', __('Debe ingresar el password actual.'));
             }
@@ -145,7 +163,7 @@ class LoginController extends Controller
         ])->save();
 
         return redirect()->back()
-            ->with('message', 'Se cambia contraseña');
+            ->with('message', 'Se cambió la contraseña');
         //return redirect()->route('login');
     }
 
@@ -157,7 +175,12 @@ class LoginController extends Controller
 
         Validator::make($request->all(), [
             'password' => $this->passwordRules(),
-        ])->validateWithBag('updatePassword');
+        ],
+            [
+                'password.required' => 'Ingrese un password',
+                'password.confirmed' => 'El password no es igual'
+            ]
+        )->validateWithBag('updatePassword');
 
         $user->forceFill([
             'password' => Hash::make($input->password),

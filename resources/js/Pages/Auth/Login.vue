@@ -82,12 +82,8 @@ const submit = () => {
                     Olvidó el passsword?
                 </Link>
 
-                <Link :href="route('register')" class="underline text-sm text-gray-600 hover:text-gray-900">
-                    Registrarse
-                </Link>
-
                 <JetButton class="ml-4" :class="{ 'opacity-25': form.processing }" :disabled="form.processing">
-                    Log in
+                    Ingresar
                 </JetButton>
             </div>
         </form>
