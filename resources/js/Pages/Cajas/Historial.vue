@@ -75,7 +75,6 @@
                                 </div>
                             </div>
                             <div class="pr-2 w-1/3 text-center">
-                                <button @click="openModal('registrar')" class="bg-blue-500 text-xs  hover:bg-blue-700 text-white font-bold py-2 px-4 rounded ">Abrir caja</button>
                             </div>
                         </div>
                     </section>

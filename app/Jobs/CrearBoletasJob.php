@@ -15,18 +15,20 @@ class CrearBoletasJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    protected $id, $cifras, $serie;
+    protected $id, $isFisica, $cifras, $serie, $precio;
 
     /**
      * Create a new job instance.
      *
      * @return void
      */
-    public function __construct($id, $cifras, $serie)
+    public function __construct($id, $isFisica, $cifras, $serie, $precio)
     {
         $this->id = $id;
+        $this->isFisica = $isFisica;
         $this->cifras = $cifras;
         $this->serie = $serie;
+        $this->precio = $precio;
     }
 
     /**
@@ -36,6 +38,6 @@ class CrearBoletasJob implements ShouldQueue
      */
     public function handle()
     {
-        RifaController::crearBoleteria($this->id, $this->cifras, $this->serie);
+        RifaController::crearBoleteria($this->id, $this->isFisica, $this->cifras, $this->serie, $this->precio);
     }
 }

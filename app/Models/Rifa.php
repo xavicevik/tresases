@@ -27,7 +27,7 @@ class Rifa extends Model
         'fechafin',
         'promocional',
         'publicar',
-        'destacada',
+        'fisica',
         'principal',
         'urlimagen1',
         'urlimagen2',

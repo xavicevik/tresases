@@ -137,12 +137,12 @@ import Welcome from '@/Jetstream/Welcome.vue';
                                             <span>2%</span>
                                         </div>
                                     </div>
-                                    <span class="block text-center text-gray-500">Compared to last week $13,988</span>
+                                    <span class="block text-center text-gray-500">Comparado con la última semana $13,988</span>
                                 </div>
                                 <table class="w-full text-gray-600">
                                     <tbody>
                                     <tr>
-                                        <td class="py-2">Tailored ui</td>
+                                        <td class="py-2">Rifa 1</td>
                                         <td class="text-gray-500">896</td>
                                         <td>
                                             <svg class="w-16 ml-auto" viewBox="0 0 68 21" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -161,7 +161,7 @@ import Welcome from '@/Jetstream/Welcome.vue';
                                         </td>
                                     </tr>
                                     <tr>
-                                        <td class="py-2">Customize</td>
+                                        <td class="py-2">Rifa 2</td>
                                         <td class="text-gray-500">1200</td>
                                         <td>
                                             <svg class="w-16 ml-auto" viewBox="0 0 68 21" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -207,7 +207,7 @@ import Welcome from '@/Jetstream/Welcome.vue';
                                 <h5 class="text-xl text-gray-700">Boletería disponible</h5>
                                 <div class="my-8">
                                     <h1 class="text-5xl font-bold text-gray-800">64,5%</h1>
-                                    <span class="text-gray-500">Compared to last week $13,988</span>
+                                    <span class="text-gray-500">Comparado con la última semana $13,988</span>
                                 </div>
                                 <svg class="w-full" viewBox="0 0 218 69" fill="none" xmlns="http://www.w3.org/2000/svg">
                                     <path d="M0 67.5C27.8998 67.5 24.6002 15 52.5 15C80.3998 15 77.1002 29 105 29C132.9 29 128.6 52 156.5 52C184.4 52 189.127 63.8158 217.027 63.8158" stroke="url(#paint0_linear_622:13664)" stroke-width="3" stroke-linecap="round"/>
@@ -226,7 +226,7 @@ import Welcome from '@/Jetstream/Welcome.vue';
                                 <table class="mt-6 -mb-2 w-full text-gray-600">
                                     <tbody>
                                     <tr>
-                                        <td class="py-2">From new users</td>
+                                        <td class="py-2">De nuevos clientes</td>
                                         <td class="text-gray-500">896</td>
                                         <td>
                                             <svg class="w-16 ml-auto" viewBox="0 0 68 21" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -245,7 +245,7 @@ import Welcome from '@/Jetstream/Welcome.vue';
                                         </td>
                                     </tr>
                                     <tr>
-                                        <td class="py-2">From old users</td>
+                                        <td class="py-2">De clientes antiguos</td>
                                         <td class="text-gray-500">1200</td>
                                         <td>
                                             <svg class="w-16 ml-auto" viewBox="0 0 68 21" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -283,7 +283,7 @@ import Welcome from '@/Jetstream/Welcome.vue';
                                     </defs>
                                 </svg>
                                 <div class="mt-6">
-                                    <h5 class="text-xl text-gray-700 text-center">Ask to customize</h5>
+                                    <h5 class="text-xl text-gray-700 text-center">Cantidad de ventas</h5>
                                     <div class="mt-2 flex justify-center gap-4">
                                         <h3 class="text-3xl font-bold text-gray-700">28</h3>
                                         <div class="flex items-end gap-1 text-green-500">
@@ -293,12 +293,12 @@ import Welcome from '@/Jetstream/Welcome.vue';
                                             <span>2%</span>
                                         </div>
                                     </div>
-                                    <span class="block text-center text-gray-500">Compared to last week 13</span>
+                                    <span class="block text-center text-gray-500">Comparado con la última semana 13</span>
                                 </div>
                                 <table class="mt-6 -mb-2 w-full text-gray-600">
                                     <tbody>
                                     <tr>
-                                        <td class="py-2">Tailored ui</td>
+                                        <td class="py-2">Rifa 1</td>
                                         <td class="text-gray-500">896</td>
                                         <td>
                                             <svg class="w-16 ml-auto" viewBox="0 0 68 21" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -317,7 +317,7 @@ import Welcome from '@/Jetstream/Welcome.vue';
                                         </td>
                                     </tr>
                                     <tr>
-                                        <td class="py-2">Customize</td>
+                                        <td class="py-2">Rifa 2</td>
                                         <td class="text-gray-500">1200</td>
                                         <td>
                                             <svg class="w-16 ml-auto" viewBox="0 0 68 21" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -336,7 +336,7 @@ import Welcome from '@/Jetstream/Welcome.vue';
                                         </td>
                                     </tr>
                                     <tr>
-                                        <td class="py-2">Other</td>
+                                        <td class="py-2">Otros</td>
                                         <td class="text-gray-500">12</td>
                                         <td>
                                             <svg class="w-16 ml-auto" viewBox="0 0 68 21" fill="none" xmlns="http://www.w3.org/2000/svg">

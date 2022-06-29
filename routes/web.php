@@ -125,6 +125,7 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'),'verified',]
 
         Route::post('/rifas/copy', [RifaController::class, 'copy'])->name('rifas.copy');
         Route::get('/rifas/getRifasActivas', [RifaController::class, 'getRifasActivas'])->name('rifas.getRifasActivas');
+        Route::get('/rifas/indexboletas', [RifaController::class, 'indexboletas'])->name('rifas.indexboletas');
 
         Route::get('/cajas/open', [CajaController::class, 'open'])->name('cajas.open');
         Route::post('/cajas/apertura', [CajaController::class, 'apertura'])->name('cajas.apertura');

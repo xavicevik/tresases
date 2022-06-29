@@ -649,7 +649,7 @@
                                                             {{ promo.fecha }}
                                                         </div>
                                                         <div class="mb-4 w-3/12 px-2">
-                                                            {{ arrayLoterias[promo.idloteria - 1].nombre  }}
+                                                            {{ nombreLoteria(promo.idloteria)  }}
                                                         </div>
                                                         <div v-show="!verMode" class="mx-auto w-1/12 px-2 self-center">
                                                             <svg xmlns="http://www.w3.org/2000/svg" @click="eliminarPromo(index)" class="mx-auto h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -667,8 +667,8 @@
                                                         <Toggle v-model="form.publicar" :disabled="verMode"/>
                                                     </div>
                                                     <div class="mb-4 w-1/2 text-center mx-auto">
-                                                        <label class="block text-gray-700 text-sm font-bold mb-2">Destacada (NO):</label>
-                                                        <Toggle v-model="form.destacada" :disabled="verMode"/>
+                                                        <label class="block text-gray-700 text-sm font-bold mb-2">Física (NO):</label>
+                                                        <Toggle v-model="form.fisica" :disabled="verMode"/>
                                                     </div>
                                                     <div class="mb-4 w-1/2 text-center mx-auto">
                                                         <label class="block text-gray-700 text-sm font-bold mb-2">Principal (NO):</label>
@@ -968,7 +968,7 @@ export default {
                 fechafin: null,
                 promocional: false,
                 publicar: false,
-                destacada: false,
+                fisica: false,
                 principal: false,
                 urlimagen1: null,
                 urlimagen2: null,
@@ -1044,6 +1044,16 @@ export default {
                 this.tiposseriestxtdst = this.tiposeriedestino.detalle.split('|');
             }
         },
+        nombreLoteria: function(id) {
+            let nombre;
+            this.arrayLoterias.forEach(function(loteria) {
+               if (loteria['id'] == id) {
+                   console.log(loteria.nombre);
+                   nombre = loteria.nombre;
+               }
+            });
+            return nombre;
+        },
         actualizarRangos() {
             let rango = null;
             let cantidad = 0;
@@ -1113,7 +1123,7 @@ export default {
                     this.form.fechafin = null;
                     this.form.promocional = null;
                     this.form.publicar = null;
-                    this.form.destacada = null;
+                    this.form.fisica = null;
                     this.form.principal = null;
                     this.form.urlimagen2 = null;
                     this.form.urlimagen1 = null;
@@ -1151,7 +1161,7 @@ export default {
                     this.form.fechafin = data['fechafin'];
                     this.form.promocional = data['promocional'];
                     this.form.publicar = data['publicar'];
-                    this.form.destacada = data['principal'];
+                    this.form.fisica = data['fisica'];
                     this.form.principal = data['principal'];
                     this.form.urlimagen2 = data['urlimagen2'];
                     this.form.urlimagen1 = data['urlimagen1'];
@@ -1194,7 +1204,7 @@ export default {
                     this.form.fechafin = data['fechafin'];
                     this.form.promocional = data['promocional'];
                     this.form.publicar = data['publicar'];
-                    this.form.destacada = data['principal'];
+                    this.form.fisica = data['fisica'];
                     this.form.principal = data['principal'];
                     this.form.urlimagen2 = data['urlimagen2'];
                     this.form.urlimagen1 = data['urlimagen1'];
@@ -1274,7 +1284,7 @@ export default {
             this.form.fechafin = null;
             this.form.promocional = null;
             this.form.publicar = null;
-            this.form.destacada = null;
+            this.form.fisica = null;
             this.form.principal = null;
             this.form.urlimagen2 = null;
             this.form.urlimagen1 = null;

@@ -13,7 +13,13 @@ class Boleta extends Model
     protected $fillable =[
         'idrifa',
         'numero',
+        'promocional',
+        'idvendedor',
+        'idcliente',
         'serie',
+        'precio',
+        'pago',
+        'saldo',
         'codigo',
         'estado',
     ];
@@ -38,4 +44,10 @@ class Boleta extends Model
         return $query->from(DB::raw("`$table` FORCE INDEX(`$index`)"));
     }
 
+    public function cliente(){
+        return $this->belongsTo(User::class, 'idcliente');
+    }
+    public function vendedor(){
+        return $this->belongsTo(User::class, 'idvendedor');
+    }
 }

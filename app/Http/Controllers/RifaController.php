@@ -19,7 +19,7 @@ use Inertia\Inertia;
 
 class RifaController extends Controller
 {
-    const canPorPagina = 10;
+    const canPorPagina = 20;
     /**
      * Display a listing of the resource.
      *
@@ -71,6 +71,72 @@ class RifaController extends Controller
             return Inertia::render('Rifas/Index', ['rifas' => $rifas]);
         }
     }
+
+    public function indexboletas(Request $request)
+    {
+        $filtros = json_decode($request->filtros);
+
+        if ($request->has('sortBy') && $request->sortBy <> ''){
+            $sortBy = $request->sortBy;
+        } else {
+            $sortBy = 'boletas.id';
+        }
+
+        if ($request->has('sortOrder') && $request->sortOrder <> ''){
+            $sortOrder = $request->sortOrder;
+        } else {
+            $sortOrder = 'desc';
+        }
+
+        if (is_null($filtros)){
+            $boletas = Boleta::orderBy($sortBy, $sortOrder)
+                ->with('rifa')
+                ->with('vendedor')
+                ->with('cliente')
+                ->paginate(self::canPorPagina);
+        } else {
+            $boletas = Boleta::orderBy($sortBy, $sortOrder)
+                ->with('rifa')
+                ->with('vendedor')
+                ->with('cliente');
+
+            if(!is_null($filtros->rifa)) {
+                $boletas = $boletas->where('idrifa.nombre', 'like', '%'.$filtros->rifa.'%');
+            }
+
+            if(!is_null($filtros->numero)) {
+                $boletas = $boletas->where('numero', 'like', '%'.$filtros->numero.'%');
+            }
+
+            if(!is_null($filtros->promocional)) {
+                $boletas = $boletas->where('promocional', 'like', '%'.$filtros->promocional.'%');
+            }
+
+            if(!is_null($filtros->estado)) {
+                $boletas = $boletas->where('estado', 'like', '%'.$filtros->estado.'%');
+            }
+            if(!is_null($filtros->cliente)) {
+                $boletas = $boletas->join('users as t1', 'boletas.idcliente', '=', 't1.id')
+                    ->where('t1.nombre', 'like', '%'.$filtros->cliente.'%')
+                    ->orWhere('t1.apellido', 'like', '%'.$filtros->cliente.'%');
+            }
+            if(!is_null($filtros->vendedor)) {
+                $boletas = $boletas->join('users as t2', 'boletas.idvendedor', '=', 't2.id')
+                    ->where('t2.username', 'like', '%'.$filtros->vendedor.'%');
+            }
+
+            $boletas = $boletas->select('boletas.*')->paginate(self::canPorPagina);
+
+        }
+
+
+        if ($request->has('ispage') && $request->ispage){
+            return ['datos' => $boletas];
+        } else {
+            return Inertia::render('Rifas/Indexboletas', ['datos' => $boletas, 'estado' => $request->estado]);
+        }
+    }
+
 
     public function getRifasActivas(Request $request)
     {
@@ -240,7 +306,7 @@ class RifaController extends Controller
             $rifa->fechafin = $request->fechafin;
             $rifa->promocional = $request->promocional;
             $rifa->publicar = $request->publicar;
-            $rifa->destacada = $request->destacada;
+            $rifa->fisica = $request->fisica;
             $rifa->principal = $request->principal;
             $rifa->urlimagen2 = $request->urlimagen2;
             $rifa->urlimagen1 = $request->urlimagen1;
@@ -294,7 +360,7 @@ class RifaController extends Controller
             }
 
             //$this->crearBoleteria($rifa->id, $rifa->cifras, $rifa->serie);
-            CrearBoletasJob::dispatch($rifa->id, $rifa->cifras, $rifa->serie);
+            CrearBoletasJob::dispatch($rifa->id, $rifa->fisica, $rifa->cifras, $rifa->serie, $rifa->precio);
 
             DB::commit();
 
@@ -309,18 +375,34 @@ class RifaController extends Controller
             ->with('message', $mensaje);
     }
 
-    public static function crearBoleteria($idrifa, $cifras, $serie) {
+    public static function crearBoleteria($idrifa, $isFisica, $cifras, $serie, $precio) {
 
         $cantboletas = pow(10, $cifras);
 
-        for($i = 0; $i < $cantboletas; $i++) {
+        for ($i = 0; $i < $cantboletas; $i++) {
             $boleta = new Boleta();
             $boleta->idrifa = $idrifa;
-            $boleta->codigo = $idrifa.$i.rand(1000000000, 9999999999);
+            $boleta->codigo = $idrifa . $i . rand(1000000000, 9999999999);
             $boleta->estado = 1;
             $boleta->serie = $serie;
-            $boleta->numero = str_pad(strval($i), $cifras,"0", STR_PAD_LEFT );
+            $boleta->precio = $precio;
+            $boleta->saldo = $precio;
+            $boleta->pago = 0;
+            $boleta->numero = str_pad(strval($i), $cifras, "0", STR_PAD_LEFT);
             $boleta->save();
+        }
+
+        if ($isFisica) {
+            $boletas = Boleta::where('estado', 1)
+                             ->where('idrifa', $idrifa)
+                             ->inRandomOrder()
+                             ->get();
+            $i = 0;
+            foreach($boletas as $boleta) {
+                $boleta->promocional = str_pad(strval($i), $cifras, "0", STR_PAD_LEFT);
+                $boleta->save();
+                $i++;
+            }
         }
 
         return ['status' => 'Terminado'];
