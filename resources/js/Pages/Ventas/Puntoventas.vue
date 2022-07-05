@@ -1,5 +1,6 @@
 <template>
     <AppLayout title="Puntos de Venta">
+        <Statscards></Statscards>
         <template #header>
             <h2 class="font-semibold text-xl text-gray-800 leading-tight">
                 Lista de Puntos de Venta
@@ -50,7 +51,7 @@
                             <table class="table-fixed w-full">
                                 <thead>
                                 <tr class="bg-gray-100">
-                                    <th class="px-4 py-2 text-sm font-bold w-1/12 hover:bg-blue-500 hover:text-gray-50 rounded-b">
+                                    <th class="px-4 py-2 text-sm font-bold w-2/12 hover:bg-blue-500 hover:text-gray-50 rounded-b">
                                         <button @click="getPuntos(buscar, 'puntos_ventas.codigo')" class="font-bold">
                                             Empresa
                                             <div v-show="sortBy == 'puntos_ventas.empresa.nombre'">
@@ -154,7 +155,7 @@
                                             class="inline-flex px-2 text-xs font-semibold leading-5 text-red-800 bg-red-100 rounded-full">Inactivo
                                         </span>
                                     </td>
-                                    <td class="border px-1 py-1 mx-auto text-center flex items-center">
+                                    <td class="border px-4 py-2 mx-auto text-center flex items-center">
                                         <button @click="edit(punto)" class="hover:bg-blue-700 text-white font-bold rounded">
                                             <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 text-blue-400" fill="none"
                                                  viewBox="0 0 24 24" stroke="currentColor">
@@ -174,7 +175,7 @@
                                     </td>
                                 </tr>
                                 <tr v-else>
-                                    <td class="border px-4 py-2 text-xs text-center" colspan="8"> La consulta no obtuvo datos</td>
+                                    <td class="border px-4 py-2 text-xs text-center" colspan="6"> La consulta no obtuvo datos</td>
                                 </tr>
                                 </tbody>
                             </table>
@@ -191,6 +192,9 @@
                                 <!-- This element is to trick the browser into centering the modal contents. -->
                                 <span class="hidden sm:inline-block sm:align-middle sm:h-screen"></span>
                                 <div class="inline-block lg:w-10/12 align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:w-full" role="dialog" aria-modal="true" aria-labelledby="modal-headline">
+                                    <button type="button" @click="closeModal()" class="absolute top-3 right-2.5 text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center dark:hover:bg-gray-800 dark:hover:text-white" data-modal-toggle="authentication-modal">
+                                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg>
+                                    </button>
                                     <div class="">
                                         <h2 v-text="tituloModal" class="text-sm font-bold text-gray-900 px-4 py-4"></h2>
                                     </div>
@@ -567,7 +571,7 @@ export default {
                 this.reset();
                 this.editMode = false;
             }).catch(function (error) {
-                console.log(error);
+                //console.log(error);
             });
 
         },
@@ -595,7 +599,7 @@ export default {
                     ispage: this.ispage
                 }
             }).then((res) => {
-                console.log(res.data);
+                //console.log(res.data);
                 var respuesta = res.data;
                 this.arrayPuntos = respuesta.puntoventas;
 
@@ -609,7 +613,7 @@ export default {
         getPaises: function () {
             axios.get('/paises',).then((res) => {
                 this.arrayPaises = res.data.paises;
-                console.log(res.data.paises)
+                //console.log(res.data.paises)
             })
         },
         getDepartamentos: function () {
@@ -619,7 +623,7 @@ export default {
                 }
             }).then((res) => {
                 this.arrayDepartamentos = res.data.departamentos;
-                console.log(res.data.departamentos)
+                //console.log(res.data.departamentos)
             })
         },
         getCiudades: function () {
@@ -630,7 +634,7 @@ export default {
                 }
             }).then((res) => {
                 this.arrayCiudades = res.data.ciudades;
-                console.log(res.data.ciudades)
+                //console.log(res.data.ciudades)
             })
         },
         deleteRow: function (data) {
@@ -665,7 +669,7 @@ export default {
                         'success'
                     )
                 }).catch(function (error) {
-                    console.log(error);
+                    //console.log(error);
                 });
                 //this.$inertia.post('/puntoventas/' + data.id, data);
 
@@ -704,16 +708,16 @@ export default {
             });
         },
         uploadFiles() {
-            console.log(this.form.files);
+            //console.log(this.form.files);
             // This is where the magic could happen!
         },
     },
     created: function () {
-        console.log(this.puntoventas);
+        //console.log(this.puntoventas);
         this.arrayPuntos = this.puntoventas;
     },
     mounted() {
-        console.log('Component mounted.');
+        //console.log('Component mounted.');
     },
 }
 </script>

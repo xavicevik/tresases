@@ -1,47 +1,6 @@
 <template>
     <AppLayout title="Usuarios">
-
-        <!-- Statistics Cards -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 p-4 gap-4">
-            <div class="bg-blue-500  shadow-lg rounded-md flex items-center justify-between p-3 border-b-4 border-blue-600  text-white font-medium group">
-                <div class="flex justify-center items-center w-14 h-14 bg-white rounded-full transition-all duration-300 transform group-hover:rotate-12">
-                    <svg width="30" height="30" fill="none" viewBox="0 0 24 24" stroke="currentColor" class="stroke-current text-blue-800  transform transition-transform duration-500 ease-in-out"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
-                </div>
-                <div class="text-right">
-                    <p class="text-2xl">{{ cajasopen }}</p>
-                    <p>Cajas abiertas</p>
-                </div>
-            </div>
-            <div class="bg-red-500 shadow-lg rounded-md flex items-center justify-between p-3 border-b-4 border-red-600  text-white font-medium group">
-                <div class="flex justify-center items-center w-14 h-14 bg-white rounded-full transition-all duration-300 transform group-hover:rotate-12">
-                    <svg width="30" height="30" fill="none" viewBox="0 0 24 24" stroke="currentColor" class="stroke-current text-blue-800  transform transition-transform duration-500 ease-in-out"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path></svg>
-                </div>
-                <div class="text-right">
-                    <p class="text-2xl">{{ cajasclose }}</p>
-                    <p>Cajas cerradas</p>
-                </div>
-            </div>
-            <div class="bg-green-500 shadow-lg rounded-md flex items-center justify-between p-3 border-b-4 border-green-600 text-white font-medium group">
-                <div class="flex justify-center items-center w-14 h-14 bg-white rounded-full transition-all duration-300 transform group-hover:rotate-12">
-                    <svg width="30" height="30" fill="none" viewBox="0 0 24 24" stroke="currentColor" class="stroke-current text-blue-800 transform transition-transform duration-500 ease-in-out"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path></svg>
-                </div>
-                <div class="text-right">
-                    <p class="text-2xl">$11,257</p>
-                    <p>Ventas</p>
-                </div>
-            </div>
-            <div class="bg-pink-500 shadow-lg rounded-md flex items-center justify-between p-3 border-b-4 border-pink-600  text-white font-medium group">
-                <div class="flex justify-center items-center w-14 h-14 bg-white rounded-full transition-all duration-300 transform group-hover:rotate-12">
-                    <svg width="30" height="30" fill="none" viewBox="0 0 24 24" stroke="currentColor" class="stroke-current text-blue-800 transform transition-transform duration-500 ease-in-out"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                </div>
-                <div class="text-right">
-                    <p class="text-2xl">$75,257</p>
-                    <p>Balances</p>
-                </div>
-            </div>
-        </div>
-        <!-- ./Statistics Cards -->
-
+        <Statscards></Statscards>
         <template #header>
             <h2 class="font-semibold text-xl text-gray-800 leading-tight">
                 Historial de movimientos de cajas
@@ -75,7 +34,6 @@
                                 </div>
                             </div>
                             <div class="pr-2 w-1/3 text-center">
-                                <button @click="openModal('registrar')" class="bg-blue-500 text-xs  hover:bg-blue-700 text-white font-bold py-2 px-4 rounded ">Abrir caja</button>
                             </div>
                         </div>
                     </section>
@@ -103,7 +61,7 @@
                                             </div>
                                         </button>
                                     </th>
-                                    <th class="px-4 py-2 w-1/12 text-sm font-bold hover:bg-blue-500 hover:text-gray-50 rounded-b">
+                                    <th class="px-4 py-2 w-2/12 text-sm font-bold hover:bg-blue-500 hover:text-gray-50 rounded-b">
                                         <button @click="getCajas(buscar, 'id')" class="font-bold">
                                             Punto de venta
                                             <div v-show="sortBy == 'nombre'">
@@ -120,9 +78,9 @@
                                             </div>
                                         </button>
                                     </th>
-                                    <th class="px-4 py-2 w-1/12 text-sm font-bold hover:bg-blue-500 hover:text-gray-50 rounded-b">
+                                    <th class="px-4 py-2 w-2/12 text-sm font-bold hover:bg-blue-500 hover:text-gray-50 rounded-b">
                                         <button @click="getCajas(buscar, 'id')" class="font-bold">
-                                            Vendedor
+                                            Usuario
                                             <div v-show="sortBy == 'nombre'">
                                                 <span v-show="!sortOrder">
                                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
@@ -137,7 +95,7 @@
                                             </div>
                                         </button>
                                     </th>
-                                    <th class="px-4 py-2 text-sm w-1/12 font-bold hover:bg-blue-500 hover:text-gray-50 rounded-b">
+                                    <th class="px-4 py-2 text-sm w-2/12 font-bold hover:bg-blue-500 hover:text-gray-50 rounded-b">
                                         <button @click="getCajas(buscar, 'id')" class="font-bold">
                                             Fecha apertura
                                             <div v-show="sortBy == 'ciudad.precio'">
@@ -154,7 +112,7 @@
                                             </div>
                                         </button>
                                     </th>
-                                    <th class="px-4 py-2 text-sm font-bold w-1/12 hover:bg-blue-500 hover:text-gray-50 rounded-b">
+                                    <th class="px-4 py-2 text-sm font-bold w-2/12 hover:bg-blue-500 hover:text-gray-50 rounded-b">
                                         <button @click="getCajas(buscar, 'id')" class="font-bold">
                                             Fecha cierre
                                             <div v-show="sortBy == 'fechafin'">
@@ -171,7 +129,7 @@
                                             </div>
                                         </button>
                                     </th>
-                                    <th class="px-4 py-2 text-sm font-bold w-1/12 hover:bg-blue-500 hover:text-gray-50 rounded-b">
+                                    <th class="px-4 py-2 text-sm font-bold w-2/12 hover:bg-blue-500 hover:text-gray-50 rounded-b">
                                         <button @click="getCajas(buscar, 'id')" class="font-bold">
                                             Recaudo
                                             <div v-show="sortBy == 'fechafin'">
@@ -188,7 +146,7 @@
                                             </div>
                                         </button>
                                     </th>
-                                    <th class="px-4 py-2 text-sm font-bold w-1/12 hover:bg-blue-500 hover:text-gray-50 rounded-b">
+                                    <th class="px-4 py-2 text-sm font-bold w-2/12 hover:bg-blue-500 hover:text-gray-50 rounded-b">
                                         <button @click="getCajas(buscar, 'id')" class="font-bold">
                                             Fondo en caja
                                             <div v-show="sortBy == 'fechafin'">
@@ -205,7 +163,24 @@
                                             </div>
                                         </button>
                                     </th>
-                                    <th class="px-4 py-2 text-sm font-bold w-1/12 hover:bg-blue-500 hover:text-gray-50 rounded-b">
+                                    <th class="px-4 py-2 text-sm font-bold w-2/12 hover:bg-blue-500 hover:text-gray-50 rounded-b">
+                                        <button @click="getCajas(buscar, 'id')" class="font-bold">
+                                            Comision de venta
+                                            <div v-show="sortBy == 'fechafin'">
+                                                <span v-show="!sortOrder">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                                                        <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+                                                    </svg>
+                                                </span>
+                                                <span v-show="sortOrder">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                                                      <path fill-rule="evenodd" d="M14.707 12.707a1 1 0 01-1.414 0L10 9.414l-3.293 3.293a1 1 0 01-1.414-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 010 1.414z" clip-rule="evenodd" />
+                                                    </svg>
+                                                </span>
+                                            </div>
+                                        </button>
+                                    </th>
+                                    <th class="px-4 py-2 text-sm font-bold w-2/12 hover:bg-blue-500 hover:text-gray-50 rounded-b">
                                         <button @click="getCajas(buscar, 'id')" class="font-bold">
                                             Efectivo en caja
                                             <div v-show="sortBy == 'fechafin'">
@@ -225,15 +200,16 @@
                                 </tr>
                                 </thead>
                                 <tbody>
-                                <tr class="text-center" text-sm v-if="arrayCajas.data" v-for="(caja, id) in arrayCajas.data" :key="id">
-                                    <td class="border px-1 py-2 text-sm truncate" v-text="caja.id"></td>
-                                    <td class="border px-1 py-2 text-sm truncate" v-text="caja.puntoventa.nombre"></td>
-                                    <td class="border px-1 py-2 text-sm truncate" v-text="caja.vendedor.username"></td>
-                                    <td class="border px-1 py-2 text-sm truncate" v-text="caja.fechaapertura"></td>
-                                    <td class="border px-1 py-2 text-sm truncate" v-text="caja.fechacierre"></td>
-                                    <td class="border px-1 py-2 text-sm truncate" v-text="formatPrice(caja.recaudoefectivo)"></td>
-                                    <td class="border px-1 py-2 text-sm truncate" v-text="formatPrice(caja.montoapertura)"></td>
-                                    <td class="border px-1 py-2 text-sm truncate" v-text="formatPrice(caja.montocierre)"></td>
+                                <tr :class="dato.id === selectedRow ? 'bg-blue-200' : ''"  class="text-left hover:bg-blue-400" @click="rowSelect(dato.id); getDetallesVentas(dato.id)" text-sm v-if="arrayCajas.data" v-for="(dato, id) in arrayCajas.data" :key="id">
+                                    <td class="border px-1 py-2 text-sm truncate" v-text="dato.id"></td>
+                                    <td class="border px-1 py-2 text-sm truncate" v-text="dato.puntoventa.nombre"></td>
+                                    <td class="border px-1 py-2 text-sm truncate" v-text="dato.vendedor.full_name"></td>
+                                    <td class="border px-1 py-2 text-sm truncate" v-text="dato.fechaapertura"></td>
+                                    <td class="border px-1 py-2 text-sm truncate" v-text="dato.fechacierre"></td>
+                                    <td class="border px-1 py-2 text-sm truncate" v-text="formatPrice(dato.recaudoefectivo)"></td>
+                                    <td class="border px-1 py-2 text-sm truncate" v-text="formatPrice(dato.montoapertura)"></td>
+                                    <td class="border px-1 py-2 text-sm truncate" v-text="formatPrice(dato.comisionventa)"></td>
+                                    <td class="border px-1 py-2 text-sm truncate" v-text="formatPrice(dato.montocierre)"></td>
                                 </tr>
                                 <tr v-else>
                                     <td class="border px-4 py-2 text-xs text-center" colspan="7"> La consulta no obtuvo datos</td>
@@ -259,256 +235,204 @@
                     </section>
                     <!-- Fin Tabla de contenido -->
 
-                    <!-- Ventana modal Abrir Caja -->
-                    <!-- Main modal -->
-                    <section> <!-- Ventana modal -->
-                        <div class="fixed z-10 inset-0 overflow-y-auto ease-out duration-400" v-if="isOpenAbrir">
-                            <div class="items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-
-                                <div class="fixed inset-0 transition-opacity">
-                                    <div class="absolute inset-0 bg-gray-500 opacity-75"></div>
-                                </div>
-
-                                <!-- This element is to trick the browser into centering the modal contents. -->
-                                <span class="hidden sm:inline-block sm:align-middle sm:h-screen"></span>
-                                <div class="inline-block lg:w-6/12 align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:w-full" role="dialog" aria-modal="true" aria-labelledby="modal-headline">
-                                    <button type="button" @click="isOpenAbrir = false" class="absolute top-3 right-2.5 text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center dark:hover:bg-gray-800 dark:hover:text-white" data-modal-toggle="authentication-modal">
-                                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg>
-                                    </button>
-                                    <div class="">
-                                        <h2 v-text="tituloModal" class="text-xl font-bold text-gray-900 px-4 py-4"></h2>
-                                    </div>
-                                    <form>
-                                        <div class="bg-white px-4 pt-2 pb-4 ">
-                                            <div class="">
-                                                <section>
-                                                    <div class="mt-2 grid gap-y-6 ">
-                                                        <div>
-                                                            <label class="block text-sm font-medium text-gray-700">Punto de venta</label>
-                                                            <div class="mt-1">
-                                                                <input type="text" disabled :class="{'bg-blue-100' : editMode}" v-model="form.puntoventa.nombre" autocomplete="given-name" class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
-                                                            </div>
-                                                        </div>
-
-                                                        <div>
-                                                            <label class="block text-sm font-medium text-gray-700">Cantidad inicial ($)</label>
-                                                            <div class="mt-1">
-                                                                <money3 v-model="form.montoapertura" v-bind="configMoney" :disabled="verMode" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"></money3>
-                                                                <div v-if="$page.props.errors.apellido" class="text-red-500">{{ $page.props.errors.apellido }}</div>
-                                                            </div>
-                                                        </div>
-
-                                                    </div>
-                                                </section>
-                                            </div>
-                                        </div>
-                                        <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
-                                            <span class="flex w-full rounded-md shadow-sm sm:ml-3 sm:w-auto">
-                                              <button wire:click.prevent="apertura()" @click="apertura(form)" type="button" class="inline-flex justify-center w-full rounded-md border border-transparent px-4 py-2 bg-green-600 text-base leading-6 font-medium text-white shadow-sm hover:bg-green-500 focus:outline-none focus:border-green-700 focus:shadow-outline-green transition ease-in-out duration-150 sm:text-sm sm:leading-5" >
-                                                Abrir
-                                              </button>
-                                            </span>
-                                         <span class="mt-3 flex w-full rounded-md shadow-sm sm:mt-0 sm:w-auto">
-
-                                          <button @click="isOpenAbrir = false" type="button" class="inline-flex justify-center w-full rounded-md border border-gray-300 px-4 py-2 bg-white text-base leading-6 font-medium text-gray-700 shadow-sm hover:text-gray-500 focus:outline-none focus:border-blue-300 focus:shadow-outline-blue transition ease-in-out duration-150 sm:text-sm sm:leading-5">
-                                            Cancelar
-                                          </button>
-                                        </span>
-                                        </div>
-                                    </form>
-
-                                </div>
-                            </div>
+                    <section>
+                        <br>
+                        <div class="w-1/3">
+                            <h3 class="font-bold text-xl text-black-800 leading-tight">
+                                Transacciones
+                            </h3>
                         </div>
                     </section>
-                    <!-- Fin Ventana modal Abrir Caj -->
 
-                    <!-- Ventana modal Cerrar Caja -->
-                    <!-- Main modal -->
-                    <section> <!-- Ventana modal -->
-                        <div class="fixed z-10 inset-0 overflow-y-auto ease-out duration-400" v-if="isOpenCerrar">
-                            <div class="items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-
-                                <div class="fixed inset-0 transition-opacity">
-                                    <div class="absolute inset-0 bg-gray-500 opacity-75"></div>
-                                </div>
-
-                                <!-- This element is to trick the browser into centering the modal contents. -->
-                                <span class="hidden sm:inline-block sm:align-middle sm:h-screen"></span>
-                                <div class="inline-block lg:w-6/12 align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:w-full" role="dialog" aria-modal="true" aria-labelledby="modal-headline">
-                                    <button type="button" @click="isOpenCerrar = false" class="absolute top-3 right-2.5 text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center dark:hover:bg-gray-800 dark:hover:text-white" data-modal-toggle="authentication-modal">
-                                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg>
-                                    </button>
-                                    <div class="">
-                                        <h2 v-text="tituloModal" class="text-xl font-bold text-gray-900 px-4 py-4"></h2>
-                                    </div>
-                                    <form>
-                                        <div class="bg-white px-4 pt-2 pb-4 ">
-                                            <div class="">
-                                                <section>
-                                                    <div class="mt-2 grid gap-y-6 ">
-                                                        <div>
-                                                            <label class="block text-sm font-medium text-gray-700">Punto de venta</label>
-                                                            <div class="mt-1">
-                                                                <input type="text" disabled :class="{'bg-blue-100' : editMode}" v-model="form.puntoventa.nombre" autocomplete="given-name" class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
-                                                            </div>
-                                                        </div>
-
-                                                        <div>
-                                                            <label class="block text-sm font-medium text-gray-700">Cantidad final ($)</label>
-                                                            <div class="mt-1">
-                                                                <money3 v-model="form.montocierre" v-bind="configMoney" :disabled="verMode" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"></money3>
-                                                                <div v-if="$page.props.errors.apellido" class="text-red-500">{{ $page.props.errors.apellido }}</div>
-                                                            </div>
-                                                        </div>
-
-                                                    </div>
-                                                </section>
+                    <!-- Tabla de contenido -->
+                    <section>
+                        <div class="lg:px-4 w-full md:px-2 sm:px-0 py-2 pb-6 overflow-x-scroll">
+                            <table class="table-fixed w-full">
+                                <thead>
+                                <tr class="text-left bg-gray-100">
+                                    <th class="w-20 px-4 py-2 text-sm font-bold hover:bg-blue-500 hover:text-gray-50 rounded-b">
+                                        <button @click="getCajas(buscar, 'id')" class="font-bold">
+                                            ID
+                                            <div v-show="sortBy == 'nombre'">
+                                                <span v-show="!sortOrder">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                                                        <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+                                                    </svg>
+                                                </span>
+                                                <span v-show="sortOrder">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                                                      <path fill-rule="evenodd" d="M14.707 12.707a1 1 0 01-1.414 0L10 9.414l-3.293 3.293a1 1 0 01-1.414-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 010 1.414z" clip-rule="evenodd" />
+                                                    </svg>
+                                                </span>
                                             </div>
-                                        </div>
-                                        <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
-                                            <span class="flex w-full rounded-md shadow-sm sm:ml-3 sm:w-auto">
-                                              <button wire:click.prevent="cierre()" @click="cierre(form)" type="button" class="inline-flex justify-center w-full rounded-md border border-transparent px-4 py-2 bg-green-600 text-base leading-6 font-medium text-white shadow-sm hover:bg-green-500 focus:outline-none focus:border-green-700 focus:shadow-outline-green transition ease-in-out duration-150 sm:text-sm sm:leading-5" >
-                                                Cerrar
-                                              </button>
-                                            </span>
-                                            <span class="mt-3 flex w-full rounded-md shadow-sm sm:mt-0 sm:w-auto">
-
-                                          <button @click="isOpenCerrar = !isOpenCerrar" type="button" class="inline-flex justify-center w-full rounded-md border border-gray-300 px-4 py-2 bg-white text-base leading-6 font-medium text-gray-700 shadow-sm hover:text-gray-500 focus:outline-none focus:border-blue-300 focus:shadow-outline-blue transition ease-in-out duration-150 sm:text-sm sm:leading-5">
-                                            Cancelar
-                                          </button>
-                                        </span>
-                                        </div>
-                                    </form>
-
-                                </div>
-                            </div>
+                                        </button>
+                                    </th>
+                                    <th class="px-4 py-2 text-sm font-bold hover:bg-blue-500 hover:text-gray-50 rounded-b">
+                                        <button @click="getCajas(buscar, 'id')" class="font-bold">
+                                            Vendedor
+                                            <div v-show="sortBy == 'nombre'">
+                                                <span v-show="!sortOrder">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                                                        <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+                                                    </svg>
+                                                </span>
+                                                <span v-show="sortOrder">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                                                      <path fill-rule="evenodd" d="M14.707 12.707a1 1 0 01-1.414 0L10 9.414l-3.293 3.293a1 1 0 01-1.414-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 010 1.414z" clip-rule="evenodd" />
+                                                    </svg>
+                                                </span>
+                                            </div>
+                                        </button>
+                                    </th>
+                                    <th class="px-4 py-2 text-sm font-bold hover:bg-blue-500 hover:text-gray-50 rounded-b">
+                                        <button @click="getCajas(buscar, 'id')" class="font-bold">
+                                            Valor Total
+                                            <div v-show="sortBy == 'ciudad.precio'">
+                                                <span v-show="!sortOrder">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                                                        <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+                                                    </svg>
+                                                </span>
+                                                <span v-show="sortOrder">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                                                      <path fill-rule="evenodd" d="M14.707 12.707a1 1 0 01-1.414 0L10 9.414l-3.293 3.293a1 1 0 01-1.414-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 010 1.414z" clip-rule="evenodd" />
+                                                    </svg>
+                                                </span>
+                                            </div>
+                                        </button>
+                                    </th>
+                                    <th class="px-4 py-2 text-sm font-bold hover:bg-blue-500 hover:text-gray-50 rounded-b">
+                                        <button @click="getCajas(buscar, 'id')" class="font-bold">
+                                            Comisión
+                                            <div v-show="sortBy == 'fechafin'">
+                                                <span v-show="!sortOrder">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                                                        <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+                                                    </svg>
+                                                </span>
+                                                <span v-show="sortOrder">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                                                      <path fill-rule="evenodd" d="M14.707 12.707a1 1 0 01-1.414 0L10 9.414l-3.293 3.293a1 1 0 01-1.414-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 010 1.414z" clip-rule="evenodd" />
+                                                    </svg>
+                                                </span>
+                                            </div>
+                                        </button>
+                                    </th>
+                                    <th class="px-4 py-2 text-sm font-bold hover:bg-blue-500 hover:text-gray-50 rounded-b">
+                                        <button @click="getCajas(buscar, 'id')" class="font-bold">
+                                            Cantidad
+                                            <div v-show="sortBy == 'fechafin'">
+                                                <span v-show="!sortOrder">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                                                        <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+                                                    </svg>
+                                                </span>
+                                                <span v-show="sortOrder">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                                                      <path fill-rule="evenodd" d="M14.707 12.707a1 1 0 01-1.414 0L10 9.414l-3.293 3.293a1 1 0 01-1.414-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 010 1.414z" clip-rule="evenodd" />
+                                                    </svg>
+                                                </span>
+                                            </div>
+                                        </button>
+                                    </th>
+                                    <th class="px-4 py-2 text-sm font-bold hover:bg-blue-500 hover:text-gray-50 rounded-b">
+                                        <button @click="getCajas(buscar, 'id')" class="font-bold">
+                                            Recibo
+                                        </button>
+                                    </th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr :class="dato.id === selectedRow2 ? 'bg-blue-200' : ''"  class="text-left hover:bg-blue-400" @click="rowSelect2(dato.id); getDetalles(dato.id)" text-sm v-if="arrayVentas.data" v-for="(dato, id) in arrayVentas.data" :key="id">
+                                    <td class="border px-1 py-2 text-sm truncate" v-text="dato.id"></td>
+                                    <td class="border px-1 py-2 text-sm truncate" v-text="dato.vendedor.full_name"></td>
+                                    <td class="border px-1 py-2 text-sm truncate" :class="{ 'text-red-400':dato.valorventa < 0 }" v-text="formatPrice(dato.valorventa)"></td>
+                                    <td class="border px-1 py-2 text-sm truncate" :class="{ 'text-red-400':-dato.comision < 0 }" v-text="formatPrice(-dato.comision)"></td>
+                                    <td class="border px-1 py-2 text-sm truncate" v-text="dato.cantidad"></td>
+                                    <td class="border px-1 py-2 text-sm truncate">
+                                        <a :href="dato.urlrecibo" target="_blank" class="hover:bg-red-700 text-red-400 font-bold rounded" fill="none"
+                                           viewBox="0 0 24 24" stroke="currentColor">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+                                            </svg>
+                                        </a>
+                                    </td>
+                                </tr>
+                                <tr v-else>
+                                    <td class="border px-4 py-2 text-xs text-center" colspan="5"> La consulta no obtuvo datos</td>
+                                </tr>
+                                </tbody>
+                            </table>
                         </div>
                     </section>
-                    <!-- Fin Ventana modal Cerrar Caja -->
+                    <!-- Fin Tabla de contenido -->
 
+                    <!-- Tabla de Detalle -->
+                    <section>
+                        <div class="lg:px-4 md:px-2 sm:px-0 py-2 pb-6 overflow-y-auto h-50">
+                            <h4 class="font-semibold text-xl text-gray-800 leading-tight">
+                                Detalle de la venta
+                            </h4>
+                            <table class="table-fixed w-full">
+                                <thead>
+                                <tr class="bg-gray-100">
+                                    <th class="px-4 py-2 w-2/12 text-sm font-bold hover:bg-blue-500 hover:text-gray-50 rounded-b">
+                                        Id
+                                    </th>
+                                    <th class="px-4 py-2 w-2/12 text-sm font-bold hover:bg-blue-500 hover:text-gray-50 rounded-b">
+                                        Rifa
+                                    </th>
+                                    <th class="px-4 py-2 w-2/12 text-sm font-bold hover:bg-blue-500 hover:text-gray-50 rounded-b">
+                                        Boleta
+                                    </th>
+                                    <th class="px-4 py-2 text-sm font-bold w-2/12 hover:bg-blue-500 hover:text-gray-50 rounded-b">
+                                        Cliente
+                                    </th>
+                                    <th class="px-4 py-2 text-sm font-bold w-2/12 hover:bg-blue-500 hover:text-gray-50 rounded-b">
+                                        Valor Boleta
+                                    </th>
+                                    <th class="px-4 py-2 text-sm font-bold w-2/12 hover:bg-blue-500 hover:text-gray-50 rounded-b">
+                                        Valor pagado
+                                    </th>
+                                    <th class="px-4 py-2 text-sm font-bold w-2/12 hover:bg-blue-500 hover:text-gray-50 rounded-b">
+                                        Comisión vendedor
+                                    </th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr class="text-center" text-sm v-if="arrayDetalles.data" v-for="(dato, id) in arrayDetalles.data" :key="id">
+                                    <td class="border px-1 py-2 text-sm truncate" v-text="dato.id"></td>
+                                    <td class="border px-1 py-2 text-sm truncate" v-text="dato.rifa.nombre_tecnico"></td>
+                                    <td class="border px-1 py-2 text-sm truncate" v-text="dato.numero"></td>
+                                    <td class="border px-1 py-2 text-sm truncate" v-text="dato.cliente.nombre+' '+dato.cliente.apellido"></td>
+                                    <td class="border px-1 py-2 text-sm truncate" v-text="formatPrice(dato.valortotal)"></td>
+                                    <td class="border px-1 py-2 text-sm truncate" v-text="formatPrice(dato.valor)"></td>
+                                    <td class="border px-1 py-2 text-sm truncate" v-text="formatPrice(dato.comision)"></td>
 
-                    <!-- Ventana modal Deatlle cierre -->
-                    <!-- Main modal -->
-                    <section> <!-- Ventana modal -->
-                        <div class="fixed z-10 inset-0 overflow-y-auto ease-out duration-400" v-if="isOpenDetalle">
-                            <div class="items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-
-                                <div class="fixed inset-0 transition-opacity">
-                                    <div class="absolute inset-0 bg-gray-500 opacity-75"></div>
-                                </div>
-
-                                <!-- This element is to trick the browser into centering the modal contents. -->
-                                <span class="hidden sm:inline-block sm:align-middle sm:h-screen"></span>
-                                <div class="inline-block lg:w-6/12 align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:w-full" role="dialog" aria-modal="true" aria-labelledby="modal-headline">
-                                    <button type="button" @click="isOpenDetalle = false" class="absolute top-3 right-2.5 text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center dark:hover:bg-gray-800 dark:hover:text-white" data-modal-toggle="authentication-modal">
-                                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg>
-                                    </button>
-
-                                    <div class="">
-                                        <h5 v-text="tituloModal" class="border-b-2 border-gray-500 text-xl font-bold text-gray-900 px-4 py-4"></h5>
+                                </tr>
+                                <tr v-else>
+                                    <td class="border px-4 py-2 text-xs text-center" colspan="6"> La consulta no obtuvo datos</td>
+                                </tr>
+                                </tbody>
+                            </table>
+                            <section class="mt-6">
+                                <div v-if="arrayDetalles.links.length > 3">
+                                    <div class="flex flex-wrap -mb-1">
+                                        <template v-for="(link, p) in arrayDetalles.links" :key="p">
+                                            <div v-if="link.url === null" class="mr-1 mb-1 px-4 py-3 text-sm leading-4 text-gray-400 border rounded"
+                                                 v-html="link.label" />
+                                            <button  v-else
+                                                     class="mr-1 mb-1 px-4 py-3 text-sm leading-4 border rounded hover:bg-white focus:border-indigo-500 focus:text-indigo-500"
+                                                     :class="{ 'bg-blue-700 text-white': link.active }"
+                                                     v-on:click="cambiarPage(link.url)"
+                                                     v-html="link.label" />
+                                        </template>
                                     </div>
-                                        <div class="bg-white px-4 pt-4 pb-4 ">
-                                            <div class="">
-                                                <section>
-                                                    <div class="relative overflow-x-auto shadow-md sm:rounded-lg">
-                                                        <table class="w-full text-sm text-left text-gray-500 ">
-                                                            <tr class="bg-white border-b ">
-                                                                <th scope="col" class="px-6 py-2">
-                                                                    Fecha de operación
-                                                                </th>
-                                                                <th scope="col" class="px-6 py-2">
-                                                                    {{ recaudocaja.fechaapertura }}
-                                                                </th>
-                                                            </tr>
-                                                            <tr class="bg-white border-b ">
-                                                                <th scope="col" class="px-6 py-2">
-                                                                    Nombre vendedor
-                                                                </th>
-                                                                <th scope="col" class="px-6 py-2">
-                                                                    {{ recaudocaja.vendedor.nombre + ' ' + recaudocaja.vendedor.apellido }}
-                                                                </th>
-                                                            </tr>
-                                                            <tr class="bg-white border-b ">
-                                                                <th scope="col" class="px-6 py-2">
-                                                                    Punto de venta
-                                                                </th>
-                                                                <th scope="col" class="px-6 py-2">
-                                                                    {{ recaudocaja.puntoventa.nombre }}
-                                                                </th>
-                                                            </tr>
-                                                            <tbody>
-                                                            <tr class="bg-white border-b ">
-                                                                <th colspan="2" scope="row" class="px-6 mx-auto py-4 font-medium text-black font-bold whitespace-nowrap">
-                                                                    Movimientos
-                                                                </th>
-                                                            </tr>
-                                                            <tr class="bg-white border-b ">
-                                                                <th scope="col" class="px-6 py-2">
-                                                                    Fonde de caja
-                                                                </th>
-                                                                <td class="px-6 py-2">
-                                                                    {{ formatPrice(recaudocaja.montoapertura) }}
-                                                                </td>
-                                                            </tr>
-                                                            <tr class="bg-white border-b ">
-                                                                <th scope="col" class="px-6 py-2">
-                                                                    Efectivo en caja
-                                                                </th>
-                                                                <td class="px-6 py-2">
-                                                                    {{ formatPrice(recaudocaja.montocierre) }}
-                                                                </td>
-                                                            </tr>
-                                                            <tr class="bg-white border-b ">
-                                                                <th scope="col" class="px-6 py-2">
-                                                                    Ventas en efectivo
-                                                                </th>
-                                                                <td class="px-6 py-2">
-                                                                    {{ formatPrice(recaudocaja.recaudoefectivo) }}
-                                                                </td>
-                                                            </tr>
-                                                            <tr class="bg-white border-b ">
-                                                                <th scope="col" class="px-6 py-2">
-                                                                    Faltante
-                                                                </th>
-                                                                <td class="px-6 py-2 text-red-700">
-                                                                    {{ formatPrice(recaudocaja.faltante) }}
-                                                                </td>
-                                                            </tr>
-                                                            <tr class="bg-white border-b ">
-                                                                <th scope="col" class="px-6 py-2">
-                                                                    Sobrante
-                                                                </th>
-                                                                <td class="px-6 py-2">
-                                                                    {{ formatPrice(recaudocaja.sobrante) }}
-                                                                </td>
-                                                            </tr>
-                                                            </tbody>
-                                                            </table>
-                                                    </div>
-                                                </section>
-                                            </div>
-                                        </div>
-                                        <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
-                                            <span class="flex w-full rounded-md shadow-sm sm:ml-3 sm:w-auto">
-                                              <button wire:click.prevent="cierre()" @click="cierre(form)" type="button" class="inline-flex justify-center w-full rounded-md border border-transparent px-4 py-2 bg-green-600 text-base leading-6 font-medium text-white shadow-sm hover:bg-green-500 focus:outline-none focus:border-green-700 focus:shadow-outline-green transition ease-in-out duration-150 sm:text-sm sm:leading-5" >
-                                                Imprimir
-                                              </button>
-                                            </span>
-                                            <span class="mt-3 flex w-full rounded-md shadow-sm sm:mt-0 sm:w-auto">
-
-                                          <button @click="isOpenCerrar = !isOpenCerrar" type="button" class="inline-flex justify-center w-full rounded-md border border-gray-300 px-4 py-2 bg-white text-base leading-6 font-medium text-gray-700 shadow-sm hover:text-gray-500 focus:outline-none focus:border-blue-300 focus:shadow-outline-blue transition ease-in-out duration-150 sm:text-sm sm:leading-5">
-                                            Cerrar
-                                          </button>
-                                        </span>
-                                        </div>
-
                                 </div>
-                            </div>
+                            </section>
                         </div>
                     </section>
-                    <!-- Fin Ventana modal Detalle cierre -->
-
+                    <!-- Fin Tabla de Detalle -->
 
                 </div>
             </div>
@@ -560,7 +484,6 @@ export default {
         estado: 0
     },
     computed: {
-
     },
     data() {
         return {
@@ -581,6 +504,8 @@ export default {
 
             ispage: true,
             tituloModal: '',
+            selectedRow: null,
+            selectedRow2: null,
             form: {
                 id: null,
                 fechaapertura: null,
@@ -597,6 +522,14 @@ export default {
             existeuser: 1,
             buscar: '',
             arrayCajas: {
+                data: [],
+                links: []
+            },
+            arrayVentas: {
+                data: [],
+                links: []
+            },
+            arrayDetalles: {
                 data: [],
                 links: []
             },
@@ -636,7 +569,7 @@ export default {
                     ispage: true
                 }
             }).then((res) => {
-                console.log(res.data.cajas);
+                //console.log(res.data.cajas);
                 var respuesta = res.data;
                 this.arrayCajas = respuesta.cajas;
             })
@@ -751,7 +684,7 @@ export default {
         cierre: function (data) {
             axios.post('/cajas/cierre', data)
                 .then((res) => {
-                    console.log(res.data);
+                    //console.log(res.data);
                     Swal.fire({
                         icon: 'success',
                         title: 'Se ha realizado el cierre de caja',
@@ -763,7 +696,7 @@ export default {
                     this.tituloModal = 'Detalle del cierre de caja'
                     this.isOpenDetalle = true;
                 }).catch(function (error) {
-                console.log(error);
+                //console.log(error);
             });
 
             /*
@@ -818,7 +751,7 @@ export default {
                     ispage: this.ispage
                 }
             }).then((res) => {
-                console.log(res);
+                //console.log(res);
                 var respuesta = res.data;
                 this.arrayCajas = respuesta.cajas;
             })
@@ -855,7 +788,7 @@ export default {
                             'success'
                         )
                     }).catch(function (error) {
-                    console.log(error);
+                    //console.log(error);
                 });
             })
 
@@ -898,16 +831,48 @@ export default {
 
                 });
             }, (5000));
+        },
+        getDetallesVentas: function (id) {
+            var url= '/ventas/getDetallesHistorial';
+            axios.get(url, {
+                params: {
+                    id: id,
+                }
+            }).then((res) => {
+                var respuesta = res.data;
+                this.arrayVentas = respuesta.data;
+                this.arrayDetalles.data = [];
+                this.arrayDetalles.links = [];
+            })
+        },
+        getDetalles: function (id) {
+            var url= '/ventas/getDetalles';
+            axios.get(url, {
+                params: {
+                    id: id,
+                }
+            }).then((res) => {
+                var respuesta = res.data;
+                this.arrayDetalles = respuesta.data;
+            })
+        },
+        rowSelect(idx) {
+            console.dir(idx)
+            this.selectedRow = idx;
+        },
+        rowSelect2(idx) {
+            console.dir(idx)
+            this.selectedRow2 = idx;
         }
     },
     created: function () {
-        console.log('inicio');
+        //console.log('inicio');
         this.arrayCajas = this.cajas;
         this.cajasAbiertas();
 
     },
     mounted() {
-        console.log('Component mounted.');
+        //console.log('Component mounted.');
 
         if (this.estado == 1) {
             Swal.fire({

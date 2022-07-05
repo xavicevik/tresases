@@ -491,7 +491,7 @@ export default {
                     ispage: this.ispage
                 }
             }).then((res) => {
-                console.log(res);
+                //console.log(res);
                 var respuesta = res.data;
                 this.arrayData = respuesta.datos;
             })
@@ -499,13 +499,13 @@ export default {
 
     },
     created: function () {
-        console.log('inicio pagos');
+        //console.log('inicio pagos');
         this.arrayData = this.datos;
-        console.log(this.datos);
+        //console.log(this.datos);
 
     },
     mounted() {
-        console.log('Component mounted.');
+        //console.log('Component mounted.');
     },
 }
 </script>

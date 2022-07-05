@@ -14,7 +14,7 @@ return new class extends Migration
     public function up()
     {
         Schema::create('cajasdisponibles', function (Blueprint $table) {
-            $table->bigIncrements();
+            $table->bigIncrements('id');
             $table->string('nombre', 100);
             $table->integer('idpuntoventa')->unsigned();
             $table->foreign('idpuntoventa')->references('id')->on('puntos_ventas');

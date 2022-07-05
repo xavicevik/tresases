@@ -1,5 +1,8 @@
 <template>
     <AppLayout title="Rifas">
+
+        <Statscards></Statscards>
+
         <template #header>
             <h2 class="font-semibold text-xl text-gray-800 leading-tight">
                 Lista de rifas
@@ -649,7 +652,7 @@
                                                             {{ promo.fecha }}
                                                         </div>
                                                         <div class="mb-4 w-3/12 px-2">
-                                                            {{ arrayLoterias[promo.idloteria - 1].nombre  }}
+                                                            {{ nombreLoteria(promo.idloteria)  }}
                                                         </div>
                                                         <div v-show="!verMode" class="mx-auto w-1/12 px-2 self-center">
                                                             <svg xmlns="http://www.w3.org/2000/svg" @click="eliminarPromo(index)" class="mx-auto h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -667,8 +670,8 @@
                                                         <Toggle v-model="form.publicar" :disabled="verMode"/>
                                                     </div>
                                                     <div class="mb-4 w-1/2 text-center mx-auto">
-                                                        <label class="block text-gray-700 text-sm font-bold mb-2">Destacada (NO):</label>
-                                                        <Toggle v-model="form.destacada" :disabled="verMode"/>
+                                                        <label class="block text-gray-700 text-sm font-bold mb-2">Física (NO):</label>
+                                                        <Toggle v-model="form.fisica" :disabled="verMode"/>
                                                     </div>
                                                     <div class="mb-4 w-1/2 text-center mx-auto">
                                                         <label class="block text-gray-700 text-sm font-bold mb-2">Principal (NO):</label>
@@ -894,7 +897,6 @@ import { Head, Link } from '@inertiajs/inertia-vue3';
 import JetNavLink from '@/Jetstream/NavLink.vue';
 import NavLink from "../../Jetstream/NavLink";
 
-
 export default {
 
     components: {
@@ -908,7 +910,6 @@ export default {
         JetNavLink,
         Link,
         money3: Money3Component,
-
     },
     props:{
         rifas : [],
@@ -968,7 +969,7 @@ export default {
                 fechafin: null,
                 promocional: false,
                 publicar: false,
-                destacada: false,
+                fisica: false,
                 principal: false,
                 urlimagen1: null,
                 urlimagen2: null,
@@ -1044,6 +1045,16 @@ export default {
                 this.tiposseriestxtdst = this.tiposeriedestino.detalle.split('|');
             }
         },
+        nombreLoteria: function(id) {
+            let nombre;
+            this.arrayLoterias.forEach(function(loteria) {
+               if (loteria['id'] == id) {
+                   //console.log(loteria.nombre);
+                   nombre = loteria.nombre;
+               }
+            });
+            return nombre;
+        },
         actualizarRangos() {
             let rango = null;
             let cantidad = 0;
@@ -1067,7 +1078,7 @@ export default {
             this.$page.props.flash.message = '';
         },
         validarFechaPromo: function() {
-            console.log('cambiar');
+            //console.log('cambiar');
             let fechapromo = this.fechapromo; //moment(this.fechapromo).format('YYYY-MM-DD HH:MM:SS');
             let fechaRifa = this.form.fechafin; //moment(this.form.fechafin).format('YYYY-MM-DD HH:MM:SS');
             if (fechapromo >= fechaRifa) {
@@ -1113,7 +1124,7 @@ export default {
                     this.form.fechafin = null;
                     this.form.promocional = null;
                     this.form.publicar = null;
-                    this.form.destacada = null;
+                    this.form.fisica = null;
                     this.form.principal = null;
                     this.form.urlimagen2 = null;
                     this.form.urlimagen1 = null;
@@ -1151,7 +1162,7 @@ export default {
                     this.form.fechafin = data['fechafin'];
                     this.form.promocional = data['promocional'];
                     this.form.publicar = data['publicar'];
-                    this.form.destacada = data['principal'];
+                    this.form.fisica = data['fisica'];
                     this.form.principal = data['principal'];
                     this.form.urlimagen2 = data['urlimagen2'];
                     this.form.urlimagen1 = data['urlimagen1'];
@@ -1194,7 +1205,7 @@ export default {
                     this.form.fechafin = data['fechafin'];
                     this.form.promocional = data['promocional'];
                     this.form.publicar = data['publicar'];
-                    this.form.destacada = data['principal'];
+                    this.form.fisica = data['fisica'];
                     this.form.principal = data['principal'];
                     this.form.urlimagen2 = data['urlimagen2'];
                     this.form.urlimagen1 = data['urlimagen1'];
@@ -1274,7 +1285,7 @@ export default {
             this.form.fechafin = null;
             this.form.promocional = null;
             this.form.publicar = null;
-            this.form.destacada = null;
+            this.form.fisica = null;
             this.form.principal = null;
             this.form.urlimagen2 = null;
             this.form.urlimagen1 = null;
@@ -1301,11 +1312,8 @@ export default {
             if (this.tiposerie.id == 1){
                 data.serie = null;
             }
-            console.log(data);
+            //console.log(data);
             this.$inertia.post('/rifas', data, {
-                onBefore: (visit) => { console.log('onBefore');},
-                onStart: (visit) => {console.log('onStart');},
-                onProgress: (progress) => {console.log('onProgress');},
                 onSuccess: (page) => {
                     Swal.fire({
                         position: 'top-end',
@@ -1319,14 +1327,11 @@ export default {
                     this.getRifas('','rifas.nombre_tecnico');
                     this.editMode = false;
                 },
-                onError: (errors) => {console.log('onError');},
-                onCancel: () => {console.log('onCancel');},
-                onFinish: visit => {console.log('onFinish');},
             });
 
         },
         copy: function (data) {
-            console.log('inicia save');
+            //console.log('inicia save');
             data.idserie = this.tiposerie.id;
             if (this.tiposerie.id == 1){
                 data.serie = null;
@@ -1335,7 +1340,7 @@ export default {
             let isSave = false;
 
             if (this.copiaserie == 1) {
-                console.log('serie oculta');
+                //console.log('serie oculta');
                 if (this.form.serieoculta == this.seriedestinooculta) {
                     Swal.fire({
                         icon: 'error',
@@ -1380,9 +1385,6 @@ export default {
             if (this.isSave) {
 
                 this.$inertia.post('/rifas/copy', data, {
-                    onBefore: (visit) => { console.log('onBefore');},
-                    onStart: (visit) => {console.log('onStart');},
-                    onProgress: (progress) => {console.log('onProgress');},
                     onSuccess: (page) => {
                         Swal.fire({
                             position: 'top-end',
@@ -1396,9 +1398,6 @@ export default {
                         this.getRifas('','rifas.id');
                         this.editMode = false;
                     },
-                    onError: (errors) => {console.log('onError');},
-                    onCancel: () => {console.log('onCancel');},
-                    onFinish: visit => {console.log('onFinish');},
                 });
             }
         },
@@ -1425,9 +1424,6 @@ export default {
             }
             data._method = 'PUT';
             this.$inertia.post('/rifas/'  + data.id, data, {
-                onBefore: (visit) => { console.log('onBefore');},
-                onStart: (visit) => {console.log('onStart');},
-                onProgress: (progress) => {console.log('onProgress');},
                 onSuccess: (page) => {
                     Swal.fire({
                         position: 'top-end',
@@ -1441,9 +1437,6 @@ export default {
                     this.reset();
                     this.editMode = false;
                 },
-                onError: (errors) => {console.log('onError');},
-                onCancel: () => {console.log('onCancel');},
-                onFinish: visit => {console.log('onFinish');},
             });
 
         },
@@ -1471,7 +1464,7 @@ export default {
                     ispage: this.ispage
                 }
             }).then((res) => {
-                console.log(res.data);
+                //console.log(res.data);
                 var respuesta = res.data;
                 this.arrayRifas = respuesta.rifas;
 
@@ -1485,19 +1478,19 @@ export default {
         getLoterias: function () {
             axios.get('/loterias',).then((res) => {
                 this.arrayLoterias = res.data.loterias;
-                console.log(res.data.loterias)
+                //console.log(res.data.loterias)
             })
         },
         getTerminos: function () {
             axios.get('/terminos',).then((res) => {
                 this.arrayTerminos = res.data.terminos;
-                console.log(res.data.terminos)
+                //console.log(res.data.terminos)
             })
         },
         getPaises: function () {
             axios.get('/paises',).then((res) => {
                 this.arrayPaises = res.data.paises;
-                console.log(res.data.paises)
+                //console.log(res.data.paises)
             })
         },
         getDepartamentos: function () {
@@ -1507,14 +1500,14 @@ export default {
                 }
             }).then((res) => {
                 this.arrayDepartamentos = res.data.departamentos;
-                console.log(res.data.departamentos)
+                //console.log(res.data.departamentos)
             })
         },
         getSeries: function () {
             axios.get('/series', {
             }).then((res) => {
                 this.arraySeries = res.data.tiposerie;
-                console.log(res.data.tiposerie)
+                //console.log(res.data.tiposerie)
             })
         },
         getCiudades: function () {
@@ -1525,7 +1518,7 @@ export default {
                 }
             }).then((res) => {
                 this.arrayCiudades = res.data.ciudades;
-                console.log(res.data.ciudades)
+                //console.log(res.data.ciudades)
             })
         },
         deleteRow: function (data) {
@@ -1560,7 +1553,7 @@ export default {
                         'success'
                     )
                 }).catch(function (error) {
-                    console.log(error);
+                    //console.log(error);
                 });
             })
 
@@ -1624,7 +1617,7 @@ export default {
             });
         },
         uploadFiles2() {
-            console.log(this.form.files1);
+            //console.log(this.form.files1);
             // This is where the magic could happen!
         },
 
@@ -1659,7 +1652,7 @@ export default {
             });
         },
         uploadFiles1() {
-            console.log(this.form.files1);
+            //console.log(this.form.files1);
             // This is where the magic could happen!
         },
     },
@@ -1669,7 +1662,7 @@ export default {
         //this.openModal('registrar')
     },
     mounted() {
-        console.log('Component mounted.');
+        //console.log('Component mounted.');
     },
 }
 </script>

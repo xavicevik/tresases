@@ -64,11 +64,16 @@ class User extends Authenticatable
      * @var array
      */
     protected $appends = [
-        'profile_photo_url',
+        'profile_photo_url', 'full_name'
     ];
+
 
     public function scopeUserApp($query) {
         return $query->where('idrol', '<>', '2')->where('idrol', '<>', '1');
+    }
+
+    public function scopeClientesApp($query) {
+        return $query->where('idrol', '=', '2');
     }
 
     public function empresa(){
@@ -107,9 +112,8 @@ class User extends Authenticatable
         );
     }
 
-    public function FullName(): Attribute {
-        return Attribute::make (
-            get: fn () => $this->nombre.' '.$this->apellido,
-        );
+    public function getFullNameAttribute()
+    {
+        return ucwords("{$this->nombre} {$this->apellido}");
     }
 }

@@ -18,7 +18,7 @@ use Spatie\Permission\Models\Role;
 
 class UserController extends Controller
 {
-    const canPorPagina = 10;
+    const canPorPagina = 15;
     /**
      * Display a listing of the resource.
      *
@@ -27,6 +27,7 @@ class UserController extends Controller
     public function index(Request $request)
     {
         $buscar = $request->buscar;
+        $filtros = json_decode($request->filtros);
 
         if ($request->has('sortBy') && $request->sortBy <> ''){
             $sortBy = $request->sortBy;
@@ -46,8 +47,7 @@ class UserController extends Controller
                         ->with('ciudad')
                         ->with('rol')
                         ->with('tipodocumento')
-                        ->with('empresa')
-                        ->paginate(self::canPorPagina);
+                        ->with('empresa');
         } else {
             $users = User::UserApp()
                         ->orderBy($sortBy, $sortOrder)
@@ -59,14 +59,112 @@ class UserController extends Controller
                         ->orWhere('apellido', 'like', '%'. $buscar . '%')
                         ->orWhere('correo', 'like', '%'. $buscar . '%')
                         ->orWhere('username', 'like', '%'. $buscar . '%')
-                        ->orWhere('documento', 'like', '%'. $buscar . '%')
-                        ->paginate(self::canPorPagina);
+                        ->orWhere('documento', 'like', '%'. $buscar . '%');
         }
+        if (!is_null($filtros)) {
+            if (!is_null($filtros->documento) && $filtros->documento <> '') {
+                $users = $users->where('documento', 'like', '%' . $filtros->documento . '%');
+            }
+
+            if (!is_null($filtros->nombre) && $filtros->nombre <> '') {
+                $users = $users->where('nombre', 'like', '%' . $filtros->nombre . '%');
+            }
+
+            if (!is_null($filtros->apellido) && $filtros->apellido <> '') {
+                $users = $users->where('apellido', 'like', '%' . $filtros->apellido . '%');
+            }
+
+            if (!is_null($filtros->correo) && $filtros->correo <> '') {
+                $users = $users->where('correo', 'like', '%' . $filtros->correo . '%');
+            }
+
+            if (!is_null($filtros->movil) && $filtros->movil <> '') {
+                $users = $users->where('movil', 'like', '%' . $filtros->movil . '%');
+            }
+
+            if (!is_null($filtros->idrol) && $filtros->idrol <> '' && $filtros->idrol <> 0) {
+                $users = $users->where('idrol', 'like', '%' . $filtros->idrol . '%');
+            }
+        }
+
+        $users = $users->paginate(self::canPorPagina);
 
         if ($request->has('ispage') && $request->ispage){
             return ['users' => $users];
         } else {
             return Inertia::render('Users/Index', ['users' => $users, '_token' => csrf_token()]);
+        }
+    }
+
+    public function indexclientes(Request $request)
+    {
+        $buscar = $request->buscar;
+        $filtros = json_decode($request->filtros);
+
+        if ($request->has('sortBy') && $request->sortBy <> ''){
+            $sortBy = $request->sortBy;
+        } else {
+            $sortBy = 'id';
+        }
+
+        if ($request->has('sortOrder') && $request->sortOrder <> ''){
+            $sortOrder = $request->sortOrder;
+        } else {
+            $sortOrder = 'desc';
+        }
+
+        if ($buscar == ''){
+            $users = User::ClientesApp()
+                ->orderBy($sortBy, $sortOrder)
+                ->with('ciudad')
+                ->with('rol')
+                ->with('tipodocumento')
+                ->with('empresa');
+        } else {
+            $users = User::UserApp()
+                ->orderBy($sortBy, $sortOrder)
+                ->with('ciudad')
+                ->with('rol')
+                ->with('tipodocumento')
+                ->with('empresa')
+                ->where('nombre', 'like', '%'. $buscar . '%')
+                ->orWhere('apellido', 'like', '%'. $buscar . '%')
+                ->orWhere('correo', 'like', '%'. $buscar . '%')
+                ->orWhere('username', 'like', '%'. $buscar . '%')
+                ->orWhere('documento', 'like', '%'. $buscar . '%');
+        }
+        if (!is_null($filtros)) {
+            if (!is_null($filtros->documento) && $filtros->documento <> '') {
+                $users = $users->where('documento', 'like', '%' . $filtros->documento . '%');
+            }
+
+            if (!is_null($filtros->nombre) && $filtros->nombre <> '') {
+                $users = $users->where('nombre', 'like', '%' . $filtros->nombre . '%');
+            }
+
+            if (!is_null($filtros->apellido) && $filtros->apellido <> '') {
+                $users = $users->where('apellido', 'like', '%' . $filtros->apellido . '%');
+            }
+
+            if (!is_null($filtros->correo) && $filtros->correo <> '') {
+                $users = $users->where('correo', 'like', '%' . $filtros->correo . '%');
+            }
+
+            if (!is_null($filtros->movil) && $filtros->movil <> '') {
+                $users = $users->where('movil', 'like', '%' . $filtros->movil . '%');
+            }
+
+            if (!is_null($filtros->idrol) && $filtros->idrol <> '' && $filtros->idrol <> 0) {
+                $users = $users->where('idrol', 'like', '%' . $filtros->idrol . '%');
+            }
+        }
+
+        $users = $users->paginate(self::canPorPagina);
+
+        if ($request->has('ispage') && $request->ispage){
+            return ['users' => $users];
+        } else {
+            return Inertia::render('Users/Indexclientes', ['users' => $users, '_token' => csrf_token()]);
         }
     }
 
@@ -103,42 +201,29 @@ class UserController extends Controller
 
         $mytime= Carbon::now('America/Bogota');
 
-        if ($paginate) {
-            if ($buscar == ''){
-                $users = User::orderBy('users.id', 'asc')
-                    ->join('roles', 'users.idrol', '=', 'roles.id')
-                    ->select('users.id', 'users.nombre', 'users.apellido', 'users.documento', 'users.correo')
-                    ->where('users.estado', '=', '1')
-                    ->where('roles.id', '=', '5')
-                    ->paginate(self::canPorPagina);
-            } else {
-                $users = User::orderBy('users.id', 'asc')
-                    ->join('roles', 'users.idrol', '=', 'roles.id')
-                    ->select('users.id', 'users.nombre', 'users.apellido', 'users.documento', 'users.correo')
-                    ->where('users.estado', '=', '1')
-                    ->where('users.'.$filtro, 'like', '%'. $buscar . '%')
-                    ->where('roles.id', '=', '5')
-                    ->paginate(self::canPorPagina);
-            }
+        if ($buscar == ''){
+            $users = User::orderBy('users.id', 'asc')
+                ->join('roles', 'users.idrol', '=', 'roles.id')
+                ->select('users.id', 'users.nombre', 'users.apellido', 'users.documento', 'users.correo')
+                ->where('users.estado', '=', '1')
+                ->where('roles.id', '=', '5');
         } else {
-            if ($buscar == ''){
-                $users = User::orderBy('users.id', 'asc')
+            $users = User::orderBy('users.id', 'asc')
                     ->join('roles', 'users.idrol', '=', 'roles.id')
                     ->select('users.id', 'users.nombre', 'users.apellido', 'users.documento', 'users.correo')
                     ->where('users.estado', '=', '1')
-                    ->where('users.'.$filtro, 'like', '%'. $buscar . '%')
                     ->where('roles.id', '=', '5')
-                    ->get();
-            } else {
-                $users = User::orderBy('users.id', 'asc')
-                        ->join('roles', 'users.idrol', '=', 'roles.id')
-                        ->select('users.id', 'users.nombre', 'users.apellido', 'users.documento', 'users.correo')
-                        ->where('users.estado', '=', '1')
-                        ->where('users.'.$filtro, 'like', '%'. $buscar . '%')
-                        ->where($filtro, 'like', '%'. $buscar . '%')
-                        ->where('roles.id', '=', '5')
-                        ->get();
-            }
+                    ->where(function ($query) use ($buscar) {
+                        return $query->where('users.nombre', 'like', "%$buscar%")
+                            ->orWhere('users.apellido', 'like', '%'. $buscar . '%')
+                            ->orWhere('users.documento', 'like', '%'. $buscar . '%');
+                    });
+        }
+
+        if ($paginate) {
+            $users = $users->paginate(self::canPorPagina);
+        } else {
+            $users = $users->get();
         }
 
         return ['vendedores' => $users];
@@ -228,7 +313,12 @@ class UserController extends Controller
                     ->with('ciudad')
                     ->where('estado', '=', '1')
                     ->where('idrol', '=', '2')
-                    ->where($filtro, 'like', '%'. $buscar . '%')
+                    //->where('fechafin', '>', $mytime->toDateString())
+                    ->where(function ($query) use ($buscar) {
+                        return $query->where('users.nombre', 'like', "%$buscar%")
+                            ->orWhere('users.apellido', 'like', '%'. $buscar . '%')
+                            ->orWhere('users.documento', 'like', '%'. $buscar . '%');
+                    })
                     ->paginate(self::canPorPagina);
             }
         } else {
@@ -238,17 +328,21 @@ class UserController extends Controller
                         ->with('ciudad')
                         ->where('estado', '=', '1')
                         ->where('idrol', '=', '2')
-                    ->where('fechafin', '>', $mytime->toDateString())
-                    ->get();
+                        //->where('fechafin', '>', $mytime->toDateString())
+                        ->get();
             } else {
                 $users = User::orderBy($sortBy, $sortOrder)
                         ->with('tipodocumento')
                         ->with('ciudad')
                         ->where('estado', '=', '1')
                         ->where('idrol', '=', '2')
-                        ->where('fechafin', '>', $mytime->toDateString())
-                        ->where($filtro, 'like', '%'. $buscar . '%')
-                    >get();
+                        //->where('fechafin', '>', $mytime->toDateString())
+                        ->where(function ($query) use ($buscar) {
+                            return $query->where('users.nombre', 'like', "%$buscar%")
+                                  ->orWhere('users.apellido', 'like', '%'. $buscar . '%')
+                                  ->orWhere('users.documento', 'like', '%'. $buscar . '%');
+                        })
+                        ->get();
             }
         }
 

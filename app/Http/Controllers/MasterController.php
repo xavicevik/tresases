@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Empresa;
+use App\Models\Loteria;
 use App\Models\Pais;
 use App\Models\Rol;
 use App\Models\Serie;
@@ -383,4 +384,17 @@ class MasterController extends Controller
         return ['data' => $empresas];
     }
 
+    public function loterias(Request $request)
+    {
+        $loterias =  Loteria::all();
+
+        return ['loterias' => $loterias];
+    }
+
+    public function terminos(Request $request)
+    {
+        $terminos =  Terminosycondiciones::all();
+
+        return ['terminos' => $terminos];
+    }
 }

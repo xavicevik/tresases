@@ -505,7 +505,7 @@ export default {
             this.form.estado = 1;
         },
         save: function (data) {
-            console.log(data);
+            //console.log(data);
             this.$inertia.post('/confcomisiones', data, {
                 onSuccess: (page) => {
                     Swal.fire({
@@ -521,7 +521,7 @@ export default {
             });
         },
         update: function (data) {
-            console.log(data);
+            //console.log(data);
             this.$inertia.put('/confcomisiones/' + data.id, data, {
                 onSuccess: (page) => {
                     Swal.fire({
@@ -565,38 +565,38 @@ export default {
                     ispage: this.ispage
                 }
             }).then((res) => {
-                console.log(res);
+               // console.log(res);
                 var respuesta = res.data;
                 this.arrayData = respuesta.datos;
             })
         },
         getMayoristas: function () {
             axios.get('/master/getEmpresas?idrol=4', ).then((res) => {
-                console.log(res.data);
+                //console.log(res.data);
                 this.arrayMayoristas = res.data.data;
             })
         },
         getDistribuidores: function () {
             axios.get('/master/getEmpresas?idrol=3&idpadre=' + this.form.idmayorista, ).then((res) => {
-                console.log(res.data);
+                //console.log(res.data);
                 this.arrayDistribuidor = res.data.data;
             })
         },
         getVendedores: function () {
             axios.get('/master/getEmpresas?idrol=5&idpadre=' + this.form.iddistribuidor, ).then((res) => {
-                console.log(res.data);
+                //console.log(res.data);
                 this.arrayVendedores = res.data.data;
             })
         },
     },
     created: function () {
-        console.log('inicio comisiones');
+        //console.log('inicio comisiones');
         this.arrayData = this.datos;
-        console.log(this.datos);
+        //console.log(this.datos);
 
     },
     mounted() {
-        console.log('Component mounted.');
+        //console.log('Component mounted.');
     },
 }
 </script>

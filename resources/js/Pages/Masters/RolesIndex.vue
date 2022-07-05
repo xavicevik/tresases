@@ -1,5 +1,5 @@
 <template>
-    <AppLayout title="Numerosreservados">
+    <AppLayout title="Roles">
         <template #header>
             <h2 class="font-semibold text-xl text-gray-800 leading-tight">
                 Lista de Roles
@@ -58,7 +58,7 @@
                                     <th class="px-4 py-2 text-sm font-bold w-2/12 hover:bg-blue-500 hover:text-gray-50 rounded-b">
                                         Grupo
                                     </th>
-                                    <th class="px-4 py-2 text-sm font-bold w-2/12 hover:bg-blue-500 hover:text-gray-50 rounded-b">
+                                    <th class="px-4 py-2 text-sm font-bold w-1/12 hover:bg-blue-500 hover:text-gray-50 rounded-b">
                                         Acciones
                                     </th>
                                 </tr>
@@ -68,7 +68,7 @@
                                     <td class="border px-1 py-2 text-sm truncate" v-text="dato.id"></td>
                                     <td class="border px-1 py-2 text-sm truncate" v-text="dato.name"></td>
                                     <td class="border px-2 py-2 text-sm truncate" v-text="dato.guard_name"></td>
-                                    <td class="border px-1 py-1 mx-auto text-center flex items-center">
+                                    <td class="border px-2 py-2 mx-auto text-center flex items-center">
                                         <button @click="ver(dato.id)" class="hover:bg-green-700 text-green-400 font-bold rounded" fill="none"
                                                 viewBox="0 0 24 24" stroke="currentColor">
                                             <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -78,7 +78,7 @@
                                         <button @click="update(dato.id)" class="hover:bg-green-700 text-green-400 font-bold rounded" fill="none"
                                                 viewBox="0 0 24 24" stroke="currentColor">
                                             <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                                <path stroke-linecap="round" stroke-linejoin="round" d="M10 21h7a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v11m0 5l4.879-4.879m0 0a3 3 0 104.243-4.242 3 3 0 00-4.243 4.242z" />
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
                                             </svg>
                                         </button>
 
@@ -120,6 +120,9 @@
                                 <!-- This element is to trick the browser into centering the modal contents. -->
                                 <span class="hidden sm:inline-block sm:align-middle sm:h-screen"></span>
                                 <div class="inline-block lg:w-8/12 align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:w-full" role="dialog" aria-modal="true" aria-labelledby="modal-headline">
+                                    <button type="button" @click="closeModal()" class="absolute top-3 right-2.5 text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center dark:hover:bg-gray-800 dark:hover:text-white" data-modal-toggle="authentication-modal">
+                                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg>
+                                    </button>
                                     <div class="">
                                         <h2 v-text="tituloModal" class="text-sm font-bold text-gray-900 px-4 py-4"></h2>
                                     </div>
@@ -149,7 +152,7 @@
                                                     <td class="border px-1 py-2 text-sm truncate" v-text="dato.id"></td>
                                                     <td class="border px-1 py-2 text-sm truncate" v-text="dato.name"></td>
                                                     <td class="border px-2 py-2 text-sm truncate" v-text="dato.guard_name"></td>
-                                                    <td class="border px-1 py-1 mx-auto text-center flex items-center">
+                                                    <td class="border px-2 py-2 mx-auto text-center flex items-center">
                                                         <button @click="ver(dato.id)" class="hover:bg-green-700 text-green-400 font-bold rounded" fill="none"
                                                                 viewBox="0 0 24 24" stroke="currentColor">
                                                             <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -218,6 +221,9 @@
                                 <!-- This element is to trick the browser into centering the modal contents. -->
                                 <span class="hidden sm:inline-block sm:align-middle sm:h-screen"></span>
                                 <div class="inline-block lg:w-8/12 align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:w-full" role="dialog" aria-modal="true" aria-labelledby="modal-headline">
+                                    <button type="button" @click="closeModalupdate()" class="absolute top-3 right-2.5 text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center dark:hover:bg-gray-800 dark:hover:text-white" data-modal-toggle="authentication-modal">
+                                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg>
+                                    </button>
                                     <div class="">
                                         <h2 v-text="tituloModal" class="text-sm font-bold text-gray-900 px-4 py-4"></h2>
                                     </div>
@@ -244,10 +250,10 @@
                                                 </thead>
                                                 <tbody>
                                                 <tr class="text-center" text-sm v-if="this.form.permission.data" v-for="(dato, id) in this.form.permission.data" :key="id">
-                                                    <td class="border px-1 py-2 text-sm truncate" v-text="dato.id"></td>
-                                                    <td class="border px-1 py-2 text-sm truncate" v-text="dato.name"></td>
+                                                    <td class="border px-2 py-2 text-sm truncate" v-text="dato.id"></td>
+                                                    <td class="border px-2 py-2 text-sm truncate" v-text="dato.name"></td>
                                                     <td class="border px-2 py-2 text-sm truncate" v-text="dato.guard_name"></td>
-                                                    <td class="border px-1 py-1 mx-auto text-center flex items-center">
+                                                    <td class="border px-2 py-2 mx-auto text-center flex items-center">
                                                         <input type="checkbox"
                                                                :name="this.permissiondat[dato.id]"
                                                                :value="dato.name"
@@ -401,7 +407,7 @@ export default {
                     id: this.form.role.id
                 }
             }).then((res) => {
-                console.log(res);
+                //console.log(res);
                 var respuesta = res.data;
                 this.form.role = respuesta.role;
                 this.form.rolePermissions = respuesta.rolePermissions;
@@ -443,7 +449,7 @@ export default {
                     id: data,
                 }
             }).then((res) => {
-                console.log(res.data);
+                //console.log(res.data);
                 var respuesta = res.data;
                 this.form.role = respuesta.role;
                 this.form.rolePermissions = respuesta.rolePermissions;
@@ -457,7 +463,7 @@ export default {
                     id: data,
                 }
             }).then((res) => {
-                console.log(res.data);
+                //console.log(res.data);
                 var respuesta = res.data;
                 this.form.role = respuesta.role;
                 this.form.permission = respuesta.permission;
@@ -467,14 +473,14 @@ export default {
             })
         },
         edit: function (data) {
-            console.log(data);
+            //console.log(data);
             var url= '/master/rolesupdate';
             axios.post(url, {
                 params: {
                     data: data,
                 }
             }).then((res) => {
-                console.log(res.data);
+                //console.log(res.data);
                 var respuesta = res.data;
                 this.form.role = respuesta.role;
                 this.form.permission = respuesta.permission;
@@ -495,7 +501,7 @@ export default {
                     ispage: true,
                 }
             }).then((res) => {
-                console.log(res.data);
+                //console.log(res.data);
                 var respuesta = res.data;
                 this.arrayData = respuesta.data;
 
@@ -556,7 +562,7 @@ export default {
         //this.openModal('registrar')
     },
     mounted() {
-        console.log('Component mounted.');
+        //console.log('Component mounted.');
     },
 }
 </script>

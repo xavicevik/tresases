@@ -30,6 +30,10 @@ class Detalleventa extends Model
         return $this->belongsTo(Venta::class, 'idventa');
     }
 
+    public function cliente(){
+        return $this->belongsTo(User::class, 'idcliente');
+    }
+
     public function boleta(){
         return $this->belongsTo(Boleta::class, 'idboleta');
     }

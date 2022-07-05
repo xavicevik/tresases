@@ -1241,7 +1241,7 @@ export default {
             if (this.tiposerie.id == 1){
                 data.serie = null;
             }
-            console.log(data);
+            //console.log(data);
             this.$inertia.post('/rifas', data, {
                 onBefore: (visit) => { console.log('onBefore');},
                 onStart: (visit) => {console.log('onStart');},
