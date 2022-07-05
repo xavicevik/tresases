@@ -296,8 +296,7 @@ class CajaController extends Controller
 
         foreach ($request->reservas as $reserva){
             $reg = json_decode($reserva);
-            $boleta = Boleta::ForceIndex('idx_rifa_num')
-                ->where('idrifa', $request->idrifa)
+            $boleta = Boleta::where('idrifa', $request->idrifa)
                 //->where('estado', '=', 2)
                 ->where('numero', $reg->numero)
                 //->where('idvendedor', $request->idvendedor)

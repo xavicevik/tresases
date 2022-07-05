@@ -391,8 +391,7 @@ class VentaController extends Controller
         $numero = str_pad($request->buscar, $cifras,"0", STR_PAD_LEFT );
         $estado = true;
 
-        $boleta = Boleta::ForceIndex('idx_rifa_num')
-                          ->where('idrifa', $idrifa)
+        $boleta = Boleta::where('idrifa', $idrifa)
                           ->where('estado', '<>', 1)
                           ->where('numero', $numero)
                           ->first();
@@ -404,8 +403,7 @@ class VentaController extends Controller
 
         if (is_null($boleta)) {
             $estado = false;
-            $boleta = Boleta::ForceIndex('idx_rifa_num')
-                ->where('idrifa', $idrifa)
+            $boleta = Boleta::where('idrifa', $idrifa)
                 ->where('estado', '=', 1)
                 ->where('numero', $numero)
                 ->first();
@@ -418,15 +416,13 @@ class VentaController extends Controller
         $idrifa = $request->rifa;
         $tiporifa = $request->tiporifa;
 
-        $bolval = Boleta::ForceIndex('idx_rifa_num')
-                           ->where('estado', 1)
+        $bolval = Boleta::where('estado', 1)
                            ->where('idrifa', $idrifa)
                            ->count();
         if ($bolval == 0) {
             $boleta = -99;
         } else {
-            $boleta = Boleta::ForceIndex('idx_rifa_num')
-                                ->where('estado', 1)
+            $boleta = Boleta::where('estado', 1)
                                 ->where('idrifa', $idrifa)
                                 ->inRandomOrder()
                                 ->first();
@@ -488,8 +484,7 @@ class VentaController extends Controller
 
         foreach ($request->reservas as $reserva){
             $reg = json_decode($reserva);
-            $boleta = Boleta::ForceIndex('idx_rifa_num')
-                ->where('idrifa', $request->idrifa)
+            $boleta = Boleta::where('idrifa', $request->idrifa)
                 //->where('estado', '=', 2)
                 ->where('numero', $reg->numero)
                 //->where('idvendedor', $request->idvendedor)
@@ -646,8 +641,7 @@ class VentaController extends Controller
 
         foreach ($request->reservas as $reserva){
             $reg = json_decode($reserva);
-            $boleta = Boleta::ForceIndex('idx_rifa_num')
-                ->where('idrifa', $request->idrifa)
+            $boleta = Boleta::where('idrifa', $request->idrifa)
                 ->where('estado', '=', 3)
                 ->where('numero', $reg->numero)
                 ->where('idvendedor', $request->idvendedor)

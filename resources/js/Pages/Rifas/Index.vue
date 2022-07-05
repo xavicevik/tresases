@@ -1049,7 +1049,7 @@ export default {
             let nombre;
             this.arrayLoterias.forEach(function(loteria) {
                if (loteria['id'] == id) {
-                   console.log(loteria.nombre);
+                   //console.log(loteria.nombre);
                    nombre = loteria.nombre;
                }
             });
@@ -1078,7 +1078,7 @@ export default {
             this.$page.props.flash.message = '';
         },
         validarFechaPromo: function() {
-            console.log('cambiar');
+            //console.log('cambiar');
             let fechapromo = this.fechapromo; //moment(this.fechapromo).format('YYYY-MM-DD HH:MM:SS');
             let fechaRifa = this.form.fechafin; //moment(this.form.fechafin).format('YYYY-MM-DD HH:MM:SS');
             if (fechapromo >= fechaRifa) {
@@ -1312,11 +1312,8 @@ export default {
             if (this.tiposerie.id == 1){
                 data.serie = null;
             }
-            console.log(data);
+            //console.log(data);
             this.$inertia.post('/rifas', data, {
-                onBefore: (visit) => { console.log('onBefore');},
-                onStart: (visit) => {console.log('onStart');},
-                onProgress: (progress) => {console.log('onProgress');},
                 onSuccess: (page) => {
                     Swal.fire({
                         position: 'top-end',
@@ -1330,14 +1327,11 @@ export default {
                     this.getRifas('','rifas.nombre_tecnico');
                     this.editMode = false;
                 },
-                onError: (errors) => {console.log('onError');},
-                onCancel: () => {console.log('onCancel');},
-                onFinish: visit => {console.log('onFinish');},
             });
 
         },
         copy: function (data) {
-            console.log('inicia save');
+            //console.log('inicia save');
             data.idserie = this.tiposerie.id;
             if (this.tiposerie.id == 1){
                 data.serie = null;
@@ -1346,7 +1340,7 @@ export default {
             let isSave = false;
 
             if (this.copiaserie == 1) {
-                console.log('serie oculta');
+                //console.log('serie oculta');
                 if (this.form.serieoculta == this.seriedestinooculta) {
                     Swal.fire({
                         icon: 'error',
@@ -1391,9 +1385,6 @@ export default {
             if (this.isSave) {
 
                 this.$inertia.post('/rifas/copy', data, {
-                    onBefore: (visit) => { console.log('onBefore');},
-                    onStart: (visit) => {console.log('onStart');},
-                    onProgress: (progress) => {console.log('onProgress');},
                     onSuccess: (page) => {
                         Swal.fire({
                             position: 'top-end',
@@ -1407,9 +1398,6 @@ export default {
                         this.getRifas('','rifas.id');
                         this.editMode = false;
                     },
-                    onError: (errors) => {console.log('onError');},
-                    onCancel: () => {console.log('onCancel');},
-                    onFinish: visit => {console.log('onFinish');},
                 });
             }
         },
@@ -1436,9 +1424,6 @@ export default {
             }
             data._method = 'PUT';
             this.$inertia.post('/rifas/'  + data.id, data, {
-                onBefore: (visit) => { console.log('onBefore');},
-                onStart: (visit) => {console.log('onStart');},
-                onProgress: (progress) => {console.log('onProgress');},
                 onSuccess: (page) => {
                     Swal.fire({
                         position: 'top-end',
@@ -1452,9 +1437,6 @@ export default {
                     this.reset();
                     this.editMode = false;
                 },
-                onError: (errors) => {console.log('onError');},
-                onCancel: () => {console.log('onCancel');},
-                onFinish: visit => {console.log('onFinish');},
             });
 
         },
@@ -1482,7 +1464,7 @@ export default {
                     ispage: this.ispage
                 }
             }).then((res) => {
-                console.log(res.data);
+                //console.log(res.data);
                 var respuesta = res.data;
                 this.arrayRifas = respuesta.rifas;
 
@@ -1496,19 +1478,19 @@ export default {
         getLoterias: function () {
             axios.get('/loterias',).then((res) => {
                 this.arrayLoterias = res.data.loterias;
-                console.log(res.data.loterias)
+                //console.log(res.data.loterias)
             })
         },
         getTerminos: function () {
             axios.get('/terminos',).then((res) => {
                 this.arrayTerminos = res.data.terminos;
-                console.log(res.data.terminos)
+                //console.log(res.data.terminos)
             })
         },
         getPaises: function () {
             axios.get('/paises',).then((res) => {
                 this.arrayPaises = res.data.paises;
-                console.log(res.data.paises)
+                //console.log(res.data.paises)
             })
         },
         getDepartamentos: function () {
@@ -1518,14 +1500,14 @@ export default {
                 }
             }).then((res) => {
                 this.arrayDepartamentos = res.data.departamentos;
-                console.log(res.data.departamentos)
+                //console.log(res.data.departamentos)
             })
         },
         getSeries: function () {
             axios.get('/series', {
             }).then((res) => {
                 this.arraySeries = res.data.tiposerie;
-                console.log(res.data.tiposerie)
+                //console.log(res.data.tiposerie)
             })
         },
         getCiudades: function () {
@@ -1536,7 +1518,7 @@ export default {
                 }
             }).then((res) => {
                 this.arrayCiudades = res.data.ciudades;
-                console.log(res.data.ciudades)
+                //console.log(res.data.ciudades)
             })
         },
         deleteRow: function (data) {
@@ -1571,7 +1553,7 @@ export default {
                         'success'
                     )
                 }).catch(function (error) {
-                    console.log(error);
+                    //console.log(error);
                 });
             })
 
@@ -1635,7 +1617,7 @@ export default {
             });
         },
         uploadFiles2() {
-            console.log(this.form.files1);
+            //console.log(this.form.files1);
             // This is where the magic could happen!
         },
 
@@ -1670,7 +1652,7 @@ export default {
             });
         },
         uploadFiles1() {
-            console.log(this.form.files1);
+            //console.log(this.form.files1);
             // This is where the magic could happen!
         },
     },
@@ -1680,7 +1662,7 @@ export default {
         //this.openModal('registrar')
     },
     mounted() {
-        console.log('Component mounted.');
+        //console.log('Component mounted.');
     },
 }
 </script>

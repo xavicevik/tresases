@@ -239,7 +239,7 @@ export default {
                     ispage: true,
                 }
             }).then((res) => {
-                console.log(res.data);
+               // console.log(res.data);
                 var respuesta = res.data;
                 this.arrayData = respuesta.data;
 
@@ -260,7 +260,7 @@ export default {
         }
     },
     mounted() {
-        console.log('Component mounted.');
+        //console.log('Component mounted.');
     },
 }
 </script>

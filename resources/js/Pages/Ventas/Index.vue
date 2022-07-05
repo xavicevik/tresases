@@ -432,7 +432,7 @@ export default {
                     ispage: this.ispage
                 }
             }).then((res) => {
-                console.log(res);
+                //console.log(res);
                 var respuesta = res.data;
                 this.arrayData = respuesta.data;
             })
@@ -454,7 +454,7 @@ export default {
                     id: id,
                 }
             }).then((res) => {
-                console.log(res);
+                //console.log(res);
                 var respuesta = res.data;
                 this.arrayComision = respuesta.data;
             })
@@ -476,7 +476,7 @@ export default {
         //this.openModal('registrar')
     },
     mounted() {
-        console.log('Component mounted.');
+        //console.log('Component mounted.');
     },
 }
 </script>

@@ -74,6 +74,7 @@ class RifaController extends Controller
 
     public function indexboletas(Request $request)
     {
+        //DB::connection()->enableQueryLog();
         $filtros = json_decode($request->filtros);
 
         if ($request->has('sortBy') && $request->sortBy <> ''){
@@ -127,7 +128,7 @@ class RifaController extends Controller
             }
             $boletas = $boletas->select('boletas.*')->paginate(self::canPorPagina);
         }
-
+        //$queries = DB::getQueryLog();
 
         if ($request->has('ispage') && $request->ispage){
             return ['datos' => $boletas];

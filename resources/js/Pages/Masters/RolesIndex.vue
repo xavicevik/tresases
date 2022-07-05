@@ -407,7 +407,7 @@ export default {
                     id: this.form.role.id
                 }
             }).then((res) => {
-                console.log(res);
+                //console.log(res);
                 var respuesta = res.data;
                 this.form.role = respuesta.role;
                 this.form.rolePermissions = respuesta.rolePermissions;
@@ -449,7 +449,7 @@ export default {
                     id: data,
                 }
             }).then((res) => {
-                console.log(res.data);
+                //console.log(res.data);
                 var respuesta = res.data;
                 this.form.role = respuesta.role;
                 this.form.rolePermissions = respuesta.rolePermissions;
@@ -463,7 +463,7 @@ export default {
                     id: data,
                 }
             }).then((res) => {
-                console.log(res.data);
+                //console.log(res.data);
                 var respuesta = res.data;
                 this.form.role = respuesta.role;
                 this.form.permission = respuesta.permission;
@@ -473,14 +473,14 @@ export default {
             })
         },
         edit: function (data) {
-            console.log(data);
+            //console.log(data);
             var url= '/master/rolesupdate';
             axios.post(url, {
                 params: {
                     data: data,
                 }
             }).then((res) => {
-                console.log(res.data);
+                //console.log(res.data);
                 var respuesta = res.data;
                 this.form.role = respuesta.role;
                 this.form.permission = respuesta.permission;
@@ -501,7 +501,7 @@ export default {
                     ispage: true,
                 }
             }).then((res) => {
-                console.log(res.data);
+                //console.log(res.data);
                 var respuesta = res.data;
                 this.arrayData = respuesta.data;
 
@@ -562,7 +562,7 @@ export default {
         //this.openModal('registrar')
     },
     mounted() {
-        console.log('Component mounted.');
+        //console.log('Component mounted.');
     },
 }
 </script>

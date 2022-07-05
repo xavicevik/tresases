@@ -569,7 +569,7 @@ export default {
                     ispage: true
                 }
             }).then((res) => {
-                console.log(res.data.cajas);
+                //console.log(res.data.cajas);
                 var respuesta = res.data;
                 this.arrayCajas = respuesta.cajas;
             })
@@ -684,7 +684,7 @@ export default {
         cierre: function (data) {
             axios.post('/cajas/cierre', data)
                 .then((res) => {
-                    console.log(res.data);
+                    //console.log(res.data);
                     Swal.fire({
                         icon: 'success',
                         title: 'Se ha realizado el cierre de caja',
@@ -696,7 +696,7 @@ export default {
                     this.tituloModal = 'Detalle del cierre de caja'
                     this.isOpenDetalle = true;
                 }).catch(function (error) {
-                console.log(error);
+                //console.log(error);
             });
 
             /*
@@ -751,7 +751,7 @@ export default {
                     ispage: this.ispage
                 }
             }).then((res) => {
-                console.log(res);
+                //console.log(res);
                 var respuesta = res.data;
                 this.arrayCajas = respuesta.cajas;
             })
@@ -788,7 +788,7 @@ export default {
                             'success'
                         )
                     }).catch(function (error) {
-                    console.log(error);
+                    //console.log(error);
                 });
             })
 
@@ -866,13 +866,13 @@ export default {
         }
     },
     created: function () {
-        console.log('inicio');
+        //console.log('inicio');
         this.arrayCajas = this.cajas;
         this.cajasAbiertas();
 
     },
     mounted() {
-        console.log('Component mounted.');
+        //console.log('Component mounted.');
 
         if (this.estado == 1) {
             Swal.fire({

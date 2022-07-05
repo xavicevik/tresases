@@ -761,7 +761,7 @@ export default {
             cantidad = Math.pow(10, this.form.idrifa.cifras);
             rangoinicial = '' + String('0'.toString()).padStart(this.form.idrifa.cifras, '0'.toString());
             rangofinal = (cantidad - 1);
-            console.log(rangoinicial);
+            //console.log(rangoinicial);
             this.form.numero = rangoinicial + ' - ' + rangofinal;
 
             this.configMoney2.min = rangoinicial.toString();
@@ -987,7 +987,7 @@ export default {
                         idvendedor: idvendedor,
                     }
                 }).then((res) => {
-                    console.log(res.data);
+                    //console.log(res.data);
                     var respuesta = res.data;
                     let isocupado = respuesta.isocupado;
                     if (isocupado) {
@@ -1061,12 +1061,9 @@ export default {
             if(this.validarCreacion()) {
                 if (this.validarNumeros(data)) {
                     this.$inertia.post('/numerosreservados', data, {
-                        onBefore: (visit) => { console.log('onBefore');},
-                        onStart: (visit) => {console.log('onStart');},
-                        onProgress: (progress) => {console.log('onProgress');},
                         onSuccess: (page) => {
                             data = page;
-                            console.log(data);
+                            //console.log(data);
                             this.reset();
                             this.closeModal();
                             this.getNumerosreservados('','numerosreservados.nombre');
@@ -1079,9 +1076,6 @@ export default {
                                 timer: 1500
                             })
                         },
-                        onError: (errors) => {console.log('onError');},
-                        onCancel: () => {console.log('onCancel');},
-                        onFinish: visit => {console.log('onFinish');},
                     });
                 }
             }
@@ -1113,12 +1107,9 @@ export default {
         update: function (data) {
             data.fechainicio = this.dateTimeFull(data.fechainicio);
             data.fechafin = this.dateTimeFull(data.fechafin);
-            console.log(data);
+            //console.log(data);
             data._method = 'PUT';
             this.$inertia.post('/numerosreservados/'  + data.id, data, {
-                onBefore: (visit) => { console.log('onBefore');},
-                onStart: (visit) => {console.log('onStart');},
-                onProgress: (progress) => {console.log('onProgress');},
                 onSuccess: (page) => {
                     Swal.fire(
                         'Actualización rifa',
@@ -1130,9 +1121,6 @@ export default {
                     this.reset();
                     this.editMode = false;
                 },
-                onError: (errors) => {console.log('onError');},
-                onCancel: () => {console.log('onCancel');},
-                onFinish: visit => {console.log('onFinish');},
             });
 
         },
@@ -1172,7 +1160,7 @@ export default {
                     paginate: paginate
                 }
             }).then((res) => {
-                console.log(res.data);
+                //console.log(res.data);
                 var respuesta = res.data;
                 this.arrayRifas = respuesta.rifas;
 
@@ -1193,7 +1181,7 @@ export default {
                     paginate: paginate
                 }
             }).then((res) => {
-                console.log(res.data);
+                //console.log(res.data);
                 var respuesta = res.data;
                 this.arrayVendedores = respuesta.vendedores;
 
@@ -1236,7 +1224,7 @@ export default {
                         'success'
                     )
                 }).catch(function (error) {
-                    console.log(error);
+                    //console.log(error);
                 });
             })
 
@@ -1245,10 +1233,10 @@ export default {
     },
     created: function () {
         this.arrayData = this.datos;
-        console.log(this.datos);
+        //console.log(this.datos);
     },
     mounted() {
-        console.log('Component mounted.');
+        //console.log('Component mounted.');
     },
 }
 </script>

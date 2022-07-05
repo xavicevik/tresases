@@ -30,7 +30,7 @@ class Boleta extends Model
         return $this->belongsTo(Rifa::class, 'idrifa');
     }
 
-    public function scopeUseIndex(Builder $query, string $index): Builder
+    public function scopeUseIndex($query, string $index)
     {
         $table = $this->getTable();
 

@@ -87,23 +87,15 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'),'verified',]
     //Route::post('/changepass', [LoginController::class, 'updatePassword'])->name('changepass.update');
     //Route::post('/changepasssu', [LoginController::class, 'updatePasswordsu'])->name('changepass.updatesu');
 
-
-
-
         Route::get('/dashboard', function () {
             return Inertia::render('Dashboard');
         })->name('dashboard');
 
-        Route::get('/loterias', function () {
-            return ['loterias' => Loteria::all()];
-        })->name('loterias');
 
-        Route::get('/terminos', function () {
-            return ['terminos' => Terminosycondiciones::all()];
-        })->name('terminos');
+        Route::get('/loterias', [MasterController::class, 'loterias'])->name('loterias');
+        Route::get('/terminos', [MasterController::class, 'terminos'])->name('terminos');
 
-        Route::get('/users/getClientes', [UserController::class, 'getClientes'])
-            ->name('users.clientes');
+        Route::get('/users/getClientes', [UserController::class, 'getClientes'])->name('users.clientes');
 
         Route::get('/ventas/sumary', [VentaController::class, 'sumary'])->name('sumary');
 

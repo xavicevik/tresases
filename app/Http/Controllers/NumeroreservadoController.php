@@ -139,8 +139,7 @@ class NumeroreservadoController extends Controller
         $numero = $request->numero;
         $estado = false;
 
-        $boleta = Boleta::ForceIndex('idx_rifa_num')
-            ->where('idrifa', $idrifa)
+        $boleta = Boleta::where('idrifa', $idrifa)
             ->where('estado', '=', 1)
             ->where('numero', $numero)
             ->first();
@@ -160,8 +159,7 @@ class NumeroreservadoController extends Controller
         $idcliente = $request->idcliente;
         $estado = false;
 
-        $boleta = Boleta::ForceIndex('idx_rifa_num')
-            ->where('idrifa', $idrifa)
+        $boleta = Boleta::where('idrifa', $idrifa)
             ->where('estado', '=', 1)
             ->where('numero', $numero)
             ->first();
@@ -169,8 +167,7 @@ class NumeroreservadoController extends Controller
         if (!is_null($boleta)) {
             $estado = true;
         } else {
-            $boleta = Boleta::ForceIndex('idx_rifa_num')
-                ->where('idrifa', $idrifa)
+            $boleta = Boleta::where('idrifa', $idrifa)
                 ->where('numero', $numero)
                 ->where('idvendedor', $idvendedor)
                 ->whereIn('estado', [2,4])
@@ -191,8 +188,7 @@ class NumeroreservadoController extends Controller
         $idcliente = $request->idcliente;
         $estado = false;
 
-        $boleta = Boleta::ForceIndex('idx_rifa_num')
-            ->where('idrifa', $idrifa)
+        $boleta = Boleta::where('idrifa', $idrifa)
             ->whereIn('estado', [3,4])
             ->where('idvendedor', $request->idvendedor)
             ->where('numero', $numero)
@@ -212,8 +208,7 @@ class NumeroreservadoController extends Controller
         $idvendedor = $request->idvendedor;
         $estado = false;
 
-        $boleta = Boleta::ForceIndex('idx_rifa_num')
-            ->where('idrifa', $idrifa)
+        $boleta = Boleta::where('idrifa', $idrifa)
             ->where('estado', '=', 2)
             ->where('numero', $numero)
             ->where('idvendedor', $idvendedor)
@@ -233,8 +228,7 @@ class NumeroreservadoController extends Controller
         $numero = $request->numero;
         $estado = false;
 
-        $boleta = Boleta::ForceIndex('idx_rifa_num')
-            ->where('idrifa', $idrifa)
+        $boleta = Boleta::where('idrifa', $idrifa)
             ->where('estado', '=', 2)
             ->where('numero', $numero)
             ->first();
@@ -460,8 +454,7 @@ class NumeroreservadoController extends Controller
         foreach ($request->reservas as $reserva){
             $reg = json_decode($reserva);
             $salida[] = $reg;
-            $boleta = Boleta::ForceIndex('idx_rifa_num')
-                ->where('idrifa', $request->idrifa)
+            $boleta = Boleta::where('idrifa', $request->idrifa)
                 ->where('estado', '=', 1)
                 ->where('numero', $reg->numero)
                 ->first();
@@ -509,8 +502,7 @@ class NumeroreservadoController extends Controller
         foreach ($request->reservas as $reserva){
             $reg = json_decode($reserva);
             $salida[] = $reg;
-            $boleta = Boleta::ForceIndex('idx_rifa_num')
-                ->where('idrifa', $request->idrifa)
+            $boleta = Boleta::where('idrifa', $request->idrifa)
                 ->where('estado', '=', 2)
                 ->where('numero', $reg->numero)
                 ->first();

@@ -821,9 +821,6 @@ export default {
         },
         save: function (data) {
             this.$inertia.post('/users', data, {
-                onBefore: (visit) => { console.log('onBefore');},
-                onStart: (visit) => {console.log('onStart');},
-                onProgress: (progress) => {console.log('onProgress');},
                 onSuccess: (page) => {
                     Swal.fire({
                         position: 'top-end',
@@ -837,9 +834,6 @@ export default {
                     this.getUsers('','nombre');
                     this.editMode = false;
                 },
-                onError: (errors) => {console.log('onError');},
-                onCancel: () => {console.log('onCancel');},
-                onFinish: visit => {console.log('onFinish');},
             });
 
         },
@@ -855,7 +849,7 @@ export default {
             this.openModal('ver', data);
         },
         update: function (data) {
-            console.log(data);
+            //console.log(data);
             data._method = 'PUT';
             this.$inertia.post('/users/'  + data.id, data, {
                 onSuccess: (page) => {
@@ -901,7 +895,7 @@ export default {
                     ispage: this.ispage
                 }
             }).then((res) => {
-                console.log(res.data);
+                //console.log(res.data);
                 var respuesta = res.data;
                 this.arrayUsers = respuesta.users;
 
@@ -915,19 +909,19 @@ export default {
         getLoterias: function () {
             axios.get('/loterias',).then((res) => {
                 this.arrayLoterias = res.data.loterias;
-                console.log(res.data.loterias)
+                //console.log(res.data.loterias)
             })
         },
         getTerminos: function () {
             axios.get('/terminos',).then((res) => {
                 this.arrayTerminos = res.data.terminos;
-                console.log(res.data.terminos)
+                //console.log(res.data.terminos)
             })
         },
         getPaises: function () {
             axios.get('/paises',).then((res) => {
                 this.arrayPaises = res.data.paises;
-                console.log(res.data.paises)
+                //console.log(res.data.paises)
             })
         },
         getDepartamentos: function () {
@@ -937,7 +931,7 @@ export default {
                 }
             }).then((res) => {
                 this.arrayDepartamentos = res.data.departamentos;
-                console.log(res.data.departamentos)
+                //console.log(res.data.departamentos)
             })
         },
         getEmpresas: function () {
@@ -957,13 +951,13 @@ export default {
                 }
             }).then((res) => {
                 this.arrayCiudades = res.data.ciudades;
-                console.log(res.data.ciudades)
+                //console.log(res.data.ciudades)
             })
         },
         getTiposdocumento: function () {
             axios.get('/master/tiposdocsearch',).then((res) => {
                 this.arrayTiposdocumento = res.data.data;
-                console.log(res.data.data)
+                //console.log(res.data.data)
             })
         },
         getRoles: async function () {
@@ -1005,7 +999,7 @@ export default {
                             'success'
                         )
                     }).catch(function (error) {
-                    console.log(error);
+                    //(error);
                 });
             })
 
@@ -1042,7 +1036,7 @@ export default {
             });
         },
         uploadFiles2() {
-            console.log(this.form.files1);
+            //console.log(this.form.files1);
             // This is where the magic could happen!
         },
 
@@ -1077,7 +1071,7 @@ export default {
             });
         },
         uploadFiles1() {
-            console.log(this.form.files1);
+            //(this.form.files1);
             // This is where the magic could happen!
         },
     },
@@ -1085,7 +1079,7 @@ export default {
         this.arrayUsers = this.users;
     },
     mounted() {
-        console.log('Component mounted.');
+        //console.log('Component mounted.');
     },
 }
 </script>

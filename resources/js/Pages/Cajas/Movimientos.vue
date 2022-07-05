@@ -1436,7 +1436,7 @@ export default {
             cantidad = Math.pow(10, this.form.idrifa.cifras);
             rangoinicial = '' + String('0'.toString()).padStart(this.form.idrifa.cifras, '0'.toString());
             rangofinal = (cantidad - 1);
-            console.log(rangoinicial);
+            //console.log(rangoinicial);
             this.form.numero = rangoinicial + ' - ' + rangofinal;
 
             this.configMoney2.min = rangoinicial.toString();
@@ -1634,11 +1634,8 @@ export default {
             formData.append('isnatural', 1);
             formData.append('idempresa', 3);
 
-            console.log(formData);
+            //console.log(formData);
             this.$inertia.post('/users', formData, {
-                onBefore: (visit) => { console.log('onBefore');},
-                onStart: (visit) => {console.log('onStart');},
-                onProgress: (progress) => {console.log('onProgress');},
                 onSuccess: (page) => {
                     Swal.fire({
                         position: 'top-end',
@@ -1650,9 +1647,6 @@ export default {
                     this.onSelectCliente(data);
                     this.closeModalClienteNew();
                 },
-                onError: (errors) => {console.log('onError');},
-                onCancel: () => {console.log('onCancel');},
-                onFinish: visit => {console.log('onFinish');},
             });
         },
         selectCliente: function () {
@@ -1668,7 +1662,7 @@ export default {
                     paginate: paginate
                 }
             }).then((res) => {
-                console.log(res.data);
+                //console.log(res.data);
                 var respuesta = res.data;
                 this.arrayClientes = respuesta.clientes;
             })
@@ -1720,7 +1714,7 @@ export default {
             this.tituloModal = 'Cierre de caja';
         },
         cierre: function (data) {
-            console.log(data);
+            //console.log(data);
             var url= '/cajas/cierre';
             axios.get(url, {
                 params: {
@@ -1728,7 +1722,7 @@ export default {
                     montocierre: data.montocierre
                 }
             }).then((res) => {
-                    console.log(res.data);
+                    //console.log(res.data);
                     Swal.fire({
                         icon: 'success',
                         title: 'Se ha realizado el cierre de caja',
@@ -1739,7 +1733,7 @@ export default {
                     this.tituloModal = 'Detalle del cierre de caja'
                     this.isOpenDetalle = true;
                 }).catch(function (error) {
-                console.log(error);
+                //console.log(error);
             });
 
             /*
@@ -1809,7 +1803,7 @@ export default {
                         idcliente: idcliente
                     }
                 }).then((res) => {
-                    console.log(res.data);
+                    //console.log(res.data);
                     var respuesta = res.data;
                     let isocupado = respuesta.isocupado;
                     if (isocupado) {
@@ -1886,9 +1880,6 @@ export default {
             if(this.validarCreacion()) {
                 if (this.validarNumeros(data)) {
                     this.$inertia.post('/numerosreservados', data, {
-                        onBefore: (visit) => { console.log('onBefore');},
-                        onStart: (visit) => {console.log('onStart');},
-                        onProgress: (progress) => {console.log('onProgress');},
                         onSuccess: (page) => {
                             data = page;
                             console.log(data);
@@ -1904,9 +1895,6 @@ export default {
                                 timer: 1500
                             })
                         },
-                        onError: (errors) => {console.log('onError');},
-                        onCancel: () => {console.log('onCancel');},
-                        onFinish: visit => {console.log('onFinish');},
                     });
                 }
             }
@@ -1938,12 +1926,9 @@ export default {
         update: function (data) {
             data.fechainicio = this.dateTimeFull(data.fechainicio);
             data.fechafin = this.dateTimeFull(data.fechafin);
-            console.log(data);
+            //console.log(data);
             data._method = 'PUT';
             this.$inertia.post('/numerosreservados/'  + data.id, data, {
-                onBefore: (visit) => { console.log('onBefore');},
-                onStart: (visit) => {console.log('onStart');},
-                onProgress: (progress) => {console.log('onProgress');},
                 onSuccess: (page) => {
                     Swal.fire(
                         'Actualización rifa',
@@ -1955,9 +1940,6 @@ export default {
                     this.reset();
                     this.editMode = false;
                 },
-                onError: (errors) => {console.log('onError');},
-                onCancel: () => {console.log('onCancel');},
-                onFinish: visit => {console.log('onFinish');},
             });
 
         },
@@ -1996,7 +1978,7 @@ export default {
                     paginate: paginate
                 }
             }).then((res) => {
-                console.log(res.data);
+                //console.log(res.data);
                 var respuesta = res.data;
                 this.arrayRifas = respuesta.rifas;
 
@@ -2017,7 +1999,7 @@ export default {
                     paginate: paginate
                 }
             }).then((res) => {
-                console.log(res.data);
+                //console.log(res.data);
                 var respuesta = res.data;
                 this.arrayVendedores = respuesta.vendedores;
             })
@@ -2054,7 +2036,7 @@ export default {
                         'success'
                     )
                 }).catch(function (error) {
-                    console.log(error);
+                    //console.log(error);
                 });
             })
 
@@ -2073,7 +2055,7 @@ export default {
         getPaises: function () {
             axios.get('/paises',).then((res) => {
                 this.arrayPaises = res.data.paises;
-                console.log(res.data.paises)
+                //console.log(res.data.paises)
             })
         },
         getDepartamentos: function () {
@@ -2083,7 +2065,7 @@ export default {
                 }
             }).then((res) => {
                 this.arrayDepartamentos = res.data.departamentos;
-                console.log(res.data.departamentos)
+                //console.log(res.data.departamentos)
             })
         },
         getCiudades: function () {
@@ -2094,13 +2076,13 @@ export default {
                 }
             }).then((res) => {
                 this.arrayCiudades = res.data.ciudades;
-                console.log(res.data.ciudades)
+                //console.log(res.data.ciudades)
             })
         },
         getTiposdocumento: function () {
             axios.get('/master/tiposdocsearch',).then((res) => {
                 this.arrayTiposdocumento = res.data.data;
-                console.log(res.data.data)
+                //console.log(res.data.data)
             })
         },
         getMovimientos: function () {
@@ -2112,7 +2094,7 @@ export default {
             }).then((res) => {
                 var respuesta = res.data;
                 this.arrayData = respuesta.datos;
-                console.log(this.arrayData);
+                //console.log(this.arrayData);
             })
         },
         rowSelect(idx) {
@@ -2125,7 +2107,7 @@ export default {
         this.arrayData = this.datos;
     },
     mounted() {
-        console.log('Component mounted.');
+        //console.log('Component mounted.');
     },
 }
 </script>
