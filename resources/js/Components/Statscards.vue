@@ -94,6 +94,7 @@ export default {
                 }
 
             });
+            /*
             setInterval(() => {
                 var url= '/cajas/open';
                 axios.get(url, {
@@ -115,6 +116,8 @@ export default {
 
                 });
             }, (60000));
+
+             */
         }
     },
     created: function () {
