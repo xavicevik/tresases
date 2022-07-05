@@ -1,5 +1,6 @@
 <template>
     <AppLayout title="Numerosreservados">
+        <Statscards></Statscards>
         <template #header>
             <h2 class="font-semibold text-xl text-gray-800 leading-tight">
                 Lista de números Reservados
@@ -29,70 +30,69 @@
                             </div>
 
                             <div class="w-1/3">
-                                <div class="container flex justify-center items-center">
-                                    <div class="relative">
-                                        <div class="absolute top-4 left-3">
-                                            <i class="fa fa-search text-gray-400 z-20 hover:text-gray-500"></i> </div>
-                                        <input type="text" v-model="buscar" @keyup="getNumerosreservados(buscar,'numero')" class="h-8 w-96 pl-4 pr-4 rounded-lg z-0 focus:shadow focus:outline-none" placeholder="Buscar (Rifa, número)">
-                                        <button @click="getNumerosreservados(buscar,'numero')">
-                                            <div class="absolute top-2 right-2">
-                                                <Icon icon="fe:search" class="h-4"  />
-                                            </div>
-                                        </button>
-                                    </div>
-                                </div>
+
                             </div>
-                            <div class="pr-2 w-1/3 text-center">
-                                <button @click="openModal('registrar')" class="bg-blue-500 text-xs  hover:bg-blue-700 text-white font-bold py-2 px-4 rounded ">CREAR RESERVA</button>
+                            <div class="flex w-1/4">
+                                <div class="w-1/2 text-center">
+                                    <button @click="openModal('registrar')" class="bg-blue-500 text-xs  hover:bg-blue-700 text-white font-bold py-2 px-4 rounded ">Asignar</button>
+                                </div>
+                                <div class="w-1/2 text-center">
+                                    <button @click="openModal('eliminar')" class="bg-blue-500 text-xs  hover:bg-blue-700 text-white font-bold py-2 px-4 rounded ">Desasignar</button>
+                                </div>
                             </div>
 
                         </div>
                     </section>
                     <!-- Fin Encabezado y titulo -->
+
+
+                    <section>
+                        <div class="px-4">
+                            <form @submit.prevent="getBoletas(form)" @keyup.enter="getBoletas(form)">
+                                <div class="grid xl:grid-cols-2 xl:gap-6">
+                                    <div class="relative z-0 w-full mb-6 group">
+                                        <input type="text" v-model="form.rifa" class="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border-blue-600 peer" placeholder=" " required />
+                                        <label class="peer-focus:font-medium absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:left-0 peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6">
+                                            Rifa
+                                        </label>
+                                    </div>
+                                    <div class="relative z-0 w-full mb-6 group">
+                                        <input type="text" v-model="form.numero" class="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border-blue-600 peer" placeholder=" " required />
+                                        <label class="peer-focus:font-medium absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:left-0 peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6">
+                                            Número
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="grid xl:grid-cols-2 xl:gap-6">
+                                    <div class="relative z-0 w-full mb-6 group">
+                                        <input type="text" v-model="form.promocional" class="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer" placeholder=" " required />
+                                        <label class="peer-focus:font-medium absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:left-0 peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6">
+                                            Promocional
+                                        </label>
+                                    </div>
+                                    <div class="relative z-0 w-full mb-6 group">
+                                        <input type="text" v-model="form.vendedor" class="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none dark:text-white dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer" placeholder=" " required />
+                                        <label class="peer-focus:font-medium absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:left-0 peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6">
+                                            Vendedor
+                                        </label>
+                                    </div>
+                                </div>
+
+                                <button type="button" @click="getBoletas(form)" class="mx-auto text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">Buscar</button>
+                            </form>
+                        </div>
+                    </section>
+                    <!-- Fin Encabezado y titulo -->
                     <!-- Tabla de contenido -->
                     <section>
-                        <div class="lg:px-4 md:px-2 sm:px-0 py-2 pb-6">
+                        <div class="lg:px-4 w-full md:px-2 sm:px-0 py-2 pb-6 overflow-x-scroll">
                             <table class="table-fixed w-full">
                                 <thead>
-                                <tr class="bg-gray-100">
-                                    <th class="px-4 py-2 w-2/12 text-sm font-bold hover:bg-blue-500 hover:text-gray-50 rounded-b">
-                                        <button @click="getNumerosreservados(buscar, 'cliente.nombre')" class="font-bold">
-                                            Cliente
-                                            <div v-show="sortBy == 'cliente.nombre'">
-                                                <span v-show="!sortOrder">
-                                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
-                                                        <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
-                                                    </svg>
-                                                </span>
-                                                <span v-show="sortOrder">
-                                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
-                                                      <path fill-rule="evenodd" d="M14.707 12.707a1 1 0 01-1.414 0L10 9.414l-3.293 3.293a1 1 0 01-1.414-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 010 1.414z" clip-rule="evenodd" />
-                                                    </svg>
-                                                </span>
-                                            </div>
-                                        </button>
-                                    </th>
-                                    <th class="px-4 py-2 w-2/12 text-sm font-bold hover:bg-blue-500 hover:text-gray-50 rounded-b">
-                                        <button @click="getNumerosreservados(buscar, 'vendedor.nombre')" class="font-bold">
-                                            Vendedor
-                                            <div v-show="sortBy == 'vendedor.nombre'">
-                                                <span v-show="!sortOrder">
-                                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
-                                                        <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
-                                                    </svg>
-                                                </span>
-                                                <span v-show="sortOrder">
-                                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
-                                                      <path fill-rule="evenodd" d="M14.707 12.707a1 1 0 01-1.414 0L10 9.414l-3.293 3.293a1 1 0 01-1.414-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 010 1.414z" clip-rule="evenodd" />
-                                                    </svg>
-                                                </span>
-                                            </div>
-                                        </button>
-                                    </th>
-                                    <th class="px-4 py-2 text-sm w-3/12 font-bold hover:bg-blue-500 hover:text-gray-50 rounded-b">
-                                        <button @click="getNumerosreservados(buscar, 'idrifa')" class="font-bold">
+                                <tr class="text-left bg-gray-100">
+                                    <th class="px-4 py-2 text-sm font-bold hover:bg-blue-500 hover:text-gray-50 rounded-b">
+                                        <button @click="getCajas(buscar, 'id')" class="font-bold">
                                             Rifa
-                                            <div v-show="sortBy == 'idrifa'">
+                                            <div v-show="sortBy == 'nombre'">
                                                 <span v-show="!sortOrder">
                                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
                                                         <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
@@ -106,10 +106,10 @@
                                             </div>
                                         </button>
                                     </th>
-                                    <th class="px-4 py-2 text-sm w-1/12 font-bold hover:bg-blue-500 hover:text-gray-50 rounded-b">
-                                        <button @click="getNumerosreservados(buscar, 'numero')" class="font-bold">
+                                    <th class="px-4 py-2 text-sm font-bold hover:bg-blue-500 hover:text-gray-50 rounded-b">
+                                        <button @click="getCajas(buscar, 'id')" class="font-bold">
                                             Número
-                                            <div v-show="sortBy == 'numero'">
+                                            <div v-show="sortBy == 'nombre'">
                                                 <span v-show="!sortOrder">
                                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
                                                         <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
@@ -123,10 +123,10 @@
                                             </div>
                                         </button>
                                     </th>
-                                    <th class="px-4 py-2 text-sm w-1/12 font-bold hover:bg-blue-500 hover:text-gray-50 rounded-b">
-                                        <button @click="getNumerosreservados(buscar, 'rango')" class="font-bold">
-                                            Rango
-                                            <div v-show="sortBy == 'rango'">
+                                    <th class="px-4 py-2 text-sm font-bold hover:bg-blue-500 hover:text-gray-50 rounded-b">
+                                        <button @click="getCajas(buscar, 'id')" class="font-bold">
+                                            Promocional
+                                            <div v-show="sortBy == 'nombre'">
                                                 <span v-show="!sortOrder">
                                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
                                                         <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
@@ -140,10 +140,27 @@
                                             </div>
                                         </button>
                                     </th>
-                                    <th class="px-4 py-2 w-2/12 text-sm font-bold w-1/12 hover:bg-blue-500 hover:text-gray-50 rounded-b">
-                                        <button @click="getNumerosreservados(buscar, 'fecha')" class="font-bold">
+                                    <th class="px-4 py-2 text-sm font-bold hover:bg-blue-500 hover:text-gray-50 rounded-b">
+                                        <button @click="getCajas(buscar, 'id')" class="font-bold">
+                                            Vendedor
+                                            <div v-show="sortBy == 'ciudad.precio'">
+                                                <span v-show="!sortOrder">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                                                        <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+                                                    </svg>
+                                                </span>
+                                                <span v-show="sortOrder">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                                                      <path fill-rule="evenodd" d="M14.707 12.707a1 1 0 01-1.414 0L10 9.414l-3.293 3.293a1 1 0 01-1.414-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 010 1.414z" clip-rule="evenodd" />
+                                                    </svg>
+                                                </span>
+                                            </div>
+                                        </button>
+                                    </th>
+                                    <th class="px-4 py-2 text-sm font-bold hover:bg-blue-500 hover:text-gray-50 rounded-b">
+                                        <button @click="getCajas(buscar, 'id')" class="font-bold">
                                             Fecha
-                                            <div v-show="sortBy == 'fecha'">
+                                            <div v-show="sortBy == 'fechafin'">
                                                 <span v-show="!sortOrder">
                                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
                                                         <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
@@ -157,83 +174,32 @@
                                             </div>
                                         </button>
                                     </th>
-                                    <th class="px-4 py-2 text-sm font-bold w-1/12 hover:bg-blue-500 hover:text-gray-50 rounded-b">
-                                        <button @click="getNumerosreservados(buscar, 'estado')" class="font-bold">
-                                            Estado
-                                            <div v-show="sortBy == 'estado'">
-                                                <span v-show="!sortOrder">
-                                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
-                                                        <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
-                                                    </svg>
-                                                </span>
-                                                <span v-show="sortOrder">
-                                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
-                                                      <path fill-rule="evenodd" d="M14.707 12.707a1 1 0 01-1.414 0L10 9.414l-3.293 3.293a1 1 0 01-1.414-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 010 1.414z" clip-rule="evenodd" />
-                                                    </svg>
-                                                </span>
-                                            </div>
-                                        </button>
-                                    </th>
-                                    <th class="lg:px-4 md:px-1 mx-auto py-2 text-sm font-bold lg:w-1/12 md:w-1/11 hover:bg-blue-500 hover:text-gray-50 rounded-b">Acciones</th>
                                 </tr>
                                 </thead>
                                 <tbody>
-                                <tr class="text-center" text-sm v-if="existenumerosreservados > 0" v-for="(numeroreservado, id) in arrayNumerosreservados.data" :key="id">
-                                    <td class="border px-1 py-2 text-sm truncate" v-text="numeroreservado.cliente.nombre + ' ' + numeroreservado.cliente.apellido"></td>
-                                    <td class="border px-1 py-2 text-sm truncate" v-text="numeroreservado.vendedor.nombre + ' ' + numeroreservado.vendedor.apellido"></td>
-                                    <td class="border px-1 py-2 text-sm truncate" v-text="numeroreservado.rifa.titulo"></td>
-                                    <td class="border px-1 py-2 text-sm truncate" v-text="numeroreservado.numero"></td>
-                                    <td class="border px-1 py-2 text-sm truncate" v-text="nvl(numeroreservado.rangoinicial, '') + ' - ' + nvl(numeroreservado.rangofinal, '')"></td>
-                                    <td class="border px-1 py-2 text-sm truncate" v-text="dateTime(numeroreservado.fecha)"></td>
-                                    <td class="border px-2 py-2 text-sm truncate" v-if="numeroreservado.estado">
-                                        <span class="inline-flex px-2 text-sm font-semibold leading-5 text-green-800 bg-green-100 rounded-full">
-                                            Activo
-                                        </span>
-                                    </td>
-                                    <td class="border px-2 py-2 text-sm" v-else>
-                                        <span class="inline-flex px-2 text-xs font-semibold leading-5 text-red-800 bg-red-100 rounded-full">
-                                            Inactivo
-                                        </span>
-                                    </td>
-                                    <td class="border px-1 py-1 mx-auto text-center flex items-center">
-                                        <button @click="ver(numeroreservado)" class="hover:bg-green-700 text-green-400 font-bold rounded" fill="none"
-                                                viewBox="0 0 24 24" stroke="currentColor">
-                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                                <path stroke-linecap="round" stroke-linejoin="round" d="M10 21h7a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v11m0 5l4.879-4.879m0 0a3 3 0 104.243-4.242 3 3 0 00-4.243 4.242z" />
-                                            </svg>
-                                        </button>
-                                        <button @click="edit(numeroreservado)" class="hover:bg-blue-700 text-white font-bold rounded">
-                                            <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 text-blue-400" fill="none"
-                                                 viewBox="0 0 24 24" stroke="currentColor">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                      d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                                            </svg>
-                                        </button>
-                                        <button @click="deleteRow(numeroreservado)" class="hover:bg-red-700 text-white font-bold rounded">
-                                            <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 text-red-400" fill="none"
-                                                 viewBox="0 0 24 24" stroke="currentColor">
-                                                <path v-if="numeroreservado.estado" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                      d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                                                <path v-else fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
-                                            </svg>
-
-                                        </button>
-                                    </td>
+                                <tr class="text-left" text-sm v-if="arrayData.data" v-for="(dato, id) in arrayData.data" :key="id">
+                                    <td class="border px-1 py-2 text-sm truncate" v-text="dato.rifa.titulo"></td>
+                                    <td class="border px-1 py-2 text-sm truncate" v-text="dato.numero"></td>
+                                    <td class="border px-1 py-2 text-sm truncate" v-text="dato.promocional"></td>
+                                    <td class="border px-1 py-2 text-sm truncate"><a :href="dato.vendedor?verVendedor(dato.vendedor.id):''"> {{ dato.vendedor?(dato.vendedor.documento + '-'+dato.vendedor.nombre+' '+dato.vendedor.apellido):''}} </a></td>
+                                    <td class="border px-1 py-2 text-sm truncate" v-text="dateTimeFull(dato.updated_at)"></td>
                                 </tr>
                                 <tr v-else>
-                                    <td class="border px-4 py-2 text-xs text-center" colspan="7"> La consulta no obtuvo datos</td>
+                                    <td class="border px-4 py-2 text-xs text-center" colspan="12"> La consulta no obtuvo datos</td>
                                 </tr>
                                 </tbody>
                             </table>
-                            <pagination class="mt-6" :links="arrayNumerosreservados.links" />
+                            <pagination class="mt-6" :links="arrayData.links" />
                         </div>
                     </section>
                     <!-- Fin Tabla de contenido -->
 
+
+
                     <!-- Ventana modal Crear Reserva-->
                     <section>
                         <div class="fixed z-10 inset-0 overflow-y-auto ease-out duration-400" v-if="isOpen">
-                            <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+                            <div class="flex items-end justify-center h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
 
                                 <div class="fixed inset-0 transition-opacity">
                                     <div class="absolute inset-0 bg-gray-500 opacity-75"></div>
@@ -242,108 +208,109 @@
                                 <span class="hidden sm:inline-block sm:align-middle sm:h-screen"></span>
 
                                 <!-- Contenido modal -->
-                                    <div class="inline-block lg:w-6/12 align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:w-full" role="dialog" aria-modal="true" aria-labelledby="modal-headline">
+                                    <div class="inline-block lg:w-6/12 align-bottom bg-white rounded-lg text-left h-fit shadow-xl transform transition-all sm:my-8 sm:align-middle sm:w-full" role="dialog" aria-modal="true" aria-labelledby="modal-headline">
+                                        <button type="button" @click="closeModal()" class="absolute top-3 right-2.5 text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center dark:hover:bg-gray-800 dark:hover:text-white" data-modal-toggle="authentication-modal">
+                                            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg>
+                                        </button>
                                     <div class="">
                                         <h2 v-text="tituloModal" class="text-xl font-bold text-gray-900 px-4 py-2"></h2>
                                     </div>
                                     <!-- Inicio Form -->
-                                    <form>
-                                        <div class="bg-white px-4 pt-2 pb-2 sm:p-6 sm:pb-4">
-                                            <div class="">
-                                                <!-- Mensajes Flash -->
-                                                <section>
-                                                    <section>
-                                                        <div v-show="errorrifa" mx-auto class="bg-red-300 border-t-4 border-red-500 rounded-b text-gray-900 px-4 py-2 shadow-md my-3" role="alert" >
-                                                            <div class="text-sm mx-auto text-gray-50 text-center">
-                                                                <div v-for="error in errorMostrarMsjrifa" :key="error" v-text="error">
+                                    <div class="bg-white px-4 pt-2 pb-2 sm:p-6 sm:pb-4">
+                                        <div class="">
 
+                                            <!-- Fin Mensajes Flash -->
+                                        <!-- Formulario -->
+                                        <section>
+                                            <div class="flex py-1">
+                                                <div class="mb-4 w-full pr-2">
+                                                    <label class="block text-gray-700 text-sm font-bold mb-2">Rifa</label>
+
+                                                    <input v-model="form.idrifa.nombre_tecnico" @click="selectRifa()" type="text" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" placeholder="Seleccione Rifa">
+
+                                                    <div v-if="$page.props.errors.rifa" class="text-red-500">{{ $page.props.errors.rifa }}</div>
+                                                </div>
+                                            </div>
+                                            <div class="flex py-1">
+                                                <div class="mb-4 w-full pr-2">
+                                                    <label class="block text-gray-700 text-sm font-bold mb-2">Vendedor</label>
+
+                                                    <input v-model="form.idvendedor.nombre" @click="selectVendedor()" type="text" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" placeholder="Seleccione Vendedor">
+
+                                                    <div v-if="$page.props.errors.vendedor" class="text-red-500">{{ $page.props.errors.vendedor }}</div>
+                                                </div>
+                                            </div>
+                                        </section>
+                                         <section>
+
+                                            <div class="flex py-1 w-full max-h-fit overflow-y-scroll">
+                                                <div class="mb-4 w-full">
+                                                    <label class="block text-gray-700 text-sm font-bold mb-2">Número</label>
+
+                                                    <div class="container flex justify-center items-center">
+                                                        <div class="relative pt-4">
+                                                            <div class="absolute top-4 left-3">
+                                                                <i class="fa fa-search text-gray-400 z-20 hover:text-gray-500"></i> </div>
+                                                            <money3 v-bind="configMoney2" v-model="form.reserva.numero" @keypress.enter="valBoletaDisponible(form.reserva.numero, form.idrifa.id, form.idvendedor.id)" class="h-8 w-96 pl-4 pr-4 rounded-lg z-0 focus:shadow focus:outline-none"></money3>
+                                                            <a @click="valBoletaDisponible(form.reserva.numero, form.idrifa.id, form.idvendedor.id)">
+                                                                <div class="absolute top-6 right-4">
+                                                                    <Icon icon="fe:search" class="h-4"  />
                                                                 </div>
+                                                            </a>
+                                                        </div>
+                                                        <div v-if="asignarMode" class="flex pl-8 pt-8">
+                                                            <button @click="generarReciboAsignar()" class="hover:bg-green-700 text-green-400 font-bold rounded" fill="none"
+                                                                    viewBox="0 0 24 24" stroke="currentColor">
+                                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                                                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                                                </svg>
+                                                            </button>
+                                                            <label>Asignar e Imprimir</label>
+
+                                                        </div>
+                                                        <div v-if="eliminarMode" class="flex pl-8 pt-8">
+                                                            <button @click="generarReciboEliminar()" class="hover:bg-red-700 text-red-400 font-bold rounded" fill="none"
+                                                                    viewBox="0 0 24 24" stroke="currentColor">
+                                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                                                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                                                </svg>
+                                                            </button>
+                                                            <label>Desasignar e Imprimir</label>
+
+                                                        </div>
+                                                    </div>
+
+                                                        <div class="flex py-1 px-2 font-bold">
+                                                            <div class="w-1/3">
+                                                                Número
+                                                            </div>
+                                                            <div class="w-1/3 px-2">
+                                                                Promocional
+                                                            </div>
+                                                            <div class="w-1/3 px-2">
+                                                                Eliminar
                                                             </div>
                                                         </div>
-                                                    </section>
-                                                </section>
-                                                <!-- Fin Mensajes Flash -->
-                                            <!-- Formulario -->
-                                            <section>
-                                                <div class="flex py-1">
-                                                    <div class="mb-4 w-full pr-2">
-                                                        <label class="block text-gray-700 text-sm font-bold mb-2">Rifa</label>
-
-                                                        <input v-model="form.idrifa.nombre_tecnico" @click="selectRifa()" type="text" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" placeholder="Seleccione Rifa">
-
-                                                        <div v-if="$page.props.errors.rifa" class="text-red-500">{{ $page.props.errors.rifa }}</div>
-                                                    </div>
-                                                </div>
-                                                <div class="flex py-1">
-                                                    <div class="mb-4 w-full pr-2">
-                                                        <label class="block text-gray-700 text-sm font-bold mb-2">Vendedor</label>
-
-                                                        <input v-model="form.idvendedor.nombre" @click="selectVendedor()" type="text" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" placeholder="Seleccione Vendedor">
-
-                                                        <div v-if="$page.props.errors.vendedor" class="text-red-500">{{ $page.props.errors.vendedor }}</div>
-                                                    </div>
-                                                </div>
-                                            </section>
-                                             <section>
-                                                 <div class="flex flex-wrap mx-auto py-4">
-                                                     <div class="flex items-center mr-4">
-                                                         <input type="radio" value="1" v-model="isIndividual" class="w-4 h-4 text-red-600 border-gray-300 focus:ring-red-500 focus:ring-2 ">
-                                                         <label class="ml-2 text-sm font-medium ">Número individual</label>
-                                                     </div>
-                                                     <div class="flex items-center mr-4">
-                                                         <input type="radio" value="0" v-model="isIndividual" class="w-4 h-4 text-green-600 border-gray-300 focus:ring-green-500 dark:ring-offset-gray-800 ">
-                                                         <label class="ml-2 text-sm font-medium ">Rango</label>
-                                                     </div>
-                                                 </div>
-                                                <div class="flex py-1 w-full">
-                                                    <div class="mb-4 w-full" v-if="isIndividual == 1">
-                                                        <label class="block text-gray-700 text-sm font-bold mb-2">Número</label>
-                                                        <input v-model="form.numero" type="text" :disabled="verMode" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" placeholder="Numero">
-                                                        <div v-if="$page.props.errors.numero" class="text-red-500">{{ $page.props.errors.numero }}</div>
-                                                    </div>
-                                                    <div class="flex py-1" v-else>
-                                                        <div class="mb-4 w-1/2 pl-2">
-                                                            <label class="block text-gray-700 text-sm font-bold mb-2">Rango Inicial</label>
-                                                            <input v-model="form.rangoinicial" type="text" :disabled="verMode" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" placeholder="Ranco inicial">
-                                                            <div v-if="$page.props.errors.rangoinicial" class="text-red-500">{{ $page.props.errors.rangoinicial }}</div>
+                                                        <div v-for="(reserva, index) in form.reservas" :key="reserva.numero" class="bg-blue-200 rounded-md flex py-1 px-2">
+                                                            <div class="w-1/3">
+                                                                {{ reserva.numero }}
+                                                            </div>
+                                                            <div class="w-1/3 px-2">
+                                                                {{ reserva.promocional }}
+                                                            </div>
+                                                            <div class="w-1/3 px-2">
+                                                                <svg xmlns="http://www.w3.org/2000/svg" @click="eliminarReserva(reserva.numero, index)" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                                                    <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                                                </svg>
+                                                            </div>
                                                         </div>
-                                                        <div class="mb-4 w-1/2 pl-2">
-                                                            <label class="block text-gray-700 text-sm font-bold mb-2">Rango Final</label>
-                                                            <input v-model="form.rangofinal" type="text" :disabled="verMode" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" placeholder="Rango final">
-                                                            <div v-if="$page.props.errors.rangofinal" class="text-red-500">{{ $page.props.errors.rangofinal }}</div>
-                                                        </div>
-                                                    </div>
+
                                                 </div>
-                                                 <div class="flex py-1 w-full">
-                                                     <div class="mb-4 w-full">
-                                                         <label class="block text-gray-700 text-sm font-bold mb-2">Subir archivo por lotes</label>
-                                                         <input type="file" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" placeholder="Seleccione archivo">
-                                                         <div v-if="$page.props.errors.file" class="text-red-500">{{ $page.props.errors.file }}</div>
-                                                     </div>
-                                                 </div>
-                                             </section>
-                                            <!-- Fin formulario -->
                                             </div>
+                                         </section>
+                                        <!-- Fin formulario -->
                                         </div>
-                                        <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
-                                            <span class="flex w-full rounded-md shadow-sm sm:ml-3 sm:w-auto">
-                                              <button v-show="!editMode && !verMode" @click="save(form)" wire:click.prevent="store()" type="button" class="inline-flex justify-center w-full rounded-md border border-transparent px-4 py-2 bg-green-600 text-base leading-6 font-medium text-white shadow-sm hover:bg-green-500 focus:outline-none focus:border-green-700 focus:shadow-outline-green transition ease-in-out duration-150 sm:text-sm sm:leading-5" >
-                                                Crear
-                                              </button>
-                                            </span>
-                                            <span class="flex w-full rounded-md shadow-sm sm:ml-3 sm:w-auto">
-                                              <button v-show="editMode" @click="update(form)" wire:click.prevent="store()" type="button" class="inline-flex justify-center w-full rounded-md border border-transparent px-4 py-2 bg-green-600 text-base leading-6 font-medium text-white shadow-sm hover:bg-green-500 focus:outline-none focus:border-green-700 focus:shadow-outline-green transition ease-in-out duration-150 sm:text-sm sm:leading-5" >
-                                                Actualizar
-                                              </button>
-                                            </span>
-                                            <span class="mt-3 flex w-full rounded-md shadow-sm sm:mt-0 sm:w-auto">
-
-                                          <button @click="closeModal()" type="button" class="inline-flex justify-center w-full rounded-md border border-gray-300 px-4 py-2 bg-white text-base leading-6 font-medium text-gray-700 shadow-sm hover:text-gray-500 focus:outline-none focus:border-blue-300 focus:shadow-outline-blue transition ease-in-out duration-150 sm:text-sm sm:leading-5">
-                                            Cancelar
-                                          </button>
-                                        </span>
-                                        </div>
-                                    </form>
+                                    </div>
                                     <!-- Fin form -->
                                 </div>
                                 <!-- Fin Contenido modal -->
@@ -653,6 +620,7 @@ export default {
         money3: Money3Component,
     },
     props:{
+        datos : [],
         numerosreservados : [],
         rifas: [],
         vendedores: [],
@@ -677,20 +645,38 @@ export default {
                 allowBlank: false,
                 minimumNumberOfCharacters: 0,
             },
-
+            configMoney2: {
+                masked: true,
+                prefix: '',
+                suffix: '',
+                thousands: '',
+                decimal: '',
+                precision: 0,
+                disableNegative: true,
+                disabled: false,
+                min: 0,
+                max: 9999,
+                allowBlank: false,
+                minimumNumberOfCharacters: 4,
+            },
             ispage: true,
 
             tituloModal: '',
             form: {
-                id: null,
-                idrifa: null,
+                rifa: null,
                 numero: null,
-                estado: false,
+                promocional: null,
+                vendedor: null,
+                cliente: null,
+                estado: '',
+                reserva: {
+                    numero: null,
+                    promocional: null
+                },
                 rangoinicial: null,
                 rangofinal: null,
                 idvendedor: 0,
-                idcliente: 0,
-                fecha: null,
+                reservas:[]
             },
             arrayRifas: {
                 data: [],
@@ -702,6 +688,8 @@ export default {
             },
             arrayClientes: [],
             editMode: false,
+            asignarMode: false,
+            eliminarMode: false,
             verMode: false,
             isOpen: false,
             existenumerosreservados: 1,
@@ -765,7 +753,7 @@ export default {
             this.form.idvendedor = data;
             this.closeMoodalVendedor();
         },
-        actualizarRangos() {
+        actualizarRangos: function() {
             let cantidad = 0;
             let rangoinicial = '';
             let rangofinal = '';
@@ -774,16 +762,97 @@ export default {
             rangoinicial = '' + String('0'.toString()).padStart(this.form.idrifa.cifras, '0'.toString());
             rangofinal = (cantidad - 1);
             console.log(rangoinicial);
-            if(this.isIndividual == 1) {
-                this.form.numero = rangoinicial + ' - ' + rangofinal;
-                this.form.rangoinicial = null;
-                this.form.rangofinal = null;
+            this.form.numero = rangoinicial + ' - ' + rangofinal;
+
+            this.configMoney2.min = rangoinicial.toString();
+            this.configMoney2.max = rangofinal.toString();
+            this.configMoney2.minimumNumberOfCharacters = this.form.idrifa.cifras;
+
+        },
+        generarReciboEliminar: function () {
+            if (this.form.reservas.length > 0){
+                var url = '/numerosreservados/reportpdfDesasignacion';
+                axios.get(url, {
+                    params: {
+                        rifa: this.form.idrifa.nombre_tecnico,
+                        vendedor: this.form.idvendedor.nombre + ' '+ this.form.idvendedor.apellido,
+                        reservas: this.form.reservas,
+                        iduserdestino: this.form.idvendedor.id,
+                        idrifa: this.form.idrifa.id
+                    }
+                }).then((res) => {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Se ha generado el recibo correspondiente',
+                        showConfirmButton: true,
+                    })
+                    window.open(res.data.url, '_blank');
+                })
             } else {
-                this.form.rangoinicial = rangoinicial.toString();
-                this.form.rangofinal = rangofinal.toString();
-                this.form.numero = null;
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Por favor seleccione por lo menos un número',
+                    showConfirmButton: true,
+                })
             }
 
+        },
+        generarReciboAsignar: function () {
+            if (this.form.reservas.length > 0){
+                var url = '/numerosreservados/reportpdfAsignacion';
+                axios.get(url, {
+                    params: {
+                        rifa: this.form.idrifa.nombre_tecnico,
+                        vendedor: this.form.idvendedor.nombre + ' '+ this.form.idvendedor.apellido,
+                        reservas: this.form.reservas,
+                        iduserdestino: this.form.idvendedor.id,
+                        idrifa: this.form.idrifa.id
+                    }
+                }).then((res) => {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Se ha generado el recibo correspondiente',
+                        showConfirmButton: true,
+                    })
+                    window.open(res.data.url, '_blank');
+                })
+            } else {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Por favor seleccione por lo menos un número',
+                    showConfirmButton: true,
+                })
+            }
+
+        },
+        eliminarReserva: function(numero, index){
+            this.form.reservas.splice(index, 1);
+            /*
+            var url = '/numerosreservados/eliminarReserva';
+            axios.get(url, {
+                params: {
+                    numero: numero,
+                    rifa: this.form.idrifa.id,
+                    idvendedor: this.form.idvendedor.id,
+                }
+            }).then((res) => {
+                console.log(res.data);
+                var respuesta = res.data;
+                let isocupado = respuesta.isocupado;
+                if (isocupado) {
+                    this.form.reservas.splice(index, 1);
+                } else {
+                    Swal.fire({
+                        //position: 'top-end',
+                        icon: 'warning',
+                        title: 'La reserva no se pudo liberar',
+                        showConfirmButton: true,
+                        //timer: 1500
+                    })
+                }
+            })
+
+             */
         },
         formatPrice(value) {
             let val = (value/1).toFixed(0).replace('.', ',')
@@ -798,15 +867,21 @@ export default {
         cleanMessage: function () {
             this.$page.props.flash.message = '';
         },
+        verVendedor: function (id) {
+            //this.isOpen = true;
+            //this.editMode = true;
+
+            //this.tituloModal = 'Administrar reservas';
+            //this.form.idrifa =  data['idrifa'];
+            //this.form.idvendedor = data['idvendedor'];
+        },
         openModal: function (accion, data = []) {
             this.isOpen = true;
-            this.getNumerosreservados();
-            //this.getRifas();
 
             switch (accion) {
                 case 'registrar':
                 {
-                    this.tituloModal = 'Crear nueva reserva';
+                    this.tituloModal = 'Asignar Boletería';
                     this.form.id = null;
                     this.form.idrifa = 0;
                     this.form.numero = null;
@@ -816,73 +891,24 @@ export default {
                     this.form.idvendedor = 0;
                     this.form.idcliente = 0;
                     this.form.fecha = null;
+                    this.asignarMode = true;
+                    this.eliminarMode = false;
                     break;
                 }
-                case 'ver':
+                case 'eliminar':
                 {
-                    this.tituloModal = 'Detalle de la Rifa ' +  data['titulo'];
-                    this.form.id = data['id'];
-                    this.form.titulo = data['titulo'];
-                    this.form.resolucion = data['resolucion'];
-                    this.form.estado = data['estado'];
-                    this.form.nombre = data['nombre'];
-                    this.form.descripcion = data['descripcion'];
-                    this.form.nombre_tecnico = data['nombre_tecnico'];
-                    this.form.resumen = data['resumen'];
-                    this.form.url = data['url'];
-                    this.form.idloteria = data['idloteria'];
-                    this.form.idpais = data['idpais'];
-                    this.form.iddepartamento = data['iddepartamento'];
-                    this.form.idciudad = data['idciudad'];
-                    this.form.cifras = data['cifras'];
-                    this.form.precio = data['precio'];
-                    this.form.fechainicio = data['fechainicio'];
-                    this.form.fechafin = data['fechafin'];
-                    this.form.promocional = data['promocional'];
-                    this.form.publicar = data['publicar'];
-                    this.form.destacada = data['principal'];
-                    this.form.principal = data['principal'];
-                    this.form.urlimagen2 = data['urlimagen2'];
-                    this.form.urlimagen1 = data['urlimagen1'];
-                    this.form.idterminos = data['idterminos'];
-                    this.form.idcreador = data['idcreador'];
-                    this.form.files1 = [];
-                    this.form.files2 = [];
-                    this.getDepartamentos();
-                    this.getCiudades();
-                    break;
-                }
-                case 'actualizar': {
-                    this.tituloModal = 'Actualizar el rifa de venta ' + data['nombre'];
-                    this.form.id = data['id'];
-                    this.form.titulo = data['titulo'];
-                    this.form.resolucion = data['resolucion'];
-                    this.form.estado = data['estado'];
-                    this.form.nombre = data['nombre'];
-                    this.form.descripcion = data['descripcion'];
-                    this.form.nombre_tecnico = data['nombre_tecnico'];
-                    this.form.resumen = data['resumen'];
-                    this.form.url = data['url'];
-                    this.form.idloteria = data['idloteria'];
-                    this.form.idpais = data['idpais'];
-                    this.form.iddepartamento = data['iddepartamento'];
-                    this.form.idciudad = data['idciudad'];
-                    this.form.cifras = data['cifras'];
-                    this.form.precio = data['precio'];
-                    this.form.fechainicio = data['fechainicio'];
-                    this.form.fechafin = data['fechafin'];
-                    this.form.promocional = data['promocional'];
-                    this.form.publicar = data['publicar'];
-                    this.form.destacada = data['principal'];
-                    this.form.principal = data['principal'];
-                    this.form.urlimagen2 = data['urlimagen2'];
-                    this.form.urlimagen1 = data['urlimagen1'];
-                    this.form.idterminos = data['idterminos'];
-                    this.form.idcreador = data['idcreador'];
-                    this.form.files1 = [];
-                    this.form.files2 = [];
-                    this.getDepartamentos();
-                    this.getCiudades();
+                    this.tituloModal = 'Desasignar Boletería';
+                    this.form.id = null;
+                    this.form.idrifa = 0;
+                    this.form.numero = null;
+                    this.form.estado = false;
+                    this.form.rangoinicial = null;
+                    this.form.rangofinal = null;
+                    this.form.idvendedor = 0;
+                    this.form.idcliente = 0;
+                    this.form.fecha = null;
+                    this.asignarMode = false;
+                    this.eliminarMode = true;
                     break;
                 }
             }
@@ -929,6 +955,61 @@ export default {
             this.form.idvendedor = 0;
             this.form.idcliente = 0;
             this.form.fecha = null;
+            this.form.reservas = [];
+        },
+        valBoletaDisponible: function (numero, rifa, idvendedor){
+            if(!this.form.idrifa.id) {
+                Swal.fire({
+                    //position: 'top-end',
+                    icon: 'warning',
+                    title: 'Primero debe seleccionar una rifa',
+                    showConfirmButton: true,
+                    //timer: 1500
+                })
+            } else if(this.form.reserva.numero == '') {
+                Swal.fire({
+                    //position: 'top-end',
+                    icon: 'warning',
+                    title: 'Ingrese un número válido',
+                    showConfirmButton: true,
+                    //timer: 1500
+                })
+            } else {
+                if (this.asignarMode) {
+                    var url = '/numerosreservados/valBoletaDisponible';
+                } else if (this.eliminarMode) {
+                    var url = '/numerosreservados/valBoletaOcupada';
+                }
+                axios.get(url, {
+                    params: {
+                        numero: numero,
+                        rifa: rifa,
+                        idvendedor: idvendedor,
+                    }
+                }).then((res) => {
+                    console.log(res.data);
+                    var respuesta = res.data;
+                    let isocupado = respuesta.isocupado;
+                    if (isocupado) {
+                        this.form.reserva.numero = respuesta.boleta.numero;
+                        this.form.reserva.promocional = respuesta.boleta.promocional;
+                        this.form.reservas.push({
+                            numero: this.form.reserva.numero,
+                            promocional: this.form.reserva.promocional
+                        });
+                        this.form.reserva.numero = null;
+                        this.form.reserva.promocional = null;
+                    } else {
+                        Swal.fire({
+                            //position: 'top-end',
+                            icon: 'warning',
+                            title: 'El número no se puede utilizar',
+                            showConfirmButton: true,
+                            //timer: 1500
+                        })
+                    }
+                })
+            }
         },
         validarNumeros: function (data) {
 
@@ -1055,9 +1136,7 @@ export default {
             });
 
         },
-        getNumerosreservados: async function (buscar, sortBy) {
-            this.buscar = buscar;
-
+        getBoletas: function (filtros = [], sortBy = 'boletas.id') {
             if (sortBy == this.sortBy){
                 this.sortOrder = !this.sortOrder;
             }
@@ -1073,20 +1152,14 @@ export default {
             var url= '/numerosreservados';
             axios.get(url, {
                 params: {
-                    buscar: this.buscar,
+                    filtros: filtros,
                     sortBy: this.sortBy,
                     sortOrder: sortOrderdesc,
                     ispage: this.ispage
                 }
             }).then((res) => {
                 var respuesta = res.data;
-                this.arrayNumerosreservados = respuesta.numerosreservados;
-
-                if (this.arrayNumerosreservados.data.length > 0) {
-                    this.existenumerosreservados = 1;
-                } else {
-                    this.existenumerosreservados = 0;
-                }
+                this.arrayData = respuesta.datos;
             })
         },
         getRifas: async function (buscar = '', filtro = 'nombre_tecnico', paginate = false) {
@@ -1171,9 +1244,8 @@ export default {
 
     },
     created: function () {
-        //this.getPaises();
-        this.arrayNumerosreservados = this.numerosreservados;
-        //this.openModal('registrar')
+        this.arrayData = this.datos;
+        console.log(this.datos);
     },
     mounted() {
         console.log('Component mounted.');

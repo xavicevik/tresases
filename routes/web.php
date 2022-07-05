@@ -112,6 +112,8 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'),'verified',]
         Route::get('/users/getVendedoresActivos', [UserController::class, 'getVendedoresActivos'])->name('users.getVendedoresActivos');
 
         Route::get('/users/getClientesActivos', [UserController::class, 'getClientesActivos'])->name('users.getClientesActivos');
+        Route::get('/users/indexclientes', [UserController::class, 'indexclientes'])->name('users.indexclientes');
+
 
         Route::resource('users', UserController::class);
 
@@ -127,15 +129,20 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'),'verified',]
         Route::get('/rifas/getRifasActivas', [RifaController::class, 'getRifasActivas'])->name('rifas.getRifasActivas');
         Route::get('/rifas/indexboletas', [RifaController::class, 'indexboletas'])->name('rifas.indexboletas');
 
+        Route::get('/cajas/movimientos', [CajaController::class, 'movimientos'])->name('cajas.movimientos');
         Route::get('/cajas/open', [CajaController::class, 'open'])->name('cajas.open');
         Route::post('/cajas/apertura', [CajaController::class, 'apertura'])->name('cajas.apertura');
-        Route::post('/cajas/cierre', [CajaController::class, 'cierre'])->name('cajas.cierre');
+       // Route::post('/cajas/cierre', [CajaController::class, 'cierre'])->name('cajas.cierre');
+        Route::get('/cajas/cierre', [CajaController::class, 'cierre'])->name('cajas.cierre');
         Route::get('/cajas', [CajaController::class, 'index'])->name('cajas.index');
         Route::get('/cajas/historial', [CajaController::class, 'historial'])->name('cajas.historial');
         Route::resource('transacciones',TransaccionController::class);
         Route::resource('pagos',Pagocontroller::class);
 
         Route::get('/ventas/getComisiones', [VentaController::class, 'getComisiones'])->name('ventas.getComisiones');
+        Route::get('/ventas/reportpdfRegistroMov', [VentaController::class, 'reportpdfRegistroMov'])->name('ventas.reportpdfRegistroMov');
+        Route::get('/ventas/reportpdfAnulaMov', [VentaController::class, 'reportpdfAnulaMov'])->name('ventas.reportpdfAnulaMov');
+        Route::get('/cajas/reportpdfCierreCaja', [CajaController::class, 'reportpdfCierreCaja'])->name('cajas.reportpdfCierreCaja');
 
         Route::resource('rifas', RifaController::class);
         Route::resource('confcomisiones',ConfcomisionController::class);
@@ -145,10 +152,19 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'),'verified',]
         Route::resource('roles', RoleController::class);
 
         Route::get('/numerosreservados', [NumeroreservadoController::class, 'index'])->name('numerosreservados.index');
+        Route::get('/numerosreservados/valBoletaDisponible', [NumeroreservadoController::class, 'valBoletaDisponible'])->name('numerosreservados.valBoletaDisponible');
+        Route::get('/numerosreservados/valBoletaOcupada', [NumeroreservadoController::class, 'valBoletaOcupada'])->name('numerosreservados.valBoletaOcupada');
+        Route::get('/numerosreservados/eliminarReserva', [NumeroreservadoController::class, 'eliminarReserva'])->name('numerosreservados.eliminarReserva');
+        Route::get('/numerosreservados/reportpdfAsignacion', [NumeroreservadoController::class, 'reportpdfAsignacion'])->name('numerosreservados.reportpdfAsignacion');
+        Route::get('/numerosreservados/reportpdfDesasignacion', [NumeroreservadoController::class, 'reportpdfDesasignacion'])->name('numerosreservados.reportpdfDesasignacion');
+
+        Route::get('/numerosreservados/getBoletaOcupadaVenta', [NumeroreservadoController::class, 'getBoletaOcupadaVenta'])->name('numerosreservados.getBoletaOcupadaVenta');
+        Route::get('/numerosreservados/getBoletaVendida', [NumeroreservadoController::class, 'getBoletaVendida'])->name('numerosreservados.getBoletaVendida');
 
         Route::resource('numerosreservados', NumeroreservadoController::class);
 
         Route::get('/ventas/getDetalles', [VentaController::class, 'getDetalles'])->name('ventas.getDetalles');
+        Route::get('/ventas/getDetallesHistorial', [VentaController::class, 'getDetallesHistorial'])->name('ventas.getDetallesHistorial');
         Route::get('/ventas/valBoletaLibre', [VentaController::class, 'valBoletaLibre'])->name('ventas.valBoletaLibre');
         Route::get('/ventas/getRandBoletaLibre', [VentaController::class, 'getRandBoletaLibre'])->name('ventas.getRandBoletaLibre');
 

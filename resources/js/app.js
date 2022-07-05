@@ -6,8 +6,8 @@ import { InertiaProgress } from '@inertiajs/progress';
 import Datepicker from '@vuepic/vue-datepicker';
 import '@vuepic/vue-datepicker/dist/main.css'
 import Submenu from '@/Components/Submenu';
-
 import Permissions from "./mixins/Permissions";
+import Statscards from "./Components/Statscards";
 
 const appName = window.document.getElementsByTagName('title')[0]?.innerText || 'Laravel';
 
@@ -20,6 +20,7 @@ createInertiaApp({
             .mixin({ methods: { route } })
             .component('Datepicker', Datepicker)
             .component('Submenu', Submenu)
+            .component('Statscards', Statscards)
             .mixin(Permissions)
             .mount(el);
     },

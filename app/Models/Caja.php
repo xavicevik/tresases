@@ -21,7 +21,7 @@ class Caja extends Model
 
     public function vendedor()
     {
-        return $this->belongsTo(User::class, 'idvendedor')->where('idrol', 5);
+        return $this->belongsTo(User::class, 'idvendedor');
     }
 
     public function puntoventa(){

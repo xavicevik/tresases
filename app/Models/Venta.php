@@ -20,6 +20,7 @@ class Venta extends Model
         'idpuntoventa',
         'fechaventa',
         'comprobante',
+        'urlrecibo',
         'estado',
         'transaccion',
     ];

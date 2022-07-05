@@ -1,5 +1,6 @@
 <template>
     <AppLayout title="Puntos de Venta">
+        <Statscards></Statscards>
         <template #header>
             <h2 class="font-semibold text-xl text-gray-800 leading-tight">
                 Lista de Puntos de Venta

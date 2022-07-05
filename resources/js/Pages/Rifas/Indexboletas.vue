@@ -1,6 +1,6 @@
 <template>
     <AppLayout title="Boletas">
-
+        <Statscards></Statscards>
         <template #header>
             <h2 class="font-semibold text-xl text-gray-800 leading-tight">
                 Boletas
@@ -18,13 +18,12 @@
                                     Buscar Boletas
                                 </h1>
                             </div>
-
                         </div>
                     </section>
 
                     <section>
                         <div class="px-4">
-                            <form>
+                            <form @submit.prevent="getBoletas(form)" @keyup.enter="getBoletas(form)">
                                 <div class="grid xl:grid-cols-2 xl:gap-6">
                                     <div class="relative z-0 w-full mb-6 group">
                                         <input type="text" v-model="form.rifa" class="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border-blue-600 peer" placeholder=" " required />
@@ -67,6 +66,7 @@
                                             <option value="1">Activo</option>
                                             <option value="2">Reservado</option>
                                             <option value="3">Vendido</option>
+                                            <option value="4">Pendiente</option>
                                         </select>
                                         <label class="peer-focus:font-medium absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:left-0 peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6">
                                             Estado
@@ -188,23 +188,6 @@
                                     </th>
                                     <th class="px-4 py-2 text-sm font-bold hover:bg-blue-500 hover:text-gray-50 rounded-b">
                                         <button @click="getCajas(buscar, 'id')" class="font-bold">
-                                            Factura
-                                            <div v-show="sortBy == 'fechafin'">
-                                                <span v-show="!sortOrder">
-                                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
-                                                        <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
-                                                    </svg>
-                                                </span>
-                                                <span v-show="sortOrder">
-                                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
-                                                      <path fill-rule="evenodd" d="M14.707 12.707a1 1 0 01-1.414 0L10 9.414l-3.293 3.293a1 1 0 01-1.414-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 010 1.414z" clip-rule="evenodd" />
-                                                    </svg>
-                                                </span>
-                                            </div>
-                                        </button>
-                                    </th>
-                                    <th class="px-4 py-2 text-sm font-bold hover:bg-blue-500 hover:text-gray-50 rounded-b">
-                                        <button @click="getCajas(buscar, 'id')" class="font-bold">
                                             Valor
                                             <div v-show="sortBy == 'fechafin'">
                                                 <span v-show="!sortOrder">
@@ -244,10 +227,33 @@
                                     <td class="border px-1 py-2 text-sm truncate" v-text="dato.rifa.titulo"></td>
                                     <td class="border px-1 py-2 text-sm truncate" v-text="dato.numero"></td>
                                     <td class="border px-1 py-2 text-sm truncate" v-text="dato.promocional"></td>
-                                    <td class="border px-1 py-2 text-sm truncate" v-text="dato.vendedor?dato.vendedor.nombre:''"></td>
-                                    <td class="border px-1 py-2 text-sm truncate" v-text="dato.cliente?dato.cliente.nombre:''"></td>
-                                    <td class="border px-1 py-2 text-sm truncate" v-text="dato.estado"></td>
-                                    <td class="border px-1 py-2 text-sm truncate" v-text="dato.estado"></td>
+                                    <td class="border px-1 py-2 text-sm truncate" v-text="dato.vendedor?dato.vendedor.full_name:''"></td>
+                                    <td class="border px-1 py-2 text-sm truncate" v-text="dato.cliente?dato.cliente.full_name:''"></td>
+                                    <td class="border px-2 py-2 text-sm truncate" v-if="dato.estado==1">
+                                        <span class="inline-flex px-2 text-sm font-semibold leading-5 text-green-800 bg-green-100 rounded-full">
+                                            Activo
+                                        </span>
+                                    </td>
+                                    <td class="border px-2 py-2 text-sm truncate" v-if="dato.estado==2">
+                                        <span class="inline-flex px-2 text-sm font-semibold leading-5 text-yellow-800 bg-yellow-100 rounded-full">
+                                            Reservado
+                                        </span>
+                                    </td>
+                                    <td class="border px-2 py-2 text-sm truncate" v-if="dato.estado==3">
+                                        <span class="inline-flex px-2 text-sm font-semibold leading-5 text-blue-800 bg-blue-100 rounded-full">
+                                            Vendido
+                                        </span>
+                                    </td>
+                                    <td class="border px-2 py-2 text-sm truncate" v-if="dato.estado==4">
+                                        <span class="inline-flex px-2 text-sm font-semibold leading-5 text-blue-800 bg-blue-100 rounded-full">
+                                            Pendiente
+                                        </span>
+                                    </td>
+                                    <td class="border px-2 py-2 text-sm" v-if="dato.estado==0">
+                                        <span class="inline-flex px-2 text-xs font-semibold leading-5 text-red-800 bg-red-100 rounded-full">
+                                            Inactivo
+                                        </span>
+                                    </td>
                                     <td class="border px-1 py-2 text-sm truncate" v-text="formatPrice(dato.valor)"></td>
                                     <td class="border px-1 py-2 text-sm truncate" v-text="formatPrice(dato.saldo)"></td>
                                 </tr>
@@ -375,7 +381,6 @@ export default {
             this.$page.props.flash.message = '';
         },
         getBoletas: function (filtros = [], sortBy = 'boletas.id') {
-            console.log(filtros);
             if (sortBy == this.sortBy){
                 this.sortOrder = !this.sortOrder;
             }

@@ -1,5 +1,6 @@
 <template>
     <AppLayout title="Ventas" :total="total">
+        <Statscards></Statscards>
         <template #header>
             <h2 class="font-semibold text-xl text-gray-800 leading-tight">
                 Nueva venta

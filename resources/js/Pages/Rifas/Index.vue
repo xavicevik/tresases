@@ -1,5 +1,8 @@
 <template>
     <AppLayout title="Rifas">
+
+        <Statscards></Statscards>
+
         <template #header>
             <h2 class="font-semibold text-xl text-gray-800 leading-tight">
                 Lista de rifas
@@ -894,7 +897,6 @@ import { Head, Link } from '@inertiajs/inertia-vue3';
 import JetNavLink from '@/Jetstream/NavLink.vue';
 import NavLink from "../../Jetstream/NavLink";
 
-
 export default {
 
     components: {
@@ -908,7 +910,6 @@ export default {
         JetNavLink,
         Link,
         money3: Money3Component,
-
     },
     props:{
         rifas : [],

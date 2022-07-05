@@ -100,33 +100,32 @@ class RifaController extends Controller
                 ->with('vendedor')
                 ->with('cliente');
 
-            if(!is_null($filtros->rifa)) {
-                $boletas = $boletas->where('idrifa.nombre', 'like', '%'.$filtros->rifa.'%');
+            if(!is_null($filtros->rifa) && $filtros->rifa <> '') {
+                $boletas = $boletas->join('rifas', 'boletas.idrifa', '=', 'rifas.id')
+                                    ->where('rifas.titulo', 'like', '%'.$filtros->rifa.'%');
             }
 
-            if(!is_null($filtros->numero)) {
+            if(!is_null($filtros->numero) && $filtros->numero <> '') {
                 $boletas = $boletas->where('numero', 'like', '%'.$filtros->numero.'%');
             }
 
-            if(!is_null($filtros->promocional)) {
+            if(!is_null($filtros->promocional) && $filtros->promocional <> '') {
                 $boletas = $boletas->where('promocional', 'like', '%'.$filtros->promocional.'%');
             }
 
-            if(!is_null($filtros->estado)) {
-                $boletas = $boletas->where('estado', 'like', '%'.$filtros->estado.'%');
+            if(!is_null($filtros->estado) && $filtros->estado <> '') {
+                $boletas = $boletas->where('boletas.estado', 'like', '%'.$filtros->estado.'%');
             }
-            if(!is_null($filtros->cliente)) {
+            if(!is_null($filtros->cliente) && $filtros->cliente <> '') {
                 $boletas = $boletas->join('users as t1', 'boletas.idcliente', '=', 't1.id')
                     ->where('t1.nombre', 'like', '%'.$filtros->cliente.'%')
                     ->orWhere('t1.apellido', 'like', '%'.$filtros->cliente.'%');
             }
-            if(!is_null($filtros->vendedor)) {
+            if(!is_null($filtros->vendedor) && $filtros->vendedor <> '') {
                 $boletas = $boletas->join('users as t2', 'boletas.idvendedor', '=', 't2.id')
                     ->where('t2.username', 'like', '%'.$filtros->vendedor.'%');
             }
-
             $boletas = $boletas->select('boletas.*')->paginate(self::canPorPagina);
-
         }
 
 

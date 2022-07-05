@@ -2,23 +2,29 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Boleta;
 use App\Models\Loteria;
 use App\Models\Imagen;
 use App\Models\NumeroReservado;
+use App\Models\Promoboleta;
+use App\Models\Recibo;
 use App\Models\Rifa;
+use App\Models\User;
+use App\Models\Venta;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Redirect;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;;
 
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use Inertia\Inertia;
 
 
 class NumeroreservadoController extends Controller
 {
-    const canPorPagina = 3;
+    const canPorPagina = 15;
     /**
      * Display a listing of the resource.
      *
@@ -26,12 +32,12 @@ class NumeroreservadoController extends Controller
      */
     public function index(Request $request)
     {
-        //if (!$request->ajax()) return redirect('/');
-        $buscar = $request->buscar;
+        $filtros = json_decode($request->filtros);
+
         if ($request->has('sortBy') && $request->sortBy <> ''){
             $sortBy = $request->sortBy;
         } else {
-            $sortBy = 'id';
+            $sortBy = 'boletas.id';
         }
 
         if ($request->has('sortOrder') && $request->sortOrder <> ''){
@@ -39,31 +45,53 @@ class NumeroreservadoController extends Controller
         } else {
             $sortOrder = 'desc';
         }
-        if ($buscar == ''){
-            $numerosreservados = NumeroReservado::orderBy($sortBy, $sortOrder)
+
+        if (is_null($filtros)){
+            $boletas = Boleta::orderBy($sortBy, $sortOrder)
                 ->with('rifa')
                 ->with('vendedor')
                 ->with('cliente')
+                ->where('boletas.estado', '2')
                 ->paginate(self::canPorPagina);
         } else {
-            $numerosreservados = NumeroReservado::orderBy($sortBy, $sortOrder)
-                                ->join('rifas', 'numeros_reservados.idrifa', '=', 'rifas.id')
-                                ->select('numeros_reservados.*')
-                                ->with('rifa')
-                                ->with('vendedor')
-                                ->with('cliente')
-                                ->where('rifas.titulo', 'like', '%'. $buscar . '%')
-                                ->orWhere('numero', 'like', '%'. $buscar . '%')
-                                ->orWhere(function($q) use ($buscar) {
-                                    $q->where('rangoinicial', '<=', $buscar)
-                                      ->where('rangofinal', '>=', $buscar);
-                                })
-                                ->paginate(self::canPorPagina);
+            $boletas = Boleta::orderBy($sortBy, $sortOrder)
+                ->with('rifa')
+                ->with('vendedor')
+                ->with('cliente')
+                ->where('boletas.estado', '2');
+
+            if(!is_null($filtros->rifa) && $filtros->rifa <> '') {
+                $boletas = $boletas->join('rifas', 'boletas.idrifa', '=', 'rifas.id')
+                    ->where('rifas.titulo', 'like', '%'.$filtros->rifa.'%');
+            }
+
+            if(!is_null($filtros->numero) && $filtros->numero <> '') {
+                $boletas = $boletas->where('numero', 'like', '%'.$filtros->numero.'%');
+            }
+
+            if(!is_null($filtros->promocional) && $filtros->promocional <> '') {
+                $boletas = $boletas->where('promocional', 'like', '%'.$filtros->promocional.'%');
+            }
+
+            if(!is_null($filtros->estado) && $filtros->estado <> '') {
+                $boletas = $boletas->where('boletas.estado', 'like', '%'.$filtros->estado.'%');
+            }
+            if(!is_null($filtros->cliente) && $filtros->cliente <> '') {
+                $boletas = $boletas->join('users as t1', 'boletas.idcliente', '=', 't1.id')
+                    ->where('t1.nombre', 'like', '%'.$filtros->cliente.'%')
+                    ->orWhere('t1.apellido', 'like', '%'.$filtros->cliente.'%');
+            }
+            if(!is_null($filtros->vendedor) && $filtros->vendedor <> '') {
+                $boletas = $boletas->join('users as t2', 'boletas.idvendedor', '=', 't2.id')
+                    ->where('t2.username', 'like', '%'.$filtros->vendedor.'%');
+            }
+            $boletas = $boletas->select('boletas.*')->paginate(self::canPorPagina);
         }
+
         if ($request->has('ispage') && $request->ispage){
-            return ['numerosreservados' => $numerosreservados];
+            return ['datos' => $boletas];
         } else {
-            return Inertia::render('Rifas/Numerosreservados', ['numerosreservados' => $numerosreservados]);
+            return Inertia::render('Rifas/Numerosreservados', ['datos' => $boletas, 'estado' => $request->estado]);
         }
     }
 
@@ -104,6 +132,123 @@ class NumeroreservadoController extends Controller
         } else {
             return Inertia::render('Rifas/Numerosreservados', ['numerosreservados' => $numerosreservados]);
         }
+    }
+
+    public function valBoletaDisponible(Request $request) {
+        $idrifa = $request->rifa;
+        $numero = $request->numero;
+        $estado = false;
+
+        $boleta = Boleta::ForceIndex('idx_rifa_num')
+            ->where('idrifa', $idrifa)
+            ->where('estado', '=', 1)
+            ->where('numero', $numero)
+            ->first();
+
+        if (!is_null($boleta)) {
+            $estado = true;
+        } else {
+            $estado = false;
+        }
+        return ['boleta' => $boleta, 'isocupado' => $estado];
+    }
+
+    public function getBoletaOcupadaVenta(Request $request) {
+        $idrifa = $request->rifa;
+        $numero = $request->numero;
+        $idvendedor = $request->idvendedor;
+        $idcliente = $request->idcliente;
+        $estado = false;
+
+        $boleta = Boleta::ForceIndex('idx_rifa_num')
+            ->where('idrifa', $idrifa)
+            ->where('estado', '=', 1)
+            ->where('numero', $numero)
+            ->first();
+
+        if (!is_null($boleta)) {
+            $estado = true;
+        } else {
+            $boleta = Boleta::ForceIndex('idx_rifa_num')
+                ->where('idrifa', $idrifa)
+                ->where('numero', $numero)
+                ->where('idvendedor', $idvendedor)
+                ->whereIn('estado', [2,4])
+                ->first();
+            if (!is_null($boleta)) {
+                $estado = true;
+            } else {
+                $estado = false;
+            }
+        }
+        return ['boleta' => $boleta, 'isocupado' => $estado];
+    }
+
+    public function getBoletaVendida(Request $request) {
+        $idrifa = $request->rifa;
+        $numero = $request->numero;
+        $idvendedor = $request->idvendedor;
+        $idcliente = $request->idcliente;
+        $estado = false;
+
+        $boleta = Boleta::ForceIndex('idx_rifa_num')
+            ->where('idrifa', $idrifa)
+            ->whereIn('estado', [3,4])
+            ->where('idvendedor', $request->idvendedor)
+            ->where('numero', $numero)
+            ->first();
+
+        if (!is_null($boleta)) {
+            $estado = true;
+        } else {
+            $estado = false;
+        }
+        return ['boleta' => $boleta, 'isocupado' => $estado];
+    }
+
+    public function valBoletaOcupada(Request $request) {
+        $idrifa = $request->rifa;
+        $numero = $request->numero;
+        $idvendedor = $request->idvendedor;
+        $estado = false;
+
+        $boleta = Boleta::ForceIndex('idx_rifa_num')
+            ->where('idrifa', $idrifa)
+            ->where('estado', '=', 2)
+            ->where('numero', $numero)
+            ->where('idvendedor', $idvendedor)
+            ->first();
+
+        if (!is_null($boleta)) {
+            $estado = true;
+        } else {
+            $estado = false;
+        }
+        return ['boleta' => $boleta, 'isocupado' => $estado];
+
+    }
+
+    public function eliminarReserva(Request $request) {
+        $idrifa = $request->rifa;
+        $numero = $request->numero;
+        $estado = false;
+
+        $boleta = Boleta::ForceIndex('idx_rifa_num')
+            ->where('idrifa', $idrifa)
+            ->where('estado', '=', 2)
+            ->where('numero', $numero)
+            ->first();
+
+        if (!is_null($boleta)) {
+            $estado = true;
+            $boleta->estado = 1;
+            $boleta->idvendedor = null;
+            $boleta->save();
+        } else {
+            $estado = false;
+        }
+        return ['boleta' => $boleta, 'isocupado' => $estado];
+
     }
 
     /**
@@ -306,5 +451,100 @@ class NumeroreservadoController extends Controller
 
         return redirect()->back()
             ->with('message', $mensaje);
+    }
+
+    public function reportpdfAsignacion(Request $request)
+    {
+        $user = Auth::user();
+
+        foreach ($request->reservas as $reserva){
+            $reg = json_decode($reserva);
+            $salida[] = $reg;
+            $boleta = Boleta::ForceIndex('idx_rifa_num')
+                ->where('idrifa', $request->idrifa)
+                ->where('estado', '=', 1)
+                ->where('numero', $reg->numero)
+                ->first();
+            $boleta->estado = 2;
+            $boleta->idvendedor = $request->iduserdestino;
+            $boleta->save();
+        }
+        $recibo = new Recibo();
+        $recibo->nombre = 'Recibo asignacion';
+        $recibo->url = 'Recibo asignacion';
+        $recibo->idusuario = Auth::user()->id;
+        $recibo->iduserdestino = $request->iduserdestino;
+        $recibo->save();
+
+        $data = [
+            'vendedor' => $request->vendedor,
+            'usuario' => $user->username,
+            'rifa' => $request->rifa,
+            'fecha' => $recibo->created_at,
+            'reservas' => $salida,
+            'recibo'  => $recibo->id,
+            'cantidad' => sizeof($salida)
+        ];
+
+        $filename = 'reciboAsignacion_'.$data['recibo'].'.pdf';
+        $recibo->url = $filename;
+        $recibo->save();
+        $pdf = app('dompdf.wrapper');
+        $pdf->getDomPDF()->set_option("enable_php", true);
+        $pdf->loadView('pdf.reportpdfAsignacion', $data);
+
+        $output = $pdf->output();
+        file_put_contents(public_path('storage').'/pdf/'.$filename, $output, FILE_APPEND);
+
+        //return $pdf->download($filename);
+        //return $pdf->stream('ventas.pdf');
+        //return redirect()->back()->with(['message' => public_path('storage').'/pdf/'.$filename]);
+        return ['url' => url('/storage/pdf/').'/'.$filename];
+    }
+
+    public function reportpdfDesasignacion(Request $request)
+    {
+        $user = Auth::user();
+
+        foreach ($request->reservas as $reserva){
+            $reg = json_decode($reserva);
+            $salida[] = $reg;
+            $boleta = Boleta::ForceIndex('idx_rifa_num')
+                ->where('idrifa', $request->idrifa)
+                ->where('estado', '=', 2)
+                ->where('numero', $reg->numero)
+                ->first();
+            $boleta->estado = 1;
+            $boleta->idvendedor = null;
+            $boleta->save();
+        }
+        $recibo = new Recibo();
+        $recibo->nombre = 'Recibo desasignacion';
+        $recibo->url = 'Recibo desasignacion';
+        $recibo->idusuario = Auth::user()->id;
+        $recibo->iduserdestino = $request->iduserdestino;
+        $recibo->save();
+
+        $data = [
+            'vendedor' => $request->vendedor,
+            'usuario' => $user->username,
+            'rifa' => $request->rifa,
+            'fecha' => $recibo->created_at,
+            'reservas' => $salida,
+            'recibo'  => $recibo->id,
+            'cantidad' => sizeof($salida)
+        ];
+
+        $filename = 'reciboDesasignacion_'.$data['recibo'].'.pdf';
+        $recibo->url = $filename;
+        $recibo->save();
+        $pdf = app('dompdf.wrapper');
+        $pdf->getDomPDF()->set_option("enable_php", true);
+        $pdf->loadView('pdf.reportpdfDesasignacion', $data);
+
+        $output = $pdf->output();
+        file_put_contents(public_path('storage').'/pdf/'.$filename, $output, FILE_APPEND);
+
+        return ['url' => url('/storage/pdf/').'/'.$filename];
     }
 }
