@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Exports\UsersExport;
+use AWS\CRT\HTTP\Request;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -27,6 +29,8 @@ use \App\Http\Controllers\TransaccionController;
 use \App\Models\Loteria;
 use \App\Models\Rol;
 use \App\Models\Terminosycondiciones;
+use App\Exports\ProductsExport;
+use Maatwebsite\Excel\Facades\Excel;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -102,10 +106,10 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'),'verified',]
         Route::resource('series', SerieController::class);
 
         Route::get('/users/getVendedoresActivos', [UserController::class, 'getVendedoresActivos'])->name('users.getVendedoresActivos');
-
         Route::get('/users/getClientesActivos', [UserController::class, 'getClientesActivos'])->name('users.getClientesActivos');
         Route::get('/users/indexclientes', [UserController::class, 'indexclientes'])->name('users.indexclientes');
-
+        Route::get('/users/export', [UserController::class, 'UsersExport'])->name('users.export');
+        Route::get('/clientes/export', [UserController::class, 'ClientesExport'])->name('clientes.export');
 
         Route::resource('users', UserController::class);
 
@@ -183,6 +187,8 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'),'verified',]
 
         Route::get('/enviar', [EmailController::class, 'send'])->name('enviar');
         Route::get('/detalleventa', [EmailController::class, 'send'])->name('detalleventa');
+
+
 
     //});
 });
