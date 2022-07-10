@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Exports\ClientesExport;
+use App\Exports\UsersExport;
 use App\Models\Rifa;
 use App\Models\Rol;
 use App\Models\User;
@@ -13,6 +15,7 @@ use Inertia\Inertia;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use Laravel\Jetstream\Jetstream;
+use Maatwebsite\Excel\Facades\Excel;
 use Spatie\Permission\Models\Role;
 
 
@@ -411,7 +414,11 @@ class UserController extends Controller
         $rol = Rol::where('id', $user->idrol)->first();
         $user->assignRole($rol->nombre);
 
-        return redirect()->back()->with('message', 'Cliente creado satisfactoriamente');
+        if ($user->observaciones == 'Creado por movimiento de caja') {
+            return ['user' => $user];
+        } else {
+            return redirect()->back()->with('message', 'Cliente creado satisfactoriamente');
+        }
     }
 
     /**
@@ -516,4 +523,15 @@ class UserController extends Controller
 
         return redirect()->back()->with('message', 'Usuario modificado satisfactoriamente');
     }
+
+    public function UsersExport(Request $request)
+    {
+        return Excel::download(new UsersExport($request), 'users.xlsx');
+    }
+
+    public function ClientesExport(Request $request)
+    {
+        return Excel::download(new ClientesExport($request), 'clientes.xlsx');
+    }
+
 }

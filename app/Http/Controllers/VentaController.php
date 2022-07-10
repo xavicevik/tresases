@@ -457,317 +457,364 @@ class VentaController extends Controller
 
     public function reportpdfRegistroMov(Request $request)
     {
-        $user = Auth::user();
-        $totalventa = 0;
-        $totalpagado = 0;
-        $toatlcomision = 0;
-        $mytime= Carbon::now('America/Bogota');
+        try {
+            // Begin a transaction
+            DB::beginTransaction();
+            $user = Auth::user();
+            $totalventa = 0;
+            $totalpagado = 0;
+            $toatlcomision = 0;
+            $mytime= Carbon::now('America/Bogota');
 
-        $concomision = Confcomision::join('users as t1', 'confcomisiones.idvendedor', '=', 't1.idempresa')
-            ->select('confcomisiones.*')
-            ->where('t1.id', $request->idvendedor)
-            ->first();
-        $venta = new Venta();
-        $venta->valorventa = 0;
-        $venta->impuesto = 0;
-        $venta->comision = 0;
-        $venta->valortotal = 0;
-        $venta->cantidad = 0;
-        $venta->idvendedor = $request->idvendedor;
-        $venta->idcliente = $request->idcliente;
-        $venta->idpuntoventa = $request->idpuntoventa;
-        $venta->fechaventa = $mytime->toDateTimeString();
-        $venta->comprobante = $request->comprobante;
-        $venta->estado = 3;
-        $venta->transaccion = $request->idcaja;
-        $venta->save();
-
-        foreach ($request->reservas as $reserva){
-            $reg = json_decode($reserva);
-            $boleta = Boleta::where('idrifa', $request->idrifa)
-                //->where('estado', '=', 2)
-                ->where('numero', $reg->numero)
-                //->where('idvendedor', $request->idvendedor)
-                ->first();
-            $reg->comision = $reg->valorpagar * ($concomision->comisionvendedor/100);
-            $toatlcomision += $reg->comision;
-            $salida[] = $reg;
-            $totalventa += $boleta->valor;
-            $totalpagado += $reg->valorpagar;
-            $boleta->idvendedor = $request->idvendedor;
-            $boleta->idcliente = $request->idcliente;
-            $boleta->pago = $boleta->pago + $reg->valorpagar;
-            $boleta->saldo = $boleta->valor - $boleta->pago;
-            if ($boleta->saldo == 0) {
-                $boleta->estado = 3;
-            } else {
-                $boleta->estado = 4;
+            $concomision = Confcomision::where('idvendedor', $request->idvendedor)
+                                        ->where('estado', 2)
+                                        ->first();
+            if (is_null($concomision)) {
+                $concomision = Confcomision::join('users as t1', 'confcomisiones.idvendedor', '=', 't1.idempresa')
+                    ->select('confcomisiones.*')
+                    ->where('t1.id', $request->idvendedor)
+                    ->first();
             }
-            $boleta->save();
 
-            $detalleventa = new Detalleventa();
+            $venta = new Venta();
+            $venta->valorventa = 0;
+            $venta->impuesto = 0;
+            $venta->comision = 0;
+            $venta->valortotal = 0;
+            $venta->cantidad = 0;
+            $venta->idvendedor = $request->idvendedor;
+            $venta->idcliente = null;
+            $venta->idpuntoventa = $request->idpuntoventa;
+            $venta->fechaventa = $mytime->toDateTimeString();
+            $venta->comprobante = $request->comprobante;
+            $venta->estado = 3;
+            $venta->transaccion = $request->idcaja;
+            $venta->save();
+
+            foreach ($request->reservas as $reserva){
+                $reg = json_decode($reserva);
+                $boleta = Boleta::where('idrifa', $request->idrifa)
+                    //->where('estado', '=', 2)
+                    ->where('numero', $reg->numero)
+                    //->where('idvendedor', $request->idvendedor)
+                    ->first();
+                $reg->comision = $reg->valorpagar * ($concomision->comisionvendedor/100);
+                $toatlcomision += $reg->comision;
+                $salida[] = $reg;
+                $totalventa += $boleta->valor;
+                $totalpagado += $reg->valorpagar;
+                $boleta->idvendedor = $request->idvendedor;
+                $boleta->idcliente = $reg->idcliente;
+                $boleta->pago = $boleta->pago + $reg->valorpagar;
+                $boleta->saldo = $boleta->valor - $boleta->pago;
+                if ($boleta->saldo == 0) {
+                    $boleta->estado = 3;
+                } else {
+                    $boleta->estado = 4;
+                }
+                $boleta->save();
+
+                $detalleventa = new Detalleventa();
+                $detalleventa->idventa = $venta->id;
+                $detalleventa->idboleta = $boleta->id;
+                $detalleventa->idrifa = $request->idrifa;
+                $detalleventa->valor = $reg->valorpagar;
+                $detalleventa->idcliente = $reg->idcliente;
+                $detalleventa->impuesto = 0;
+                $detalleventa->comision = $reg->comision;
+                $detalleventa->valortotal = $boleta->valor;
+                $detalleventa->numero = $reg->numero;
+                $detalleventa->cantidad = 1;
+                $detalleventa->estado = 3;
+                $detalleventa->save();
+
+                $reg->valorpagar = "$" . number_format($reg->valorpagar, 0, ".", ",");
+                $reg->comision = "$" . number_format($reg->comision, 0, ".", ",");
+            }
+            $recibo = new Recibo();
+            $recibo->nombre = 'Recibo venta';
+            $recibo->url = 'Recibo venta';
+            $recibo->idusuario = Auth::user()->id;
+            $recibo->iduserdestino = $request->idvendedor;
+            $recibo->save();
+
             $detalleventa->idventa = $venta->id;
-            $detalleventa->idboleta = $boleta->id;
-            $detalleventa->idrifa = $request->idrifa;
-            $detalleventa->valor = $reg->valorpagar;
-            $detalleventa->idcliente = $request->idcliente;
-            $detalleventa->impuesto = 0;
-            $detalleventa->comision = $reg->comision;
-            $detalleventa->valortotal = $boleta->valor;
-            $detalleventa->numero = $reg->numero;
-            $detalleventa->cantidad = 1;
-            $detalleventa->estado = 3;
             $detalleventa->save();
 
-            $reg->valorpagar = "$" . number_format($reg->valorpagar, 0, ".", ",");
-            $reg->comision = "$" . number_format($reg->comision, 0, ".", ",");
+            $comision = new Comision();
+            $comision->idventa = $venta->id;
+            $comision->idconfiguracion = $concomision->id;
+            $comision->valorventa = $totalpagado;
+            $comision->comisionmayorista = $totalpagado * ($concomision->comisionmayorista/100);
+            $comision->comisiondistribuidor = $totalpagado * ($concomision->comisiondistribuidor/100);
+            $comision->comisionvendedor = $totalpagado * ($concomision->comisionvendedor/100);
+            $comision->estado = true;
+            $comision->save();
+
+            $venta->comision = $comision->comisionmayorista + $comision->comisiondistribuidor + $comision->comisionvendedor;
+            $venta->valorventa = $totalpagado;
+            $venta->valortotal = $totalventa;
+            $venta->cantidad = sizeof($salida);
+            $venta->save();
+
+            $concepto = 2;
+            $descripcion = 'Pago en efectivo';
+            $signo = self::debito;
+            $impuesto = 0;
+
+            $transaccion = new Transaccion();
+            $transaccion->idusuarioori = $request->idvendedor;
+            $transaccion->idusuariodest = Auth::user()->id;
+            $transaccion->idconcepto = $concepto;
+            $transaccion->origen = 'Fisico';
+            $transaccion->destino = 'Fisico';
+            $transaccion->signo = $signo;
+            $transaccion->valor = $venta->valorventa;
+            $transaccion->impuesto = $impuesto;
+            $transaccion->descripcion = $descripcion;
+            $transaccion->soporte = $request->comprobante;
+            $transaccion->mes = $mytime->month;
+            $transaccion->ano = $mytime->year;
+            $transaccion->save();
+
+            $pago = new Pago();
+            $pago->idventa = $venta->id;
+            $pago->valortotal = $venta->valorventa;
+            $pago->idcliente = null;
+            $pago->idvendedor = $request->idvendedor;
+            $pago->saldo = $venta->valortotal - $venta->valorventa;
+            $pago->canal = 'Fisico';
+            $pago->descripcion = $descripcion;
+            $pago->tipo = 'Pago';
+            $pago->soporte = $request->comprobante;
+            $pago->idtransaccion = $transaccion->id;
+            $pago->idpuntoventa = $request->idpuntoventa;
+            $pago->idcaja = $request->idcaja;
+            $pago->save();
+
+            $data = [
+                'vendedor' => $request->vendedor,
+                'usuario' => $user->username,
+                'rifa' => $request->rifa,
+                'fecha' => $recibo->created_at,
+                'reservas' => $salida,
+                'recibo'  => $recibo->id,
+                'comisionvendedor' => "-$" . number_format($comision->comisionvendedor, 0, ".", ","),
+                'valortotal' => "$" . number_format($venta->valorventa, 0, ".", ","),
+                'valorentregar' => "$" . number_format($venta->valorventa - $comision->comisionvendedor, 0, ".", ","),
+                'cantidad' => sizeof($salida)
+            ];
+
+            $filename = 'reciboVenta_'.$data['recibo'].'.pdf';
+            $recibo->url = $filename;
+            $recibo->save();
+            $pdf = app('dompdf.wrapper');
+            $pdf->getDomPDF()->set_option("enable_php", true);
+            $pdf->loadView('pdf.reportpdfVenta', $data);
+
+            $output = $pdf->output();
+            file_put_contents(public_path('storage').'/pdf/'.$filename, $output, FILE_APPEND);
+            $venta->urlrecibo = url('/storage/pdf/').'/'.$filename;
+            $venta->save();
+            DB::commit();
+
+            return ['url' => url('/storage/pdf/').'/'.$filename];
+        } catch (\Exception $e) {
+            // An error occured; cancel the transaction...
+            DB::rollback();
+
+            // return redirect()->back()->withErrors(['error' => 'No se pudo registrar la venta, por favor validar los parámetros ingresados']);
+            return back()->withErrors(['error' => ['No se pudo registrar la venta, por favor validar los parámetros ingresados']]);
+            // and throw the error again.
+            //throw $e;
         }
-        $recibo = new Recibo();
-        $recibo->nombre = 'Recibo venta';
-        $recibo->url = 'Recibo venta';
-        $recibo->idusuario = Auth::user()->id;
-        $recibo->iduserdestino = $request->idvendedor;
-        $recibo->save();
-
-        $detalleventa->idventa = $venta->id;
-        $detalleventa->save();
-
-        $comision = new Comision();
-        $comision->idventa = $venta->id;
-        $comision->idconfiguracion = $concomision->id;
-        $comision->valorventa = $totalpagado;
-        $comision->comisionmayorista = $totalpagado * ($concomision->comisionmayorista/100);
-        $comision->comisiondistribuidor = $totalpagado * ($concomision->comisiondistribuidor/100);
-        $comision->comisionvendedor = $totalpagado * ($concomision->comisionvendedor/100);
-        $comision->estado = true;
-        $comision->save();
-
-        $venta->comision = $comision->comisionmayorista + $comision->comisiondistribuidor + $comision->comisionvendedor;
-        $venta->valorventa = $totalpagado;
-        $venta->valortotal = $totalventa;
-        $venta->cantidad = sizeof($salida);
-        $venta->save();
-
-        $concepto = 2;
-        $descripcion = 'Pago en efectivo';
-        $signo = self::debito;
-        $impuesto = 0;
-
-        $transaccion = new Transaccion();
-        $transaccion->idusuarioori = $request->idcliente;
-        $transaccion->idusuariodest = $request->idvendedor;
-        $transaccion->idconcepto = $concepto;
-        $transaccion->origen = 'Fisico';
-        $transaccion->destino = 'Fisico';
-        $transaccion->signo = $signo;
-        $transaccion->valor = $venta->valorventa;
-        $transaccion->impuesto = $impuesto;
-        $transaccion->descripcion = $descripcion;
-        $transaccion->soporte = $request->comprobante;
-        $transaccion->mes = $mytime->month;
-        $transaccion->ano = $mytime->year;
-        $transaccion->save();
-
-        $pago = new Pago();
-        $pago->idventa = $venta->id;
-        $pago->valortotal = $venta->valorventa;
-        $pago->idcliente = $request->idcliente;
-        $pago->idvendedor = $request->idvendedor;
-        $pago->saldo = $venta->valortotal - $venta->valorventa;
-        $pago->canal = 'Fisico';
-        $pago->descripcion = $descripcion;
-        $pago->tipo = 'Pago';
-        $pago->soporte = $request->comprobante;
-        $pago->idtransaccion = $transaccion->id;
-        $pago->idpuntoventa = $request->idpuntoventa;
-        $pago->idcaja = $request->idcaja;
-        $pago->save();
-
-        $data = [
-            'vendedor' => $request->vendedor,
-            'usuario' => $user->username,
-            'rifa' => $request->rifa,
-            'fecha' => $recibo->created_at,
-            'reservas' => $salida,
-            'recibo'  => $recibo->id,
-            'comisionvendedor' => "-$" . number_format($comision->comisionvendedor, 0, ".", ","),
-            'valortotal' => "$" . number_format($venta->valorventa, 0, ".", ","),
-            'valorentregar' => "$" . number_format($venta->valorventa - $comision->comisionvendedor, 0, ".", ","),
-            'cantidad' => sizeof($salida)
-        ];
-
-        $filename = 'reciboVenta_'.$data['recibo'].'.pdf';
-        $recibo->url = $filename;
-        $recibo->save();
-        $pdf = app('dompdf.wrapper');
-        $pdf->getDomPDF()->set_option("enable_php", true);
-        $pdf->loadView('pdf.reportpdfVenta', $data);
-
-        $output = $pdf->output();
-        file_put_contents(public_path('storage').'/pdf/'.$filename, $output, FILE_APPEND);
-        $venta->urlrecibo = url('/storage/pdf/').'/'.$filename;
-        $venta->save();
-
-        return ['url' => url('/storage/pdf/').'/'.$filename];
     }
 
     public function reportpdfAnulaMov(Request $request)
     {
-        $user = Auth::user();
-        $totalventa = 0;
-        $totalpagado = 0;
-        $toatlcomision = 0;
-        $totaldevuelto = 0;
-        $mytime= Carbon::now('America/Bogota');
-        $concomision = Confcomision::join('users as t1', 'confcomisiones.idvendedor', '=', 't1.idempresa')
-            ->select('confcomisiones.*')
-            ->where('t1.id', $request->idvendedor)
-            ->first();
+        try {
+            // Begin a transaction
+            DB::beginTransaction();
 
-        $venta = new Venta();
-        $venta->valorventa = 0;
-        $venta->impuesto = 0;
-        $venta->comision = 0;
-        $venta->valortotal = 0;
-        $venta->cantidad = 0;
-        $venta->idvendedor = $request->idvendedor;
-        $venta->idcliente = $request->idcliente;
-        $venta->idpuntoventa = $request->idpuntoventa;
-        $venta->fechaventa = $mytime->toDateTimeString();
-        $venta->comprobante = $request->comprobante;
-        $venta->estado = 9;
-        $venta->transaccion = $request->idcaja;
-        $venta->save();
+            $user = Auth::user();
+            $totalventa = 0;
+            $totalpagado = 0;
+            $toatlcomision = 0;
+            $totaldevuelto = 0;
+            $mytime= Carbon::now('America/Bogota');
 
-        foreach ($request->reservas as $reserva){
-            $reg = json_decode($reserva);
-            $boleta = Boleta::where('idrifa', $request->idrifa)
-                ->where('estado', '=', 3)
-                ->where('numero', $reg->numero)
-                ->where('idvendedor', $request->idvendedor)
+            $concomision = Confcomision::where('idvendedor', $request->idvendedor)
+                ->where('estado', 2)
                 ->first();
-            $reg->comision = -$reg->valorpagado * ($concomision->comisionvendedor/100);
-            $toatlcomision += $reg->comision;
-            $salida[] = $reg;
-            $totalventa += $boleta->valor;
-            $totalpagado += $reg->valorpagado;
-            $boleta->pago = $boleta->pago - $reg->valorpagado;
-            $boleta->saldo = $boleta->valor - $boleta->pago;
-            if ($boleta->pago == 0) {
-                $boleta->estado = 2;
-                $boleta->idvendedor = $request->idvendedor;
-                $boleta->idcliente = null;
-            } else {
-                $boleta->estado = 3;
-                $boleta->idvendedor = $request->idvendedor;
-                $boleta->idcliente = $request->idcliente;
+            if (is_null($concomision)) {
+                $concomision = Confcomision::join('users as t1', 'confcomisiones.idvendedor', '=', 't1.idempresa')
+                    ->select('confcomisiones.*')
+                    ->where('t1.id', $request->idvendedor)
+                    ->first();
             }
-            $boleta->save();
 
-            $detalleventa = new Detalleventa();
+            $venta = new Venta();
+            $venta->valorventa = 0;
+            $venta->impuesto = 0;
+            $venta->comision = 0;
+            $venta->valortotal = 0;
+            $venta->cantidad = 0;
+            $venta->idvendedor = $request->idvendedor;
+            $venta->idcliente = $request->idcliente;
+            $venta->idpuntoventa = $request->idpuntoventa;
+            $venta->fechaventa = $mytime->toDateTimeString();
+            $venta->comprobante = $request->comprobante;
+            $venta->estado = 9;
+            $venta->transaccion = $request->idcaja;
+            $venta->save();
+
+            foreach ($request->reservas as $reserva){
+                $reg = json_decode($reserva);
+
+                $boleta = Boleta::where('idrifa', $request->idrifa)
+                    ->whereIn('estado', [3,4])
+                    ->where('numero', $reg->numero)
+                    ->where('idvendedor', $request->idvendedor)
+                    ->first();
+                $reg->comision = -$reg->valorpagado * ($concomision->comisionvendedor/100);
+                $toatlcomision += $reg->comision;
+                $salida[] = $reg;
+                $totalventa += $boleta->valor;
+                $totalpagado += $reg->valorpagado;
+                $boleta->pago = $boleta->pago - $reg->valorpagado;
+                $boleta->saldo = $boleta->valor - $boleta->pago;
+
+                $idclientetmp = $boleta->idcliente;
+                if ($boleta->pago == 0) {
+                    $boleta->estado = 2;
+                    $boleta->idvendedor = $request->idvendedor;
+                    $boleta->idcliente = null;
+                } else {
+                    $boleta->estado = 3;
+                    $boleta->idvendedor = $request->idvendedor;
+                }
+                if ($boleta->saldo == 0) {
+                    $boleta->estado = 3;
+                } else {
+                    $boleta->estado = 4;
+                }
+                $boleta->save();
+
+                $detalleventa = new Detalleventa();
+                $detalleventa->idventa = $venta->id;
+                $detalleventa->idboleta = $boleta->id;
+                $detalleventa->idrifa = $request->idrifa;
+                $detalleventa->valor = -$reg->valorpagado;
+                $detalleventa->idcliente = $idclientetmp;
+                $detalleventa->impuesto = 0;
+                $detalleventa->comision = -$reg->comision;
+                $detalleventa->valortotal = $boleta->valor;
+                $detalleventa->numero = $reg->numero;
+                $detalleventa->cantidad = 1;
+                $detalleventa->estado = 9;
+                $detalleventa->save();
+
+                $reg->valorpagado = "$" . number_format($reg->valorpagado, 0, ".", ",");
+                $reg->comision = "$" . number_format($reg->comision, 0, ".", ",");
+            }
+            $recibo = new Recibo();
+            $recibo->nombre = 'Recibo anulacion venta';
+            $recibo->url = 'Recibo anulacion venta';
+            $recibo->idusuario = Auth::user()->id;
+            $recibo->iduserdestino = $request->idvendedor;
+            $recibo->save();
+
             $detalleventa->idventa = $venta->id;
-            $detalleventa->idboleta = $boleta->id;
-            $detalleventa->idrifa = $request->idrifa;
-            $detalleventa->valor = -$reg->valorpagado;
-            $detalleventa->idcliente = $request->idcliente;
-            $detalleventa->impuesto = 0;
-            $detalleventa->comision = -$reg->comision;
-            $detalleventa->valortotal = $boleta->valor;
-            $detalleventa->numero = $reg->numero;
-            $detalleventa->cantidad = 1;
-            $detalleventa->estado = 9;
             $detalleventa->save();
 
-            $reg->valorpagado = "$" . number_format($reg->valorpagado, 0, ".", ",");
-            $reg->comision = "$" . number_format($reg->comision, 0, ".", ",");
+            $comision = new Comision();
+            $comision->idventa = $venta->id;
+            $comision->idconfiguracion = $concomision->id;
+            $comision->valorventa = -$totalpagado;
+            $comision->comisionmayorista = -$totalpagado * ($concomision->comisionmayorista/100);
+            $comision->comisiondistribuidor = -$totalpagado * ($concomision->comisiondistribuidor/100);
+            $comision->comisionvendedor = -$totalpagado * ($concomision->comisionvendedor/100);
+            $comision->estado = true;
+            $comision->save();
+
+            $venta->comision = $comision->comisionmayorista + $comision->comisiondistribuidor + $comision->comisionvendedor;
+            $venta->valorventa = -$totalpagado;
+            $venta->valortotal = $totalventa;
+            $venta->cantidad = sizeof($salida);
+            $venta->save();
+
+            $concepto = 5;
+            $descripcion = 'Anulación Pago en efectivo';
+            $signo = self::credito;
+            $impuesto = 0;
+
+            $transaccion = new Transaccion();
+            $transaccion->idusuarioori = $request->idvendedor;
+            $transaccion->idusuariodest = $request->idvendedor;
+            $transaccion->idconcepto = $concepto;
+            $transaccion->origen = 'Fisico';
+            $transaccion->destino = 'Fisico';
+            $transaccion->signo = $signo;
+            $transaccion->valor = $venta->valorventa;
+            $transaccion->impuesto = $impuesto;
+            $transaccion->descripcion = $descripcion;
+            $transaccion->soporte = $request->comprobante;
+            $transaccion->mes = $mytime->month;
+            $transaccion->ano = $mytime->year;
+            $transaccion->save();
+
+            $pago = new Pago();
+            $pago->idventa = $venta->id;
+            $pago->valortotal = $venta->valorventa;
+            $pago->idcliente = $request->idcliente;
+            $pago->idvendedor = $request->idvendedor;
+            $pago->saldo = $venta->valortotal - $venta->valorventa;
+            $pago->canal = 'Fisico';
+            $pago->descripcion = $descripcion;
+            $pago->tipo = 'Devolucion Pago';
+            $pago->soporte = $request->comprobante;
+            $pago->idtransaccion = $transaccion->id;
+            $pago->idpuntoventa = $request->idpuntoventa;
+            $pago->idcaja = $request->idcaja;
+            $pago->save();
+
+            $data = [
+                'vendedor' => $request->vendedor,
+                'usuario' => $user->username,
+                'rifa' => $request->rifa,
+                'fecha' => $recibo->created_at,
+                'reservas' => $salida,
+                'recibo'  => $recibo->id,
+                'comisionvendedor' => "$" . number_format($comision->comisionvendedor, 0, ".", ","),
+                'valortotal' => "$" . number_format($venta->valorventa, 0, ".", ","),
+                'valorentregar' => "$" . number_format($venta->valorventa - $comision->comisionvendedor, 0, ".", ","),
+                'cantidad' => sizeof($salida)
+            ];
+
+            $filename = 'reciboAnulacionVenta_'.$data['recibo'].'.pdf';
+            $recibo->url = $filename;
+            $recibo->save();
+            $pdf = app('dompdf.wrapper');
+            $pdf->getDomPDF()->set_option("enable_php", true);
+            $pdf->loadView('pdf.reportpdfAnulacionVenta', $data);
+
+            $output = $pdf->output();
+            file_put_contents(public_path('storage').'/pdf/'.$filename, $output, FILE_APPEND);
+            $venta->urlrecibo = url('/storage/pdf/').'/'.$filename;
+            $venta->save();
+
+            DB::commit();
+
+            return ['url' => url('/storage/pdf/').'/'.$filename];
+        } catch (\Exception $e) {
+            // An error occured; cancel the transaction...
+            DB::rollback();
+
+            return back()->withErrors(['error' => ['No se pudo registrar la venta, por favor validar los parámetros ingresados']]);
+            // and throw the error again.
+            //throw $e;
         }
-        $recibo = new Recibo();
-        $recibo->nombre = 'Recibo anulacion venta';
-        $recibo->url = 'Recibo anulacion venta';
-        $recibo->idusuario = Auth::user()->id;
-        $recibo->iduserdestino = $request->idvendedor;
-        $recibo->save();
 
-        $detalleventa->idventa = $venta->id;
-        $detalleventa->save();
-
-        $comision = new Comision();
-        $comision->idventa = $venta->id;
-        $comision->idconfiguracion = $concomision->id;
-        $comision->valorventa = -$totalpagado;
-        $comision->comisionmayorista = -$totalpagado * ($concomision->comisionmayorista/100);
-        $comision->comisiondistribuidor = -$totalpagado * ($concomision->comisiondistribuidor/100);
-        $comision->comisionvendedor = -$totalpagado * ($concomision->comisionvendedor/100);
-        $comision->estado = true;
-        $comision->save();
-
-        $venta->comision = $comision->comisionmayorista + $comision->comisiondistribuidor + $comision->comisionvendedor;
-        $venta->valorventa = -$totalpagado;
-        $venta->valortotal = $totalventa;
-        $venta->cantidad = sizeof($salida);
-        $venta->save();
-
-        $concepto = 5;
-        $descripcion = 'Anulación Pago en efectivo';
-        $signo = self::credito;
-        $impuesto = 0;
-
-        $transaccion = new Transaccion();
-        $transaccion->idusuarioori = $request->idvendedor;
-        $transaccion->idusuariodest = $request->idcliente;
-        $transaccion->idconcepto = $concepto;
-        $transaccion->origen = 'Fisico';
-        $transaccion->destino = 'Fisico';
-        $transaccion->signo = $signo;
-        $transaccion->valor = $venta->valorventa;
-        $transaccion->impuesto = $impuesto;
-        $transaccion->descripcion = $descripcion;
-        $transaccion->soporte = $request->comprobante;
-        $transaccion->mes = $mytime->month;
-        $transaccion->ano = $mytime->year;
-        $transaccion->save();
-
-        $pago = new Pago();
-        $pago->idventa = $venta->id;
-        $pago->valortotal = $venta->valorventa;
-        $pago->idcliente = $request->idcliente;
-        $pago->idvendedor = $request->idvendedor;
-        $pago->saldo = $venta->valortotal - $venta->valorventa;
-        $pago->canal = 'Fisico';
-        $pago->descripcion = $descripcion;
-        $pago->tipo = 'Devolucion Pago';
-        $pago->soporte = $request->comprobante;
-        $pago->idtransaccion = $transaccion->id;
-        $pago->idpuntoventa = $request->idpuntoventa;
-        $pago->idcaja = $request->idcaja;
-        $pago->save();
-
-        $data = [
-            'vendedor' => $request->vendedor,
-            'usuario' => $user->username,
-            'rifa' => $request->rifa,
-            'fecha' => $recibo->created_at,
-            'reservas' => $salida,
-            'recibo'  => $recibo->id,
-            'comisionvendedor' => "$" . number_format($comision->comisionvendedor, 0, ".", ","),
-            'valortotal' => "$" . number_format($venta->valorventa, 0, ".", ","),
-            'valorentregar' => "$" . number_format($venta->valorventa - $comision->comisionvendedor, 0, ".", ","),
-            'cantidad' => sizeof($salida)
-        ];
-
-        $filename = 'reciboAnulacionVenta_'.$data['recibo'].'.pdf';
-        $recibo->url = $filename;
-        $recibo->save();
-        $pdf = app('dompdf.wrapper');
-        $pdf->getDomPDF()->set_option("enable_php", true);
-        $pdf->loadView('pdf.reportpdfAnulacionVenta', $data);
-
-        $output = $pdf->output();
-        file_put_contents(public_path('storage').'/pdf/'.$filename, $output, FILE_APPEND);
-        $venta->urlrecibo = url('/storage/pdf/').'/'.$filename;
-        $venta->save();
-
-        return ['url' => url('/storage/pdf/').'/'.$filename];
     }
 
 }

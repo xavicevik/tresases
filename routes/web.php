@@ -2,6 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Exports\BoletasExport;
+use App\Exports\VentasExport;
+use App\Imports\NumeroreservadoImport;
+use \Illuminate\Http\Request;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -27,6 +31,8 @@ use \App\Http\Controllers\TransaccionController;
 use \App\Models\Loteria;
 use \App\Models\Rol;
 use \App\Models\Terminosycondiciones;
+use App\Exports\ProductsExport;
+use Maatwebsite\Excel\Facades\Excel;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -91,21 +97,33 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'),'verified',]
             return Inertia::render('Dashboard');
         })->name('dashboard');
 
+        // export
+        Route::get('/users/export', [UserController::class, 'UsersExport'])->name('users.export');
+        Route::get('/clientes/export', [UserController::class, 'ClientesExport'])->name('clientes.export');
+
+        Route::get('/boletas/export', function (Request $request) {
+            return Excel::download(new BoletasExport($request), 'boletas.xlsx');
+        })->name('boletas.export');
+
+        Route::get('/reservas/export', function (Request $request) {
+            return Excel::download(new VentasExport($request), 'reservas.xlsx');
+        })->name('reservas.export');
+
+        Route::post('/numerosreservados/import', function (Request $request) {
+            Excel::import(new NumeroreservadoImport($request), $request->file('file')->getRealPath());
+            return redirect()->back()->with('success', 'All good!');
+        })->name('numerosreservados.import');
+
 
         Route::get('/loterias', [MasterController::class, 'loterias'])->name('loterias');
         Route::get('/terminos', [MasterController::class, 'terminos'])->name('terminos');
-
         Route::get('/users/getClientes', [UserController::class, 'getClientes'])->name('users.clientes');
-
         Route::get('/ventas/sumary', [VentaController::class, 'sumary'])->name('sumary');
-
         Route::resource('series', SerieController::class);
 
         Route::get('/users/getVendedoresActivos', [UserController::class, 'getVendedoresActivos'])->name('users.getVendedoresActivos');
-
         Route::get('/users/getClientesActivos', [UserController::class, 'getClientesActivos'])->name('users.getClientesActivos');
         Route::get('/users/indexclientes', [UserController::class, 'indexclientes'])->name('users.indexclientes');
-
 
         Route::resource('users', UserController::class);
 
@@ -126,15 +144,17 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'),'verified',]
         Route::post('/cajas/apertura', [CajaController::class, 'apertura'])->name('cajas.apertura');
        // Route::post('/cajas/cierre', [CajaController::class, 'cierre'])->name('cajas.cierre');
         Route::get('/cajas/cierre', [CajaController::class, 'cierre'])->name('cajas.cierre');
+        Route::get('/cajas/printcierre', [CajaController::class, 'printcierre'])->name('cajas.printcierre');
         Route::get('/cajas', [CajaController::class, 'index'])->name('cajas.index');
         Route::get('/cajas/historial', [CajaController::class, 'historial'])->name('cajas.historial');
+        Route::get('/cajas/getHistorial', [CajaController::class, 'getHistorial'])->name('cajas.getHistorial');
+
         Route::resource('transacciones',TransaccionController::class);
         Route::resource('pagos',Pagocontroller::class);
 
         Route::get('/ventas/getComisiones', [VentaController::class, 'getComisiones'])->name('ventas.getComisiones');
         Route::get('/ventas/reportpdfRegistroMov', [VentaController::class, 'reportpdfRegistroMov'])->name('ventas.reportpdfRegistroMov');
         Route::get('/ventas/reportpdfAnulaMov', [VentaController::class, 'reportpdfAnulaMov'])->name('ventas.reportpdfAnulaMov');
-        Route::get('/cajas/reportpdfCierreCaja', [CajaController::class, 'reportpdfCierreCaja'])->name('cajas.reportpdfCierreCaja');
 
         Route::resource('rifas', RifaController::class);
         Route::resource('confcomisiones',ConfcomisionController::class);
@@ -166,6 +186,7 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'),'verified',]
         Route::get('/cart/validarId', [CartController::class, 'validarId'])->name('validarId');
         Route::resource('/cart', CartController::class);
 
+        Route::get('/master/getDashboard', [MasterController::class, 'getDashboard'])->name('master.getDashboard');
         Route::get('/master/getEmpresas', [MasterController::class, 'getEmpresas'])->name('master.getEmpresas');
         Route::get('/master/getRoles', [MasterController::class, 'getRoles'])->name('master.getRoles');
         Route::get('/master/index', [MasterController::class, 'rolesIndex'])->name('master.index');
@@ -183,6 +204,8 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'),'verified',]
 
         Route::get('/enviar', [EmailController::class, 'send'])->name('enviar');
         Route::get('/detalleventa', [EmailController::class, 'send'])->name('detalleventa');
+
+
 
     //});
 });

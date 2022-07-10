@@ -83,7 +83,12 @@
                                         </label>
                                     </div>
                                 </div>
-                                <button type="button" @click="getUsers('', '', form)" class="mx-auto text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">Buscar</button>
+                                <div class="flex mx-auto">
+                                    <button type="button" @click="getUsers('', '', form)" class="mx-auto text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">Buscar</button>
+                                    <a  href="#" @click="UsersExport(form)">
+                                        <svg xmlns="http://www.w3.org/2000/svg"  viewBox="0 0 48 48" class="h-8 w-8"><path fill="#4CAF50" d="M41,10H25v28h16c0.553,0,1-0.447,1-1V11C42,10.447,41.553,10,41,10z"/><path fill="#FFF" d="M32 15H39V18H32zM32 25H39V28H32zM32 30H39V33H32zM32 20H39V23H32zM25 15H30V18H25zM25 25H30V28H25zM25 30H30V33H25zM25 20H30V23H25z"/><path fill="#2E7D32" d="M27 42L6 38 6 10 27 6z"/><path fill="#FFF" d="M19.129,31l-2.411-4.561c-0.092-0.171-0.186-0.483-0.284-0.938h-0.037c-0.046,0.215-0.154,0.541-0.324,0.979L13.652,31H9.895l4.462-7.001L10.274,17h3.837l2.001,4.196c0.156,0.331,0.296,0.725,0.42,1.179h0.04c0.078-0.271,0.224-0.68,0.439-1.22L19.237,17h3.515l-4.199,6.939l4.316,7.059h-3.74V31z"/></svg>
+                                    </a>
+                                </div>
                             </form>
                         </div>
                     </section>
@@ -162,23 +167,6 @@
                                         </button>
                                     </th>
                                     <th class="px-4 py-2 text-sm font-bold w-1/12 hover:bg-blue-500 hover:text-gray-50 rounded-b">
-                                        <button @click="getUsers(buscar, 'fechafin')" class="font-bold">
-                                            Perfil
-                                            <div v-show="sortBy == 'fechafin'">
-                                                <span v-show="!sortOrder">
-                                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
-                                                        <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
-                                                    </svg>
-                                                </span>
-                                                <span v-show="sortOrder">
-                                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
-                                                      <path fill-rule="evenodd" d="M14.707 12.707a1 1 0 01-1.414 0L10 9.414l-3.293 3.293a1 1 0 01-1.414-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 010 1.414z" clip-rule="evenodd" />
-                                                    </svg>
-                                                </span>
-                                            </div>
-                                        </button>
-                                    </th>
-                                    <th class="px-4 py-2 text-sm font-bold w-1/12 hover:bg-blue-500 hover:text-gray-50 rounded-b">
                                         <button @click="getUsers(buscar, 'estado')" class="font-bold">
                                             Estado
                                             <div v-show="sortBy == 'estado'">
@@ -204,7 +192,6 @@
                                     <td class="border px-1 py-2 text-sm truncate" v-text="user.nombre + ' ' + user.apellido"></td>
                                     <td class="border px-1 py-2 text-sm truncate" v-text="user.movil"></td>
                                     <td class="border px-1 py-2 text-sm truncate" v-text="user.correo"></td>
-                                    <td class="border px-1 py-2 text-sm truncate" v-text="user.rol.nombre"></td>
                                     <td class="border px-2 py-2 text-sm truncate" v-if="user.estado">
                                         <span class="inline-flex px-2 text-sm font-semibold leading-5 text-green-800 bg-green-100 rounded-full">
                                             Activo
@@ -399,7 +386,7 @@
                                                             <div class="mt-1">
                                                                 <select :disabled="verMode" @change="getEmpresas()" :class="{'bg-blue-100' : verMode}" class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" v-model="form.idrol">
                                                                     <option value="0" >Seleccione Rol</option>
-                                                                    <option v-for="rol in arrayRoles" :key="rol.id" :value="rol.id" v-text="rol.nombre"></option>
+                                                                    <option v-show="rol.id == 2"  v-for="rol in arrayRoles" :key="rol.id" :value="rol.id" v-text="rol.nombre"></option>
                                                                 </select>
                                                                 <div v-if="$page.props.errors.idrol" class="text-red-500">{{ $page.props.errors.idrol }}</div>
                                                             </div>
@@ -790,32 +777,21 @@ export default {
         reset: function () {
             this.tituloModal = 'Crear nuevo rifa de venta';
             this.form.id = null;
-            this.form.titulo = null;
-            this.form.resolucion = null;
-            this.form.estado = false;
             this.form.nombre = null;
-            this.form.descripcion = null;
-            this.form.nombre_tecnico = null;
-            this.form.resumen = null;
-            this.form.url = null;
-            this.form.idloteria = 0;
+            this.form.documento = null;
+            this.form.apellido = null;
+            this.form.correo = null;
+            this.form.telefono = null;
+            this.form.movil = null;
+            this.form.username = null;
+            this.form.password = null;
             this.form.idpais = 0;
             this.form.iddepartamento = 0;
             this.form.idciudad = 0;
-            this.form.cifras = 0;
-            this.form.precio = 0;
-            this.form.fechainicio = null;
+            this.form.direccion = null;
+            this.form.idrol = 0;
+            this.form.idempresa = null;
             this.form.fechafin = null;
-            this.form.promocional = null;
-            this.form.publicar = null;
-            this.form.destacada = null;
-            this.form.principal = null;
-            this.form.urlimagen2 = null;
-            this.form.urlimagen1 = null;
-            this.form.idterminos = 0;
-            this.form.idcreador = 0;
-            this.form.files1 = [];
-            this.form.files2 = [];
         },
         save: function (data) {
             this.$inertia.post('/users', data, {
@@ -902,6 +878,25 @@ export default {
                 } else {
                     this.existeuser = 0;
                 }
+            })
+        },
+        UsersExport: function (filtros = []) {
+            let fecha = moment(new Date()).format('DDMMYYYY');
+            var url= '/clientes/export';
+            axios.get(url, {
+                params: {
+                    filtros: filtros,
+                },
+                responseType: 'blob',
+            }).then((response) => {
+                var fileURL = window.URL.createObjectURL(new Blob([response.data]));
+                var fileLink = document.createElement('a');
+
+                fileLink.href = fileURL;
+                fileLink.setAttribute('download', 'clientes_'+ fecha + '.xlsx');
+                document.body.appendChild(fileLink);
+
+                fileLink.click();
             })
         },
         getLoterias: function () {

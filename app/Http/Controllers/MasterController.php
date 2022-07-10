@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Boleta;
 use App\Models\Empresa;
 use App\Models\Loteria;
 use App\Models\Pais;
@@ -9,6 +10,7 @@ use App\Models\Rol;
 use App\Models\Serie;
 use App\Models\Terminosycondiciones;
 use App\Models\TiposDocumento;
+use App\Models\User;
 use Illuminate\Http\Request;
 
 use Illuminate\Support\Facades\Auth;
@@ -335,49 +337,59 @@ class MasterController extends Controller
 
     public function getEmpresas(Request $request)
     {
-        if(!$request->has('idpadre')){
-            switch ($request->idrol) {
-                case 1:
-                    $empresas = Empresa::where('id', 3)->get();
-                    break;
-                case 2:
-                    $empresas = Empresa::where('id', 3)->get();
-                    break;
-                case 3:
-                    $empresas = Empresa::where('idtipoempresa', 2)->get();
-                    break;
-                case 4:
-                    $empresas = Empresa::where('idtipoempresa',  1)->get();
-                    break;
-                case 5:
-                    $empresas = Empresa::where('idtipoempresa', 3)->get();
-                    break;
-                default:
-                    $empresas = Empresa::all();
-                    break;
-            }
+        $estado = $request->estado;
+
+        if($request->has('estado') && $estado == 2) {
+            $empresas = User::join('empresas', 'users.idempresa', '=', 'empresas.id')
+                              ->where('users.idrol', 5)
+                              ->where('empresas.idpadre', $request->idpadre)
+                              ->select('users.id as id', DB::raw('CONCAT(users.nombre, " ", users.apellido) AS razon_social'))
+                              ->get();
         } else {
-            switch ($request->idrol) {
-                case 1:
-                    $empresas = Empresa::where('id', 3)->where('idpadre', $request->idpadre)->get();
-                    break;
-                case 2:
-                    $empresas = Empresa::where('id', 3)
-                                       ->where('idpadre', $request->idpadre)
-                                       ->get();
-                    break;
-                case 3:
-                    $empresas = Empresa::where('idtipoempresa', 2)->where('idpadre', $request->idpadre)->get();
-                    break;
-                case 4:
-                    $empresas = Empresa::where('idtipoempresa',  1)->where('idpadre', $request->idpadre)->get();
-                    break;
-                case 5:
-                    $empresas = Empresa::where('idtipoempresa', 3)->where('idpadre', $request->idpadre)->get();
-                    break;
-                default:
-                    $empresas = Empresa::all();
-                    break;
+            if (!$request->has('idpadre')) {
+                switch ($request->idrol) {
+                    case 1:
+                        $empresas = Empresa::where('id', 3)->get();
+                        break;
+                    case 2:
+                        $empresas = Empresa::where('id', 3)->get();
+                        break;
+                    case 3:
+                        $empresas = Empresa::where('idtipoempresa', 2)->get();
+                        break;
+                    case 4:
+                        $empresas = Empresa::where('idtipoempresa', 1)->get();
+                        break;
+                    case 5:
+                        $empresas = Empresa::where('idtipoempresa', 3)->get();
+                        break;
+                    default:
+                        $empresas = Empresa::all();
+                        break;
+                }
+            } else {
+                switch ($request->idrol) {
+                    case 1:
+                        $empresas = Empresa::where('id', 3)->where('idpadre', $request->idpadre)->get();
+                        break;
+                    case 2:
+                        $empresas = Empresa::where('id', 3)
+                            ->where('idpadre', $request->idpadre)
+                            ->get();
+                        break;
+                    case 3:
+                        $empresas = Empresa::where('idtipoempresa', 2)->where('idpadre', $request->idpadre)->get();
+                        break;
+                    case 4:
+                        $empresas = Empresa::where('idtipoempresa', 1)->where('idpadre', $request->idpadre)->get();
+                        break;
+                    case 5:
+                        $empresas = Empresa::where('idtipoempresa', 3)->where('idpadre', $request->idpadre)->get();
+                        break;
+                    default:
+                        $empresas = Empresa::all();
+                        break;
+                }
             }
         }
 
@@ -397,4 +409,12 @@ class MasterController extends Controller
 
         return ['terminos' => $terminos];
     }
+
+    public function getDashboard(Request $request)
+    {
+        $boletasdisponibles = Boleta::where('1')->get()->count();;
+
+        return ['terminos' => $boletasdisponibles];
+    }
+
 }

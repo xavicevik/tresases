@@ -32,6 +32,7 @@ class NumeroreservadoController extends Controller
      */
     public function index(Request $request)
     {
+        $token = csrf_token();
         $filtros = json_decode($request->filtros);
 
         if ($request->has('sortBy') && $request->sortBy <> ''){
@@ -91,7 +92,7 @@ class NumeroreservadoController extends Controller
         if ($request->has('ispage') && $request->ispage){
             return ['datos' => $boletas];
         } else {
-            return Inertia::render('Rifas/Numerosreservados', ['datos' => $boletas, 'estado' => $request->estado]);
+            return Inertia::render('Rifas/Numerosreservados', ['datos' => $boletas, 'estado' => $request->estado, '_token' => $token]);
         }
     }
 
@@ -168,6 +169,7 @@ class NumeroreservadoController extends Controller
             $estado = true;
         } else {
             $boleta = Boleta::where('idrifa', $idrifa)
+                ->with('cliente')
                 ->where('numero', $numero)
                 ->where('idvendedor', $idvendedor)
                 ->whereIn('estado', [2,4])
@@ -189,6 +191,7 @@ class NumeroreservadoController extends Controller
         $estado = false;
 
         $boleta = Boleta::where('idrifa', $idrifa)
+            ->with('cliente')
             ->whereIn('estado', [3,4])
             ->where('idvendedor', $request->idvendedor)
             ->where('numero', $numero)

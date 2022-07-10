@@ -45,12 +45,14 @@ class ConfcomisionController extends Controller
         if ($buscar == ''){
             $comision = Confcomision::orderBy($sortBy, $sortOrder)
                 ->with('vendedor')
+                ->with('agente')
                 ->with('mayorista')
                 ->with('distribuidor')
                 ->paginate(self::canPorPagina);
         } else {
             $comision = Confcomision::orderBy($sortBy, $sortOrder)
                 ->with('vendedor')
+                ->with('agente')
                 ->with('mayorista')
                 ->with('distribuidor')
                 ->paginate(self::canPorPagina);

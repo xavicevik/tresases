@@ -69,7 +69,7 @@ class User extends Authenticatable
 
 
     public function scopeUserApp($query) {
-        return $query->where('idrol', '<>', '2')->where('idrol', '<>', '1');
+        return $query->where('idrol', '<>', '2')->where('idrol', '<>', '6');
     }
 
     public function scopeClientesApp($query) {
