@@ -78,7 +78,7 @@ export default {
                     <img class="w-7 h-7 md:w-10 md:h-10 mr-2 rounded-md overflow-hidden" src="https://therminic2018.eu/wp-content/uploads/2018/07/dummy-avatar.jpg" />
                     <span class="hidden md:block">
                         {{ $page.props.auth.user.roles[0].name }}<br>
-                        {{ $page.props.user.username }}
+                        {{ $page.props.user.full_name }}
                     </span>
 
                 </div>
@@ -244,16 +244,6 @@ export default {
                                   </svg>
                                 </span>
                                     <span class="ml-2 text-sm tracking-wide truncate">Boletas</span>
-                                </Link>
-                            </li>
-                            <li>
-                                <Link v-if="$can('rifas-create')" :href="route('rifas.create')" href="#" class="relative flex flex-row items-center h-8 focus:outline-none hover:bg-blue-800 dark:hover:bg-gray-600 text-white-600 hover:text-white-800 border-l-4 border-transparent hover:border-blue-500 dark:hover:border-gray-800 pr-6">
-                                <span class="inline-flex justify-center items-center ml-4">
-                                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                                      <path fill-rule="evenodd" d="M10 2a4 4 0 00-4 4v1H5a1 1 0 00-.994.89l-1 9A1 1 0 004 18h12a1 1 0 00.994-1.11l-1-9A1 1 0 0015 7h-1V6a4 4 0 00-4-4zm2 5V6a2 2 0 10-4 0v1h4zm-6 3a1 1 0 112 0 1 1 0 01-2 0zm7-1a1 1 0 100 2 1 1 0 000-2z" clip-rule="evenodd" />
-                                  </svg>
-                                </span>
-                                    <span class="ml-2 text-sm tracking-wide truncate">Nueva</span>
                                 </Link>
                             </li>
                             <li>

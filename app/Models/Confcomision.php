@@ -24,6 +24,11 @@ class Confcomision extends Model
         return $this->belongsTo(Empresa::class, 'idvendedor')->where('idtipoempresa', 3);
     }
 
+    public function agente()
+    {
+        return $this->belongsTo(User::class, 'idvendedor');
+    }
+
     public function distribuidor(){
         return $this->belongsTo(Empresa::class, 'iddistribuidor')->where('idtipoempresa', 2);
     }

@@ -18,24 +18,36 @@
                                     Historial de movimientos de cajas
                                 </h1>
                             </div>
-
-                            <div class="w-1/3">
-                                <div class="container flex justify-center items-center">
-                                    <div class="relative">
-                                        <div class="absolute top-4 left-3">
-                                            <i class="fa fa-search text-gray-400 z-20 hover:text-gray-500"></i> </div>
-                                        <input type="text" v-model="buscar" @keyup="getCajas(buscar,'id')" class="h-8 w-96 pl-4 pr-4 rounded-lg z-0 focus:shadow focus:outline-none" placeholder="Buscar (Nombre, Apellido, Correo, Usuario)">
-                                        <button @click="getCajas(buscar,'id')">
-                                            <div class="absolute top-2 right-2">
-                                                <Icon icon="fe:search" class="h-4"  />
-                                            </div>
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="pr-2 w-1/3 text-center">
-                            </div>
                         </div>
+                        <section>
+                            <div class="px-4">
+                                <form>
+                                    <div class="grid xl:grid-cols-2 xl:gap-6">
+                                        <div class="relative z-0 w-full mb-4 group">
+                                            <input type="text" v-model="form.vendedor" class="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border-blue-600 peer" placeholder=" " required />
+                                            <label class="peer-focus:font-medium absolute text-sm text-gray-500 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:left-0 peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6">
+                                                Usuario
+                                            </label>
+                                        </div>
+                                        <div class="relative z-0 w-full mb-4 group">
+                                            <input type="text" v-model="form.puntoventa" class="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border-blue-600 peer" placeholder=" " required />
+                                            <label class="peer-focus:font-medium absolute text-sm text-gray-500 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:left-0 peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6">
+                                                Punto de venta
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div class="grid xl:grid-cols-2 xl:gap-6">
+                                        <div class="relative z-0 w-full mb-4 group">
+                                            <Datepicker v-model="form.fechainicio" autoApply placeholder="Fecha inicio" class="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 appearance-none focus:outline-none focus:ring-0 focus:border-blue-600 peer"/>
+                                        </div>
+                                        <div class="relative z-0 w-full mb-4 group">
+                                            <Datepicker v-model="form.fechafin" autoApply placeholder="Fecha fin" class="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 appearance-none focus:outline-none focus:ring-0 focus:border-blue-600 peer"/>
+                                        </div>
+                                    </div>
+                                    <button type="button" @click="getData(form)" class="mx-auto text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center">Buscar</button>
+                                </form>
+                            </div>
+                        </section>
                     </section>
                     <!-- Fin Encabezado y titulo -->
                     <!-- Tabla de contenido -->
@@ -200,7 +212,7 @@
                                 </tr>
                                 </thead>
                                 <tbody>
-                                <tr :class="dato.id === selectedRow ? 'bg-blue-200' : ''"  class="text-left hover:bg-blue-400" @click="rowSelect(dato.id); getDetallesVentas(dato.id)" text-sm v-if="arrayCajas.data" v-for="(dato, id) in arrayCajas.data" :key="id">
+                                <tr :class="dato.id === selectedRow ? 'bg-blue-200' : '', (dato.recaudoefectivo - dato.comisionventa - dato.montocierre) != 0? 'text-red-600' : ''"  class="text-left hover:bg-blue-400" @click="rowSelect(dato.id); getDetallesVentas(dato.id)" text-sm v-if="arrayCajas.data" v-for="(dato, id) in arrayCajas.data" :key="id">
                                     <td class="border px-1 py-2 text-sm truncate" v-text="dato.id"></td>
                                     <td class="border px-1 py-2 text-sm truncate" v-text="dato.puntoventa.nombre"></td>
                                     <td class="border px-1 py-2 text-sm truncate" v-text="dato.vendedor.full_name"></td>
@@ -507,12 +519,10 @@ export default {
             selectedRow: null,
             selectedRow2: null,
             form: {
-                id: null,
-                fechaapertura: null,
-                fechacierre: null,
-                montoapertura: 0.0,
-                montocierre: 0.0,
-                estado: 0,
+                fechainicio: null,
+                fechafin: null,
+                puntoventa: null,
+                vendedor: null,
             },
             editMode: false,
             verMode: false,
@@ -793,7 +803,32 @@ export default {
             })
 
         },
+        getData: function (filtros = [], sortBy = 'historialcajas.id') {
+            if (sortBy == this.sortBy){
+                this.sortOrder = !this.sortOrder;
+            }
+            let sortOrderdesc;
+            if (this.sortOrder){
+                sortOrderdesc = 'asc';
+            } else {
+                sortOrderdesc = 'desc';
+            }
+            this.sortBy = sortBy;
+            this.ispage = true;
 
+            var url= '/cajas/getHistorial';
+            axios.get(url, {
+                params: {
+                    filtros: filtros,
+                    sortBy: this.sortBy,
+                    sortOrder: sortOrderdesc,
+                    ispage: this.ispage
+                }
+            }).then((res) => {
+                var respuesta = res.data;
+                this.arrayCajas = respuesta.data;
+            })
+        },
         cajasAbiertas: async function () {
             var url= '/cajas/open';
             axios.get(url, {

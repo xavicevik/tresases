@@ -1,6 +1,7 @@
 <template>
     <AppLayout title="Comisiones">
 
+        <Statscards></Statscards>
         <template #header>
             <h2 class="font-semibold text-xl text-gray-800 leading-tight">
                 Configuración de comisiones
@@ -164,6 +165,23 @@
                                             </div>
                                         </button>
                                     </th>
+                                    <th class="px-4 py-2 text-sm font-bold w-1/12 hover:bg-blue-500 hover:text-gray-50 rounded-b">
+                                        <button @click="getCajas(buscar, 'id')" class="font-bold">
+                                            Tipo Comisión
+                                            <div v-show="sortBy == 'fechafin'">
+                                                <span v-show="!sortOrder">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                                                        <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+                                                    </svg>
+                                                </span>
+                                                <span v-show="sortOrder">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                                                      <path fill-rule="evenodd" d="M14.707 12.707a1 1 0 01-1.414 0L10 9.414l-3.293 3.293a1 1 0 01-1.414-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 010 1.414z" clip-rule="evenodd" />
+                                                    </svg>
+                                                </span>
+                                            </div>
+                                        </button>
+                                    </th>
 
                                     <th class="lg:px-4 md:px-1 mx-auto py-2 text-sm font-bold lg:w-1/12 md:w-1/11 hover:bg-blue-500 hover:text-gray-50 rounded-b">Acciones</th>
                                 </tr>
@@ -173,10 +191,20 @@
                                     <td class="border px-1 py-2 text-sm truncate" v-text="dato.id"></td>
                                     <td class="border px-1 py-2 text-sm truncate" v-text="dato.mayorista.razon_social"></td>
                                     <td class="border px-1 py-2 text-sm truncate" v-text="dato.distribuidor.razon_social"></td>
-                                    <td class="border px-1 py-2 text-sm truncate" v-text="dato.vendedor.razon_social"></td>
+                                    <td class="border px-1 py-2 text-sm truncate" v-text="(dato.estado == 1)?dato.vendedor.razon_social:dato.agente.full_name"></td>
                                     <td class="border px-1 py-2 text-sm truncate" v-text="dato.comisionmayorista+'%'"></td>
                                     <td class="border px-1 py-2 text-sm truncate" v-text="dato.comisiondistribuidor+'%'"></td>
                                     <td class="border px-1 py-2 text-sm truncate" v-text="dato.comisionvendedor+'%'"></td>
+                                    <td class="border px-2 py-2 text-sm truncate" v-if="dato.estado == 1">
+                                        <span class="inline-flex px-2 text-sm font-semibold leading-5 text-green-800 bg-green-100 rounded-full">
+                                            Empresa
+                                        </span>
+                                    </td>
+                                    <td class="border px-2 py-2 text-sm" v-else>
+                                        <span class="inline-flex px-2 text-xs font-semibold leading-5 text-red-800 bg-red-100 rounded-full">
+                                            Vendedor
+                                        </span>
+                                    </td>
 
                                     <td class="border px-1 py-1 mx-auto text-center flex items-center">
                                         <button @click="editar(dato)" class="hover:bg-green-700 text-green-400 font-bold rounded" fill="none"
@@ -222,6 +250,16 @@
                                         <div class="bg-white px-4 pt-2 pb-4 ">
                                             <div class="">
                                                 <section>
+                                                    <div class="flex mt-2 grid-cols-2 gap-y-6 py-4">
+                                                        <div class="flex items-center mr-4">
+                                                            <input type="radio" value="1" v-model="form.estado" class="w-4 h-4 text-red-600 border-gray-300 focus:ring-red-500 focus:ring-2 ">
+                                                            <label class="ml-2 text-sm font-medium ">Comisión x empresa</label>
+                                                        </div>
+                                                        <div class="flex items-center mr-4">
+                                                            <input type="radio" value="2" v-model="form.estado" class="w-4 h-4 text-green-600 border-gray-300 focus:ring-green-500 dark:ring-offset-gray-800 ">
+                                                            <label class="ml-2 text-sm font-medium ">Comisión x vendedor</label>
+                                                        </div>
+                                                    </div>
                                                     <div class="flex mt-2 grid-cols-2 gap-y-6 py-4">
                                                         <div class="w-full mx-auto px-4">
                                                             <label class="block text-sm font-bold font-medium text-gray-700">Mayorista</label>
@@ -271,9 +309,12 @@
                                                             </div>
                                                         </div>
                                                         <div class="w-full mx-auto px-4">
-                                                            <label class="block text-sm font-bold font-medium text-gray-700">Comisión vendedor</label>
+                                                            <label class="block text-sm font-bold font-medium  http://127.0.0.1:8000/master/getVendedores?estado=1&idrol=5&idpadre=13
+
+
+                                                            text-gray-700">Comisión vendedor</label>
                                                             <div class="mt-1">
-                                                                <money3 v-model="form.comisionvendedor" v-bind="configPercent" disabled class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"></money3>
+                                                                <money3 v-model="form.comisionvendedor" v-bind="configPercent" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"></money3>
                                                             </div>
                                                         </div>
                                                     </div>
@@ -336,10 +377,12 @@ import { Head, Link } from '@inertiajs/inertia-vue3';
 import JetNavLink from '@/Jetstream/NavLink.vue';
 import NavLink from "../../Jetstream/NavLink";
 import Input from "../../Jetstream/Input";
+import Statscards from "../../Components/Statscards";
 
 export default {
 
     components: {
+        Statscards,
         Input,
         NavLink,
         Button,
@@ -401,7 +444,7 @@ export default {
                 comisionmayorista: this.maxcomision.valornum,
                 comisiondistribuidor: 0.0,
                 comisionvendedor: 0.0,
-                estado: 1,
+                estado: 2,
             },
             editMode: false,
             verMode: false,
@@ -496,9 +539,9 @@ export default {
         },
         reset: function () {
             this.tituloModal = '';
-            this.form.idmayorista = 0;
-            this.form.iddistribuidor = 0;
-            this.form.idvendedor = 0;
+            this.form.idmayorista = null;
+            this.form.iddistribuidor = null;
+            this.form.idvendedor = null;
             this.form.comisionmayorista = this.maxcomision.valornum;
             this.form.comisiondistribuidor = 0;
             this.form.comisionvendedor = 0;
@@ -583,7 +626,8 @@ export default {
             })
         },
         getVendedores: function () {
-            axios.get('/master/getEmpresas?idrol=5&idpadre=' + this.form.iddistribuidor, ).then((res) => {
+            axios.get('/master/getEmpresas?estado='+this.form.estado+'&idrol=5&idpadre=' + this.form.iddistribuidor,
+            ).then((res) => {
                 //console.log(res.data);
                 this.arrayVendedores = res.data.data;
             })

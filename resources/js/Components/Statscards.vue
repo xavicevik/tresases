@@ -120,9 +120,15 @@ export default {
              */
         }
     },
+    mounted() {
+        this.cajasAbiertas();
+    }
+    /*
     created: function () {
         this.cajasAbiertas();
     },
+
+     */
 }
 </script>
 

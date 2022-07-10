@@ -99,9 +99,6 @@
                                         Vendedor
                                     </th>
                                     <th class="px-4 py-2 text-sm font-bold w-2/12 hover:bg-blue-500 hover:text-gray-50 rounded-b">
-                                        Cliente
-                                    </th>
-                                    <th class="px-4 py-2 text-sm font-bold w-2/12 hover:bg-blue-500 hover:text-gray-50 rounded-b">
                                         Punto de venta
                                     </th>
                                     <th class="px-4 py-2 text-sm font-bold w-2/12 hover:bg-blue-500 hover:text-gray-50 rounded-b">
@@ -117,7 +114,6 @@
                                     <td class="border px-1 py-2 text-sm truncate" v-text="dato.id"></td>
                                     <td class="border px-1 py-2 text-sm truncate" v-text="formatPrice(dato.valorventa)"></td>
                                     <td class="border px-1 py-2 text-sm truncate" v-text="dato.vendedor.nombre"></td>
-                                    <td class="border px-1 py-2 text-sm truncate" v-text="dato.cliente.nombre"></td>
                                     <td class="border px-1 py-2 text-sm truncate" v-text="dato.puntoventa.nombre"></td>
                                     <td class="border px-1 py-2 text-sm truncate" v-text="dateTimeFull(dato.fechaventa)"></td>
                                     <td class="border px-2 py-2 text-sm truncate" v-if="dato.estado">

@@ -19,20 +19,6 @@
                                 </h1>
                             </div>
 
-                            <div class="w-1/3">
-                                <div class="container flex justify-center items-center">
-                                    <div class="relative">
-                                        <div class="absolute top-4 left-3">
-                                            <i class="fa fa-search text-gray-400 z-20 hover:text-gray-500"></i> </div>
-                                        <input type="text" v-model="buscar" @keyup="getCajas(buscar,'id')" class="h-8 w-96 pl-4 pr-4 rounded-lg z-0 focus:shadow focus:outline-none" placeholder="Buscar (Nombre, Apellido, Correo, Usuario)">
-                                        <button @click="getCajas(buscar,'id')">
-                                            <div class="absolute top-2 right-2">
-                                                <Icon icon="fe:search" class="h-4"  />
-                                            </div>
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
                             <div class="pr-2 w-1/3 text-center">
                             </div>
                         </div>
@@ -442,7 +428,7 @@
                                         </div>
                                         <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
                                             <span class="flex w-full rounded-md shadow-sm sm:ml-3 sm:w-auto">
-                                              <button wire:click.prevent="cierre()" @click="cierre(form)" type="button" class="inline-flex justify-center w-full rounded-md border border-transparent px-4 py-2 bg-green-600 text-base leading-6 font-medium text-white shadow-sm hover:bg-green-500 focus:outline-none focus:border-green-700 focus:shadow-outline-green transition ease-in-out duration-150 sm:text-sm sm:leading-5" >
+                                              <button wire:click.prevent="printcierre()" @click="printcierre(recaudocaja)" type="button" class="inline-flex justify-center w-full rounded-md border border-transparent px-4 py-2 bg-green-600 text-base leading-6 font-medium text-white shadow-sm hover:bg-green-500 focus:outline-none focus:border-green-700 focus:shadow-outline-green transition ease-in-out duration-150 sm:text-sm sm:leading-5" >
                                                 Imprimir
                                               </button>
                                             </span>
@@ -676,57 +662,47 @@ export default {
             this.form.files2 = [];
         },
         apertura: function (data) {
-            this.$inertia.post('/cajas/apertura', data, {
-                onSuccess: (page) => {
-                    Swal.fire({
-                        icon: 'success',
-                        title: 'Se ha realizado la apertura de caja',
-                        showConfirmButton: true,
-                    })
-                    this.isOpenAbrir = false;
-                    this.getCajas();
-                },
-            });
-
+            var url= '/cajas/apertura';
+            axios.post(url, data
+            ).then((res) => {
+                let status = res.data.status;
+                let msg;
+                if (status) {
+                    msg = 'Se ha realizado la apertura de caja';
+                } else {
+                    msg = 'El usuario cuenta con la caja #' + res.data.caja + ' abierta';
+                }
+                Swal.fire({
+                    icon: 'success',
+                    title: msg,
+                    showConfirmButton: true,
+                })
+                this.isOpenAbrir = false;
+                this.getCajas();
+            })
         },
         cierre: function (data) {
-            axios.post('/cajas/cierre', data)
-                .then((res) => {
-                    Swal.fire({
-                        icon: 'success',
-                        title: 'Se ha realizado el cierre de caja',
-                        showConfirmButton: true,
-                    })
-                    this.recaudocaja = res.data.histocaja;
-                    this.isOpenCerrar = false;
-                    this.getCajas();
-                    this.tituloModal = 'Detalle del cierre de caja'
-                    this.isOpenDetalle = true;
-                }).catch(function (error) {
+            var url= '/cajas/cierre';
+            axios.get(url, {
+                params: {
+                    idcaja: data.id,
+                    montocierre: data.montocierre
+                }
+            }).then((res) => {
+                //console.log(res.data);
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Se ha realizado el cierre de caja',
+                    showConfirmButton: true,
+                })
+                this.recaudocaja = res.data.histocaja;
+                this.isOpenCerrar = false;
+                this.tituloModal = 'Detalle del cierre de caja'
+                this.isOpenDetalle = true;
+                this.getCajas();
+            }).catch(function (error) {
+                //console.log(error);
             });
-
-            /*
-            this.$inertia.post('/cajas/cierre', data, {
-                onBefore: (visit) => { console.log('onBefore');},
-                onStart: (visit) => {console.log('onStart');},
-                onProgress: (progress) => {console.log('onProgress');},
-                onSuccess: (page) => {
-                    Swal.fire({
-                        icon: 'success',
-                        title: 'Se ha realizado el cierre de caja',
-                        showConfirmButton: true,
-                    })
-                    this.isOpenCerrar = false;
-                    this.getCajas();
-                    this.tituloModal = 'Detalle del cierre de caja'
-                    this.isOpenDetalle = true;
-                },
-                onError: (errors) => {console.log('onError');},
-                onCancel: () => {console.log('onCancel');},
-                onFinish: visit => {console.log('onFinish');},
-            });
-            */
-
         },
         ver: function (data) {
             this.verMode = true;
@@ -797,6 +773,17 @@ export default {
                 });
             })
 
+        },
+        printcierre: function (recaudocaja) {
+            var url = '/cajas/printcierre';
+            axios.get(url, {
+                params: {
+                    recaudocaja: recaudocaja
+                }
+            }).then((res) => {
+                window.open(res.data.url, '_blank');
+                window.location.replace("/cajas");
+            })
         },
         cajasAbiertas: async function () {
             var url= '/cajas/open';

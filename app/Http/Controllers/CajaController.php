@@ -112,6 +112,56 @@ class CajaController extends Controller
         }
     }
 
+    public function getHistorial(Request $request)
+    {
+        //DB::connection()->enableQueryLog();
+        $filtros = json_decode($request->filtros);
+        $buscar = $request->buscar;
+
+        if ($request->has('sortBy') && $request->sortBy <> ''){
+            $sortBy = $request->sortBy;
+        } else {
+            $sortBy = 'id';
+        }
+
+        if ($request->has('sortOrder') && $request->sortOrder <> ''){
+            $sortOrder = $request->sortOrder;
+        } else {
+            $sortOrder = 'desc';
+        }
+
+        $cajas = Historialcaja::orderBy($sortBy, $sortOrder)
+            ->with('caja')
+            ->with('vendedor')
+            ->with('puntoventa');
+
+        if (!is_null($filtros)){
+            if(!is_null($filtros->fechainicio) && $filtros->fechainicio <> '') {
+                $cajas = $cajas->where('historialcajas.created_at', '>=', $filtros->fechainicio);
+            }
+            if(!is_null($filtros->fechafin) && $filtros->fechafin <> '') {
+                $cajas = $cajas->where('historialcajas.created_at', '<=', $filtros->fechafin);
+            }
+
+            if(!is_null($filtros->vendedor) && $filtros->vendedor <> '') {
+                $cajas = $cajas->join('users as t2', 'historialcajas.idvendedor', '=', 't2.id')
+                    ->where('t2.nombre', 'like', '%'.$filtros->vendedor.'%')
+                    ->orWhere('t2.apellido', 'like', '%'.$filtros->vendedor.'%');
+            }
+            if(!is_null($filtros->puntoventa) && $filtros->puntoventa <> '') {
+                $cajas = $cajas->join('puntos_ventas', 'historialcajas.idpuntoventa', '=', 'puntos_ventas.id')
+                               ->where('puntos_ventas.nombre', 'like', '%'.$filtros->puntoventa.'%');
+            }
+        }
+
+        $cajas = $cajas->paginate(self::canPorPagina);
+
+        //$queries = \DB::getQueryLog();
+        //dd($queries);
+
+        return ['data' => $cajas];
+    }
+
     public function open(Request $request)
     {
         $cajas = Caja::select('estado', DB::raw('count(1) as cantidad'))
@@ -129,21 +179,30 @@ class CajaController extends Controller
     {
         $mytime= Carbon::now('America/Bogota');
         $caja = $request->session()->pull('caja', 0);
+        $status = false;
 
-        $cajas = Caja::where('id', $request->id)
-                      ->firstOrFail();
-        $cajas->estado = 1;
-        $cajas->idvendedor = Auth::user()->id;
-        $cajas->montoapertura = $request->montoapertura;
-        $cajas->fechaapertura = $mytime->toDateTimeString();
-        $cajas->fechacierre = null;
-        $cajas->montocierre = 0.0;
-        $cajas->save();
+        $cajas = Caja::where('idvendedor', Auth::user()->id)
+                      ->where('estado', 1)
+                      ->first();
+        if (is_null($cajas)) {
+            $status = true;
+            $cajas = Caja::where('id', $request->id)
+                ->firstOrFail();
+            $cajas->estado = 1;
+            $cajas->idvendedor = Auth::user()->id;
+            $cajas->montoapertura = $request->montoapertura;
+            $cajas->fechaapertura = $mytime->toDateTimeString();
+            $cajas->fechacierre = null;
+            $cajas->montocierre = 0.0;
+            $cajas->save();
 
-        $request->session()->push('caja', $cajas->id);
-
-        return redirect()->back()
-                         ->with(['message' => 'Caja abierta']);
+            $request->session()->push('caja', $cajas->id);
+        } else {
+            $status = false;
+        }
+        return ['status' => $status, 'caja' => $cajas->id];
+        //return redirect()->back()
+        //                 ->with(['message' => 'Caja abierta']);
     }
 
     public function cierre(Request $request)
@@ -251,8 +310,8 @@ class CajaController extends Controller
                         'datos' => $ventas,
                         'caja' => $caja,
                         'estado' => $request->estado,
-                        'totaltransaccion' => $totaltransaccion,
-                        'totalcomisiones' => $totalcomisiones,
+                        'totaltransaccionprop' => $totaltransaccion,
+                        'totalcomisionesprop' => $totalcomisiones,
                         'totalboletas' => $totalboletas
                     ];
         } else {
@@ -260,165 +319,47 @@ class CajaController extends Controller
                                                         'datos' => $ventas,
                                                         'caja' => $caja,
                                                         'estado' => $request->estado,
-                                                        'totaltransaccion' => $totaltransaccion,
-                                                        'totalcomisiones' => $totalcomisiones,
+                                                        'totaltransaccionprop' => $totaltransaccion,
+                                                        'totalcomisionesprop' => $totalcomisiones,
                                                         'totalboletas' => $totalboletas
                                                         ]);
         }
     }
 
-    public function reportpdfCierreCaja(Request $request)
+    public function printcierre(Request $request)
     {
-        $user = Auth::user();
-        $totalventa = 0;
-        $totalpagado = 0;
-        $toatlcomision = 0;
-        $mytime= Carbon::now('America/Bogota');
+        $recaudocaja = json_decode($request->recaudocaja);
 
-        $concomision = Confcomision::join('users as t1', 'confcomisiones.idvendedor', '=', 't1.idempresa')
-            ->select('confcomisiones.*')
-            ->where('t1.id', $request->idvendedor)
-            ->first();
-        $venta = new Venta();
-        $venta->valorventa = 0;
-        $venta->impuesto = 0;
-        $venta->comision = 0;
-        $venta->valortotal = 0;
-        $venta->cantidad = 0;
-        $venta->idvendedor = $request->idvendedor;
-        $venta->idcliente = $request->idcliente;
-        $venta->idpuntoventa = $request->idpuntoventa;
-        $venta->fechaventa = $mytime->toDateTimeString();
-        $venta->comprobante = $request->comprobante;
-        $venta->estado = 3;
-        $venta->transaccion = $request->idcaja;
-        $venta->save();
-
-        foreach ($request->reservas as $reserva){
-            $reg = json_decode($reserva);
-            $boleta = Boleta::where('idrifa', $request->idrifa)
-                //->where('estado', '=', 2)
-                ->where('numero', $reg->numero)
-                //->where('idvendedor', $request->idvendedor)
-                ->first();
-            $reg->comision = $reg->valorpagar * ($concomision->comisionvendedor/100);
-            $toatlcomision += $reg->comision;
-            $salida[] = $reg;
-            $totalventa += $boleta->valor;
-            $totalpagado += $reg->valorpagar;
-            $boleta->estado = 3;
-            $boleta->idvendedor = $request->idvendedor;
-            $boleta->idcliente = $request->idcliente;
-            $boleta->pago = $boleta->pago + $reg->valorpagar;
-            $boleta->saldo = $boleta->valor - $boleta->pago;
-            $boleta->save();
-
-            $detalleventa = new Detalleventa();
-            $detalleventa->idventa = $venta->id;
-            $detalleventa->idboleta = $boleta->id;
-            $detalleventa->idrifa = $request->idrifa;
-            $detalleventa->valor = $reg->valorpagar;
-            $detalleventa->idcliente = $request->idcliente;
-            $detalleventa->impuesto = 0;
-            $detalleventa->comision = $reg->comision;
-            $detalleventa->valortotal = $boleta->valor;
-            $detalleventa->numero = $reg->numero;
-            $detalleventa->cantidad = 1;
-            $detalleventa->estado = 3;
-            $detalleventa->save();
-
-            $reg->valorpagar = "$" . number_format($reg->valorpagar, 0, ".", ",");
-            $reg->comision = "$" . number_format($reg->comision, 0, ".", ",");
-        }
         $recibo = new Recibo();
-        $recibo->nombre = 'Recibo venta';
-        $recibo->url = 'Recibo venta';
+        $recibo->nombre = 'Resumen cierre caja';
+        $recibo->url = 'Resumen cierre caja';
         $recibo->idusuario = Auth::user()->id;
-        $recibo->iduserdestino = $request->idvendedor;
+        $recibo->iduserdestino = Auth::user()->id;
         $recibo->save();
 
-        $detalleventa->idventa = $venta->id;
-        $detalleventa->save();
-
-        $comision = new Comision();
-        $comision->idventa = $venta->id;
-        $comision->idconfiguracion = $concomision->id;
-        $comision->valorventa = $totalpagado;
-        $comision->comisionmayorista = $totalpagado * ($concomision->comisionmayorista/100);
-        $comision->comisiondistribuidor = $totalpagado * ($concomision->comisiondistribuidor/100);
-        $comision->comisionvendedor = $totalpagado * ($concomision->comisionvendedor/100);
-        $comision->estado = true;
-        $comision->save();
-
-        $venta->comision = $comision->comisionmayorista + $comision->comisiondistribuidor + $comision->comisionvendedor;
-        $venta->valorventa = $totalpagado;
-        $venta->valortotal = $totalventa;
-        $venta->cantidad = sizeof($salida);
-        $venta->save();
-
-        $concepto = 2;
-        $descripcion = 'Pago en efectivo';
-        $signo = self::debito;
-        $impuesto = 0;
-
-        $transaccion = new Transaccion();
-        $transaccion->idusuarioori = $request->idcliente;
-        $transaccion->idusuariodest = $request->idvendedor;
-        $transaccion->idconcepto = $concepto;
-        $transaccion->origen = 'Fisico';
-        $transaccion->destino = 'Fisico';
-        $transaccion->signo = $signo;
-        $transaccion->valor = $venta->valorventa;
-        $transaccion->impuesto = $impuesto;
-        $transaccion->descripcion = $descripcion;
-        $transaccion->soporte = $request->comprobante;
-        $transaccion->mes = $mytime->month;
-        $transaccion->ano = $mytime->year;
-        $transaccion->save();
-
-        $pago = new Pago();
-        $pago->idventa = $venta->id;
-        $pago->valortotal = $venta->valorventa;
-        $pago->idcliente = $request->idcliente;
-        $pago->idvendedor = $request->idvendedor;
-        $pago->saldo = $venta->valortotal - $venta->valorventa;
-        $pago->canal = 'Fisico';
-        $pago->descripcion = $descripcion;
-        $pago->tipo = 'Pago';
-        $pago->soporte = $request->comprobante;
-        $pago->idtransaccion = $transaccion->id;
-        $pago->idpuntoventa = $request->idpuntoventa;
-        $pago->idcaja = $request->idcaja;
-        $pago->save();
+        $recaudocaja->fondo = "$" . number_format($recaudocaja->montoapertura, 0, ".", ",");
+        $recaudocaja->montocierre = "$" . number_format($recaudocaja->montocierre, 0, ".", ",");
+        $recaudocaja->recaudoefectivo = "$" . number_format($recaudocaja->recaudoefectivo, 0, ".", ",");
+        $recaudocaja->comisionventa = "$" . number_format($recaudocaja->comisionventa, 0, ".", ",");
+        $recaudocaja->faltante = "$" . number_format($recaudocaja->faltante, 0, ".", ",");
+        $recaudocaja->sobrante = "$" . number_format($recaudocaja->sobrante, 0, ".", ",");
 
         $data = [
-            'vendedor' => $request->vendedor,
-            'usuario' => $user->username,
-            'rifa' => $request->rifa,
+            'recaudocaja' => $recaudocaja,
             'fecha' => $recibo->created_at,
-            'reservas' => $salida,
             'recibo'  => $recibo->id,
-            'comisionvendedor' => "-$" . number_format($comision->comisionvendedor, 0, ".", ","),
-            'valortotal' => "$" . number_format($venta->valorventa, 0, ".", ","),
-            'valorentregar' => "$" . number_format($venta->valorventa - $comision->comisionvendedor, 0, ".", ","),
-            'cantidad' => sizeof($salida)
         ];
 
-        $filename = 'reciboVenta_'.$data['recibo'].'.pdf';
+        $filename = 'reciboResumencierre_'.$data['recibo'].'.pdf';
         $recibo->url = $filename;
         $recibo->save();
         $pdf = app('dompdf.wrapper');
         $pdf->getDomPDF()->set_option("enable_php", true);
-        $pdf->loadView('pdf.reportpdfVenta', $data);
+        $pdf->loadView('pdf.reportpdfCierreCaja', $data);
 
         $output = $pdf->output();
         file_put_contents(public_path('storage').'/pdf/'.$filename, $output, FILE_APPEND);
-        $venta->urlrecibo = url('/storage/pdf/').'/'.$filename;
-        $venta->save();
 
-        //return $pdf->download($filename);
-        //return $pdf->stream('ventas.pdf');
-        //return redirect()->back()->with(['message' => public_path('storage').'/pdf/'.$filename]);
         return ['url' => url('/storage/pdf/').'/'.$filename];
     }
 

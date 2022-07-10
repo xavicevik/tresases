@@ -52,7 +52,7 @@
                                 </tr>
                                 <tr class="flex bg-white border-b ">
                                     <th scope="col" class="w-1/2 px-6 py-2 font-medium text-black font-bold">
-                                        Responsable:
+                                        Perfil:
                                     </th>
                                     <th scope="col" class="w-1/2 px-6 py-2 font-medium">
                                         {{ $page.props.auth.user.roles[0].name }}
@@ -60,10 +60,10 @@
                                 </tr>
                                 <tr class="flex bg-white border-b ">
                                     <th scope="col" class="w-1/2 px-6 py-2 font-medium text-black font-bold">
-                                        Perfil:
+                                        Responsable:
                                     </th>
                                     <th scope="col" class="w-1/2 px-6 py-2 font-medium">
-                                        {{ $page.props.user.username }}
+                                        {{ $page.props.user.username + ' - ' + $page.props.user.full_name  }}
                                     </th>
                                 </tr>
                             </table>
@@ -295,7 +295,7 @@
                                             <button  v-else
                                                      class="mr-1 mb-1 px-4 py-3 text-sm leading-4 border rounded hover:bg-white focus:border-indigo-500 focus:text-indigo-500"
                                                      :class="{ 'bg-blue-700 text-white': link.active }"
-                                                     v-on:click="cambiarPage(link.url)"
+                                                     v-on:click="cambiarPage(link.url, 'detalles')"
                                                      v-html="link.label" />
                                         </template>
                                     </div>
@@ -346,13 +346,6 @@
                                                     <label class="block text-gray-700 text-sm font-bold mb-2">Vendedor</label>
 
                                                     <input v-model="form.idvendedor.full_name" @click="selectVendedor()" type="text" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" placeholder="Seleccione Vendedor">
-
-                                                    <div v-if="$page.props.errors.vendedor" class="text-red-500">{{ $page.props.errors.vendedor }}</div>
-                                                </div>
-                                                <div class="mb-4 w-full pr-2">
-                                                    <label class="block text-gray-700 text-sm font-bold mb-2">Cliente</label>
-
-                                                    <input v-model="form.idcliente.full_name" @click="selectCliente()" type="text" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" placeholder="Seleccione Cliente">
 
                                                     <div v-if="$page.props.errors.vendedor" class="text-red-500">{{ $page.props.errors.vendedor }}</div>
                                                 </div>
@@ -410,6 +403,9 @@
                                                             <div class="w-2/5 px-2">
                                                                 {{ asignarMode?'Valor a pagar':'Valor a anular' }}
                                                             </div>
+                                                            <div class="w-2/5 px-2">
+                                                                Cliente
+                                                            </div>
                                                             <div class="w-1/5 px-2">
                                                                 Eliminar
                                                             </div>
@@ -428,7 +424,11 @@
                                                                 <money3 v-if="asignarMode" v-bind="configMoney" :max="reserva.valorsaldo" v-model="reserva.valorpagar" class="h-8 w-full pl-4 pr-4 rounded-md z-0 focus:shadow focus:outline-none"></money3>
                                                                 <money3 v-else v-bind="configMoney" :max="reserva.valoranular" v-model="reserva.valorpagado" class="h-8 w-full pl-4 pr-4 rounded-md z-0 focus:shadow focus:outline-none"></money3>
                                                             </div>
-                                                            <div class="w-1/5 px-2">
+                                                            <div class="w-3/5 px-2">
+                                                                <input type="hidden" v-model="reserva.idcliente">
+                                                                <input v-model="reserva.cliente" :disabled="eliminarMode" @keyup.enter="selectCliente(index, reserva)" type="text" class="h-8 w-full pl-4 pr-4 rounded-md z-0 focus:shadow focus:outline-none" placeholder="Cliente">
+                                                            </div>
+                                                            <div class="w-1/10 px-2">
                                                                 <svg xmlns="http://www.w3.org/2000/svg" @click="eliminarReserva(reserva.numero, index)" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                                                     <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                                                                 </svg>
@@ -446,6 +446,9 @@
                                                             </div>
                                                             <div class="w-2/5 px-2">
                                                                 {{ formatPrice(totalapagar) }}
+                                                            </div>
+                                                            <div class="w-3/5 px-2">
+
                                                             </div>
                                                             <div class="w-1/5 px-2">
 
@@ -497,12 +500,12 @@
                                                     <div class="relative">
                                                         <div class="absolute top-4 left-3">
                                                             <i class="fa fa-search text-gray-400 z-20 hover:text-gray-500"></i> </div>
-                                                        <input type="text" v-model="buscar" @keyup="getRifas(buscar,'nombre_tecnico', true)" class="h-8 w-26 pl-4 pr-4 rounded-lg z-0 focus:shadow focus:outline-none" placeholder="Buscar (nombre_tecnico)">
-                                                        <button @click="getRifas(buscar,'nombre_tecnico', true)">
-                                                            <div class="absolute top-2 right-2">
-                                                                <Icon icon="fe:search" class="h-4"  />
-                                                            </div>
-                                                        </button>
+                                                            <input type="text" v-model="buscar" @keyup.enter="getRifas(buscar,'nombre_tecnico', true)" class="h-8 w-26 pl-4 pr-4 rounded-lg z-0 focus:shadow focus:outline-none" placeholder="Buscar (nombre_tecnico)">
+                                                            <button @click="getRifas(buscar,'nombre_tecnico', true)">
+                                                                <div class="absolute top-2 right-2">
+                                                                    <Icon icon="fe:search" class="h-4"  />
+                                                                </div>
+                                                            </button>
                                                     </div>
                                                 </div>
                                             </div>
@@ -626,7 +629,7 @@
                                                             <button  v-else
                                                                           class="mr-1 mb-1 px-4 py-3 text-sm leading-4 border rounded hover:bg-white focus:border-indigo-500 focus:text-indigo-500"
                                                                           :class="{ 'bg-blue-700 text-white': link.active }"
-                                                                          v-on:click="cambiarPage(link.url)"
+                                                                          v-on:click="cambiarPage(link.url, 'rifas')"
                                                                           v-html="link.label" />
                                                         </template>
                                                     </div>
@@ -674,7 +677,7 @@
                                                     <div class="relative">
                                                         <div class="absolute top-4 left-3">
                                                             <i class="fa fa-search text-gray-400 z-20 hover:text-gray-500"></i> </div>
-                                                        <input type="text" v-model="buscar" @keyup="getVendedores(buscar,'documento', true)" class="h-8 w-26 pl-4 pr-4 rounded-lg z-0 focus:shadow focus:outline-none" placeholder="Buscar (Nombre, apellido)">
+                                                        <input type="text" v-model="buscar" @keyup.enter="getVendedores(buscar,'documento', true)" class="h-8 w-26 pl-4 pr-4 rounded-lg z-0 focus:shadow focus:outline-none" placeholder="Buscar (Nombre, apellido)">
                                                         <button @click="getVendedores(buscar,'documento', true)">
                                                             <div class="absolute top-2 right-2">
                                                                 <Icon icon="fe:search" class="h-4"  />
@@ -724,7 +727,7 @@
                                                             <button  v-else
                                                                      class="mr-1 mb-1 px-4 py-3 text-sm leading-4 border rounded hover:bg-white focus:border-indigo-500 focus:text-indigo-500"
                                                                      :class="{ 'bg-blue-700 text-white': link.active }"
-                                                                     v-on:click="cambiarPagev(link.url)"
+                                                                     v-on:click="cambiarPagev(link.url, 'vendedor')"
                                                                      v-html="link.label" />
                                                         </template>
                                                     </div>
@@ -775,7 +778,7 @@
                                                     <div class="relative">
                                                         <div class="absolute top-4 left-3">
                                                             <i class="fa fa-search text-gray-400 z-20 hover:text-gray-500"></i> </div>
-                                                        <input type="text" v-model="buscarcliente" @keyup="getClientes(buscarcliente,'documento, nombre', true)" class="h-8 w-26 pl-4 pr-4 rounded-lg z-0 focus:shadow focus:outline-none" placeholder="Buscar (documento, nombre)">
+                                                        <input type="text" v-model="buscarcliente" @keyup.enter="getClientes(buscarcliente,'documento, nombre', true)" class="h-8 w-26 pl-4 pr-4 rounded-lg z-0 focus:shadow focus:outline-none" placeholder="Buscar (documento, nombre)">
                                                         <button @click="getClientes(buscarcliente,'documento, nombre', true)">
                                                             <div class="absolute top-2 right-2">
                                                                 <Icon icon="fe:search" class="h-4"  />
@@ -867,7 +870,7 @@
                                                             <button  v-else
                                                                      class="mr-1 mb-1 px-4 py-3 text-sm leading-4 border rounded hover:bg-white focus:border-indigo-500 focus:text-indigo-500"
                                                                      :class="{ 'bg-blue-700 text-white': link.active }"
-                                                                     v-on:click="cambiarPage(link.url)"
+                                                                     v-on:click="cambiarPage(link.url, 'cliente')"
                                                                      v-html="link.label" />
                                                         </template>
                                                     </div>
@@ -918,7 +921,7 @@
                                             <div class=" p-4 mt-5 mb-10 lg:mt-0">
                                                 <div class="flex">
                                                     <h2 class="text-lg font-bold text-gray-900">Guardar</h2>
-                                                    <a href="#"  @click="saveCliente(form.cliente)">
+                                                    <a href="#"  @click="saveClienteLite(form.cliente)">
                                                         <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                                             <path stroke-linecap="round" stroke-linejoin="round" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />
                                                         </svg>
@@ -950,48 +953,10 @@
                                                     </div>
 
                                                     <div>
-                                                        <label class="block text-sm font-medium text-gray-700">Tipo documento</label>
-                                                        <div class="mt-1">
-                                                            <select :disabled="!isNewCliente" :class="{'bg-blue-100' : !isNewCliente}" class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" v-model="form.cliente.idtipos_documento">
-                                                                <option value="0" >Seleccione</option>
-                                                                <option v-for="tipodoc in arrayTiposdocumento" :key="tipodoc.id" :value="tipodoc.id" v-text="tipodoc.nombre_corto"></option>
-                                                            </select>
-                                                        </div>
-                                                    </div>
-
-                                                    <div>
                                                         <label class="block text-sm font-medium text-gray-700">Documento</label>
                                                         <div class="mt-1">
                                                             <input type="text" :disabled="!isNewCliente" :class="{'bg-blue-100' : !isNewCliente}" v-model="form.cliente.documento" autocomplete="postal-code" class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
                                                             <div v-if="$page.props.errors.documento" class="text-red-500">{{ $page.props.errors.docuemnto }}</div>
-                                                        </div>
-                                                    </div>
-
-                                                    <div>
-                                                        <label class="block text-sm font-medium text-gray-700">País</label>
-                                                        <div class="mt-1">
-                                                            <select :disabled="!isNewCliente" :class="{'bg-blue-100' : !isNewCliente}" class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" v-model="form.cliente.idpais" @change="getDepartamentos()">
-                                                                <option value="0" >Seleccione País</option>
-                                                                <option v-for="pais in arrayPaises" :key="pais.id" :value="pais.id" v-text="pais.nombre"></option>
-                                                            </select>
-                                                        </div>
-                                                    </div>
-                                                    <div>
-                                                        <label class="block text-sm font-medium text-gray-700">Departamento</label>
-                                                        <div class="mt-1">
-                                                            <select :disabled="!isNewCliente" :class="{'bg-blue-100' : !isNewCliente}" class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" v-model="form.cliente.iddepartamento" @change="getCiudades">
-                                                                <option value="0" >Seleccione departamento</option>
-                                                                <option v-for="departamento in arrayDepartamentos" :key="departamento.id" :value="departamento.id" v-text="departamento.nombre"></option>
-                                                            </select>
-                                                        </div>
-                                                    </div>
-                                                    <div>
-                                                        <label class="block text-sm font-medium text-gray-700">Ciudad</label>
-                                                        <div class="mt-1">
-                                                            <select :disabled="!isNewCliente" :class="{'bg-blue-100' : !isNewCliente}" class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" v-model="form.cliente.idciudad">
-                                                                <option value="0" >Seleccione Ciudad</option>
-                                                                <option v-for="ciudad in arrayCiudades" :key="ciudad.id" :value="ciudad.id" v-text="ciudad.nombre"></option>
-                                                            </select>
                                                         </div>
                                                     </div>
                                                     <div>
@@ -1095,7 +1060,7 @@
                                 <!-- This element is to trick the browser into centering the modal contents. -->
                                 <span class="hidden sm:inline-block sm:align-middle sm:h-screen"></span>
                                 <div class="inline-block lg:w-6/12 align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:w-full" role="dialog" aria-modal="true" aria-labelledby="modal-headline">
-                                    <button type="button" @click="isOpenDetalle = false" class="absolute top-3 right-2.5 text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center dark:hover:bg-gray-800 dark:hover:text-white" data-modal-toggle="authentication-modal">
+                                    <button type="button" @click="route('cajas.index')" class="absolute top-3 right-2.5 text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center dark:hover:bg-gray-800 dark:hover:text-white" data-modal-toggle="authentication-modal">
                                         <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg>
                                     </button>
 
@@ -1193,7 +1158,7 @@
                                     </div>
                                     <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
                                             <span class="flex w-full rounded-md shadow-sm sm:ml-3 sm:w-auto">
-                                              <button wire:click.prevent="cierre()" @click="cierre(form)" type="button" class="inline-flex justify-center w-full rounded-md border border-transparent px-4 py-2 bg-green-600 text-base leading-6 font-medium text-white shadow-sm hover:bg-green-500 focus:outline-none focus:border-green-700 focus:shadow-outline-green transition ease-in-out duration-150 sm:text-sm sm:leading-5" >
+                                              <button wire:click.prevent="printcierre()" @click="printcierre(recaudocaja)" type="button" class="inline-flex justify-center w-full rounded-md border border-transparent px-4 py-2 bg-green-600 text-base leading-6 font-medium text-white shadow-sm hover:bg-green-500 focus:outline-none focus:border-green-700 focus:shadow-outline-green transition ease-in-out duration-150 sm:text-sm sm:leading-5" >
                                                 Imprimir
                                               </button>
                                             </span>
@@ -1230,11 +1195,13 @@ import '@vueup/vue-quill/dist/vue-quill.snow.css';
 import { ref, onMounted } from 'vue';
 import { Money3Component } from 'v-money3'
 import {InertiaLink} from "@inertiajs/inertia-vue3";
+import Input from "../../Jetstream/Input";
 
 
 export default {
 
     components: {
+        Input,
         Button,
         AppLayout,
         Icon,
@@ -1250,8 +1217,8 @@ export default {
         rifas: [],
         vendedores: [],
         errors: Object,
-        totaltransaccion: 0,
-        totalcomisiones: 0,
+        totaltransaccionprop: 0,
+        totalcomisionesprop: 0,
         totalboletas: 0
     },
     computed: {
@@ -1333,7 +1300,8 @@ export default {
                     valortotal:null,
                     valorpagar:null,
                     valorsaldo: null,
-                    idcliente:null
+                    idcliente:null,
+                    cliente:null
                 },
                 rangoinicial: null,
                 rangofinal: null,
@@ -1371,12 +1339,15 @@ export default {
             isOpenRifa: false,
             isOpenVendedor: false,
             isOpenDetalle: false,
+            indexcliente: null,
             existerifa: 0,
             existevendedor: 0,
             isIndividual: 0,
             arrayPaises:[],
             arrayDepartamentos:[],
-            arrayCiudades:[]
+            arrayCiudades:[],
+            totaltransaccion: 0,
+            totalcomisiones: 0,
         }
     },
     methods: {
@@ -1388,29 +1359,18 @@ export default {
         selTipoSerie: function (data){
             this.isIndividual = data;
         },
-        cambiarPage: function (url = '') {
+        cambiarPage: function (url = '', entidad = '') {
             axios.get(url, {
             }).then((res) => {
                 var respuesta = res.data;
-                this.arrayRifas = respuesta.rifas;
-
-                if (this.arrayRifas.data.length > 0) {
-                    this.existerifa = 1;
-                } else {
-                    this.existerifa = 0;
-                }
-            })
-        },
-        cambiarPagev: function (url = '') {
-            axios.get(url, {
-            }).then((res) => {
-                var respuesta = res.data;
-                this.arrayVendedores = respuesta.vendedores;
-
-                if (this.arrayVendedores.data.length > 0) {
-                    this.existevendedor = 1;
-                } else {
-                    this.existevendedor = 0;
+                if (entidad == 'cliente') {
+                    this.arrayClientes = respuesta.clientes;
+                } else if (entidad == 'rifas') {
+                    this.arrayRifas = respuesta.rifas;
+                } else if (entidad == 'vendedor') {
+                    this.arrayVendedores = respuesta.vendedores;
+                } else if (entidad == 'detalles') {
+                    this.arrayDetalles = respuesta.data;
                 }
             })
         },
@@ -1424,9 +1384,11 @@ export default {
             this.closeMoodalVendedor();
         },
         onSelectCliente: function(data){
-            this.form.idcliente = data;
+            this.form.reservas[this.indexcliente].cliente = data.full_name;
+            this.form.reservas[this.indexcliente].idcliente = data.id;
             this.isNewCliente = false;
             this.closeModalCliente();
+            this.closeModalClienteNew();
         },
         actualizarRangos: function() {
             let cantidad = 0;
@@ -1445,29 +1407,45 @@ export default {
 
         },
         generarReciboEliminar: function () {
+            let isOk = true;
             if (this.form.reservas.length > 0){
-                var url = '/ventas/reportpdfAnulaMov';
-                axios.get(url, {
-                    params: {
-                        rifa: this.form.idrifa.nombre_tecnico,
-                        idvendedor: this.form.idvendedor.id,
-                        idcliente: this.form.idcliente.id,
-                        vendedor: this.form.idvendedor.full_name,
-                        cliente: this.form.idcliente.full_name,
-                        reservas: this.form.reservas,
-                        idrifa: this.form.idrifa.id,
-                        idcaja: this.caja.id,
-                        idpuntoventa: this.caja.idpuntoventa
+                this.form.reservas.forEach(element => {
+                    if (element['idcliente'] == '' || element['idcliente'] === null) {
+                        isOk = false;
                     }
-                }).then((res) => {
+                });
+
+                if (isOk) {
+                    var url = '/ventas/reportpdfAnulaMov';
+                    axios.get(url, {
+                        params: {
+                            rifa: this.form.idrifa.nombre_tecnico,
+                            idvendedor: this.form.idvendedor.id,
+                            idcliente: this.form.idcliente.id,
+                            vendedor: this.form.idvendedor.full_name,
+                            cliente: this.form.idcliente.full_name,
+                            reservas: this.form.reservas,
+                            idrifa: this.form.idrifa.id,
+                            idcaja: this.caja.id,
+                            idpuntoventa: this.caja.idpuntoventa
+                        }
+                    }).then((res) => {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Se ha generado el recibo correspondiente',
+                            showConfirmButton: true,
+                        })
+                        window.open(res.data.url, '_blank');
+                        this.form.reservas = [];
+                        this.getMovimientos();
+                    })
+                } else {
                     Swal.fire({
-                        icon: 'success',
-                        title: 'Se ha generado el recibo correspondiente',
+                        icon: 'warning',
+                        title: 'Por favor seleccione los clientes para cada número',
                         showConfirmButton: true,
                     })
-                    window.open(res.data.url, '_blank');
-                    this.getMovimientos();
-                })
+                }
             } else {
                 Swal.fire({
                     icon: 'warning',
@@ -1478,29 +1456,44 @@ export default {
 
         },
         generarReciboAsignar: function () {
+            let isOk = true;
             if (this.form.reservas.length > 0){
-                var url = '/ventas/reportpdfRegistroMov';
-                axios.get(url, {
-                    params: {
-                        rifa: this.form.idrifa.nombre_tecnico,
-                        idvendedor: this.form.idvendedor.id,
-                        idcliente: this.form.idcliente.id,
-                        vendedor: this.form.idvendedor.full_name,
-                        cliente: this.form.idcliente.full_name,
-                        reservas: this.form.reservas,
-                        idrifa: this.form.idrifa.id,
-                        idcaja: this.caja.id,
-                        idpuntoventa: this.caja.idpuntoventa
+                this.form.reservas.forEach(element => {
+                    if (element['idcliente'] == '' || element['idcliente'] === null) {
+                        isOk = false;
                     }
-                }).then((res) => {
+                });
+
+                if (isOk) {
+                    var url = '/ventas/reportpdfRegistroMov';
+                    axios.get(url, {
+                        params: {
+                            rifa: this.form.idrifa.nombre_tecnico,
+                            idvendedor: this.form.idvendedor.id,
+                            idcliente: this.form.idcliente.id,
+                            vendedor: this.form.idvendedor.full_name,
+                            reservas: this.form.reservas,
+                            idrifa: this.form.idrifa.id,
+                            idcaja: this.caja.id,
+                            idpuntoventa: this.caja.idpuntoventa
+                        }
+                    }).then((res) => {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Se ha generado el recibo correspondiente',
+                            showConfirmButton: true,
+                        })
+                        window.open(res.data.url, '_blank');
+                        this.form.reservas = [];
+                        this.getMovimientos();
+                    })
+                } else {
                     Swal.fire({
-                        icon: 'success',
-                        title: 'Se ha generado el recibo correspondiente',
+                        icon: 'warning',
+                        title: 'Por favor seleccione los clientes para cada número',
                         showConfirmButton: true,
                     })
-                    window.open(res.data.url, '_blank');
-                    this.getMovimientos();
-                })
+                }
             } else {
                 Swal.fire({
                     icon: 'warning',
@@ -1614,7 +1607,7 @@ export default {
             this.getPaises();
             this.getTiposdocumento();
         },
-        saveCliente: function(data) {
+        saveClienteLite: function(data) {
             var formData = new FormData();
             formData.append('nombre', this.form.cliente.nombre);
             formData.append('apellido', this.form.cliente.apellido);
@@ -1623,35 +1616,38 @@ export default {
             formData.append('username', this.form.cliente.documento);
             formData.append('idrol', 2);
             formData.append('estado', 1);
-            formData.append('idtipos_documento', this.form.cliente.idtipos_documento);
+            formData.append('idtipos_documento', 1);
             formData.append('documento', this.form.cliente.documento);
-            formData.append('direccion', this.form.cliente.direccion);
-            formData.append('idpais', this.form.cliente.idpais);
-            formData.append('iddepartamento', this.form.cliente.iddepartamento);
-            formData.append('idciudad', this.form.cliente.idciudad);
+            formData.append('direccion', '');
+            formData.append('idpais', 1);
+            formData.append('iddepartamento', 17);
+            formData.append('idciudad', 1017001);
             formData.append('telefono', this.form.cliente.movil);
             formData.append('movil', this.form.cliente.movil);
             formData.append('isnatural', 1);
             formData.append('idempresa', 3);
+            formData.append('observaciones', 'Creado por movimiento de caja');
 
             //console.log(formData);
-            this.$inertia.post('/users', formData, {
-                onSuccess: (page) => {
-                    Swal.fire({
-                        position: 'top-end',
-                        icon: 'success',
-                        title: 'El cliente se ha creado satisfactoriamene',
-                        showConfirmButton: false,
-                        timer: 1500
-                    })
-                    this.onSelectCliente(data);
-                    this.closeModalClienteNew();
-                },
-            });
+            var url= '/users';
+            axios.post(url, formData
+            ).then((res) => {
+                Swal.fire({
+                    position: 'top-end',
+                    icon: 'success',
+                    title: 'El cliente se ha creado satisfactoriamene',
+                    showConfirmButton: false,
+                    timer: 1500
+                })
+                var respuesta = res.data;
+                this.onSelectCliente(respuesta.user);
+            })
+
         },
-        selectCliente: function () {
+        selectCliente: function (index, reserva) {
             this.isOpenCliente = true;
-            this.getClientes('','documento','true');
+            this.indexcliente = index;
+            this.getClientes(this.form.reservas[index].cliente,'documento','true');
         },
         getClientes: async function (buscar = '', filtro = 'documento', paginate = false) {
             var url= '/users/getClientesActivos';
@@ -1713,8 +1709,18 @@ export default {
             this.form = data;
             this.tituloModal = 'Cierre de caja';
         },
+        printcierre: function (recaudocaja) {
+            var url = '/cajas/printcierre';
+            axios.get(url, {
+                params: {
+                    recaudocaja: recaudocaja
+                }
+            }).then((res) => {
+                window.open(res.data.url, '_blank');
+                window.location.replace("/cajas");
+            })
+        },
         cierre: function (data) {
-            //console.log(data);
             var url= '/cajas/cierre';
             axios.get(url, {
                 params: {
@@ -1814,7 +1820,9 @@ export default {
                             valorpagar: respuesta.boleta.saldo,
                             valorsaldo: respuesta.boleta.saldo,
                             valoranular: respuesta.boleta.pago,
-                            valorpagado: respuesta.boleta.pago
+                            valorpagado: respuesta.boleta.pago,
+                            idcliente: respuesta.boleta.idcliente,
+                            cliente: respuesta.boleta.cliente?respuesta.boleta.cliente.full_name:'',
                         });
                         this.form.reserva.numero = null;
                         this.form.reserva.promocional = null;
@@ -2094,6 +2102,8 @@ export default {
             }).then((res) => {
                 var respuesta = res.data;
                 this.arrayData = respuesta.datos;
+                this.totaltransaccion = respuesta.totaltransaccionprop;
+                this.totalcomisiones = respuesta.totalcomisionesprop;
                 //console.log(this.arrayData);
             })
         },
@@ -2105,6 +2115,10 @@ export default {
     },
     created: function () {
         this.arrayData = this.datos;
+        this.totaltransaccion = this.totaltransaccionprop;
+        this.totalcomisiones = this.totalcomisionesprop;
+        this.getRifas('','nombre_tecnico', true);
+        this.getVendedores('','documento', true);
     },
     mounted() {
         //console.log('Component mounted.');

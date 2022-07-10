@@ -414,7 +414,11 @@ class UserController extends Controller
         $rol = Rol::where('id', $user->idrol)->first();
         $user->assignRole($rol->nombre);
 
-        return redirect()->back()->with('message', 'Cliente creado satisfactoriamente');
+        if ($user->observaciones == 'Creado por movimiento de caja') {
+            return ['user' => $user];
+        } else {
+            return redirect()->back()->with('message', 'Cliente creado satisfactoriamente');
+        }
     }
 
     /**
@@ -529,6 +533,5 @@ class UserController extends Controller
     {
         return Excel::download(new ClientesExport($request), 'clientes.xlsx');
     }
-
 
 }

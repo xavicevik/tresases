@@ -386,7 +386,7 @@
                                                             <div class="mt-1">
                                                                 <select :disabled="verMode" @change="getEmpresas()" :class="{'bg-blue-100' : verMode}" class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" v-model="form.idrol">
                                                                     <option value="0" >Seleccione Rol</option>
-                                                                    <option v-for="rol in arrayRoles" :key="rol.id" :value="rol.id" v-text="rol.nombre"></option>
+                                                                    <option v-show="rol.id == 2"  v-for="rol in arrayRoles" :key="rol.id" :value="rol.id" v-text="rol.nombre"></option>
                                                                 </select>
                                                                 <div v-if="$page.props.errors.idrol" class="text-red-500">{{ $page.props.errors.idrol }}</div>
                                                             </div>
@@ -881,6 +881,7 @@ export default {
             })
         },
         UsersExport: function (filtros = []) {
+            let fecha = moment(new Date()).format('DDMMYYYY');
             var url= '/clientes/export';
             axios.get(url, {
                 params: {
@@ -892,7 +893,7 @@ export default {
                 var fileLink = document.createElement('a');
 
                 fileLink.href = fileURL;
-                fileLink.setAttribute('download', 'clientes.xlsx');
+                fileLink.setAttribute('download', 'clientes_'+ fecha + '.xlsx');
                 document.body.appendChild(fileLink);
 
                 fileLink.click();

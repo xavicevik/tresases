@@ -1,6 +1,5 @@
 <template>
     <AppLayout title="Pagos">
-
         <template #header>
             <h2 class="font-semibold text-xl text-gray-800 leading-tight">
                 Pagos
@@ -138,23 +137,6 @@
                                     </th>
                                     <th class="px-4 py-2 text-sm font-bold hover:bg-blue-500 hover:text-gray-50 rounded-b">
                                         <button @click="getCajas(buscar, 'id')" class="font-bold">
-                                            Cliente
-                                            <div v-show="sortBy == 'nombre'">
-                                                <span v-show="!sortOrder">
-                                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
-                                                        <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
-                                                    </svg>
-                                                </span>
-                                                <span v-show="sortOrder">
-                                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
-                                                      <path fill-rule="evenodd" d="M14.707 12.707a1 1 0 01-1.414 0L10 9.414l-3.293 3.293a1 1 0 01-1.414-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 010 1.414z" clip-rule="evenodd" />
-                                                    </svg>
-                                                </span>
-                                            </div>
-                                        </button>
-                                    </th>
-                                    <th class="px-4 py-2 text-sm font-bold hover:bg-blue-500 hover:text-gray-50 rounded-b">
-                                        <button @click="getCajas(buscar, 'id')" class="font-bold">
                                             Vendedor
                                             <div v-show="sortBy == 'nombre'">
                                                 <span v-show="!sortOrder">
@@ -223,7 +205,7 @@
                                     </th>
                                     <th class="px-4 py-2 text-sm font-bold hover:bg-blue-500 hover:text-gray-50 rounded-b">
                                         <button @click="getCajas(buscar, 'id')" class="font-bold">
-                                            tipo
+                                            Tipo
                                             <div v-show="sortBy == 'fechafin'">
                                                 <span v-show="!sortOrder">
                                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
@@ -329,7 +311,6 @@
                                 <tr class="text-center" text-sm v-if="arrayData.data" v-for="(dato, id) in arrayData.data" :key="id">
                                     <td class="border px-1 py-2 text-sm truncate" v-text="dato.id"></td>
                                     <td class="border px-1 py-2 text-sm truncate" v-text="dato.idventa"></td>
-                                    <td class="border px-1 py-2 text-sm truncate" v-text="dato.cliente.username"></td>
                                     <td class="border px-1 py-2 text-sm truncate" v-text="dato.vendedor.username"></td>
                                     <td class="border px-1 py-2 text-sm truncate" v-text="formatPrice(dato.valortotal)"></td>
                                     <td class="border px-1 py-2 text-sm truncate" v-text="formatPrice(dato.saldo)"></td>
@@ -382,10 +363,12 @@ import { Head, Link } from '@inertiajs/inertia-vue3';
 import JetNavLink from '@/Jetstream/NavLink.vue';
 import NavLink from "../../Jetstream/NavLink";
 import Input from "../../Jetstream/Input";
+import Statscards from "../../Components/Statscards";
 
 export default {
 
     components: {
+        Statscards,
         Input,
         NavLink,
         Button,

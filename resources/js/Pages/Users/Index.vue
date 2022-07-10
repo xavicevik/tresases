@@ -406,7 +406,7 @@
                                                             <div class="mt-1">
                                                                 <select :disabled="verMode" @change="getEmpresas()" :class="{'bg-blue-100' : verMode}" class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" v-model="form.idrol">
                                                                     <option value="0" >Seleccione Rol</option>
-                                                                    <option v-for="rol in arrayRoles" :key="rol.id" :value="rol.id" v-text="rol.nombre"></option>
+                                                                    <option v-show="rol.id == 5" v-for="rol in arrayRoles" :key="rol.id" :value="rol.id" v-text="rol.nombre"></option>
                                                                 </select>
                                                                 <div v-if="$page.props.errors.idrol" class="text-red-500">{{ $page.props.errors.idrol }}</div>
                                                             </div>
@@ -706,6 +706,7 @@ export default {
             switch (accion) {
                 case 'registrar':
                 {
+                    this.reset();
                     this.tituloModal = 'Crear nuevo Usuario';
                     this.form.idpais = 0;
                     this.form.iddepartamento = 0;
@@ -795,7 +796,7 @@ export default {
             this.$page.props.errors.updatePassword = null;
         },
         reset: function () {
-            this.tituloModal = 'Crear nuevo rifa de venta';
+            this.tituloModal = '';
             this.form.id = null;
             this.form.nombre = null;
             this.form.documento = null;
@@ -811,7 +812,6 @@ export default {
             this.form.direccion = null;
             this.form.idrol = 0;
             this.form.idempresa = null;
-            this.form.fechafin = null;
         },
         save: function (data) {
             this.$inertia.post('/users', data, {
@@ -901,6 +901,7 @@ export default {
             })
         },
         UsersExport: function (filtros = []) {
+            let fecha = moment(new Date()).format('DDMMYYYY');
             var url= '/users/export';
             axios.get(url, {
                 params: {
@@ -912,7 +913,7 @@ export default {
                 var fileLink = document.createElement('a');
 
                 fileLink.href = fileURL;
-                fileLink.setAttribute('download', 'users.xlsx');
+                fileLink.setAttribute('download', 'users_'+ fecha + '.xlsx');
                 document.body.appendChild(fileLink);
 
                 fileLink.click();

@@ -29,17 +29,29 @@
                                 </h1>
                             </div>
 
-                            <div class="w-1/3">
 
-                            </div>
-                            <div class="flex w-1/4">
-                                <div class="w-1/2 text-center">
+                            <div class="flex w-1/2">
+                                <div class="w-1/6 text-center">
                                     <button @click="openModal('registrar')" class="bg-blue-500 text-xs  hover:bg-blue-700 text-white font-bold py-2 px-4 rounded ">Asignar</button>
                                 </div>
-                                <div class="w-1/2 text-center">
-                                    <button @click="openModal('eliminar')" class="bg-blue-500 text-xs  hover:bg-blue-700 text-white font-bold py-2 px-4 rounded ">Desasignar</button>
+                                <div class="w-1/6 text-center">
+                                    <button @click="openModal('eliminar')" class="bg-red-500 text-xs  hover:bg-red-700 text-white font-bold py-2 px-4 rounded ">Desasignar</button>
+                                </div>
+                                <div class="w-1/6 text-center">
+                                    <button onclick="document.getElementById('import').submit()" class="bg-orange-500 text-xs  hover:bg-orange-700 text-white font-bold py-2 px-4 rounded ">Importar</button>
+                                </div>
+                                <div class="w-4/6 text-center">
+                                    <form name="import" id="import" :action="route('numerosreservados.import')" method="POST" enctype="multipart/form-data">
+                                        <div class="form-group mb-4">
+                                            <div class="custom-file text-left">
+                                                <input type="hidden" name="_token" :value="form._token">
+                                                <input class="block w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 cursor-pointer dark:text-gray-400 focus:outline-none dark:bg-gray-700 dark:border-gray-400 dark:placeholder-gray-200" type="file" name="file" id="customFile">
+                                            </div>
+                                        </div>
+                                    </form>
                                 </div>
                             </div>
+
 
                         </div>
                     </section>
@@ -332,6 +344,9 @@
 
                                 <!-- Contenido modal -->
                                 <div class="inline-block lg:w-7/12 align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:w-full" role="dialog" aria-modal="true" aria-labelledby="modal-headline">
+                                    <button type="button" @click="closeMoodalRifa()" class="absolute top-3 right-2.5 text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center dark:hover:bg-gray-800 dark:hover:text-white" data-modal-toggle="authentication-modal">
+                                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg>
+                                    </button>
                                     <section>
                                         <div class="flex justify-between mx-auto p-4">
                                             <div class="w-1/2">
@@ -504,6 +519,9 @@
 
                                 <!-- Contenido modal -->
                                 <div class="inline-block lg:w-7/12 align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:w-full" role="dialog" aria-modal="true" aria-labelledby="modal-headline">
+                                    <button type="button" @click="closeMoodalVendedor()" class="absolute top-3 right-2.5 text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center dark:hover:bg-gray-800 dark:hover:text-white" data-modal-toggle="authentication-modal">
+                                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg>
+                                    </button>
                                     <section>
                                         <div class="flex justify-between mx-auto p-4">
                                             <div class="w-1/2">
@@ -549,7 +567,7 @@
                                                 </thead>
                                                 <tbody>
                                                 <tr @click="onSelectVendedor(vendedor)" class="hover:bg-blue-50 text-center" text-sm v-if="existevendedor > 0" v-for="(vendedor, id) in arrayVendedores.data" :key="id">
-                                                    <td class="border px-1 py-2 text-sm truncate" v-text="vendedor.nombre"></td>
+                                                    <td class="border px-1 py-2 text-sm truncate" v-text="vendedor.full_name"></td>
                                                     <td class="border px-1 py-2 text-sm truncate" v-text="vendedor.documento"></td>
                                                     <td class="border px-1 py-2 text-sm truncate" v-text="vendedor.correo"></td>
                                                 </tr>
@@ -605,12 +623,14 @@ import { QuillEditor } from '@vueup/vue-quill';
 import '@vueup/vue-quill/dist/vue-quill.snow.css';
 import { ref, onMounted } from 'vue';
 import { Money3Component } from 'v-money3'
-import {InertiaLink} from "@inertiajs/inertia-vue3";
+import {InertiaLink, usePage} from "@inertiajs/inertia-vue3";
+import Input from "../../Jetstream/Input";
 
 
 export default {
 
     components: {
+        Input,
         Button,
         AppLayout,
         Icon,
@@ -663,6 +683,7 @@ export default {
 
             tituloModal: '',
             form: {
+                _token: usePage().props.value._token,
                 rifa: null,
                 numero: null,
                 promocional: null,

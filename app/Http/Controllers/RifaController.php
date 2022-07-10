@@ -122,9 +122,10 @@ class RifaController extends Controller
                     ->where('t1.nombre', 'like', '%'.$filtros->cliente.'%')
                     ->orWhere('t1.apellido', 'like', '%'.$filtros->cliente.'%');
             }
-            if(!is_null($filtros->vendedor) && $filtros->vendedor <> '') {
+            if(!is_null($filtros->cliente) && $filtros->cliente <> '') {
                 $boletas = $boletas->join('users as t2', 'boletas.idvendedor', '=', 't2.id')
-                    ->where('t2.username', 'like', '%'.$filtros->vendedor.'%');
+                    ->where('t2.nombre', 'like', '%'.$filtros->cliente.'%')
+                    ->orWhere('t2.apellido', 'like', '%'.$filtros->cliente.'%');
             }
             $boletas = $boletas->select('boletas.*')->paginate(self::canPorPagina);
         }
@@ -385,7 +386,7 @@ class RifaController extends Controller
             $boleta->codigo = $idrifa . $i . rand(1000000000, 9999999999);
             $boleta->estado = 1;
             $boleta->serie = $serie;
-            $boleta->precio = $precio;
+            $boleta->valor = $precio;
             $boleta->saldo = $precio;
             $boleta->pago = 0;
             $boleta->numero = str_pad(strval($i), $cifras, "0", STR_PAD_LEFT);

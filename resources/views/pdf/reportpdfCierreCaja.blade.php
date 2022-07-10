@@ -10,48 +10,113 @@
         <br>Sus sueños hechos realidad
         </strong>
         <hr>
-        <strong>Usuario:</strong>  {{ $usuario}}
-        <br><strong>Rifa:</strong>  {{ $rifa }}
-        <br><strong>Fecha:</strong>{{ $fecha }}
+        <strong>Usuario:</strong> {{ $recaudocaja->vendedor->username }}
         <hr>
     </p>
     <p class="centrado">
-        <strong>ASIGNAR BOLETERIA</strong>
+        <strong>RSUMEN CIERRE CAJA</strong>
         <br><strong>Recibo: </strong>{{ $recibo }}
         <hr>
 
     </p>
 
     <br>
-    <table class="centrado">
-        <thead>
-        <tr>
-            <th class="mayor">MAYOR</th>
-            <th class="promo">PROMO</th>
+    <table class="table">
+        <tr class="bg-white border-b ">
+            <th scope="col" class="px-6 py-2">
+                Fecha:
+            </th>
+            <th scope="col" class="px-6 py-2">
+                {{ $fecha }}
+            </th>
         </tr>
-        </thead>
+        <tr class="bg-white border-b ">
+            <th scope="col" class="px-6 py-2">
+                Usuario
+            </th>
+            <th scope="col" class="px-6 py-2">
+                {{ $recaudocaja->vendedor->full_name }}
+            </th>
+        </tr>
+        <tr class="bg-white border-b ">
+            <th scope="col" class="px-6 py-2">
+                Punto de venta
+            </th>
+            <th scope="col" class="px-6 py-2">
+                {{ $recaudocaja->puntoventa->nombre }}
+            </th>
+        </tr>
         <tbody>
-        @foreach($reservas as $boleta)
-            <tr>
-                <td class="numero">{{ $boleta->numero }}</td>
-                <td class="numero">{{ $boleta->promocional }}</td>
-            </tr>
-        @endforeach
+        <tr class="">
+            <th colspan="2" scope="row" style="border: black" class="px-6 mx-auto py-4 font-medium text-black font-bold whitespace-nowrap">
+                Movimientos
+            </th>
+        </tr>
 
-
+        <tr class="bg-white border-b ">
+            <th scope="col" class="px-6 py-2">
+                Fondo:
+            </th>
+            <td class="px-6 py-2">
+                {{ $recaudocaja->montoapertura }}
+            </td>
+        </tr>
+        <tr class="bg-white border-b ">
+            <th scope="col" class="px-6 py-2">
+                Efectivo:
+            </th>
+            <td class="px-6 py-2">
+                {{ $recaudocaja->montocierre }}
+            </td>
+        </tr>
+        <tr class="bg-white border-b ">
+            <th scope="col" class="px-6 py-2">
+                Ventas:
+            </th>
+            <td class="px-6 py-2">
+                {{ $recaudocaja->recaudoefectivo }}
+            </td>
+        </tr>
+        <tr class="bg-white border-b ">
+            <th scope="col" class="px-6 py-2">
+                Comisiones:
+            </th>
+            <td class="px-6 py-2">
+                {{ $recaudocaja->comisionventa }}
+            </td>
+        </tr>
+        <tr class="bg-white border-b ">
+            <th scope="col" class="px-6 py-2">
+                Faltante
+            </th>
+            <td class="px-6 py-2 text-red-700">
+                {{ $recaudocaja->faltante }}
+            </td>
+        </tr>
+        <tr class="bg-white border-b ">
+            <th scope="col" class="px-6 py-2">
+                Sobrante
+            </th>
+            <td class="px-6 py-2">
+                {{ $recaudocaja->sobrante }}
+            </td>
+        </tr>
         </tbody>
     </table>
+
+
+
+
+
 <hr>
-<p class="left"><strong>Total boletas Entregadas:</strong> {{ $cantidad }}
-    <br><strong>Vendedor</strong>: {{ $vendedor }}
-</p>
+
 </div>
 </body>
 </html>
 
 <style>
     * {
-        font-size: 16px;
+        font-size: 14px;
         font-family: 'Verdana';
     }
 
