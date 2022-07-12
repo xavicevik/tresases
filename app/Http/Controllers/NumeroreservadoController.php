@@ -452,94 +452,117 @@ class NumeroreservadoController extends Controller
 
     public function reportpdfAsignacion(Request $request)
     {
-        $user = Auth::user();
+        try {
+            // Begin a transaction
+            DB::beginTransaction();
+            $user = Auth::user();
 
-        foreach ($request->reservas as $reserva){
-            $reg = json_decode($reserva);
-            $salida[] = $reg;
-            $boleta = Boleta::where('idrifa', $request->idrifa)
-                ->where('estado', '=', 1)
-                ->where('numero', $reg->numero)
-                ->first();
-            $boleta->estado = 2;
-            $boleta->idvendedor = $request->iduserdestino;
-            $boleta->save();
+            foreach ($request->reservas as $reserva){
+                $reg = json_decode($reserva);
+                $salida[] = $reg;
+                $boleta = Boleta::where('idrifa', $request->idrifa)
+                    ->where('estado', '=', 1)
+                    ->where('numero', $reg->numero)
+                    ->first();
+                $boleta->estado = 2;
+                $boleta->idvendedor = $request->iduserdestino;
+                $boleta->save();
+            }
+            $recibo = new Recibo();
+            $recibo->nombre = 'Recibo asignacion';
+            $recibo->url = 'Recibo asignacion';
+            $recibo->idusuario = Auth::user()->id;
+            $recibo->iduserdestino = $request->iduserdestino;
+            $recibo->save();
+
+            $data = [
+                'vendedor' => $request->vendedor,
+                'usuario' => $user->username,
+                'rifa' => $request->rifa,
+                'fecha' => $recibo->created_at,
+                'reservas' => $salida,
+                'recibo'  => $recibo->id,
+                'cantidad' => sizeof($salida)
+            ];
+
+            $filename = 'reciboAsignacion_'.$data['recibo'].'.pdf';
+            $recibo->url = $filename;
+            $recibo->save();
+            $pdf = app('dompdf.wrapper');
+            $pdf->getDomPDF()->set_option("enable_php", true);
+            $pdf->loadView('pdf.reportpdfAsignacion', $data);
+
+            $output = $pdf->output();
+            file_put_contents(public_path('storage').'/pdf/'.$filename, $output, FILE_APPEND);
+
+            //return $pdf->download($filename);
+            //return $pdf->stream('ventas.pdf');
+            //return redirect()->back()->with(['message' => public_path('storage').'/pdf/'.$filename]);
+            return ['url' => url('/storage/pdf/').'/'.$filename];
+            DB::commit();
+
+        } catch (\Exception $e) {
+            // An error occured; cancel the transaction...
+            DB::rollback();
+
+            return back()->withErrors(['error' => ['No se pudo reservar el número']]);
+            //throw $e;
         }
-        $recibo = new Recibo();
-        $recibo->nombre = 'Recibo asignacion';
-        $recibo->url = 'Recibo asignacion';
-        $recibo->idusuario = Auth::user()->id;
-        $recibo->iduserdestino = $request->iduserdestino;
-        $recibo->save();
-
-        $data = [
-            'vendedor' => $request->vendedor,
-            'usuario' => $user->username,
-            'rifa' => $request->rifa,
-            'fecha' => $recibo->created_at,
-            'reservas' => $salida,
-            'recibo'  => $recibo->id,
-            'cantidad' => sizeof($salida)
-        ];
-
-        $filename = 'reciboAsignacion_'.$data['recibo'].'.pdf';
-        $recibo->url = $filename;
-        $recibo->save();
-        $pdf = app('dompdf.wrapper');
-        $pdf->getDomPDF()->set_option("enable_php", true);
-        $pdf->loadView('pdf.reportpdfAsignacion', $data);
-
-        $output = $pdf->output();
-        file_put_contents(public_path('storage').'/pdf/'.$filename, $output, FILE_APPEND);
-
-        //return $pdf->download($filename);
-        //return $pdf->stream('ventas.pdf');
-        //return redirect()->back()->with(['message' => public_path('storage').'/pdf/'.$filename]);
-        return ['url' => url('/storage/pdf/').'/'.$filename];
     }
 
     public function reportpdfDesasignacion(Request $request)
     {
-        $user = Auth::user();
+        try {
+            // Begin a transaction
+            DB::beginTransaction();
+            $user = Auth::user();
 
-        foreach ($request->reservas as $reserva){
-            $reg = json_decode($reserva);
-            $salida[] = $reg;
-            $boleta = Boleta::where('idrifa', $request->idrifa)
-                ->where('estado', '=', 2)
-                ->where('numero', $reg->numero)
-                ->first();
-            $boleta->estado = 1;
-            $boleta->idvendedor = null;
-            $boleta->save();
+            foreach ($request->reservas as $reserva){
+                $reg = json_decode($reserva);
+                $salida[] = $reg;
+                $boleta = Boleta::where('idrifa', $request->idrifa)
+                    ->where('estado', '=', 2)
+                    ->where('numero', $reg->numero)
+                    ->first();
+                $boleta->estado = 1;
+                $boleta->idvendedor = null;
+                $boleta->save();
+            }
+            $recibo = new Recibo();
+            $recibo->nombre = 'Recibo desasignacion';
+            $recibo->url = 'Recibo desasignacion';
+            $recibo->idusuario = Auth::user()->id;
+            $recibo->iduserdestino = $request->iduserdestino;
+            $recibo->save();
+
+            $data = [
+                'vendedor' => $request->vendedor,
+                'usuario' => $user->username,
+                'rifa' => $request->rifa,
+                'fecha' => $recibo->created_at,
+                'reservas' => $salida,
+                'recibo'  => $recibo->id,
+                'cantidad' => sizeof($salida)
+            ];
+
+            $filename = 'reciboDesasignacion_'.$data['recibo'].'.pdf';
+            $recibo->url = $filename;
+            $recibo->save();
+            $pdf = app('dompdf.wrapper');
+            $pdf->getDomPDF()->set_option("enable_php", true);
+            $pdf->loadView('pdf.reportpdfDesasignacion', $data);
+
+            $output = $pdf->output();
+            file_put_contents(public_path('storage').'/pdf/'.$filename, $output, FILE_APPEND);
+            DB::commit();
+
+            return ['url' => url('/storage/pdf/').'/'.$filename];
+        } catch (\Exception $e) {
+            // An error occured; cancel the transaction...
+            DB::rollback();
+
+            return back()->withErrors(['error' => ['No se pudo reservar el número']]);
+                //throw $e;
         }
-        $recibo = new Recibo();
-        $recibo->nombre = 'Recibo desasignacion';
-        $recibo->url = 'Recibo desasignacion';
-        $recibo->idusuario = Auth::user()->id;
-        $recibo->iduserdestino = $request->iduserdestino;
-        $recibo->save();
-
-        $data = [
-            'vendedor' => $request->vendedor,
-            'usuario' => $user->username,
-            'rifa' => $request->rifa,
-            'fecha' => $recibo->created_at,
-            'reservas' => $salida,
-            'recibo'  => $recibo->id,
-            'cantidad' => sizeof($salida)
-        ];
-
-        $filename = 'reciboDesasignacion_'.$data['recibo'].'.pdf';
-        $recibo->url = $filename;
-        $recibo->save();
-        $pdf = app('dompdf.wrapper');
-        $pdf->getDomPDF()->set_option("enable_php", true);
-        $pdf->loadView('pdf.reportpdfDesasignacion', $data);
-
-        $output = $pdf->output();
-        file_put_contents(public_path('storage').'/pdf/'.$filename, $output, FILE_APPEND);
-
-        return ['url' => url('/storage/pdf/').'/'.$filename];
     }
 }

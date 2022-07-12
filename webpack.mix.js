@@ -20,6 +20,12 @@ mix.js('resources/js/app.js', 'public/js').vue()
         '@': 'resources/js',
     });
 
+mix.browserSync({
+    proxy: 'localhost.test',
+    host: 'localhost.test',
+    open: 'external'
+});
+
 if (mix.inProduction()) {
     mix.version();
 }

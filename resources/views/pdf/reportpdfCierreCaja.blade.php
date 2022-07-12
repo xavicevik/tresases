@@ -3,6 +3,14 @@
 <head>
     <link rel="stylesheet" href="style.css"> <script src="script.js"></script>
 </head>
+<style>
+    @page {
+        margin-left: 1cm;
+        margin-right: 0;
+        margin-top: 1.5cm;
+        margin-bottom: 0.5cm;
+    }
+</style>
 <body style="width: 6cm">
 <p class="ticket">
     <p class="left">
