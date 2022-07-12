@@ -38,17 +38,7 @@
                                     <button @click="openModal('eliminar')" class="bg-red-500 text-xs  hover:bg-red-700 text-white font-bold py-2 px-4 rounded ">Desasignar</button>
                                 </div>
                                 <div class="w-1/6 text-center">
-                                    <button onclick="document.getElementById('import').submit()" class="bg-orange-500 text-xs  hover:bg-orange-700 text-white font-bold py-2 px-4 rounded ">Importar</button>
-                                </div>
-                                <div class="w-4/6 text-center">
-                                    <form name="import" id="import" :action="route('numerosreservados.import')" method="POST" enctype="multipart/form-data">
-                                        <div class="form-group mb-4">
-                                            <div class="custom-file text-left">
-                                                <input type="hidden" name="_token" :value="form._token">
-                                                <input class="block w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 cursor-pointer dark:text-gray-400 focus:outline-none dark:bg-gray-700 dark:border-gray-400 dark:placeholder-gray-200" type="file" name="file" id="customFile">
-                                            </div>
-                                        </div>
-                                    </form>
+                                    <button @click="openModal('importar')" class="bg-orange-500 text-xs  hover:bg-orange-700 text-white font-bold py-2 px-4 rounded ">Importar</button>
                                 </div>
                             </div>
 
@@ -254,8 +244,25 @@
                                             </div>
                                         </section>
                                          <section>
+                                            <div v-if="isImport" class="flex py-1 w-full max-h-fit overflow-y-scroll">
+                                                 <div class="mb-4 w-full">
+                                                     <label class="block text-gray-700 text-sm font-bold mb-2">Importar</label>
 
-                                            <div class="flex py-1 w-full max-h-fit overflow-y-scroll">
+                                                         <form name="import" id="import" :action="route('numerosreservados.import')" method="POST" enctype="multipart/form-data">
+                                                             <div class="form-group mb-4">
+                                                                 <div class="custom-file text-left">
+                                                                     <input type="hidden" name="vendedor" :value="form.idvendedor.id">
+                                                                     <input type="hidden" name="rifa" :value="form.idrifa.id">
+                                                                     <input type="hidden" name="_token" :value="form._token">
+                                                                     <input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" type="file" name="file" id="customFile">
+                                                                 </div>
+                                                             </div>
+                                                         </form>
+                                                     <button onclick="document.getElementById('import').submit()" class="bg-orange-500 text-xs  hover:bg-orange-700 text-white font-bold py-2 px-4 rounded ">Importar</button>
+
+                                                 </div>
+                                            </div>
+                                            <div v-else class="flex py-1 w-full max-h-fit overflow-y-scroll">
                                                 <div class="mb-4 w-full">
                                                     <label class="block text-gray-700 text-sm font-bold mb-2">Número</label>
 
@@ -728,6 +735,7 @@ export default {
             existerifa: 0,
             existevendedor: 0,
             isIndividual: 0,
+            isImport: false,
         }
     },
     methods: {
@@ -930,6 +938,23 @@ export default {
                     this.form.fecha = null;
                     this.asignarMode = false;
                     this.eliminarMode = true;
+                    break;
+                }
+                case 'importar':
+                {
+                    this.tituloModal = 'Importar reserva de Boletería';
+                    this.form.id = null;
+                    this.form.idrifa = 0;
+                    this.form.numero = null;
+                    this.form.estado = false;
+                    this.form.rangoinicial = null;
+                    this.form.rangofinal = null;
+                    this.form.idvendedor = 0;
+                    this.form.idcliente = 0;
+                    this.form.fecha = null;
+                    this.asignarMode = true;
+                    this.eliminarMode = false;
+                    this.isImport = true;
                     break;
                 }
             }

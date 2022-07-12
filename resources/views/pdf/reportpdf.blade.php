@@ -4,6 +4,14 @@
     <link rel="stylesheet" href="style.css"> <script src="script.js"></script>
 </head>
 <body>
+<style>
+    @page {
+        margin-left: 1cm;
+        margin-right: 0;
+        margin-top: 1.5cm;
+        margin-bottom: 0.5cm;
+    }
+</style>
 <div class="ticket">
     <img
         src="storage/img/logo_baner.jpg"

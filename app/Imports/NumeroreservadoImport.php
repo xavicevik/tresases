@@ -4,12 +4,22 @@ namespace App\Imports;
 
 use App\Models\Boleta;
 use App\Models\NumeroReservado;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Maatwebsite\Excel\Concerns\ToModel;
 use function PHPUnit\Framework\isNull;
 
 class NumeroreservadoImport implements ToModel
 {
+    protected $idvenddor = null;
+    protected $idrifa = null;
+
+    public function __construct(Request $request)
+    {
+        $this->idrifa = $request->rifa;
+        $this->idvenddor = $request->vendedor;
+    }
+
     /**
     * @param array $row
     *
@@ -17,12 +27,12 @@ class NumeroreservadoImport implements ToModel
     */
     public function model(array $row)
     {
-        $boleta = Boleta::where('idrifa', $row[1])
-                        ->where('numero', $row[2])
+        $boleta = Boleta::where('idrifa', $this->idrifa)
+                        ->where('numero', $row[0])
                         ->firstOrFail();
         if (!is_null($boleta)) {
             if (($boleta->idvendedor === '' || $boleta->idvendedor === null) && $boleta->estado == 1) {
-                $boleta->idvendedor = $row[0];
+                $boleta->idvendedor = $this->idvenddor;
                 $boleta->estado = 2;
                 $boleta->save();
             }
