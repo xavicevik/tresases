@@ -53,13 +53,13 @@
                             <form @submit.prevent="getBoletas(form)" @keyup.enter="getBoletas(form)">
                                 <div class="grid xl:grid-cols-2 xl:gap-6">
                                     <div class="relative z-0 w-full mb-6 group">
-                                        <input type="text" v-model="form.rifa" class="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border-blue-600 peer" placeholder=" " required />
-                                        <label class="peer-focus:font-medium absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:left-0 peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6">
-                                            Rifa
-                                        </label>
+                                        <select class="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer" v-model="form.rifa">
+                                            <option value="0" >Seleccione Rifa</option>
+                                            <option v-for="rifa in arrayRifas.data" :key="rifa.id" :value="rifa.id" v-text="rifa.titulo"></option>
+                                        </select>
                                     </div>
                                     <div class="relative z-0 w-full mb-6 group">
-                                        <input type="text" v-model="form.numero" class="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border-blue-600 peer" placeholder=" " required />
+                                        <input type="text" v-model="form.numero" class="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer" placeholder=" " required />
                                         <label class="peer-focus:font-medium absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:left-0 peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6">
                                             Número
                                         </label>
@@ -73,10 +73,10 @@
                                         </label>
                                     </div>
                                     <div class="relative z-0 w-full mb-6 group">
-                                        <input type="text" v-model="form.vendedor" class="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none dark:text-white dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer" placeholder=" " required />
-                                        <label class="peer-focus:font-medium absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:left-0 peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6">
-                                            Vendedor
-                                        </label>
+                                        <select class="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer" v-model="form.vendedor">
+                                            <option value="0" >Seleccione Vendedor</option>
+                                            <option v-for="vendedor in arrayVendedores.data" :key="vendedor.id" :value="vendedor.id" v-text="vendedor.full_name"></option>
+                                        </select>
                                     </div>
                                 </div>
 
@@ -573,7 +573,7 @@
                                                 </tr>
                                                 </thead>
                                                 <tbody>
-                                                <tr @click="onSelectVendedor(vendedor)" class="hover:bg-blue-50 text-center" text-sm v-if="existevendedor > 0" v-for="(vendedor, id) in arrayVendedores.data" :key="id">
+                                                <tr @click="onSelectVendedor(vendedor)" class="hover:bg-blue-50 text-center" text-sm v-if="arrayVendedores.data" v-for="(vendedor, id) in arrayVendedores.data" :key="id">
                                                     <td class="border px-1 py-2 text-sm truncate" v-text="vendedor.full_name"></td>
                                                     <td class="border px-1 py-2 text-sm truncate" v-text="vendedor.documento"></td>
                                                     <td class="border px-1 py-2 text-sm truncate" v-text="vendedor.correo"></td>
@@ -691,10 +691,10 @@ export default {
             tituloModal: '',
             form: {
                 _token: usePage().props.value._token,
-                rifa: null,
+                rifa: 0,
                 numero: null,
                 promocional: null,
-                vendedor: null,
+                vendedor: 0,
                 cliente: null,
                 estado: '',
                 reserva: {
@@ -816,6 +816,7 @@ export default {
                         showConfirmButton: true,
                     })
                     window.open(res.data.url, '_blank');
+                    this.form.reservas = [];
                 })
             } else {
                 Swal.fire({
@@ -844,6 +845,7 @@ export default {
                         showConfirmButton: true,
                     })
                     window.open(res.data.url, '_blank');
+                    this.form.reservas = [];
                 })
             } else {
                 Swal.fire({
@@ -1230,12 +1232,6 @@ export default {
                 //console.log(res.data);
                 var respuesta = res.data;
                 this.arrayVendedores = respuesta.vendedores;
-
-                if (this.arrayVendedores.data.length > 0) {
-                    this.existevendedor = 1;
-                } else {
-                    this.existevendedor = 0;
-                }
             })
         },
         deleteRow: function (data) {
@@ -1279,6 +1275,8 @@ export default {
     },
     created: function () {
         this.arrayData = this.datos;
+        this.arrayVendedores = this.getVendedores('');
+        this.arrayRifas = this.getRifas('');
         //console.log(this.datos);
     },
     mounted() {

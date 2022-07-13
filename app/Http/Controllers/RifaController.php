@@ -101,9 +101,12 @@ class RifaController extends Controller
                 ->with('vendedor')
                 ->with('cliente');
 
-            if(!is_null($filtros->rifa) && $filtros->rifa <> '') {
-                $boletas = $boletas->join('rifas', 'boletas.idrifa', '=', 'rifas.id')
-                                    ->where('rifas.titulo', 'like', '%'.$filtros->rifa.'%');
+            if(!is_null($filtros->rifa) && $filtros->rifa <> '' && $filtros->rifa <> 0) {
+                $boletas = $boletas->where('boletas.idrifa', $filtros->rifa);
+            }
+
+            if(!is_null($filtros->vendedor) && $filtros->vendedor <> '' && $filtros->vendedor <> 0) {
+                $boletas = $boletas->where('boletas.idvendedor', $filtros->vendedor);
             }
 
             if(!is_null($filtros->numero) && $filtros->numero <> '') {
@@ -122,11 +125,7 @@ class RifaController extends Controller
                     ->where('t1.nombre', 'like', '%'.$filtros->cliente.'%')
                     ->orWhere('t1.apellido', 'like', '%'.$filtros->cliente.'%');
             }
-            if(!is_null($filtros->cliente) && $filtros->cliente <> '') {
-                $boletas = $boletas->join('users as t2', 'boletas.idvendedor', '=', 't2.id')
-                    ->where('t2.nombre', 'like', '%'.$filtros->cliente.'%')
-                    ->orWhere('t2.apellido', 'like', '%'.$filtros->cliente.'%');
-            }
+
             $boletas = $boletas->select('boletas.*')->paginate(self::canPorPagina);
         }
         //$queries = DB::getQueryLog();
