@@ -61,9 +61,8 @@ class NumeroreservadoController extends Controller
                 ->with('cliente')
                 ->where('boletas.estado', '2');
 
-            if(!is_null($filtros->rifa) && $filtros->rifa <> '') {
-                $boletas = $boletas->join('rifas', 'boletas.idrifa', '=', 'rifas.id')
-                    ->where('rifas.titulo', 'like', '%'.$filtros->rifa.'%');
+            if(!is_null($filtros->rifa) && $filtros->rifa <> '' && $filtros->rifa <> 0) {
+                $boletas = $boletas->where('boletas.idrifa', $filtros->rifa);
             }
 
             if(!is_null($filtros->numero) && $filtros->numero <> '') {
@@ -82,9 +81,8 @@ class NumeroreservadoController extends Controller
                     ->where('t1.nombre', 'like', '%'.$filtros->cliente.'%')
                     ->orWhere('t1.apellido', 'like', '%'.$filtros->cliente.'%');
             }
-            if(!is_null($filtros->vendedor) && $filtros->vendedor <> '') {
-                $boletas = $boletas->join('users as t2', 'boletas.idvendedor', '=', 't2.id')
-                    ->where('t2.username', 'like', '%'.$filtros->vendedor.'%');
+            if(!is_null($filtros->vendedor) && $filtros->vendedor <> '' && $filtros->vendedor <> 0) {
+                $boletas = $boletas->where('boletas.idvendedor', $filtros->vendedor);
             }
             $boletas = $boletas->select('boletas.*')->paginate(self::canPorPagina);
         }
