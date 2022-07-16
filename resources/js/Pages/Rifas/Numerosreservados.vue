@@ -806,9 +806,9 @@ export default {
                         title: 'Se ha generado el recibo correspondiente',
                         showConfirmButton: true,
                     })
+                    this.getBoletas();
                     window.open(res.data.url, '_blank');
                     this.form.reservas = [];
-                    this.getBoletas(form);
                 })
             } else {
                 Swal.fire({
@@ -837,8 +837,8 @@ export default {
                         showConfirmButton: true,
                     })
                     window.open(res.data.url, '_blank');
+                    this.getBoletas();
                     this.form.reservas = [];
-                    this.getBoletas(form);
                 })
             } else {
                 Swal.fire({
