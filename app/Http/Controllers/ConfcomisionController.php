@@ -20,7 +20,7 @@ use Laravel\Jetstream\Jetstream;
 
 class ConfcomisionController extends Controller
 {
-    const canPorPagina = 10;
+    const canPorPagina = 15;
     /**
      * Display a listing of the resource.
      *
@@ -51,10 +51,17 @@ class ConfcomisionController extends Controller
                 ->paginate(self::canPorPagina);
         } else {
             $comision = Confcomision::orderBy($sortBy, $sortOrder)
+                ->join('users', 'users.id', 'confcomisiones.idvendedor')
                 ->with('vendedor')
                 ->with('agente')
                 ->with('mayorista')
                 ->with('distribuidor')
+                ->where(function ($query) use ($buscar) {
+                    return $query->where('users.nombre', 'like', "%$buscar%")
+                        ->orWhere('users.apellido', 'like', '%' . $buscar . '%')
+                        ->orWhere('users.documento', 'like', '%' . $buscar . '%');
+                        })
+                ->select('confcomisiones.*')
                 ->paginate(self::canPorPagina);
         }
 

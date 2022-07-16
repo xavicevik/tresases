@@ -21,18 +21,7 @@
                             </div>
 
                             <div class="w-1/3">
-                                <div class="container flex justify-center items-center">
-                                    <div class="relative">
-                                        <div class="absolute top-4 left-3">
-                                            <i class="fa fa-search text-gray-400 z-20 hover:text-gray-500"></i> </div>
-                                        <input type="text" v-model="buscar" @keyup="getCajas(buscar,'id')" class="h-8 w-96 pl-4 pr-4 rounded-lg z-0 focus:shadow focus:outline-none" placeholder="Buscar (Nombre, Apellido, Correo, Usuario)">
-                                        <button @click="getCajas(buscar,'id')">
-                                            <div class="absolute top-2 right-2">
-                                                <Icon icon="fe:search" class="h-4"  />
-                                            </div>
-                                        </button>
-                                    </div>
-                                </div>
+
                             </div>
                             <div class="pr-2 w-1/3 text-center">
                                 <button @click="openModal('registrar')" class="bg-blue-500 text-xs  hover:bg-blue-700 text-white font-bold py-2 px-4 rounded ">Crear Nueva</button>

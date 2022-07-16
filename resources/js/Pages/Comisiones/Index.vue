@@ -25,8 +25,8 @@
                                     <div class="relative">
                                         <div class="absolute top-4 left-3">
                                             <i class="fa fa-search text-gray-400 z-20 hover:text-gray-500"></i> </div>
-                                        <input type="text" v-model="buscar" @keyup="getCajas(buscar,'id')" class="h-8 w-96 pl-4 pr-4 rounded-lg z-0 focus:shadow focus:outline-none" placeholder="Buscar (Nombre, Apellido, Correo, Usuario)">
-                                        <button @click="getCajas(buscar,'id')">
+                                        <input type="text" v-model="buscar" @keyup.enter="getConfcomisiones(buscar,'id')" class="h-8 w-96 pl-4 pr-4 rounded-lg z-0 focus:shadow focus:outline-none" placeholder="Buscar">
+                                        <button @click="getConfcomisiones(buscar,'id')">
                                             <div class="absolute top-2 right-2">
                                                 <Icon icon="fe:search" class="h-4"  />
                                             </div>

@@ -81,8 +81,10 @@ class NumeroreservadoController extends Controller
                     ->where('t1.nombre', 'like', '%'.$filtros->cliente.'%')
                     ->orWhere('t1.apellido', 'like', '%'.$filtros->cliente.'%');
             }
-            if(!is_null($filtros->vendedor) && $filtros->vendedor <> '' && $filtros->vendedor <> 0) {
-                $boletas = $boletas->where('boletas.idvendedor', $filtros->vendedor);
+            if(!is_null($filtros->idvendedor) && $filtros->idvendedor?$filtros->idvendedor:0 <> 0) {
+                if ($filtros->idvendedor->id <> '' && $filtros->idvendedor->id <> 0) {
+                    $boletas = $boletas->where('boletas.idvendedor', $filtros->idvendedor->id);
+                }
             }
             $boletas = $boletas->select('boletas.*')->paginate(self::canPorPagina);
         }
@@ -492,12 +494,9 @@ class NumeroreservadoController extends Controller
 
             $output = $pdf->output();
             file_put_contents(public_path('storage').'/pdf/'.$filename, $output, FILE_APPEND);
-
-            //return $pdf->download($filename);
-            //return $pdf->stream('ventas.pdf');
-            //return redirect()->back()->with(['message' => public_path('storage').'/pdf/'.$filename]);
-            return ['url' => url('/storage/pdf/').'/'.$filename];
             DB::commit();
+
+            return ['url' => url('/storage/pdf/').'/'.$filename];
 
         } catch (\Exception $e) {
             // An error occured; cancel the transaction...
@@ -511,7 +510,6 @@ class NumeroreservadoController extends Controller
     public function reportpdfDesasignacion(Request $request)
     {
         try {
-            // Begin a transaction
             DB::beginTransaction();
             $user = Auth::user();
 

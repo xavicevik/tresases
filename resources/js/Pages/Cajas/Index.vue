@@ -678,7 +678,8 @@ export default {
                     showConfirmButton: true,
                 })
                 this.isOpenAbrir = false;
-                this.getCajas();
+                window.location.replace('/cajas/movimientos');
+                //this.getCajas();
             })
         },
         cierre: function (data) {
