@@ -21,7 +21,7 @@ use Laravel\Jetstream\Jetstream;
 
 class ComisionController extends Controller
 {
-    const canPorPagina = 10;
+    const canPorPagina = 15;
     /**
      * Display a listing of the resource.
      *

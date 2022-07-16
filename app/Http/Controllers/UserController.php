@@ -186,10 +186,10 @@ class UserController extends Controller
         $buscar = $request->buscar;
         $filtro = $request->filtro;
         $paginate = $request->paginate;
+
         if (isset($request->page) and $request->page > 0){
             $paginate = true;
         }
-
         if ($request->has('sortBy') && $request->sortBy <> ''){
             $sortBy = $request->sortBy;
         } else {
@@ -223,12 +223,11 @@ class UserController extends Controller
                     });
         }
 
-        if ($paginate) {
+        if ($paginate == "true") {
             $users = $users->paginate(self::canPorPagina);
         } else {
             $users = $users->get();
         }
-
         return ['vendedores' => $users];
     }
 

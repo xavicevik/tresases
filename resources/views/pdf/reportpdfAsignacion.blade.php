@@ -7,11 +7,11 @@
     @page {
         margin-left: 1cm;
         margin-right: 0;
-        margin-top: 1.5cm;
+        margin-top: 0cm;
         margin-bottom: 0.5cm;
     }
 </style>
-<body style="width: 6cm; margin: 0px">
+<body style="width: 6cm; margin: 0px; margin-top: 0cm;">
 <p class="ticket">
     <p class="left">
         <strong>Los Tres Ases
@@ -67,9 +67,9 @@
     th,
     tr,
     table {
-        border-top: 1px dot-dash black;
+        border-top: 0px dot-dash black;
         border-collapse: collapse;
-        padding: 4px;
+        padding: 2px;
     }
 
     td.numero,

@@ -48,7 +48,7 @@
                                     <div class="relative z-0 w-full mb-6 group">
                                         <select class="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer" v-model="form.vendedor">
                                             <option value="0" >Seleccione Vendedor</option>
-                                            <option v-for="vendedor in arrayVendedores.data" :key="vendedor.id" :value="vendedor.id" v-text="vendedor.full_name"></option>
+                                            <option v-for="vendedor in arrayVendedores" :key="vendedor.id" :value="vendedor.id" v-text="vendedor.full_name"></option>
                                         </select>
                                     </div>
                                 </div>
@@ -470,7 +470,6 @@ export default {
                     paginate: paginate
                 }
             }).then((res) => {
-                //console.log(res.data);
                 var respuesta = res.data;
                 this.arrayVendedores = respuesta.vendedores;
             })
@@ -479,7 +478,7 @@ export default {
     created: function () {
         //console.log('inicio comisiones');
         this.arrayData = this.datos;
-        this.arrayVendedores = this.getVendedores('');
+        this.arrayVendedores = this.getVendedores('', '', false);
         this.arrayRifas = this.getRifas('');
         //console.log(this.datos);
 

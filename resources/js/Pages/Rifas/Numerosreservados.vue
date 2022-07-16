@@ -73,10 +73,7 @@
                                         </label>
                                     </div>
                                     <div class="relative z-0 w-full mb-6 group">
-                                        <select class="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer" v-model="form.vendedor">
-                                            <option value="0" >Seleccione Vendedor</option>
-                                            <option v-for="vendedor in arrayVendedores.data" :key="vendedor.id" :value="vendedor.id" v-text="vendedor.full_name"></option>
-                                        </select>
+                                        <input v-model="form.idvendedor.full_name" @click="selectVendedor('menu')" type="text" class="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer" placeholder="Seleccione Vendedor">
                                     </div>
                                 </div>
 
@@ -91,7 +88,7 @@
                             <table class="table-fixed w-full">
                                 <thead>
                                 <tr class="text-left bg-gray-100">
-                                    <th class="px-4 py-2 text-sm font-bold hover:bg-blue-500 hover:text-gray-50 rounded-b">
+                                    <th class="px-4 py-2 w-1/5 text-sm font-bold hover:bg-blue-500 hover:text-gray-50 rounded-b">
                                         <button @click="getCajas(buscar, 'id')" class="font-bold">
                                             Rifa
                                             <div v-show="sortBy == 'nombre'">
@@ -108,7 +105,7 @@
                                             </div>
                                         </button>
                                     </th>
-                                    <th class="px-4 py-2 text-sm font-bold hover:bg-blue-500 hover:text-gray-50 rounded-b">
+                                    <th class="px-4 py-2 w-1/5 text-sm font-bold hover:bg-blue-500 hover:text-gray-50 rounded-b">
                                         <button @click="getCajas(buscar, 'id')" class="font-bold">
                                             Número
                                             <div v-show="sortBy == 'nombre'">
@@ -125,7 +122,7 @@
                                             </div>
                                         </button>
                                     </th>
-                                    <th class="px-4 py-2 text-sm font-bold hover:bg-blue-500 hover:text-gray-50 rounded-b">
+                                    <th class="px-4 py-2 w-1/5 text-sm font-bold hover:bg-blue-500 hover:text-gray-50 rounded-b">
                                         <button @click="getCajas(buscar, 'id')" class="font-bold">
                                             Promocional
                                             <div v-show="sortBy == 'nombre'">
@@ -142,7 +139,7 @@
                                             </div>
                                         </button>
                                     </th>
-                                    <th class="px-4 py-2 text-sm font-bold hover:bg-blue-500 hover:text-gray-50 rounded-b">
+                                    <th class="px-4 w-2/5 py-2 text-sm font-bold hover:bg-blue-500 hover:text-gray-50 rounded-b">
                                         <button @click="getCajas(buscar, 'id')" class="font-bold">
                                             Vendedor
                                             <div v-show="sortBy == 'ciudad.precio'">
@@ -159,7 +156,7 @@
                                             </div>
                                         </button>
                                     </th>
-                                    <th class="px-4 py-2 text-sm font-bold hover:bg-blue-500 hover:text-gray-50 rounded-b">
+                                    <th class="px-4 py-2 w-1/5 text-sm font-bold hover:bg-blue-500 hover:text-gray-50 rounded-b">
                                         <button @click="getCajas(buscar, 'id')" class="font-bold">
                                             Fecha
                                             <div v-show="sortBy == 'fechafin'">
@@ -180,11 +177,11 @@
                                 </thead>
                                 <tbody>
                                 <tr class="text-left" text-sm v-if="arrayData.data" v-for="(dato, id) in arrayData.data" :key="id">
-                                    <td class="border px-1 py-2 text-sm truncate" v-text="dato.rifa.titulo"></td>
-                                    <td class="border px-1 py-2 text-sm truncate" v-text="dato.numero"></td>
-                                    <td class="border px-1 py-2 text-sm truncate" v-text="dato.promocional"></td>
-                                    <td class="border px-1 py-2 text-sm truncate"><a :href="dato.vendedor?verVendedor(dato.vendedor.id):''"> {{ dato.vendedor?(dato.vendedor.documento + '-'+dato.vendedor.nombre+' '+dato.vendedor.apellido):''}} </a></td>
-                                    <td class="border px-1 py-2 text-sm truncate" v-text="dateTimeFull(dato.updated_at)"></td>
+                                    <td class="border px-4 py-2 text-sm truncate" v-text="dato.rifa.titulo"></td>
+                                    <td class="border px-4 py-2 text-sm truncate" v-text="dato.numero"></td>
+                                    <td class="border px-4 py-2 text-sm truncate" v-text="dato.promocional"></td>
+                                    <td class="border px-4 py-2 text-sm truncate"><a :href="dato.vendedor?verVendedor(dato.vendedor.id):''"> {{ dato.vendedor?(dato.vendedor.documento + ' - '+dato.vendedor.full_name):''}} </a></td>
+                                    <td class="border px-4 py-2 text-sm truncate" v-text="dateTimeFull(dato.updated_at)"></td>
                                 </tr>
                                 <tr v-else>
                                     <td class="border px-4 py-2 text-xs text-center" colspan="12"> La consulta no obtuvo datos</td>
@@ -237,7 +234,7 @@
                                                 <div class="mb-4 w-full pr-2">
                                                     <label class="block text-gray-700 text-sm font-bold mb-2">Vendedor</label>
 
-                                                    <input v-model="form.idvendedor.nombre" @click="selectVendedor()" type="text" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" placeholder="Seleccione Vendedor">
+                                                    <input v-model="form.idvendedor.full_name" @click="selectVendedor()" type="text" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" placeholder="Seleccione Vendedor">
 
                                                     <div v-if="$page.props.errors.vendedor" class="text-red-500">{{ $page.props.errors.vendedor }}</div>
                                                 </div>
@@ -542,12 +539,12 @@
                                                     <div class="relative">
                                                         <div class="absolute top-4 left-3">
                                                             <i class="fa fa-search text-gray-400 z-20 hover:text-gray-500"></i> </div>
-                                                        <input type="text" v-model="buscar" @keyup="getRifas(buscar,'nombre_tecnico', true)" class="h-8 w-26 pl-4 pr-4 rounded-lg z-0 focus:shadow focus:outline-none" placeholder="Buscar (Nombre, apellido)">
-                                                        <button @click="getRifas(buscar,'nombre_tecnico', true)">
-                                                            <div class="absolute top-2 right-2">
-                                                                <Icon icon="fe:search" class="h-4"  />
-                                                            </div>
-                                                        </button>
+                                                            <input type="text" v-model="buscar" @keyup.enter="getVendedores(buscar,'nombre', true)" class="h-8 w-26 pl-4 pr-4 rounded-lg z-0 focus:shadow focus:outline-none" placeholder="Buscar (Nombre, apellido)">
+                                                            <button @click="getVendedores(buscar,'nombre', true)">
+                                                                <div class="absolute top-2 right-2">
+                                                                    <Icon icon="fe:search" class="h-4"  />
+                                                                </div>
+                                                            </button>
                                                     </div>
                                                 </div>
                                             </div>
@@ -573,7 +570,7 @@
                                                 </tr>
                                                 </thead>
                                                 <tbody>
-                                                <tr @click="onSelectVendedor(vendedor)" class="hover:bg-blue-50 text-center" text-sm v-if="arrayVendedores.data" v-for="(vendedor, id) in arrayVendedores.data" :key="id">
+                                                <tr @click="onSelectVendedor(vendedor, )" class="hover:bg-blue-50 text-center" text-sm v-if="arrayVendedores.data" v-for="(vendedor, id) in arrayVendedores.data" :key="id">
                                                     <td class="border px-1 py-2 text-sm truncate" v-text="vendedor.full_name"></td>
                                                     <td class="border px-1 py-2 text-sm truncate" v-text="vendedor.documento"></td>
                                                     <td class="border px-1 py-2 text-sm truncate" v-text="vendedor.correo"></td>
@@ -765,12 +762,6 @@ export default {
             }).then((res) => {
                 var respuesta = res.data;
                 this.arrayVendedores = respuesta.vendedores;
-
-                if (this.arrayVendedores.data.length > 0) {
-                    this.existevendedor = 1;
-                } else {
-                    this.existevendedor = 0;
-                }
             })
         },
         onSelectRifa: function(data){
@@ -778,7 +769,7 @@ export default {
             this.closeMoodalRifa();
             this.actualizarRangos();
         },
-        onSelectVendedor: function(data){
+        onSelectVendedor: function(data, target = ''){
             this.form.idvendedor = data;
             this.closeMoodalVendedor();
         },
@@ -817,6 +808,7 @@ export default {
                     })
                     window.open(res.data.url, '_blank');
                     this.form.reservas = [];
+                    this.getBoletas(form);
                 })
             } else {
                 Swal.fire({
@@ -846,6 +838,7 @@ export default {
                     })
                     window.open(res.data.url, '_blank');
                     this.form.reservas = [];
+                    this.getBoletas(form);
                 })
             } else {
                 Swal.fire({
@@ -966,10 +959,10 @@ export default {
             //this.getUsers();
             this.getRifas('','nombre_tecnico','true');
         },
-        selectVendedor: function () {
+        selectVendedor: function (target = '') {
             this.isOpenVendedor = true;
             //this.getUsers();
-            this.getVendedores('','users.nombre','true');
+            this.getVendedores('','users.nombre','true', target);
         },
         closeModal: function () {
             this.isOpen = false;
@@ -1219,7 +1212,7 @@ export default {
                 }
             })
         },
-        getVendedores: async function (buscar = '', filtro = 'nombre', paginate = false) {
+        getVendedores: async function (buscar = '', filtro = 'nombre', paginate = false, target = '') {
 
             var url= '/users/getVendedoresActivos';
             axios.get(url, {
@@ -1229,7 +1222,6 @@ export default {
                     paginate: paginate
                 }
             }).then((res) => {
-                //console.log(res.data);
                 var respuesta = res.data;
                 this.arrayVendedores = respuesta.vendedores;
             })
