@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Boleta;
+use App\Models\Detalleventa;
 use App\Models\Loteria;
 use App\Models\Imagen;
 use App\Models\NumeroReservado;
@@ -468,6 +469,7 @@ class NumeroreservadoController extends Controller
                 $boleta->idvendedor = $request->iduserdestino;
                 $boleta->save();
             }
+            asort($salida);
             $recibo = new Recibo();
             $recibo->nombre = 'Recibo asignacion';
             $recibo->url = 'Recibo asignacion';
@@ -524,6 +526,7 @@ class NumeroreservadoController extends Controller
                 $boleta->idvendedor = null;
                 $boleta->save();
             }
+            asort($salida);
             $recibo = new Recibo();
             $recibo->nombre = 'Recibo desasignacion';
             $recibo->url = 'Recibo desasignacion';
@@ -560,5 +563,49 @@ class NumeroreservadoController extends Controller
             return back()->withErrors(['error' => ['No se pudo reservar el número']]);
                 //throw $e;
         }
+    }
+
+    public function reportpdfCliente(Request $request)
+    {
+        $detalleventa = Detalleventa::where('id', $request->iddetalleventa)
+                                     ->with('cliente')
+                                     ->with('boleta')
+                                     ->with('boleta.vendedor')
+                                     ->with('rifa')
+                                     ->first();
+        $recibo = new Recibo();
+        $recibo->nombre = 'Recibo cliente';
+        $recibo->url = 'Recibo cliente';
+        $recibo->idusuario = Auth::user()->id;
+        $recibo->iduserdestino = $detalleventa->cliente->id;
+        $recibo->save();
+
+        $data = [
+            'vendedor' => $detalleventa->boleta->vendedor->full_name,
+            'cliente' => $detalleventa->cliente->full_name,
+            'usuario' => Auth::user()->username,
+            'rifa' => $detalleventa->rifa->titulo,
+            'fecha' => $detalleventa->created_at,
+            'numero' => $detalleventa->boleta->numero,
+            'promocional' => $detalleventa->boleta->promocional,
+            'total' => "$" . number_format($detalleventa->boleta->valor, 0, ".", ","),
+            'pagado' => "$" . number_format($detalleventa->boleta->pago, 0, ".", ","),
+            'saldo' => "$" . number_format($detalleventa->boleta->saldo, 0, ".", ","),
+            'recibo'  => $recibo->id
+        ];
+
+        $filename = 'reciboAsignacion_'.$data['recibo'].'.pdf';
+        $recibo->url = $filename;
+        $recibo->save();
+        $pdf = app('dompdf.wrapper');
+        $pdf->getDomPDF()->set_option("enable_php", true);
+        $pdf->loadView('pdf.reportpdfVentaCliente', $data);
+
+        return $pdf->download($filename);
+
+        $output = $pdf->output();
+        //file_put_contents(public_path('storage').'/pdf/'.$filename, $output, FILE_APPEND);
+
+        //return ['url' => url('/storage/pdf/').'/'.$filename];
     }
 }

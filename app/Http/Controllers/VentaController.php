@@ -531,6 +531,8 @@ class VentaController extends Controller
                 $reg->valorpagar = "$" . number_format($reg->valorpagar, 0, ".", ",");
                 $reg->comision = "$" . number_format($reg->comision, 0, ".", ",");
             }
+
+            asort($salida);
             $recibo = new Recibo();
             $recibo->nombre = 'Recibo venta';
             $recibo->url = 'Recibo venta';
@@ -717,6 +719,7 @@ class VentaController extends Controller
                 $reg->valorpagado = "$" . number_format($reg->valorpagado, 0, ".", ",");
                 $reg->comision = "$" . number_format($reg->comision, 0, ".", ",");
             }
+            asort($salida);
             $recibo = new Recibo();
             $recibo->nombre = 'Recibo anulacion venta';
             $recibo->url = 'Recibo anulacion venta';

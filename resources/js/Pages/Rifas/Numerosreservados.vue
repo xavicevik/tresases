@@ -320,6 +320,16 @@
                                                                 </svg>
                                                             </div>
                                                         </div>
+                                                        <div class="bg-blue-400 rounded-md flex py-1 px-2 font-bold">
+                                                            <div class="w-1/3">
+                                                                Cantidad:
+                                                            </div>
+                                                            <div class="w-1/3 px-2">
+                                                            </div>
+                                                            <div class="w-1/3 px-2">
+                                                                {{ form.reservas.length }}
+                                                            </div>
+                                                        </div>
 
                                                 </div>
                                             </div>

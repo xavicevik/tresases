@@ -170,6 +170,8 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'),'verified',]
         Route::get('/numerosreservados/eliminarReserva', [NumeroreservadoController::class, 'eliminarReserva'])->name('numerosreservados.eliminarReserva');
         Route::get('/numerosreservados/reportpdfAsignacion', [NumeroreservadoController::class, 'reportpdfAsignacion'])->name('numerosreservados.reportpdfAsignacion');
         Route::get('/numerosreservados/reportpdfDesasignacion', [NumeroreservadoController::class, 'reportpdfDesasignacion'])->name('numerosreservados.reportpdfDesasignacion');
+        Route::get('/numerosreservados/reportpdfCliente', [NumeroreservadoController::class, 'reportpdfCliente'])->name('numerosreservados.reportpdfCliente');
+
 
         Route::get('/numerosreservados/getBoletaOcupadaVenta', [NumeroreservadoController::class, 'getBoletaOcupadaVenta'])->name('numerosreservados.getBoletaOcupadaVenta');
         Route::get('/numerosreservados/getBoletaVendida', [NumeroreservadoController::class, 'getBoletaVendida'])->name('numerosreservados.getBoletaVendida');
