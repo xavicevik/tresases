@@ -21,6 +21,7 @@ use App\Models\Venta;
 use Darryldecode\Cart\Cart;
 use Illuminate\Routing\Route;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Redirect;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -31,6 +32,7 @@ use Illuminate\Support\Facades\Validator;
 use Inertia\Inertia;
 use Spatie\Permission\Models\Permission;
 use function PHPUnit\Framework\isEmpty;
+
 
 class VentaController extends Controller
 {
@@ -620,6 +622,49 @@ class VentaController extends Controller
             $venta->save();
             DB::commit();
 
+            // Envío de mensajes de texto
+            foreach ($request->reservas as $reserva) {
+                $reg = json_decode($reserva);
+                $cliente = User::where('id', $reg->idcliente)->first();
+
+                $to = "57".$cliente->movil;//"573155665528";
+                //$to = "573155665528";
+
+                if ($reg->valorpagar > 0) {
+                    $saldo = $reg->valortotal - $reg->valorpagar;
+                    $saldotxt = "Tu saldo pendiente es $saldo.";
+                }
+                $message = "Los Tres Ases te da la bienvenida y agradece tu fidelidad, el gran bono millonario premio mayor $reg->numero promocional $reg->promocional ha sido registrado con exito. $saldotxt SUERTE";
+
+                $response = Http::withHeaders([
+                    'Content-Type' => 'application/json',
+                    'Authorization' => 'Basic QWRhbW1Tb2x1Y2lvbmVzX0JfMVdFOjZpW3pMRVEkTWI=',
+                ])->post("https://api-sms.masivapp.com/send-message", [
+                    "to" => $to,
+                    "text" => $message,
+                    "customdata" => "CUS_ID_0125",
+                    "isPremium" => false,
+                    "isFlash" => false,
+                    "isLongmessage" => true,
+                    "isRandomRoute" => false
+                ]);
+                if ($saldo == 0) {
+                    $message = "Conserva este mensaje de paz y salvo valido para reclamar el premio mayor: Apto Plaza Robles, Camioneta mazda y Tour resolucion EDSA N 999 premio mayor $reg->numero y promocional $reg->promocional. Sorteo miercoles 21 de diciembre de 2022 con el premio mayor de la loteria de manizales";
+
+                    $response = Http::withHeaders([
+                        'Content-Type' => 'application/json',
+                        'Authorization' => 'Basic QWRhbW1Tb2x1Y2lvbmVzX0JfMVdFOjZpW3pMRVEkTWI=',
+                    ])->post("https://api-sms.masivapp.com/send-message", [
+                        "to" => $to,
+                        "text" => $message,
+                        "customdata" => "CUS_ID_0125",
+                        "isPremium" => false,
+                        "isFlash" => false,
+                        "isLongmessage" => true,
+                        "isRandomRoute" => false
+                    ]);
+                }
+            }
             return ['url' => url('/storage/pdf/').'/'.$filename];
         } catch (\Exception $e) {
             // An error occured; cancel the transaction...

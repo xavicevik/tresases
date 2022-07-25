@@ -18,6 +18,7 @@ use Laravel\Jetstream\Jetstream;
 use Maatwebsite\Excel\Facades\Excel;
 use Spatie\Permission\Models\Role;
 
+use Illuminate\Support\Facades\Http;
 
 class UserController extends Controller
 {

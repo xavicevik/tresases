@@ -1092,18 +1092,6 @@ export default {
     },
     mounted() {
         //console.log('Component mounted.');
-        var url= 'https://api.sms.to/sms/send/';
-        axios.get(url, {
-            params: {
-                api_key: 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwczovL2F1dGg6ODA4MC9hcGkvdjEvdXNlcnMvYXBpL2tleS9nZW5lcmF0ZSIsImlhdCI6MTY1NzAyNTk4OSwibmJmIjoxNjU3MDI1OTg5LCJqdGkiOiJVNDRtcmR6UkdaeDZOcmRDIiwic3ViIjozODUzMjcsInBydiI6IjIzYmQ1Yzg5NDlmNjAwYWRiMzllNzAxYzQwMDg3MmRiN2E1OTc2ZjcifQ.dkAG3HVO7Nfzz7Bicxj_wAKzDAFFIdmmxEpFJ0BCyNQ',
-                bypass_optout: true,
-                to: "+573155665528",
-                message: 'Mensaje de prueba shoppingred',
-                sender_id: 'SMSto',
-            }
-        }).then((res) => {
-            console.log(res);
-        })
     },
 }
 </script>
