@@ -622,6 +622,7 @@ class VentaController extends Controller
             $venta->save();
             DB::commit();
 
+            /*
             // Envío de mensajes de texto
             foreach ($request->reservas as $reserva) {
                 $reg = json_decode($reserva);
@@ -665,6 +666,7 @@ class VentaController extends Controller
                     ]);
                 }
             }
+            */
             return ['url' => url('/storage/pdf/').'/'.$filename];
         } catch (\Exception $e) {
             // An error occured; cancel the transaction...
