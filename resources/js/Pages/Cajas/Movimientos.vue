@@ -2124,18 +2124,14 @@ export default {
             })
         },
         sendSMS: function (id) {
-            this.$inertia.get('/ventas/sendSmsSales?id='+id, {}, {
-                onSuccess: (page) => {
-                    Swal.fire({
-                        icon: 'success',
-                        title: 'Mensaje enviado',
-                        showConfirmButton: false,
-                        timer: 1000
-                    })
-                },
-            });
-
-
+            axios.get('/ventas/sendSmsSales?id='+id,).then((res) => {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Mensaje enviado',
+                    showConfirmButton: false,
+                    timer: 1000
+                })
+            })
         },
         rowSelect(idx) {
             console.dir(idx)
