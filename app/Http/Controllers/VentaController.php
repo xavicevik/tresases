@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Jobs\SendEmailJob;
 use App\Models\Boleta;
 use App\Models\Caja;
+use App\Models\Cliente;
 use App\Models\Comision;
 use App\Models\Confcomision;
 use App\Models\Detalleventa;
@@ -469,10 +470,10 @@ class VentaController extends Controller
             $mytime= Carbon::now('America/Bogota');
 
             $concomision = Confcomision::where('idvendedor', $request->idvendedor)
-                                        ->where('estado', 2)
-                                        ->first();
+                ->where('estado', 2)
+                ->first();
             if (is_null($concomision)) {
-                $concomision = Confcomision::join('users as t1', 'confcomisiones.idvendedor', '=', 't1.idempresa')
+                $concomision = Confcomision::join('vendedors as t1', 'confcomisiones.idvendedor', '=', 't1.idempresa')
                     ->select('confcomisiones.*')
                     ->where('t1.id', $request->idvendedor)
                     ->first();
@@ -529,7 +530,6 @@ class VentaController extends Controller
                 $detalleventa->cantidad = 1;
                 $detalleventa->estado = 3;
                 $detalleventa->save();
-
                 $reg->valorpagar = "$" . number_format($reg->valorpagar, 0, ".", ",");
                 $reg->comision = "$" . number_format($reg->comision, 0, ".", ",");
             }
@@ -625,44 +625,23 @@ class VentaController extends Controller
             // Envío de mensajes de texto
             foreach ($request->reservas as $reserva) {
                 $reg = json_decode($reserva);
-                $cliente = User::where('id', $reg->idcliente)->first();
+                $cliente = Cliente::where('id', $reg->idcliente)->first();
 
                 $to = "57".$cliente->movil;//"573155665528";
-                //$to = "573155665528";
+
+                $saldo = $reg->valortotal - $reg->valorpagar;
+                $saldotxt = '';
 
                 if ($reg->valorpagar > 0) {
-                    $saldo = $reg->valortotal - $reg->valorpagar;
                     $saldotxt = "Tu saldo pendiente es $saldo.";
                 }
                 $message = "Los Tres Ases te da la bienvenida y agradece tu fidelidad, el gran bono millonario premio mayor $reg->numero promocional $reg->promocional ha sido registrado con exito. $saldotxt SUERTE";
 
-                $response = Http::withHeaders([
-                    'Content-Type' => 'application/json',
-                    'Authorization' => 'Basic QWRhbW1Tb2x1Y2lvbmVzX0JfMVdFOjZpW3pMRVEkTWI=',
-                ])->post("https://api-sms.masivapp.com/send-message", [
-                    "to" => $to,
-                    "text" => $message,
-                    "customdata" => "CUS_ID_0125",
-                    "isPremium" => false,
-                    "isFlash" => false,
-                    "isLongmessage" => true,
-                    "isRandomRoute" => false
-                ]);
+                $this->sendSMS($to, $message);
                 if ($saldo == 0) {
                     $message = "Conserva este mensaje de paz y salvo valido para reclamar el premio mayor: Apto Plaza Robles, Camioneta mazda y Tour resolucion EDSA N 999 premio mayor $reg->numero y promocional $reg->promocional. Sorteo miercoles 21 de diciembre de 2022 con el premio mayor de la loteria de manizales";
 
-                    $response = Http::withHeaders([
-                        'Content-Type' => 'application/json',
-                        'Authorization' => 'Basic QWRhbW1Tb2x1Y2lvbmVzX0JfMVdFOjZpW3pMRVEkTWI=',
-                    ])->post("https://api-sms.masivapp.com/send-message", [
-                        "to" => $to,
-                        "text" => $message,
-                        "customdata" => "CUS_ID_0125",
-                        "isPremium" => false,
-                        "isFlash" => false,
-                        "isLongmessage" => true,
-                        "isRandomRoute" => false
-                    ]);
+                    $this->sendSMS($to, $message);
                 }
             }
             return ['url' => url('/storage/pdf/').'/'.$filename];
@@ -694,7 +673,7 @@ class VentaController extends Controller
                 ->where('estado', 2)
                 ->first();
             if (is_null($concomision)) {
-                $concomision = Confcomision::join('users as t1', 'confcomisiones.idvendedor', '=', 't1.idempresa')
+                $concomision = Confcomision::join('vendedors as t1', 'confcomisiones.idvendedor', '=', 't1.idempresa')
                     ->select('confcomisiones.*')
                     ->where('t1.id', $request->idvendedor)
                     ->first();
@@ -863,6 +842,48 @@ class VentaController extends Controller
             //throw $e;
         }
 
+    }
+
+    public function sendSmsSales(Request $request) {
+        $id = $request->id;
+
+        $detalle = Detalleventa::where('id', $id)
+            ->with('cliente')
+            ->with('boleta')
+            ->first();
+        $to = "57".$detalle->cliente->movil;//"573155665528";
+
+        $saldo = $detalle->boleta->saldo;
+        $saldotxt = '';
+
+        if ($saldo > 0) {
+            $saldotxt = "Tu saldo pendiente es $saldo.";
+        }
+        $message = "Los Tres Ases te da la bienvenida y agradece tu fidelidad, el gran bono millonario premio mayor ".$detalle->boleta->numero." promocional ".$detalle->boleta->promocional." ha sido registrado con exito. $saldotxt SUERTE";
+
+        $this->sendSMS($to, $message);
+        if ($saldo == 0) {
+            $message = "Conserva este mensaje de paz y salvo valido para reclamar el premio mayor: Apto Plaza Robles, Camioneta mazda y Tour resolucion EDSA N 999 premio mayor ".$detalle->boleta->numero." y promocional ".$detalle->boleta->promocional.". Sorteo miercoles 21 de diciembre de 2022 con el premio mayor de la loteria de manizales";
+
+            $this->sendSMS($to, $message);
+        }
+    }
+
+    private function sendSMS($to, $message) {
+        $response = Http::withHeaders([
+            'Content-Type' => 'application/json',
+            'Authorization' => 'Basic QWRhbW1Tb2x1Y2lvbmVzX0JfMVdFOjZpW3pMRVEkTWI=',
+        ])->post("https://api-sms.masivapp.com/send-message", [
+            "to" => $to,
+            "text" => $message,
+            "customdata" => "CUS_ID_0125",
+            "isPremium" => false,
+            "isFlash" => false,
+            "isLongmessage" => true,
+            "isRandomRoute" => false
+        ]);
+
+        return $response;
     }
 
 }
