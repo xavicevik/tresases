@@ -30,7 +30,7 @@ class Historialcaja extends Model
 
     public function vendedor()
     {
-        return $this->belongsTo(User::class, 'idvendedor');
+        return $this->belongsTo(Vendedor::class, 'idvendedor');
     }
 
     public function puntoventa(){

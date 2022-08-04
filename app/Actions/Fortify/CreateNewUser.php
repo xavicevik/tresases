@@ -2,8 +2,10 @@
 
 namespace App\Actions\Fortify;
 
+use App\Models\Cliente;
 use App\Models\Team;
 use App\Models\User;
+use App\Models\Vendedor;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
@@ -22,28 +24,73 @@ class CreateNewUser implements CreatesNewUsers
      */
     public function create(array $input)
     {
-        Validator::make($input, [
-            'nombre' => ['required', 'string', 'max:255'],
-            'apellido' => ['required', 'string', 'max:255'],
-            'correo' => ['required', 'string', 'email', 'max:255'],
-            'username' => ['required', 'string', 'max:255', 'unique:users'],
-            'password' => $this->passwordRules(),
-            'terms' => Jetstream::hasTermsAndPrivacyPolicyFeature() ? ['accepted', 'required'] : '',
-        ])->validate();
+        // Creación de Cliente
+        if ($input['idrol'] == 2) {
+            Validator::make($input, [
+                'nombre' => ['required', 'string', 'max:255'],
+                'apellido' => ['required', 'string', 'max:255'],
+                'correo' => ['required', 'string', 'email', 'max:255'],
+                'username' => ['required', 'string', 'max:255', 'unique:clientes'],
+                'password' => $this->passwordRules(),
+                'terms' => Jetstream::hasTermsAndPrivacyPolicyFeature() ? ['accepted', 'required'] : '',
+            ])->validate();
 
-        return DB::transaction(function () use ($input) {
-            return tap(User::create([
-                'nombre' => $input['nombre'],
-                'apellido' => $input['apellido'],
-                'username' => $input['username'],
-                'correo' => $input['correo'],
-                'idrol' => $input['idrol'],
-                'estado' => true,
-                'password' => Hash::make($input['password']),
-            ]), function (User $user) {
-                $this->createTeam($user);
+            return DB::transaction(function () use ($input) {
+                return tap(Cliente::create([
+                    'nombre' => $input['nombre'],
+                    'apellido' => $input['apellido'],
+                    'username' => $input['username'],
+                    'correo' => $input['correo'],
+                    'idrol' => $input['idrol'],
+                    'estado' => true,
+                    'password' => Hash::make($input['password']),
+                ]));
             });
-        });
+        } elseif ($input['idrol'] == 5) {
+            Validator::make($input, [
+                'nombre' => ['required', 'string', 'max:255'],
+                'apellido' => ['required', 'string', 'max:255'],
+                'correo' => ['required', 'string', 'email', 'max:255'],
+                'username' => ['required', 'string', 'max:255', 'unique:vendedors'],
+                'password' => $this->passwordRules(),
+                'terms' => Jetstream::hasTermsAndPrivacyPolicyFeature() ? ['accepted', 'required'] : '',
+            ])->validate();
+
+            return DB::transaction(function () use ($input) {
+                return tap(User::create([
+                    'nombre' => $input['nombre'],
+                    'apellido' => $input['apellido'],
+                    'username' => $input['username'],
+                    'correo' => $input['correo'],
+                    'idrol' => $input['idrol'],
+                    'estado' => true,
+                    'password' => Hash::make($input['password']),
+                ]));
+            });
+        } else {
+            Validator::make($input, [
+                'nombre' => ['required', 'string', 'max:255'],
+                'apellido' => ['required', 'string', 'max:255'],
+                'correo' => ['required', 'string', 'email', 'max:255'],
+                'username' => ['required', 'string', 'max:255', 'unique:users'],
+                'password' => $this->passwordRules(),
+                'terms' => Jetstream::hasTermsAndPrivacyPolicyFeature() ? ['accepted', 'required'] : '',
+            ])->validate();
+
+            return DB::transaction(function () use ($input) {
+                return tap(User::create([
+                    'nombre' => $input['nombre'],
+                    'apellido' => $input['apellido'],
+                    'username' => $input['username'],
+                    'correo' => $input['correo'],
+                    'idrol' => $input['idrol'],
+                    'estado' => true,
+                    'password' => Hash::make($input['password']),
+                ]), function (User $user) {
+                    $this->createTeam($user);
+                });
+            });
+        }
     }
 
     /**

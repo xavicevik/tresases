@@ -31,7 +31,7 @@ class Detalleventa extends Model
     }
 
     public function cliente(){
-        return $this->belongsTo(User::class, 'idcliente');
+        return $this->belongsTo(Cliente::class, 'idcliente');
     }
 
     public function boleta(){

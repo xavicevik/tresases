@@ -19,14 +19,14 @@ class Confcomision extends Model
         'estado'
     ];
 
-    public function vendedor()
+    public function salesman()
     {
         return $this->belongsTo(Empresa::class, 'idvendedor')->where('idtipoempresa', 3);
     }
 
     public function agente()
     {
-        return $this->belongsTo(User::class, 'idvendedor');
+        return $this->belongsTo(Vendedor::class, 'idvendedor');
     }
 
     public function distribuidor(){

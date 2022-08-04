@@ -206,9 +206,9 @@
                                 </tr>
                                 </thead>
                                 <tbody>
-                                <tr class="text-center" text-sm v-if="existeuser > 0" v-for="(user, id) in arrayUsers.data" :key="id">
+                                <tr class="text-center" text-sm v-if="arrayData.data" v-for="(user, id) in arrayData.data" :key="id">
                                     <td class="border px-1 py-2 text-sm truncate" v-text="user.documento"></td>
-                                    <td class="border px-1 py-2 text-sm truncate" v-text="user.nombre + ' ' + user.apellido"></td>
+                                    <td class="border px-1 py-2 text-sm truncate" v-text="user.full_name"></td>
                                     <td class="border px-1 py-2 text-sm truncate" v-text="user.movil"></td>
                                     <td class="border px-1 py-2 text-sm truncate" v-text="user.correo"></td>
                                     <td class="border px-1 py-2 text-sm truncate" v-text="user.rol.nombre"></td>
@@ -252,7 +252,23 @@
                                 </tr>
                                 </tbody>
                             </table>
-                            <pagination class="mt-6" :links="arrayUsers.links" />
+                            <!-- Paginacion -->
+                            <section class="mt-6">
+                                <div v-if="arrayData.links.length > 3">
+                                    <div class="flex flex-wrap -mb-1">
+                                        <template v-for="(link, p) in arrayData.links" :key="p">
+                                            <div v-if="link.url === null" class="mr-1 mb-1 px-4 py-3 text-sm leading-4 text-gray-400 border rounded"
+                                                 v-html="link.label" />
+                                            <button  v-else
+                                                     class="mr-1 mb-1 px-4 py-3 text-sm leading-4 border rounded hover:bg-white focus:border-indigo-500 focus:text-indigo-500"
+                                                     :class="{ 'bg-blue-700 text-white': link.active }"
+                                                     v-on:click="this.cambiarPage(link.url, 'users', form)"
+                                                     v-html="link.label" />
+                                        </template>
+                                    </div>
+                                </div>
+                            </section>
+                            <!-- Paginacion -->
                         </div>
                     </section>
                     <!-- Fin Tabla de contenido -->
@@ -527,21 +543,14 @@
 import AppLayout from '@/Layouts/AppLayout.vue';
 import Swal from "sweetalert2";
 import { Icon } from '@iconify/vue';
-import Pagination from '@/Components/Pagination';
-
 import Toggle from '@vueform/toggle';
 import '@vueform/toggle/themes/default.css';
 import Button from "../../Jetstream/Button";
-
 import moment from 'moment'
 import { QuillEditor } from '@vueup/vue-quill';
 import '@vueup/vue-quill/dist/vue-quill.snow.css';
 import { ref, onMounted } from 'vue';
-
 import { Money3Component } from 'v-money3'
-
-
-import { Inertia } from '@inertiajs/inertia';
 import {Head, Link, usePage} from '@inertiajs/inertia-vue3';
 import JetNavLink from '@/Jetstream/NavLink.vue';
 import NavLink from "../../Jetstream/NavLink";
@@ -555,7 +564,6 @@ export default {
         Button,
         AppLayout,
         Icon,
-        Pagination,
         Toggle,
         QuillEditor,
         JetNavLink,
@@ -572,30 +580,6 @@ export default {
     },
     data() {
         return {
-            configMoney: {
-                masked: false,
-                prefix: '$ ',
-                suffix: '',
-                thousands: ',',
-                decimal: '.',
-                precision: 0,
-                disableNegative: false,
-                disabled: false,
-                min: null,
-                max: null,
-                allowBlank: false,
-                minimumNumberOfCharacters: 0,
-            },
-
-            ispage: true,
-            pageX1: 0,
-            pageY1: 0,
-            uploadDragoverTracking1: false,
-            uploadDragoverEvent1: false,
-            pageX2: 0,
-            pageY2: 0,
-            uploadDragoverTracking2: false,
-            uploadDragoverEvent2: false,
             tituloModal: '',
             formpasswd: {
                 _token: usePage().props.value._token,
@@ -626,57 +610,9 @@ export default {
                 url: false,
                 cambiarpassword: true
             },
-            arrayPaises: [],
-            arrayDepartamentos: [],
-            arrayCiudades: [],
-            arrayRoles: [],
-            arrayTiposdocumento: [],
-            arrayEmpresas: [],
-            editMode: false,
-            verMode: false,
-            newMode: false,
-            isOpen: false,
-            isOpencambiopass: false,
-            existeuser: 1,
-            buscar: '',
-            arrayUsers: {
-                data: [],
-                links: []
-            },
-            sortOrder: 1,
-            sortBy: '',
-            errorusers: 0,
-            errorMostrarMsjrifa: [],
-            activetab: '1',
         }
     },
     methods: {
-        actualizarRangos() {
-            let rango = null;
-            let cantidad = 0;
-
-            cantidad = Math.pow(10, this.form.cifras);
-            rango = String(0).padStart(this.form.cifras, '0') + ' - ' + (cantidad-1);
-            this.cantboletas = cantidad;
-            this.rango = rango;
-        },
-        formatPrice(value) {
-            let val = (value/1).toFixed(0).replace('.', ',')
-            return '$ '+ val.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".")
-        },
-        dateTime(value) {
-            return moment(value).format('DD/MM/YYYY');
-        },
-        dateTimeFull(value) {
-            return moment(value).format('YYYY-MM-DD HH:MM:SS');
-        },
-        cleanMessage: function () {
-            this.$page.props.flash.message = '';
-        },
-        previewImage(e) {
-            const file = e.target.files[0];
-            this.url = URL.createObjectURL(file);
-        },
         cambiarPass: function(){
             this.isOpencambiopass = true;
         } ,
@@ -889,15 +825,8 @@ export default {
                     ispage: this.ispage
                 }
             }).then((res) => {
-                //console.log(res.data);
                 var respuesta = res.data;
-                this.arrayUsers = respuesta.users;
-
-                if (this.arrayUsers.data.length > 0) {
-                    this.existeuser = 1;
-                } else {
-                    this.existeuser = 0;
-                }
+                this.arrayData = respuesta.users;
             })
         },
         UsersExport: function (filtros = []) {
@@ -917,67 +846,6 @@ export default {
                 document.body.appendChild(fileLink);
 
                 fileLink.click();
-            })
-        },
-        getLoterias: function () {
-            axios.get('/loterias',).then((res) => {
-                this.arrayLoterias = res.data.loterias;
-                //console.log(res.data.loterias)
-            })
-        },
-        getTerminos: function () {
-            axios.get('/terminos',).then((res) => {
-                this.arrayTerminos = res.data.terminos;
-                //console.log(res.data.terminos)
-            })
-        },
-        getPaises: function () {
-            axios.get('/paises',).then((res) => {
-                this.arrayPaises = res.data.paises;
-                //console.log(res.data.paises)
-            })
-        },
-        getDepartamentos: function () {
-            axios.get('/paises/departamentos', {
-                params: {
-                    idpais: this.form.idpais
-                }
-            }).then((res) => {
-                this.arrayDepartamentos = res.data.departamentos;
-                //console.log(res.data.departamentos)
-            })
-        },
-        getEmpresas: function () {
-            axios.get('/master/getEmpresas', {
-                params: {
-                    idrol: this.form.idrol
-                }
-            }).then((res) => {
-                this.arrayEmpresas = res.data.data;
-            })
-        },
-        getCiudades: function () {
-            axios.get('/paises/ciudades', {
-                params: {
-                    idpais: this.form.idpais,
-                    iddepartamento: this.form.iddepartamento
-                }
-            }).then((res) => {
-                this.arrayCiudades = res.data.ciudades;
-                //console.log(res.data.ciudades)
-            })
-        },
-        getTiposdocumento: function () {
-            axios.get('/master/tiposdocsearch',).then((res) => {
-                this.arrayTiposdocumento = res.data.data;
-                //console.log(res.data.data)
-            })
-        },
-        getRoles: async function () {
-            var url= '/master/getRoles';
-            axios.get(url).then((res) => {
-                var respuesta = res.data;
-                this.arrayRoles = respuesta.data;
             })
         },
         deleteRow: function (data) {
@@ -1017,81 +885,12 @@ export default {
             })
 
         },
-        onUploadDragoverEvent2(e) {
-            this.uploadDragoverEvent2 = true;
-            this.uploadDragoverTracking2 = true;
-            this.pageX2 = e.pageX2;
-            this.pageY2 = e.pageY2;
-        },
-        onUploadDropEvent2(e) {
-            this.uploadDragoverEvent2 = false;
-            this.uploadDragoverTracking2 = false;
-            this.pageX2 = 0;
-            this.pageY2 = 0;
-            this.droppedFiles2(e)
-        },
-        droppedFiles2(e) {
-            let droppedFiles = e.dataTransfer.files;
-
-            if (!droppedFiles) return;
-
-            ([...droppedFiles]).forEach(f => {
-                this.form.files2.push(f);
-            });
-        },
-        droppedFileValidator2(file) {
-            return false;
-        },
-        removeFile2(file) {
-            this.form.files1 = this.form.files1.filter(f => {
-                return f != file;
-            });
-        },
-        uploadFiles2() {
-            //console.log(this.form.files1);
-            // This is where the magic could happen!
-        },
-
-        onUploadDragoverEvent1(e) {
-            this.uploadDragoverEvent1 = true;
-            this.uploadDragoverTracking1 = true;
-            this.pageX1 = e.pageX1;
-            this.pageY1 = e.pageY1;
-        },
-        onUploadDropEvent1(e) {
-            this.uploadDragoverEvent1 = false;
-            this.uploadDragoverTracking1 = false;
-            this.pageX1 = 0;
-            this.pageY1 = 0;
-            this.droppedFiles1(e)
-        },
-        droppedFiles1(e) {
-            let droppedFiles = e.dataTransfer.files;
-
-            if (!droppedFiles) return;
-
-            ([...droppedFiles]).forEach(f => {
-                this.form.files1.push(f);
-            });
-        },
-        droppedFileValidator1(file) {
-            return false;
-        },
-        removeFile1(file) {
-            this.form.files1 = this.form.files1.filter(f => {
-                return f != file;
-            });
-        },
-        uploadFiles1() {
-            //(this.form.files1);
-            // This is where the magic could happen!
-        },
     },
     created: function () {
-        this.arrayUsers = this.users;
+        this.arrayData = this.users;
     },
     mounted() {
-        //console.log('Component mounted.');
+        console.log(this.users);
     },
 }
 </script>

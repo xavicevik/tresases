@@ -4,9 +4,11 @@ namespace App\Http\Controllers;
 
 use App\Exports\ClientesExport;
 use App\Exports\UsersExport;
+use App\Models\Cliente;
 use App\Models\Rifa;
 use App\Models\Rol;
 use App\Models\User;
+use App\Models\Vendedor;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Http\Request;
@@ -46,15 +48,13 @@ class UserController extends Controller
         }
 
         if ($buscar == ''){
-            $users = User::UserApp()
-                        ->orderBy($sortBy, $sortOrder)
+            $users = User::orderBy($sortBy, $sortOrder)
                         ->with('ciudad')
                         ->with('rol')
                         ->with('tipodocumento')
                         ->with('empresa');
         } else {
-            $users = User::UserApp()
-                        ->orderBy($sortBy, $sortOrder)
+            $users = User::orderBy($sortBy, $sortOrder)
                         ->with('ciudad')
                         ->with('rol')
                         ->with('tipodocumento')
@@ -118,15 +118,13 @@ class UserController extends Controller
         }
 
         if ($buscar == ''){
-            $users = User::ClientesApp()
-                ->orderBy($sortBy, $sortOrder)
+            $users = Cliente::orderBy($sortBy, $sortOrder)
                 ->with('ciudad')
                 ->with('rol')
                 ->with('tipodocumento')
                 ->with('empresa');
         } else {
-            $users = User::UserApp()
-                ->orderBy($sortBy, $sortOrder)
+            $users = Cliente::orderBy($sortBy, $sortOrder)
                 ->with('ciudad')
                 ->with('rol')
                 ->with('tipodocumento')
@@ -166,18 +164,86 @@ class UserController extends Controller
         $users = $users->paginate(self::canPorPagina);
 
         if ($request->has('ispage') && $request->ispage){
-            return ['users' => $users];
+            return ['clientes' => $users];
         } else {
-            return Inertia::render('Users/Indexclientes', ['users' => $users, '_token' => csrf_token()]);
+            return Inertia::render('Users/Indexclientes', ['clientes' => $users, '_token' => csrf_token()]);
+        }
+    }
+
+    public function indexvendedores(Request $request)
+    {
+        $buscar = $request->buscar;
+        $filtros = json_decode($request->filtros);
+
+        if ($request->has('sortBy') && $request->sortBy <> ''){
+            $sortBy = $request->sortBy;
+        } else {
+            $sortBy = 'id';
+        }
+
+        if ($request->has('sortOrder') && $request->sortOrder <> ''){
+            $sortOrder = $request->sortOrder;
+        } else {
+            $sortOrder = 'desc';
+        }
+
+        if ($buscar == ''){
+            $vendedores = Vendedor::orderBy($sortBy, $sortOrder)
+                ->with('ciudad')
+                ->with('rol')
+                ->with('tipodocumento')
+                ->with('empresa');
+        } else {
+            $vendedores = Vendedor::orderBy($sortBy, $sortOrder)
+                ->with('ciudad')
+                ->with('rol')
+                ->with('tipodocumento')
+                ->with('empresa')
+                ->where('nombre', 'like', '%'. $buscar . '%')
+                ->orWhere('apellido', 'like', '%'. $buscar . '%')
+                ->orWhere('correo', 'like', '%'. $buscar . '%')
+                ->orWhere('username', 'like', '%'. $buscar . '%')
+                ->orWhere('documento', 'like', '%'. $buscar . '%');
+        }
+        if (!is_null($filtros)) {
+            if (!is_null($filtros->documento) && $filtros->documento <> '') {
+                $vendedores = $vendedores->where('documento', 'like', '%' . $filtros->documento . '%');
+            }
+
+            if (!is_null($filtros->nombre) && $filtros->nombre <> '') {
+                $vendedores = $vendedores->where('nombre', 'like', '%' . $filtros->nombre . '%');
+            }
+
+            if (!is_null($filtros->apellido) && $filtros->apellido <> '') {
+                $vendedores = $vendedores->where('apellido', 'like', '%' . $filtros->apellido . '%');
+            }
+
+            if (!is_null($filtros->correo) && $filtros->correo <> '') {
+                $vendedores = $vendedores->where('correo', 'like', '%' . $filtros->correo . '%');
+            }
+
+            if (!is_null($filtros->movil) && $filtros->movil <> '') {
+                $vendedores = $vendedores->where('movil', 'like', '%' . $filtros->movil . '%');
+            }
+
+            if (!is_null($filtros->idrol) && $filtros->idrol <> '' && $filtros->idrol <> 0) {
+                $vendedores = $vendedores->where('idrol', 'like', '%' . $filtros->idrol . '%');
+            }
+        }
+
+        $vendedores = $vendedores->paginate(self::canPorPagina);
+
+        if ($request->has('ispage') && $request->ispage){
+            return ['vendedores' => $vendedores];
+        } else {
+            return Inertia::render('Users/Indexvendedores', ['vendedores' => $vendedores, '_token' => csrf_token()]);
         }
     }
 
     public function getClientes(Request $request)
     {
-        $users = User::orderBy('users.id', 'asc')
-            ->join('roles', 'users.idrol', '=', 'roles.id')
-            ->select('users.id', 'users.nombre', 'users.apellido')
-            ->where('roles.nombre', '=', 'Cliente')->get();
+        $users = Cliente::orderBy('id', 'asc')
+                ->select('id', 'nombre', 'apellido')->get();
 
         return ['users' => $users];
     }
@@ -206,21 +272,17 @@ class UserController extends Controller
         $mytime= Carbon::now('America/Bogota');
 
         if ($buscar == ''){
-            $users = User::orderBy('users.id', 'asc')
-                ->join('roles', 'users.idrol', '=', 'roles.id')
-                ->select('users.id', 'users.nombre', 'users.apellido', 'users.documento', 'users.correo')
-                ->where('users.estado', '=', '1')
-                ->where('roles.id', '=', '5');
+            $users = Vendedor::orderBy('id', 'asc')
+                ->select('id', 'nombre', 'apellido', 'documento', 'correo')
+                ->where('estado', 1);
         } else {
-            $users = User::orderBy('users.id', 'asc')
-                    ->join('roles', 'users.idrol', '=', 'roles.id')
-                    ->select('users.id', 'users.nombre', 'users.apellido', 'users.documento', 'users.correo')
-                    ->where('users.estado', '=', '1')
-                    ->where('roles.id', '=', '5')
+            $users = Vendedor::orderBy('id', 'asc')
+                    ->select('id', 'nombre', 'apellido', 'documento', 'correo')
+                    ->where('estado', 1)
                     ->where(function ($query) use ($buscar) {
-                        return $query->where('users.nombre', 'like', "%$buscar%")
-                            ->orWhere('users.apellido', 'like', '%'. $buscar . '%')
-                            ->orWhere('users.documento', 'like', '%'. $buscar . '%');
+                        return $query->where('nombre', 'like', "%$buscar%")
+                            ->orWhere('apellido', 'like', '%'. $buscar . '%')
+                            ->orWhere('documento', 'like', '%'. $buscar . '%');
                     });
         }
 
@@ -232,53 +294,6 @@ class UserController extends Controller
         return ['vendedores' => $users];
     }
 
-    /*
-    public function buscaUsers(Request $request)
-    {
-        $buscar = $request->buscar;
-
-        if (isset($request->sortBy)) {
-            $sortOrder = $request->sortOrder;
-            $sortBy = $request->sortBy;
-        } else {
-            $sortOrder = 'asc';
-            $sortBy = 'detalle_users.id';
-        }
-
-        if ($buscar==''){
-            $users = User::join('detalle_users', 'users.id','=', 'detalle_users.id')
-                ->join('roles', 'detalle_users.idrol', '=', 'roles.id')
-                ->join('ciudades', function ($join) {
-                    $join->on('detalle_users.idciudad', '=', 'ciudades.id')
-                        ->on('detalle_users.idpais', '=', 'ciudades.idpais')
-                        ->on('detalle_users.iddepartamento', '=', 'ciudades.iddepartamento');
-                })
-                ->select('users.id', 'detalle_users.num_documento as documento', 'detalle_users.estado',
-                    'users.name as nombre', 'detalle_users.movil as celular',
-                    'users.email as correo', 'roles.nombre as perfil', 'ciudades.nombre as ciudad')
-                ->orderBy($sortBy, $sortOrder)
-                ->paginate(self::canPorPagina);
-        } else {
-            $users = User::join('detalle_users', 'users.id','=', 'detalle_users.id')
-                ->join('roles', 'detalle_users.idrol', '=', 'roles.id')
-                ->join('ciudades', function ($join) {
-                    $join->on('detalle_users.idciudad', '=', 'ciudades.id')
-                        ->on('detalle_users.idpais', '=', 'ciudades.idpais')
-                        ->on('detalle_users.iddepartamento', '=', 'ciudades.iddepartamento');
-                })
-                ->where('users.name', 'like', '%'. $buscar . '%')
-                ->orWhere('detalle_users.num_documento', 'like', '%'. $buscar . '%')
-                ->orWhere('users.email', 'like', '%'. $buscar . '%')
-                ->select('users.id', 'detalle_users.num_documento as documento', 'detalle_users.estado',
-                    'users.name as nombre', 'detalle_users.movil as celular',
-                    'users.email as correo', 'roles.nombre as perfil', 'ciudades.nombre as ciudad')
-                ->orderBy($sortBy, $sortOrder)
-                ->paginate(self::canPorPagina);
-        }
-
-        return ['users' => $users];
-    }
-    */
     public function getClientesActivos(Request $request)
     {
         $buscar = $request->buscar;
@@ -304,48 +319,40 @@ class UserController extends Controller
 
         if ($paginate) {
             if ($buscar == ''){
-                $users = User::orderBy($sortBy, $sortOrder)
+                $users = Cliente::orderBy($sortBy, $sortOrder)
                     ->with('tipodocumento')
                     ->with('ciudad')
-                    ->where('estado', '=', '1')
-                    ->where('idrol', '=', '2')
+                    ->where('estado', 1)
                     ->paginate(self::canPorPagina);
             } else {
-                $users = User::orderBy($sortBy, $sortOrder)
+                $users = Cliente::orderBy($sortBy, $sortOrder)
                     ->with('tipodocumento')
                     ->with('ciudad')
-                    ->where('estado', '=', '1')
-                    ->where('idrol', '=', '2')
-                    //->where('fechafin', '>', $mytime->toDateString())
+                    ->where('estado', 1)
                     ->where(function ($query) use ($buscar) {
-                        return $query->where('users.nombre', 'like', "%$buscar%")
-                            ->orWhere('users.apellido', 'like', '%'. $buscar . '%')
-                            ->orWhere('users.documento', 'like', '%'. $buscar . '%');
+                        return $query->where('nombre', 'like', "%$buscar%")
+                            ->orWhere('apellido', 'like', '%'. $buscar . '%')
+                            ->orWhere('documento', 'like', '%'. $buscar . '%');
                     })
                     ->paginate(self::canPorPagina);
             }
         } else {
             if ($buscar == ''){
-                $users = User::orderBy($sortBy, $sortOrder)
+                $users = Cliente::orderBy($sortBy, $sortOrder)
                         ->with('tipodocumento')
                         ->with('ciudad')
-                        ->where('estado', '=', '1')
-                        ->where('idrol', '=', '2')
-                        //->where('fechafin', '>', $mytime->toDateString())
+                        ->where('estado', 1)
                         ->get();
             } else {
-                $users = User::orderBy($sortBy, $sortOrder)
+                $users = Cliente::orderBy($sortBy, $sortOrder)
                         ->with('tipodocumento')
                         ->with('ciudad')
-                        ->where('estado', '=', '1')
-                        ->where('idrol', '=', '2')
-                        //->where('fechafin', '>', $mytime->toDateString())
+                        ->where('estado', 1)
                         ->where(function ($query) use ($buscar) {
-                            return $query->where('users.nombre', 'like', "%$buscar%")
-                                  ->orWhere('users.apellido', 'like', '%'. $buscar . '%')
-                                  ->orWhere('users.documento', 'like', '%'. $buscar . '%');
-                        })
-                        ->get();
+                            return $query->where('nombre', 'like', "%$buscar%")
+                                  ->orWhere('apellido', 'like', '%'. $buscar . '%')
+                                  ->orWhere('documento', 'like', '%'. $buscar . '%');
+                        })->get();
             }
         }
 
@@ -393,14 +400,22 @@ class UserController extends Controller
             'idtipos_documento.gt' => 'Seleccione una tipo de documento',
             'idpais.gt' => 'Seleccione un País',
             'iddepartamento.gt' => 'Seleccione un Departamento',
-            'idrol.gt' => 'Seleccione una Ciudad',
-            'idciudad.gt' => 'Seleccione un Rol',
+            'idrol.gt' => 'Seleccione un Rol',
+            'idciudad.gt' => 'Seleccione una ciudad',
             'idempresa.gt' => 'Seleccione una Empresa',
         ])->validate();
 
         $mytime= Carbon::now('America/Bogota');
 
-        $user = User::create($request->all());
+        if ($request->idrol == 2) {
+            $user = Cliente::create($request->all());
+        } elseif ($request->idrol == 5) {
+            $user = Vendedor::create($request->all());
+        } else {
+            $user = User::create($request->all());
+        }
+
+
         if(!$request->cambiarpassword) {
             $user->changedpassword = $mytime->toDateString();
         } else {
@@ -517,7 +532,14 @@ class UserController extends Controller
      */
     public function destroy(Request $request)
     {
-        $user = User::where('id', $request->id)->first();
+        if ($request->idrol == 2) {
+            $user = Cliente::where('id', $request->id)->first();
+        } elseif ($request->idrol == 5) {
+            $user = Vendedor::where('id', $request->id)->first();
+        } else {
+            $user = User::where('id', $request->id)->first();
+        }
+
         $user->estado = !$user->estado;
         $user->save();
 

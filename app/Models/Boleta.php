@@ -22,6 +22,7 @@ class Boleta extends Model
         'saldo',
         'codigo',
         'estado',
+        'estado_ant'
     ];
 
 

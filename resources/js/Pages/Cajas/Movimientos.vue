@@ -269,7 +269,7 @@
                                         Comisión vendedor
                                     </th>
                                     <th class="px-4 py-2 text-sm font-bold w-2/12 hover:bg-blue-500 hover:text-gray-50 rounded-b">
-                                        Recibo
+                                        Recibo/SMS
                                     </th>
                                 </tr>
                                 </thead>
@@ -282,11 +282,17 @@
                                     <td class="border px-1 py-2 text-sm truncate" v-text="formatPrice(dato.valortotal)"></td>
                                     <td class="border px-1 py-2 text-sm truncate" v-text="formatPrice(dato.valor)"></td>
                                     <td class="border px-1 py-2 text-sm truncate" v-text="formatPrice(dato.comision)"></td>
-                                    <td class="border px-1 py-2 text-sm truncate">
+                                    <td class="flex border px-1 py-2 text-sm truncate">
                                         <a :href="route('numerosreservados.reportpdfCliente', {'iddetalleventa' : dato.id})" target="_blank" class="hover:bg-red-700 text-red-400 font-bold rounded" fill="none"
                                            viewBox="0 0 24 24" stroke="currentColor">
                                             <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                                 <path stroke-linecap="round" stroke-linejoin="round" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+                                            </svg>
+                                        </a>
+                                        <a href="#" @click="sendSMS(dato.id)" class="hover:bg-blue-700 text-blue-400 font-bold rounded" fill="none"
+                                           viewBox="0 0 24 24" stroke="currentColor">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="M3 19v-8.93a2 2 0 01.89-1.664l7-4.666a2 2 0 012.22 0l7 4.666A2 2 0 0121 10.07V19M3 19a2 2 0 002 2h14a2 2 0 002-2M3 19l6.75-4.5M21 19l-6.75-4.5M3 10l6.75 4.5M21 10l-6.75 4.5m0 0l-1.14.76a2 2 0 01-2.22 0l-1.14-.76" />
                                             </svg>
                                         </a>
                                     </td>
@@ -335,6 +341,11 @@
                                     <div class="">
                                         <h2 v-text="tituloModal" class="text-xl font-bold text-gray-900 px-4 py-2"></h2>
                                     </div>
+                                    <div class="mx-auto w-full">
+                                        <vue-countdown ref="countdown" class="mx-auto text-blue-500" :time="time" v-slot="{ minutes, seconds }" @end="onCountdownEnd">
+                                            Tiempo restante：{{ minutes }} minutos, {{ seconds }} segundos.
+                                        </vue-countdown>
+                                    </div>
                                     <!-- Inicio Form -->
                                     <div class="bg-white px-4 pt-2 pb-2 sm:p-6 sm:pb-4">
                                         <div class="">
@@ -346,7 +357,7 @@
                                                 <div class="mb-4 w-full pr-2">
                                                     <label class="block text-gray-700 text-sm font-bold mb-2">Rifa</label>
 
-                                                    <input v-model="form.idrifa.nombre_tecnico" @click="selectRifa()" type="text" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" placeholder="Seleccione Rifa">
+                                                    <input v-model="form.idrifa.titulo" @click="selectRifa()" type="text" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" placeholder="Seleccione Rifa">
 
                                                     <div v-if="$page.props.errors.rifa" class="text-red-500">{{ $page.props.errors.rifa }}</div>
                                                 </div>
@@ -431,7 +442,7 @@
                                                                 {{ formatPrice(reserva.valortotal) }}
                                                             </div>
                                                             <div class="w-2/5 px-2">
-                                                                <money3 v-if="asignarMode" v-bind="configMoney" :max="reserva.valorsaldo" v-model="reserva.valorpagar" class="h-8 w-full pl-4 pr-4 rounded-md z-0 focus:shadow focus:outline-none"></money3>
+                                                                <money3 v-if="asignarMode" v-bind="configMoney" @focusout="pushSessionDetail(session.id, reserva, 'upd')" :max="reserva.valorsaldo" v-model="reserva.valorpagar" class="h-8 w-full pl-4 pr-4 rounded-md z-0 focus:shadow focus:outline-none"></money3>
                                                                 <money3 v-else v-bind="configMoney" :max="reserva.valoranular" v-model="reserva.valorpagado" class="h-8 w-full pl-4 pr-4 rounded-md z-0 focus:shadow focus:outline-none"></money3>
                                                             </div>
                                                             <div class="w-3/5 px-2">
@@ -439,7 +450,7 @@
                                                                 <input v-model="reserva.cliente" :disabled="eliminarMode" @keyup.enter="selectCliente(index, reserva)" type="text" class="h-8 w-full pl-4 pr-4 rounded-md z-0 focus:shadow focus:outline-none" placeholder="Cliente">
                                                             </div>
                                                             <div class="w-1/10 px-2">
-                                                                <svg xmlns="http://www.w3.org/2000/svg" @click="eliminarReserva(reserva.numero, index)" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                                                <svg xmlns="http://www.w3.org/2000/svg" @click="eliminarReserva(reserva, index)" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                                                     <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                                                                 </svg>
                                                             </div>
@@ -618,7 +629,7 @@
                                                 </tr>
                                                 </thead>
                                                 <tbody>
-                                                <tr @click="onSelectRifa(rifa)" class="hover:bg-blue-50 text-center" text-sm v-if="existerifa > 0" v-for="(rifa, id) in arrayRifas.data" :key="id">
+                                                <tr @click="onSelectRifa(rifa)" class="hover:bg-blue-50 text-center" text-sm v-if="arrayRifas.data" v-for="(rifa, id) in arrayRifas.data" :key="id">
                                                     <td class="border px-1 py-2 text-sm truncate" v-text="rifa.loteria.nombre"></td>
                                                     <td class="border px-1 py-2 text-sm truncate" v-text="rifa.serieoculta"></td>
                                                     <td class="border px-1 py-2 text-sm truncate" v-text="rifa.serie"></td>
@@ -728,6 +739,7 @@
                                                 </tr>
                                                 </tbody>
                                             </table>
+                                            <!-- Paginacion -->
                                             <section class="mt-6">
                                                 <div v-if="arrayVendedores.links.length > 3">
                                                     <div class="flex flex-wrap -mb-1">
@@ -737,12 +749,13 @@
                                                             <button  v-else
                                                                      class="mr-1 mb-1 px-4 py-3 text-sm leading-4 border rounded hover:bg-white focus:border-indigo-500 focus:text-indigo-500"
                                                                      :class="{ 'bg-blue-700 text-white': link.active }"
-                                                                     v-on:click="cambiarPagev(link.url, 'vendedor')"
+                                                                     v-on:click="this.cambiarPage(link.url, 'vendedores', form)"
                                                                      v-html="link.label" />
                                                         </template>
                                                     </div>
                                                 </div>
                                             </section>
+                                            <!-- Paginacion -->
 
                                         </div>
                                     </section>
@@ -1207,8 +1220,11 @@ import { Money3Component } from 'v-money3'
 import {InertiaLink} from "@inertiajs/inertia-vue3";
 import Input from "../../Jetstream/Input";
 
+import VueCountdown from '@chenfengyuan/vue-countdown';
+
 
 export default {
+    name: 'App',
 
     components: {
         Input,
@@ -1219,6 +1235,7 @@ export default {
         Toggle,
         QuillEditor,
         money3: Money3Component,
+        VueCountdown
     },
     props:{
         datos : [],
@@ -1258,20 +1275,8 @@ export default {
     },
     data() {
         return {
-            configMoney: {
-                masked: false,
-                prefix: '$ ',
-                suffix: '',
-                thousands: ',',
-                decimal: '.',
-                precision: 0,
-                disableNegative: false,
-                disabled: false,
-                min: null,
-                max: null,
-                allowBlank: false,
-                minimumNumberOfCharacters: 0,
-            },
+            time: 1 * 60 * 1000,
+            session: [],
             configMoney2: {
                 masked: true,
                 prefix: '',
@@ -1286,19 +1291,12 @@ export default {
                 allowBlank: false,
                 minimumNumberOfCharacters: 4,
             },
-            ispage: true,
             isOpenCliente: false,
             isOpenClienteNew: false,
             isOpenCerrar: false,
-            arrayData:[],
-            arrayDetalles: {
-                data: [],
-                links: []
-            },
-            selectedRow: null,
             tituloModal: '',
             form: {
-                rifa: null,
+                idrifa: null,
                 numero: null,
                 promocional: null,
                 vendedor: null,
@@ -1318,29 +1316,9 @@ export default {
                 idvendedor: null,
                 reservas:[]
             },
-            arrayRifas: {
-                data: [],
-                links: []
-            },
-            arrayVendedores: {
-                data: [],
-                links: []
-            },
-            arrayClientes: {
-                data: [],
-                links: []
-            },
-            editMode: false,
-            asignarMode: false,
-            eliminarMode: false,
-            verMode: false,
-            isOpen: false,
             existenumerosreservados: 1,
-            buscar: '',
             buscarcliente: '',
             arrayNumerosreservados: [],
-            sortOrder: 1,
-            sortBy: '',
             rangoinicial: null,
             rangofinal: null,
             cantboletas: 0,
@@ -1353,45 +1331,22 @@ export default {
             existerifa: 0,
             existevendedor: 0,
             isIndividual: 0,
-            arrayPaises:[],
-            arrayDepartamentos:[],
-            arrayCiudades:[],
             totaltransaccion: 0,
             totalcomisiones: 0,
+            boletatmp: []
         }
     },
     methods: {
-        nvl: function (value, fallbackValue) {
-            return typeof value !== 'undefined' && value != null
-                ? value
-                : fallbackValue;
-        },
-        selTipoSerie: function (data){
-            this.isIndividual = data;
-        },
-        cambiarPage: function (url = '', entidad = '') {
-            axios.get(url, {
-            }).then((res) => {
-                var respuesta = res.data;
-                if (entidad == 'cliente') {
-                    this.arrayClientes = respuesta.clientes;
-                } else if (entidad == 'rifas') {
-                    this.arrayRifas = respuesta.rifas;
-                } else if (entidad == 'vendedor') {
-                    this.arrayVendedores = respuesta.vendedores;
-                } else if (entidad == 'detalles') {
-                    this.arrayDetalles = respuesta.data;
-                }
-            })
-        },
         onSelectRifa: function(data){
             this.form.idrifa = data;
             this.closeMoodalRifa();
             this.actualizarRangos();
+            this.updateSession(this.session.id, this.form.idrifa.id, this.form.idvendedor.id);
         },
         onSelectVendedor: function(data){
             this.form.idvendedor = data;
             this.closeMoodalVendedor();
+            this.updateSession(this.session.id, this.form.idrifa.id, this.form.idvendedor.id);
         },
         onSelectCliente: function(data){
             this.form.reservas[this.indexcliente].cliente = data.full_name;
@@ -1399,22 +1354,7 @@ export default {
             this.isNewCliente = false;
             this.closeModalCliente();
             this.closeModalClienteNew();
-        },
-        actualizarRangos: function() {
-            let cantidad = 0;
-            let rangoinicial = '';
-            let rangofinal = '';
-
-            cantidad = Math.pow(10, this.form.idrifa.cifras);
-            rangoinicial = '' + String('0'.toString()).padStart(this.form.idrifa.cifras, '0'.toString());
-            rangofinal = (cantidad - 1);
-            //console.log(rangoinicial);
-            this.form.numero = rangoinicial + ' - ' + rangofinal;
-
-            this.configMoney2.min = rangoinicial.toString();
-            this.configMoney2.max = rangofinal.toString();
-            this.configMoney2.minimumNumberOfCharacters = this.form.idrifa.cifras;
-
+            this.pushSessionDetail(this.session.id, this.boletatmp, 'upd');
         },
         generarReciboEliminar: function () {
             let isOk = true;
@@ -1513,47 +1453,9 @@ export default {
             }
 
         },
-        eliminarReserva: function(numero, index){
+        eliminarReserva: function(boleta, index){
             this.form.reservas.splice(index, 1);
-            /*
-            var url = '/numerosreservados/eliminarReserva';
-            axios.get(url, {
-                params: {
-                    numero: numero,
-                    rifa: this.form.idrifa.id,
-                    idvendedor: this.form.idvendedor.id,
-                }
-            }).then((res) => {
-                console.log(res.data);
-                var respuesta = res.data;
-                let isocupado = respuesta.isocupado;
-                if (isocupado) {
-                    this.form.reservas.splice(index, 1);
-                } else {
-                    Swal.fire({
-                        //position: 'top-end',
-                        icon: 'warning',
-                        title: 'La reserva no se pudo liberar',
-                        showConfirmButton: true,
-                        //timer: 1500
-                    })
-                }
-            })
-
-             */
-        },
-        formatPrice(value) {
-            let val = (value/1).toFixed(0).replace('.', ',')
-            return '$ '+ val.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".")
-        },
-        dateTime(value) {
-            return moment(value).format('DD/MM/YYYY');
-        },
-        dateTimeFull(value) {
-            return moment(value).format('YYYY-MM-DD HH:MM:SS');
-        },
-        cleanMessage: function () {
-            this.$page.props.flash.message = '';
+            this.pushSessionDetail(this.session.id, boleta, 'del');
         },
         verVendedor: function (id) {
             //this.isOpen = true;
@@ -1571,16 +1473,17 @@ export default {
                 {
                     this.tituloModal = 'Registrar movimiento';
                     this.form.id = null;
-                    this.form.idrifa = 0;
+                    this.form.idrifa = '';
                     this.form.numero = null;
                     this.form.estado = false;
                     this.form.rangoinicial = null;
                     this.form.rangofinal = null;
-                    this.form.idvendedor = 0;
-                    this.form.idcliente = 0;
+                    this.form.idvendedor = '';
+                    this.form.idcliente = '';
                     this.form.fecha = null;
                     this.asignarMode = true;
                     this.eliminarMode = false;
+                    this.registrarSessionVenta(this.caja.puntoventa.id)
                     break;
                 }
                 case 'eliminar':
@@ -1603,8 +1506,7 @@ export default {
         },
         selectRifa: function () {
             this.isOpenRifa = true;
-            //this.getUsers();
-            this.getRifas('','nombre_tecnico','true');
+            this.getRifas('','titulo','true');
         },
         crearCliente: function (){
             this.isOpenClienteNew = true;
@@ -1658,20 +1560,7 @@ export default {
             this.isOpenCliente = true;
             this.indexcliente = index;
             this.getClientes(this.form.reservas[index].cliente,'documento','true');
-        },
-        getClientes: async function (buscar = '', filtro = 'documento', paginate = false) {
-            var url= '/users/getClientesActivos';
-            axios.get(url, {
-                params: {
-                    buscar: buscar,
-                    filtro: filtro,
-                    paginate: paginate
-                }
-            }).then((res) => {
-                //console.log(res.data);
-                var respuesta = res.data;
-                this.arrayClientes = respuesta.clientes;
-            })
+            this.boletatmp = reserva;
         },
         selectVendedor: function () {
             this.isOpenVendedor = true;
@@ -1791,7 +1680,6 @@ export default {
         valBoletaDisponible: function (numero, rifa, idvendedor, idcliente){
             if(!this.form.idrifa.id) {
                 Swal.fire({
-                    //position: 'top-end',
                     icon: 'warning',
                     title: 'Primero debe seleccionar una rifa',
                     showConfirmButton: true,
@@ -1836,6 +1724,7 @@ export default {
                         });
                         this.form.reserva.numero = null;
                         this.form.reserva.promocional = null;
+                        this.pushSessionDetail(this.session.id, respuesta.boleta, 'add');
                     } else {
                         Swal.fire({
                             //position: 'top-end',
@@ -1932,9 +1821,7 @@ export default {
             }
         },
         edit: function (data) {
-            //this.form = Object.assign({}, data);
             this.editMode = true;
-            //console.log(this.form);
             this.openModal('actualizar', data);
         },
         ver: function (data) {
@@ -1960,67 +1847,6 @@ export default {
                 },
             });
 
-        },
-        getBoletas: function (filtros = [], sortBy = 'boletas.id') {
-            if (sortBy == this.sortBy){
-                this.sortOrder = !this.sortOrder;
-            }
-            let sortOrderdesc;
-            if (this.sortOrder){
-                sortOrderdesc = 'asc';
-            } else {
-                sortOrderdesc = 'desc';
-            }
-            this.sortBy = sortBy;
-            this.ispage = true;
-
-            var url= '/numerosreservados';
-            axios.get(url, {
-                params: {
-                    filtros: filtros,
-                    sortBy: this.sortBy,
-                    sortOrder: sortOrderdesc,
-                    ispage: this.ispage
-                }
-            }).then((res) => {
-                var respuesta = res.data;
-                this.arrayData = respuesta.datos;
-            })
-        },
-        getRifas: async function (buscar = '', filtro = 'nombre_tecnico', paginate = false) {
-            var url= '/rifas/getRifasActivas';
-            axios.get(url, {
-                params: {
-                    buscar: buscar,
-                    filtro: filtro,
-                    paginate: paginate
-                }
-            }).then((res) => {
-                //console.log(res.data);
-                var respuesta = res.data;
-                this.arrayRifas = respuesta.rifas;
-
-                if (this.arrayRifas.data.length > 0) {
-                    this.existerifa = 1;
-                } else {
-                    this.existerifa = 0;
-                }
-            })
-        },
-        getVendedores: async function (buscar = '', filtro = 'nombre', paginate = false) {
-
-            var url= '/users/getVendedoresActivos';
-            axios.get(url, {
-                params: {
-                    buscar: buscar,
-                    filtro: filtro,
-                    paginate: paginate
-                }
-            }).then((res) => {
-                //console.log(res.data);
-                var respuesta = res.data;
-                this.arrayVendedores = respuesta.vendedores;
-            })
         },
         deleteRow: function (data) {
             let mensaje = '';
@@ -2070,39 +1896,6 @@ export default {
                 this.arrayDetalles = respuesta.data;
             })
         },
-        getPaises: function () {
-            axios.get('/paises',).then((res) => {
-                this.arrayPaises = res.data.paises;
-                //console.log(res.data.paises)
-            })
-        },
-        getDepartamentos: function () {
-            axios.get('/paises/departamentos', {
-                params: {
-                    idpais: this.form.cliente.idpais
-                }
-            }).then((res) => {
-                this.arrayDepartamentos = res.data.departamentos;
-                //console.log(res.data.departamentos)
-            })
-        },
-        getCiudades: function () {
-            axios.get('/paises/ciudades', {
-                params: {
-                    idpais: this.form.cliente.idpais,
-                    iddepartamento: this.form.cliente.iddepartamento
-                }
-            }).then((res) => {
-                this.arrayCiudades = res.data.ciudades;
-                //console.log(res.data.ciudades)
-            })
-        },
-        getTiposdocumento: function () {
-            axios.get('/master/tiposdocsearch',).then((res) => {
-                this.arrayTiposdocumento = res.data.data;
-                //console.log(res.data.data)
-            })
-        },
         getMovimientos: function () {
             var url= '/cajas/movimientos';
             axios.get(url, {
@@ -2114,24 +1907,99 @@ export default {
                 this.arrayData = respuesta.datos;
                 this.totaltransaccion = respuesta.totaltransaccionprop;
                 this.totalcomisiones = respuesta.totalcomisionesprop;
-                //console.log(this.arrayData);
             })
         },
-        rowSelect(idx) {
-            console.dir(idx)
-            this.selectedRow = idx;
+        updateSession: function (idsesion, idrifa = null, idvendedor = null) {
+            var url= '/ventas/updateSession';
+            axios.get(url, {
+                params: {
+                    idsesion: idsesion,
+                    idrifa: idrifa,
+                    idvendedor: idvendedor,
+                }
+            }).then((res) => {
+            })
+        },
+        pushSessionDetail: function (id, boleta, type) {
+            var url= '/ventas/updDetailSession';
+            axios.get(url, {
+                params: {
+                    idsesion: id,
+                    boleta: boleta,
+                    type: type
+                }
+            }).then((res) => {
+                console.log(res.data);
+            })
+        },
+        registrarSessionVenta: function (idpuntoventa = null, idrifa = null, idvendedor = null) {
+            var url= '/ventas/initSession';
+            axios.get(url, {
+                params: {
+                    idpuntoventa: idpuntoventa,
+                    idrifa: idrifa,
+                    idvendedor: idvendedor
+                }
+            }).then((res) => {
+                var respuesta = res.data;
+                this.session = respuesta.session;
+                this.detallesession = respuesta.detallesession;
+                if(this.session.rifa) this.form.idrifa = this.session.rifa;
+                if(this.session.vendedor) this.form.idvendedor = this.session.vendedor;
+                this.time = respuesta.time * 1000;
+                for (const property in this.detallesession) {
+                    this.form.reservas.push({
+                        numero: this.detallesession[property]['numero'],
+                        promocional: this.detallesession[property]['promocional'],
+                        valortotal: this.detallesession[property]['valortotal'],
+                        valorpagar: this.detallesession[property]['valor'],
+                        valorsaldo: this.detallesession[property]['saldo'],
+                        valoranular: this.detallesession[property]['pago'],
+                        valorpagado: this.detallesession[property]['pago'],
+                        idcliente: this.detallesession[property]['idcliente'],
+                        cliente: this.detallesession[property]['idcliente']?this.detallesession[property]['full_name']:'',
+                    });
+                }
+            })
+        },
+        finishSession: function () {
+            var url= '/ventas/finishSession';
+            axios.get(url, {
+                params: {
+                    idsesion: this.session.id,
+                }
+            }).then((res) => {
+                Swal.fire({
+                    position: 'top-end',
+                    icon: 'success',
+                    title: 'Se ha superado el tiempo máximo para realizar la venta',
+                    showConfirmButton: true,
+                    timer: 1000
+                })
+                //this.registrarSessionVenta(this.caja.puntoventa.id)
+                this.form.reservas = [];
+                this.form.idrifa = [];
+                this.form.idvendedor = [];
+                this.getMovimientos();
+                this.closeModal();
+                //this.$refs.countdown.start();
+            })
+        },
+        onCountdownEnd: function () {
+            console.log('termino');
+            this.finishSession()
         }
-
     },
     created: function () {
         this.arrayData = this.datos;
         this.totaltransaccion = this.totaltransaccionprop;
         this.totalcomisiones = this.totalcomisionesprop;
-        this.getRifas('','nombre_tecnico', true);
+        this.getRifas('','titulo', true);
         this.getVendedores('','documento', true);
+
     },
     mounted() {
-        //console.log('Component mounted.');
+
     },
 }
 </script>

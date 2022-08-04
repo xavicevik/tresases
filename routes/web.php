@@ -125,6 +125,7 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'),'verified',]
         Route::get('/users/getVendedoresActivos', [UserController::class, 'getVendedoresActivos'])->name('users.getVendedoresActivos');
         Route::get('/users/getClientesActivos', [UserController::class, 'getClientesActivos'])->name('users.getClientesActivos');
         Route::get('/users/indexclientes', [UserController::class, 'indexclientes'])->name('users.indexclientes');
+        Route::get('/users/indexvendedores', [UserController::class, 'indexvendedores'])->name('users.indexvendedores');
 
         Route::resource('users', UserController::class);
 
@@ -156,6 +157,12 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'),'verified',]
         Route::get('/ventas/getComisiones', [VentaController::class, 'getComisiones'])->name('ventas.getComisiones');
         Route::get('/ventas/reportpdfRegistroMov', [VentaController::class, 'reportpdfRegistroMov'])->name('ventas.reportpdfRegistroMov');
         Route::get('/ventas/reportpdfAnulaMov', [VentaController::class, 'reportpdfAnulaMov'])->name('ventas.reportpdfAnulaMov');
+        Route::get('/ventas/sendSmsSales', [VentaController::class, 'sendSmsSales'])->name('ventas.sendSmsSales');
+        Route::get('/ventas/initSession', [VentaController::class, 'initSession'])->name('ventas.initSession');
+        Route::get('/ventas/updateSession', [VentaController::class, 'updateSession'])->name('ventas.updateSession');
+        Route::get('/ventas/updDetailSession', [VentaController::class, 'updDetailSession'])->name('ventas.updDetailSession');
+        Route::get('/ventas/finishSession', [VentaController::class, 'finishSession'])->name('ventas.finishSession');
+
 
         Route::resource('rifas', RifaController::class);
         Route::resource('confcomisiones',ConfcomisionController::class);

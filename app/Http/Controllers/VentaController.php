@@ -5,8 +5,10 @@ namespace App\Http\Controllers;
 use App\Jobs\SendEmailJob;
 use App\Models\Boleta;
 use App\Models\Caja;
+use App\Models\Cliente;
 use App\Models\Comision;
 use App\Models\Confcomision;
+use App\Models\Detallesesion;
 use App\Models\Detalleventa;
 use App\Models\Loteria;
 use App\Models\Imagen;
@@ -15,8 +17,10 @@ use App\Models\Promoboleta;
 use App\Models\Promocional;
 use App\Models\Recibo;
 use App\Models\Rifa;
+use App\Models\Sesionventa;
 use App\Models\Transaccion;
 use App\Models\User;
+use App\Models\Vendedor;
 use App\Models\Venta;
 use Darryldecode\Cart\Cart;
 use Illuminate\Routing\Route;
@@ -472,7 +476,7 @@ class VentaController extends Controller
                                         ->where('estado', 2)
                                         ->first();
             if (is_null($concomision)) {
-                $concomision = Confcomision::join('users as t1', 'confcomisiones.idvendedor', '=', 't1.idempresa')
+                $concomision = Confcomision::join('vendedors as t1', 'confcomisiones.idvendedor', '=', 't1.idempresa')
                     ->select('confcomisiones.*')
                     ->where('t1.id', $request->idvendedor)
                     ->first();
@@ -529,7 +533,6 @@ class VentaController extends Controller
                 $detalleventa->cantidad = 1;
                 $detalleventa->estado = 3;
                 $detalleventa->save();
-
                 $reg->valorpagar = "$" . number_format($reg->valorpagar, 0, ".", ",");
                 $reg->comision = "$" . number_format($reg->comision, 0, ".", ",");
             }
@@ -622,51 +625,28 @@ class VentaController extends Controller
             $venta->save();
             DB::commit();
 
-            /*
             // Envío de mensajes de texto
             foreach ($request->reservas as $reserva) {
                 $reg = json_decode($reserva);
-                $cliente = User::where('id', $reg->idcliente)->first();
+                $cliente = Cliente::where('id', $reg->idcliente)->first();
 
                 $to = "57".$cliente->movil;//"573155665528";
-                //$to = "573155665528";
+
+                $saldo = $reg->valortotal - $reg->valorpagar;
+                $saldotxt = '';
 
                 if ($reg->valorpagar > 0) {
-                    $saldo = $reg->valortotal - $reg->valorpagar;
                     $saldotxt = "Tu saldo pendiente es $saldo.";
                 }
                 $message = "Los Tres Ases te da la bienvenida y agradece tu fidelidad, el gran bono millonario premio mayor $reg->numero promocional $reg->promocional ha sido registrado con exito. $saldotxt SUERTE";
 
-                $response = Http::withHeaders([
-                    'Content-Type' => 'application/json',
-                    'Authorization' => 'Basic QWRhbW1Tb2x1Y2lvbmVzX0JfMVdFOjZpW3pMRVEkTWI=',
-                ])->post("https://api-sms.masivapp.com/send-message", [
-                    "to" => $to,
-                    "text" => $message,
-                    "customdata" => "CUS_ID_0125",
-                    "isPremium" => false,
-                    "isFlash" => false,
-                    "isLongmessage" => true,
-                    "isRandomRoute" => false
-                ]);
+                $this->sendSMS($to, $message);
                 if ($saldo == 0) {
                     $message = "Conserva este mensaje de paz y salvo valido para reclamar el premio mayor: Apto Plaza Robles, Camioneta mazda y Tour resolucion EDSA N 999 premio mayor $reg->numero y promocional $reg->promocional. Sorteo miercoles 21 de diciembre de 2022 con el premio mayor de la loteria de manizales";
 
-                    $response = Http::withHeaders([
-                        'Content-Type' => 'application/json',
-                        'Authorization' => 'Basic QWRhbW1Tb2x1Y2lvbmVzX0JfMVdFOjZpW3pMRVEkTWI=',
-                    ])->post("https://api-sms.masivapp.com/send-message", [
-                        "to" => $to,
-                        "text" => $message,
-                        "customdata" => "CUS_ID_0125",
-                        "isPremium" => false,
-                        "isFlash" => false,
-                        "isLongmessage" => true,
-                        "isRandomRoute" => false
-                    ]);
+                    $this->sendSMS($to, $message);
                 }
             }
-            */
             return ['url' => url('/storage/pdf/').'/'.$filename];
         } catch (\Exception $e) {
             // An error occured; cancel the transaction...
@@ -696,7 +676,7 @@ class VentaController extends Controller
                 ->where('estado', 2)
                 ->first();
             if (is_null($concomision)) {
-                $concomision = Confcomision::join('users as t1', 'confcomisiones.idvendedor', '=', 't1.idempresa')
+                $concomision = Confcomision::join('vendedors as t1', 'confcomisiones.idvendedor', '=', 't1.idempresa')
                     ->select('confcomisiones.*')
                     ->where('t1.id', $request->idvendedor)
                     ->first();
@@ -866,5 +846,180 @@ class VentaController extends Controller
         }
 
     }
+
+    public function sendSmsSales(Request $request) {
+        $id = $request->id;
+
+        $detalle = Detalleventa::where('id', $id)
+                              ->with('cliente')
+                              ->with('boleta')
+                              ->first();
+        $to = "57".$detalle->cliente->movil;//"573155665528";
+
+        $saldo = $detalle->boleta->saldo;
+        $saldotxt = '';
+
+        if ($saldo > 0) {
+            $saldotxt = "Tu saldo pendiente es $saldo.";
+        }
+        $message = "Los Tres Ases te da la bienvenida y agradece tu fidelidad, el gran bono millonario premio mayor ".$detalle->boleta->numero." promocional ".$detalle->boleta->promocional." ha sido registrado con exito. $saldotxt SUERTE";
+
+        $this->sendSMS($to, $message);
+        if ($saldo == 0) {
+            $message = "Conserva este mensaje de paz y salvo valido para reclamar el premio mayor: Apto Plaza Robles, Camioneta mazda y Tour resolucion EDSA N 999 premio mayor ".$detalle->boleta->numero." y promocional ".$detalle->boleta->promocional.". Sorteo miercoles 21 de diciembre de 2022 con el premio mayor de la loteria de manizales";
+
+            $this->sendSMS($to, $message);
+        }
+    }
+
+    public function initSession(Request $request) {
+        $time = 120;
+        $idusuario = Auth::user()->id;
+        $detallesession = null;
+
+        $session = Sesionventa::where('idusuario', $idusuario)
+                                ->where('idpuntoventa', $request->idpuntoventa)
+                                ->where('estado', 1)
+                                ->with('vendedor')
+                                ->with('rifa')
+                                ->first();
+        if($session) {
+            if ($session->created_at->diffInSeconds() > $time) {
+                $boletas = Boleta::join('detallesesion', 'boletas.id', '=', 'detallesesion.idboleta')
+                    ->where('detallesesion.idsesionventa', $session->id)
+                    ->select('boletas.*')
+                    ->get();
+                $detalle = Detallesesion::where('idsesionventa', $session->id)->delete();
+
+                foreach ($boletas as $dato) {
+                    $dato->estado = $dato->estado_ant;
+                    $dato->save();
+                }
+                $session->delete();
+                $session = new Sesionventa();
+                $session->idusuario = $idusuario;
+                $session->idrifa = $request->idrifa;
+                $session->idvendedor = $request->idvendedor;
+                $session->idpuntoventa = $request->idpuntoventa;
+                $session->estado = 1;
+                $session->save();
+            } else {
+                $detallesession = Detallesesion::join('boletas', 'detallesesion.idboleta', 'boletas.id')
+                                               ->leftJoin('clientes', 'detallesesion.idcliente', 'clientes.id')
+                                               ->where('detallesesion.idsesionventa', $session->id)
+                                               ->select('detallesesion.*', 'boletas.pago', 'boletas.saldo', 'boletas.numero', 'boletas.promocional', 'boletas.valor as valortotal', DB::raw('CONCAT(clientes.nombre, " ", clientes.apellido) AS full_name'))
+                                               ->get();
+                $time = $time - $session->created_at->diffInSeconds();
+            }
+        } else {
+            $session = new Sesionventa();
+            $session->idusuario = $idusuario;
+            $session->idrifa = $request->idrifa;
+            $session->idvendedor = $request->idvendedor;
+            $session->idpuntoventa = $request->idpuntoventa;
+            $session->estado = 1;
+            $session->save();
+        }
+
+        return ['session' => $session, 'time' => $time, 'detallesession' => $detallesession ];
+    }
+
+    public function updateSession(Request $request) {
+        $idsesion = $request->idsesion;
+
+        $session = Sesionventa::where('id', $idsesion)
+                                ->first();
+        $session->idvendedor = $request->idvendedor;
+        $session->idrifa = $request->idrifa;
+        $session->save();
+
+        return 1;
+    }
+
+    public function updDetailSession(Request $request) {
+
+        $boleta = json_decode($request->boleta);
+        $idsesion = $request->idsesion;
+
+        if ($request->type == 'add') {
+            $detalle = new Detallesesion();
+            $detalle->idsesionventa = $idsesion;
+            $detalle->idboleta = $boleta->id;
+            $detalle->idcliente = $boleta->idcliente;
+            $detalle->save();
+
+            $boleta = Boleta::where('id', $boleta->id)->first();
+            $boleta->estado_ant = $boleta->estado;
+            $boleta->estado = 5;
+            $boleta->save();
+        }
+
+        if ($request->type == 'del') {
+            $detalle = Detallesesion::join('boletas', 'boletas.id', '=', 'detallesesion.idboleta')
+                                     ->where('detallesesion.idsesionventa', $idsesion)
+                                     ->where('boletas.numero', $boleta->numero)
+                                     ->delete();
+
+            $boleta = Boleta::where('numero', $boleta->numero)->first();
+            $boleta->estado = $boleta->estado_ant;
+            $boleta->save();
+        }
+
+        if ($request->type == 'upd') {
+            $detalle = Detallesesion::join('boletas', 'boletas.id', '=', 'detallesesion.idboleta')
+                                    ->where('detallesesion.idsesionventa', $idsesion)
+                                    ->where('boletas.numero', $boleta->numero)
+                                    ->select('detallesesion.*')
+                                    ->first();
+            $detalle->valor = $boleta->valorpagar;
+            $detalle->idcliente = $boleta->idcliente;
+            $detalle->save();
+        }
+        return 1;
+    }
+
+    public function finishSession(Request $request) {
+
+        try {
+            DB::beginTransaction();
+
+            $idsesion = $request->idsesion;
+            $session = Sesionventa::where('id', $idsesion)->delete();
+
+            $boletas = Boleta::join('detallesesion', 'boletas.id', '=', 'detallesesion.idboleta')
+                            ->where('detallesesion.idsesionventa', $idsesion)
+                            ->select('boletas.*')
+                            ->get();
+            $detalle = Detallesesion::where('idsesionventa', $idsesion)->delete();
+
+            foreach ($boletas as $dato) {
+                $dato->estado = $dato->estado_ant;
+                $dato->save();
+            }
+           DB::commit();
+        } catch (Throwable $e){
+            DB::rollBack();
+        }
+        return 1;
+    }
+
+    private function sendSMS($to, $message) {
+        $response = Http::withHeaders([
+            'Content-Type' => 'application/json',
+            'Authorization' => 'Basic QWRhbW1Tb2x1Y2lvbmVzX0JfMVdFOjZpW3pMRVEkTWI=',
+        ])->post("https://api-sms.masivapp.com/send-message", [
+            "to" => $to,
+            "text" => $message,
+            "customdata" => "CUS_ID_0125",
+            "isPremium" => false,
+            "isFlash" => false,
+            "isLongmessage" => true,
+            "isRandomRoute" => false
+        ]);
+
+        return $response;
+    }
+
+
 
 }

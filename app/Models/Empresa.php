@@ -40,7 +40,7 @@ class Empresa extends Model
     }
 
     public function vendedores() {
-        return $this->hasMany(User::class, 'idempresa')->where('idrol', '=', '5');
+        return $this->hasMany(Vendedor::class, 'idempresa')->where('idrol', '=', '5');
     }
 
     public function padre(){

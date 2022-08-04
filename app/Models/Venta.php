@@ -62,10 +62,10 @@ class Venta extends Model
         return $this->belongsTo(Puntoventa::class, 'idpuntoventa');
     }
     public function cliente(){
-        return $this->belongsTo(User::class, 'idcliente');
+        return $this->belongsTo(Cliente::class, 'idcliente');
     }
     public function vendedor(){
-        return $this->belongsTo(User::class, 'idvendedor');
+        return $this->belongsTo(Vendedor::class, 'idvendedor');
     }
     public function detalles() {
         return $this->hasMany(Detalleventa::class, 'idventa');
