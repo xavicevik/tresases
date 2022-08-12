@@ -2,9 +2,9 @@
 version: '3'
 services:
     shoppingred-app:
-        container_name: shoppingred-app
+        container_name: shoppingred2.0
         build:
-            context: ./vendor/laravel/sail/runtimes/8.1
+            context: ./docker/8.1
             dockerfile: Dockerfile
             args:
                 WWWGROUP: '${WWWGROUP}'

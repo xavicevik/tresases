@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Exports\ClientesExport;
 use App\Exports\UsersExport;
 use App\Models\Cliente;
+use App\Models\Confcomision;
 use App\Models\Rifa;
 use App\Models\Rol;
 use App\Models\User;
@@ -292,6 +293,20 @@ class UserController extends Controller
             $users = $users->get();
         }
         return ['vendedores' => $users];
+    }
+
+    public function getConfVendedor(Request $request)
+    {
+        $concomision = Confcomision::where('idvendedor', $request->idvendedor)
+            ->where('estado', 2)
+            ->first();
+        if (is_null($concomision)) {
+            $concomision = Confcomision::join('vendedors as t1', 'confcomisiones.idvendedor', '=', 't1.idempresa')
+                ->select('confcomisiones.*')
+                ->where('t1.id', $request->idvendedor)
+                ->first();
+        }
+        return ['comision' => $concomision ];
     }
 
     public function getClientesActivos(Request $request)

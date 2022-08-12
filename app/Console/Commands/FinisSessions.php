@@ -6,6 +6,7 @@ use App\Models\Boleta;
 use App\Models\Detallesesion;
 use App\Models\Sesionventa;
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 class FinisSessions extends Command
@@ -58,7 +59,10 @@ class FinisSessions extends Command
                     $dato->save();
                 }
                 $session->delete();
+
+                \Cart::remove($idsesion);
             }
+
             DB::commit();
         } catch (Throwable $e){
             DB::rollBack();

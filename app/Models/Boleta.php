@@ -46,9 +46,9 @@ class Boleta extends Model
     }
 
     public function cliente(){
-        return $this->belongsTo(User::class, 'idcliente');
+        return $this->belongsTo(Cliente::class, 'idcliente');
     }
     public function vendedor(){
-        return $this->belongsTo(User::class, 'idvendedor');
+        return $this->belongsTo(Vendedor::class, 'idvendedor');
     }
 }

@@ -28,7 +28,7 @@ use Laravel\Jetstream\Jetstream;
 
 class CajaController extends Controller
 {
-    const canPorPagina = 15;
+    const canPorPagina = 10;
     /**
      * Display a listing of the resource.
      *
@@ -78,6 +78,7 @@ class CajaController extends Controller
 
     public function historial(Request $request)
     {
+        $filtros = json_decode($request->filtros);
         $buscar = $request->buscar;
 
         if ($request->has('sortBy') && $request->sortBy <> ''){
@@ -96,15 +97,35 @@ class CajaController extends Controller
             $cajas = Historialcaja::orderBy($sortBy, $sortOrder)
                 ->with('caja')
                 ->with('vendedor')
-                ->with('puntoventa')
-                ->paginate(self::canPorPagina);
+                ->with('puntoventa');
         } else {
             $cajas = Historialcaja::orderBy($sortBy, $sortOrder)
                 ->with('caja')
                 ->with('vendedor')
-                ->with('puntoventa')
-                ->paginate(self::canPorPagina);
+                ->with('puntoventa');
         }
+
+        if (!is_null($filtros)){
+            if(!is_null($filtros->fechainicio) && $filtros->fechainicio <> '') {
+                $cajas = $cajas->where('historialcajas.created_at', '>=', $filtros->fechainicio);
+            }
+            if(!is_null($filtros->fechafin) && $filtros->fechafin <> '') {
+                $cajas = $cajas->where('historialcajas.created_at', '<=', $filtros->fechafin);
+            }
+
+            if(!is_null($filtros->vendedor) && $filtros->vendedor <> '') {
+                $cajas = $cajas->join('users as t2', 'historialcajas.idvendedor', '=', 't2.id')
+                    ->where('t2.nombre', 'like', '%'.$filtros->vendedor.'%')
+                    ->orWhere('t2.apellido', 'like', '%'.$filtros->vendedor.'%');
+            }
+            if(!is_null($filtros->puntoventa) && $filtros->puntoventa <> '') {
+                $cajas = $cajas->join('puntos_ventas', 'historialcajas.idpuntoventa', '=', 'puntos_ventas.id')
+                    ->where('puntos_ventas.nombre', 'like', '%'.$filtros->puntoventa.'%');
+            }
+        }
+
+        $cajas = $cajas->paginate(self::canPorPagina);
+
         if ($request->has('ispage') && $request->ispage){
             return ['cajas' => $cajas];
         } else {

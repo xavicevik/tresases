@@ -233,6 +233,23 @@
                                 </tr>
                                 </tbody>
                             </table>
+                            <!-- Paginacion -->
+                            <section class="mt-6">
+                                <div v-if="arrayData.links.length > 3">
+                                    <div class="flex flex-wrap -mb-1">
+                                        <template v-for="(link, p) in arrayData.links" :key="p">
+                                            <div v-if="link.url === null" class="mr-1 mb-1 px-4 py-3 text-sm leading-4 text-gray-400 border rounded"
+                                                 v-html="link.label" />
+                                            <button  v-else
+                                                     class="mr-1 mb-1 px-4 py-3 text-sm leading-4 border rounded hover:bg-white focus:border-indigo-500 focus:text-indigo-500"
+                                                     :class="{ 'bg-blue-700 text-white': link.active }"
+                                                     v-on:click="this.cambiarPage(link.url, 'movimientos', form, idVenta)"
+                                                     v-html="link.label" />
+                                        </template>
+                                    </div>
+                                </div>
+                            </section>
+                            <!-- Paginacion -->
                         </div>
                     </section>
                     <!-- Fin Tabla de contenido -->
@@ -269,7 +286,7 @@
                                         Comisión vendedor
                                     </th>
                                     <th class="px-4 py-2 text-sm font-bold w-2/12 hover:bg-blue-500 hover:text-gray-50 rounded-b">
-                                        Recibo/SMS
+                                        Recibo/SMS/Anular
                                     </th>
                                 </tr>
                                 </thead>
@@ -295,6 +312,12 @@
                                                 <path stroke-linecap="round" stroke-linejoin="round" d="M3 19v-8.93a2 2 0 01.89-1.664l7-4.666a2 2 0 012.22 0l7 4.666A2 2 0 0121 10.07V19M3 19a2 2 0 002 2h14a2 2 0 002-2M3 19l6.75-4.5M21 19l-6.75-4.5M3 10l6.75 4.5M21 10l-6.75 4.5m0 0l-1.14.76a2 2 0 01-2.22 0l-1.14-.76" />
                                             </svg>
                                         </a>
+                                        <a href="#" @click="anularVenta(dato.id)" class="hover:bg-blue-700 text-blue-400 font-bold rounded" fill="none"
+                                           viewBox="0 0 24 24" stroke="currentColor">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6" />
+                                            </svg>
+                                        </a>
                                     </td>
                                 </tr>
                                 <tr v-else>
@@ -302,6 +325,7 @@
                                 </tr>
                                 </tbody>
                             </table>
+                            <!-- Paginacion -->
                             <section class="mt-6">
                                 <div v-if="arrayDetalles.links.length > 3">
                                     <div class="flex flex-wrap -mb-1">
@@ -311,12 +335,13 @@
                                             <button  v-else
                                                      class="mr-1 mb-1 px-4 py-3 text-sm leading-4 border rounded hover:bg-white focus:border-indigo-500 focus:text-indigo-500"
                                                      :class="{ 'bg-blue-700 text-white': link.active }"
-                                                     v-on:click="cambiarPage(link.url, 'detalles')"
+                                                     v-on:click="this.cambiarPage(link.url, 'detalles', form, idVenta)"
                                                      v-html="link.label" />
                                         </template>
                                     </div>
                                 </div>
                             </section>
+                            <!-- Paginacion -->
                         </div>
                     </section>
                     <!-- Fin Tabla de Detalle -->
@@ -341,9 +366,9 @@
                                     <div class="">
                                         <h2 v-text="tituloModal" class="text-xl font-bold text-gray-900 px-4 py-2"></h2>
                                     </div>
-                                    <div class="mx-auto w-full">
-                                        <vue-countdown ref="countdown" class="mx-auto text-blue-500" :time="time" v-slot="{ minutes, seconds }" @end="onCountdownEnd">
-                                            Tiempo restante：{{ minutes }} minutos, {{ seconds }} segundos.
+                                    <div class="mx-auto text-center w-full border-1">
+                                        <vue-countdown ref="countdown" class="p-2 border-2 border-gray-800 rounded-md mx-auto text-blue-700" :time="time" v-slot="{ minutes, seconds }" @end="onCountdownEnd">
+                                            Tiempo restante：{{ minutes }} min, {{ seconds }} seg.
                                         </vue-countdown>
                                     </div>
                                     <!-- Inicio Form -->
@@ -1256,7 +1281,6 @@ export default {
             );
             return sumWithInitial;
         },
-
         totalapagar: function () {
             if (this.asignarMode) {
                 const sumWithInitial = this.form.reservas.reduce(
@@ -1291,6 +1315,8 @@ export default {
                 allowBlank: false,
                 minimumNumberOfCharacters: 4,
             },
+            idHistorial: null,
+            idVenta: null,
             isOpenCliente: false,
             isOpenClienteNew: false,
             isOpenCerrar: false,
@@ -1344,9 +1370,27 @@ export default {
             this.updateSession(this.session.id, this.form.idrifa.id, this.form.idvendedor.id);
         },
         onSelectVendedor: function(data){
-            this.form.idvendedor = data;
-            this.closeMoodalVendedor();
-            this.updateSession(this.session.id, this.form.idrifa.id, this.form.idvendedor.id);
+            var url= '/users/getConfVendedor';
+            axios.get(url, {
+                params: {
+                    idvendedor: data.id,
+                }
+            }).then((res) => {
+                let configuracion = res.data;
+
+                if (configuracion.comision && configuracion.comision !== null && configuracion.comision.comisionvendedor > 0) {
+                    this.form.idvendedor = data;
+                    this.closeMoodalVendedor();
+                    this.updateSession(this.session.id, this.form.idrifa.id, this.form.idvendedor.id);
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'El vendedor no cuenta con al configuración de las comisiones',
+                        showConfirmButton: false,
+                        timer: 1500
+                    })
+                }
+            })
         },
         onSelectCliente: function(data){
             this.form.reservas[this.indexcliente].cliente = data.full_name;
@@ -1418,12 +1462,7 @@ export default {
                     var url = '/ventas/reportpdfRegistroMov';
                     axios.get(url, {
                         params: {
-                            rifa: this.form.idrifa.nombre_tecnico,
-                            idvendedor: this.form.idvendedor.id,
-                            idcliente: this.form.idcliente.id,
-                            vendedor: this.form.idvendedor.full_name,
-                            reservas: this.form.reservas,
-                            idrifa: this.form.idrifa.id,
+                            idsesion: this.session.id,
                             idcaja: this.caja.id,
                             idpuntoventa: this.caja.idpuntoventa
                         }
@@ -1433,6 +1472,7 @@ export default {
                             title: 'Se ha generado el recibo correspondiente',
                             showConfirmButton: true,
                         })
+                        this.$refs.countdown.end();
                         window.open(res.data.url, '_blank');
                         this.form.reservas = [];
                         this.getMovimientos();
@@ -1885,17 +1925,6 @@ export default {
             })
 
         },
-        getDetalles: function (id) {
-            var url= '/ventas/getDetalles';
-            axios.get(url, {
-                params: {
-                    id: id,
-                }
-            }).then((res) => {
-                var respuesta = res.data;
-                this.arrayDetalles = respuesta.data;
-            })
-        },
         getMovimientos: function () {
             var url= '/cajas/movimientos';
             axios.get(url, {
@@ -1985,8 +2014,17 @@ export default {
                 //this.$refs.countdown.start();
             })
         },
+        anularVenta: function (id) {
+            axios.get('/ventas/anularVenta?id='+id,).then((res) => {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Mensaje enviado',
+                    showConfirmButton: false,
+                    timer: 1000
+                })
+            })
+        },
         onCountdownEnd: function () {
-            console.log('termino');
             this.finishSession()
         }
     },

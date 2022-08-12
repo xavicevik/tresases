@@ -524,7 +524,6 @@
 import AppLayout from '@/Layouts/AppLayout.vue';
 import Swal from "sweetalert2";
 import { Icon } from '@iconify/vue';
-import Pagination from '@/Components/Pagination';
 import Toggle from '@vueform/toggle';
 import '@vueform/toggle/themes/default.css';
 import Button from "../../Jetstream/Button";
@@ -545,7 +544,6 @@ export default {
         Button,
         AppLayout,
         Icon,
-        Pagination,
         Toggle,
         QuillEditor,
         JetNavLink,

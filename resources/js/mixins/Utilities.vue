@@ -60,11 +60,12 @@ export default {
         }
     },
     methods: {
-        cambiarPage: function (url = '', entidad = '', filtros = []) {
+        cambiarPage: function (url = '', entidad = '', filtros = [], id = null) {
             axios.get(url, {
                 params: {
                     filtros: filtros,
-                    ispage: 1
+                    ispage: 1,
+                    id: id,
                 }
             }).then((res) => {
                 var respuesta = res.data;
@@ -78,8 +79,16 @@ export default {
                     this.arrayData = respuesta.vendedores;
                 } else if (entidad == 'detalles') {
                     this.arrayDetalles = respuesta.data;
+                } else if (entidad == 'cajas') {
+                    this.arrayCajas = respuesta.cajas;
+                } else if (entidad == 'ventas') {
+                    this.arrayVentas = respuesta.data;
+                } else if (entidad == 'detalles') {
+                    this.arrayDetalles = respuesta.data;
                 } else if (entidad == 'users') {
                     this.arrayDetalles = respuesta.users;
+                } else {
+                    this.arrayData = respuesta.datos;
                 }
             })
         },
@@ -170,7 +179,7 @@ export default {
                 this.arrayClientes = respuesta.clientes;
             })
         },
-        getBoletas: function (filtros = [], sortBy = 'boletas.id') {
+        getBoletasreservas: function (filtros = [], sortBy = 'boletas.id') {
             if (sortBy == this.sortBy){
                 this.sortOrder = !this.sortOrder;
             }
@@ -196,6 +205,32 @@ export default {
                 this.arrayData = respuesta.datos;
             })
         },
+        getBoletas: function (filtros = [], sortBy = 'boletas.id') {
+            if (sortBy == this.sortBy){
+                this.sortOrder = !this.sortOrder;
+            }
+            let sortOrderdesc;
+            if (this.sortOrder){
+                sortOrderdesc = 'asc';
+            } else {
+                sortOrderdesc = 'desc';
+            }
+            this.sortBy = sortBy;
+            this.ispage = true;
+
+            var url= '/rifas/indexboletas';
+            axios.get(url, {
+                params: {
+                    filtros: filtros,
+                    sortBy: this.sortBy,
+                    sortOrder: sortOrderdesc,
+                    ispage: this.ispage
+                }
+            }).then((res) => {
+                var respuesta = res.data;
+                this.arrayData = respuesta.datos;
+            })
+        },
         getRifas: async function (buscar = '', filtro = 'titulo', paginate = false) {
             var url= '/rifas/getRifasActivas';
             axios.get(url, {
@@ -209,6 +244,19 @@ export default {
                 this.arrayRifas = respuesta.rifas;
             })
         },
+        getVendedoresSelect: async function (buscar = '', filtro = 'nombre', paginate = false) {
+            var url= '/users/getVendedoresActivos';
+            axios.get(url, {
+                params: {
+                    buscar: buscar,
+                    filtro: filtro,
+                    paginate: paginate
+                }
+            }).then((res) => {
+                var respuesta = res.data;
+                this.arrayVendedoresMenu = respuesta.vendedores;
+            })
+        },
         getVendedores: async function (buscar = '', filtro = 'nombre', paginate = false) {
             var url= '/users/getVendedoresActivos';
             axios.get(url, {
@@ -220,6 +268,32 @@ export default {
             }).then((res) => {
                 var respuesta = res.data;
                 this.arrayVendedores = respuesta.vendedores;
+            })
+        },
+        getDetallesVentas: function (id) {
+            var url= '/ventas/getDetallesHistorial';
+            axios.get(url, {
+                params: {
+                    id: id,
+                }
+            }).then((res) => {
+                var respuesta = res.data;
+                this.arrayVentas = respuesta.data;
+                this.arrayDetalles.data = [];
+                this.arrayDetalles.links = [];
+                this.idHistorial = id;
+            })
+        },
+        getDetalles: function (id) {
+            var url= '/ventas/getDetalles';
+            axios.get(url, {
+                params: {
+                    id: id,
+                }
+            }).then((res) => {
+                var respuesta = res.data;
+                this.arrayDetalles = respuesta.data;
+                this.idVenta = id;
             })
         },
         deleteRow: function (data) {
@@ -273,8 +347,10 @@ export default {
             })
         },
         rowSelect(idx) {
-            console.dir(idx)
             this.selectedRow = idx;
+        },
+        rowSelect2(idx) {
+            this.selectedRow2 = idx;
         },
         nvl: function (value, fallbackValue) {
             return typeof value !== 'undefined' && value != null

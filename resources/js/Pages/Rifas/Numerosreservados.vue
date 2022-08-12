@@ -50,7 +50,7 @@
 
                     <section>
                         <div class="px-4">
-                            <form @submit.prevent="getBoletas(form)" @keyup.enter="getBoletas(form)">
+                            <form @submit.prevent="getBoletasreservas(form)" @keyup.enter="getBoletasreservas(form)">
                                 <div class="grid xl:grid-cols-2 xl:gap-6">
                                     <div class="relative z-0 w-full mb-6 group">
                                         <select class="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer" v-model="form.rifa">
@@ -73,11 +73,14 @@
                                         </label>
                                     </div>
                                     <div class="relative z-0 w-full mb-6 group">
-                                        <input v-model="form.idvendedor.full_name" @click="selectVendedor('menu')" type="text" class="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer" placeholder="Seleccione Vendedor">
+                                        <select class="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer" v-model="form.vendedor">
+                                            <option value="0" >Seleccione Vendedor</option>
+                                            <option v-for="vendedor in arrayVendedoresMenu" :key="vendedor.id" :value="vendedor.id" v-text="vendedor.full_name"></option>
+                                        </select>
                                     </div>
                                 </div>
 
-                                <button type="button" @click="getBoletas(form)" class="mx-auto text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">Buscar</button>
+                                <button type="button" @click="getBoletasreservas(form)" class="mx-auto text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">Buscar</button>
                             </form>
                         </div>
                     </section>
@@ -188,7 +191,23 @@
                                 </tr>
                                 </tbody>
                             </table>
-                            <pagination class="mt-6" :links="arrayData.links" />
+                            <!-- Paginacion -->
+                            <section class="mt-6">
+                                <div v-if="arrayData.links.length > 3">
+                                    <div class="flex flex-wrap -mb-1">
+                                        <template v-for="(link, p) in arrayData.links" :key="p">
+                                            <div v-if="link.url === null" class="mr-1 mb-1 px-4 py-3 text-sm leading-4 text-gray-400 border rounded"
+                                                 v-html="link.label" />
+                                            <button  v-else
+                                                     class="mr-1 mb-1 px-4 py-3 text-sm leading-4 border rounded hover:bg-white focus:border-indigo-500 focus:text-indigo-500"
+                                                     :class="{ 'bg-blue-700 text-white': link.active }"
+                                                     v-on:click="this.cambiarPage(link.url, 'reservas', form)"
+                                                     v-html="link.label" />
+                                        </template>
+                                    </div>
+                                </div>
+                            </section>
+                            <!-- Paginacion -->
                         </div>
                     </section>
                     <!-- Fin Tabla de contenido -->
@@ -482,7 +501,7 @@
                                                 </tr>
                                                 </thead>
                                                 <tbody>
-                                                <tr @click="onSelectRifa(rifa)" class="hover:bg-blue-50 text-center" text-sm v-if="existerifa > 0" v-for="(rifa, id) in arrayRifas.data" :key="id">
+                                                <tr @click="onSelectRifa(rifa)" class="hover:bg-blue-50 text-center" text-sm v-if="arrayRifas.data" v-for="(rifa, id) in arrayRifas.data" :key="id">
                                                     <td class="border px-1 py-2 text-sm truncate" v-text="rifa.loteria.nombre"></td>
                                                     <td class="border px-1 py-2 text-sm truncate" v-text="rifa.serieoculta"></td>
                                                     <td class="border px-1 py-2 text-sm truncate" v-text="rifa.serie"></td>
@@ -501,10 +520,10 @@
                                                             <div v-if="link.url === null" class="mr-1 mb-1 px-4 py-3 text-sm leading-4 text-gray-400 border rounded"
                                                                  v-html="link.label" />
                                                             <button  v-else
-                                                                          class="mr-1 mb-1 px-4 py-3 text-sm leading-4 border rounded hover:bg-white focus:border-indigo-500 focus:text-indigo-500"
-                                                                          :class="{ 'bg-blue-700 text-white': link.active }"
-                                                                          v-on:click="cambiarPage(link.url)"
-                                                                          v-html="link.label" />
+                                                                  class="mr-1 mb-1 px-4 py-3 text-sm leading-4 border rounded hover:bg-white focus:border-indigo-500 focus:text-indigo-500"
+                                                                  :class="{ 'bg-blue-700 text-white': link.active }"
+                                                                  v-on:click="this.cambiarPage(link.url, 'rifas', form)"
+                                                                  v-html="link.label" />
                                                         </template>
                                                     </div>
                                                 </div>
@@ -599,7 +618,7 @@
                                                             <button  v-else
                                                                      class="mr-1 mb-1 px-4 py-3 text-sm leading-4 border rounded hover:bg-white focus:border-indigo-500 focus:text-indigo-500"
                                                                      :class="{ 'bg-blue-700 text-white': link.active }"
-                                                                     v-on:click="cambiarPagev(link.url)"
+                                                                     v-on:click="this.cambiarPage(link.url, 'vendedores', form)"
                                                                      v-html="link.label" />
                                                         </template>
                                                     </div>
@@ -721,6 +740,7 @@ export default {
                 data: [],
                 links: []
             },
+            arrayVendedoresMenu: [],
             arrayClientes: [],
             editMode: false,
             asignarMode: false,
@@ -746,34 +766,10 @@ export default {
         }
     },
     methods: {
-        nvl: function (value, fallbackValue) {
-            return typeof value !== 'undefined' && value != null
-                ? value
-                : fallbackValue;
-        },
         selTipoSerie: function (data){
             this.isIndividual = data;
         },
-        cambiarPage: function (url = '') {
-            axios.get(url, {
-            }).then((res) => {
-                var respuesta = res.data;
-                this.arrayRifas = respuesta.rifas;
 
-                if (this.arrayRifas.data.length > 0) {
-                    this.existerifa = 1;
-                } else {
-                    this.existerifa = 0;
-                }
-            })
-        },
-        cambiarPagev: function (url = '') {
-            axios.get(url, {
-            }).then((res) => {
-                var respuesta = res.data;
-                this.arrayVendedores = respuesta.vendedores;
-            })
-        },
         onSelectRifa: function(data){
             this.form.idrifa = data;
             this.closeMoodalRifa();
@@ -816,7 +812,7 @@ export default {
                         title: 'Se ha generado el recibo correspondiente',
                         showConfirmButton: true,
                     })
-                    this.getBoletas();
+                    this.getBoletasreservas();
                     window.open(res.data.url, '_blank');
                     this.form.reservas = [];
                 })
@@ -847,7 +843,7 @@ export default {
                         showConfirmButton: true,
                     })
                     window.open(res.data.url, '_blank');
-                    this.getBoletas();
+                    this.getBoletasreservas();
                     this.form.reservas = [];
                 })
             } else {
@@ -887,19 +883,6 @@ export default {
             })
 
              */
-        },
-        formatPrice(value) {
-            let val = (value/1).toFixed(0).replace('.', ',')
-            return '$ '+ val.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".")
-        },
-        dateTime(value) {
-            return moment(value).format('DD/MM/YYYY');
-        },
-        dateTimeFull(value) {
-            return moment(value).format('YYYY-MM-DD HH:MM:SS');
-        },
-        cleanMessage: function () {
-            this.$page.props.flash.message = '';
         },
         verVendedor: function (id) {
             //this.isOpen = true;
@@ -966,12 +949,10 @@ export default {
         },
         selectRifa: function () {
             this.isOpenRifa = true;
-            //this.getUsers();
-            this.getRifas('','nombre_tecnico','true');
+            this.getRifas('','titulo','true');
         },
         selectVendedor: function (target = '') {
             this.isOpenVendedor = true;
-            //this.getUsers();
             this.getVendedores('','users.nombre','true', target);
         },
         closeModal: function () {
@@ -1175,67 +1156,7 @@ export default {
             });
 
         },
-        getBoletas: function (filtros = [], sortBy = 'boletas.id') {
-            if (sortBy == this.sortBy){
-                this.sortOrder = !this.sortOrder;
-            }
-            let sortOrderdesc;
-            if (this.sortOrder){
-                sortOrderdesc = 'asc';
-            } else {
-                sortOrderdesc = 'desc';
-            }
-            this.sortBy = sortBy;
-            this.ispage = true;
 
-            var url= '/numerosreservados';
-            axios.get(url, {
-                params: {
-                    filtros: filtros,
-                    sortBy: this.sortBy,
-                    sortOrder: sortOrderdesc,
-                    ispage: this.ispage
-                }
-            }).then((res) => {
-                var respuesta = res.data;
-                this.arrayData = respuesta.datos;
-            })
-        },
-        getRifas: async function (buscar = '', filtro = 'nombre_tecnico', paginate = false) {
-
-            var url= '/rifas/getRifasActivas';
-            axios.get(url, {
-                params: {
-                    buscar: buscar,
-                    filtro: filtro,
-                    paginate: paginate
-                }
-            }).then((res) => {
-                //console.log(res.data);
-                var respuesta = res.data;
-                this.arrayRifas = respuesta.rifas;
-
-                if (this.arrayRifas.data.length > 0) {
-                    this.existerifa = 1;
-                } else {
-                    this.existerifa = 0;
-                }
-            })
-        },
-        getVendedores: async function (buscar = '', filtro = 'nombre', paginate = false, target = '') {
-
-            var url= '/users/getVendedoresActivos';
-            axios.get(url, {
-                params: {
-                    buscar: buscar,
-                    filtro: filtro,
-                    paginate: paginate
-                }
-            }).then((res) => {
-                var respuesta = res.data;
-                this.arrayVendedores = respuesta.vendedores;
-            })
-        },
         deleteRow: function (data) {
             let mensaje = '';
             let title = '';
@@ -1268,7 +1189,6 @@ export default {
                         'success'
                     )
                 }).catch(function (error) {
-                    //console.log(error);
                 });
             })
 
@@ -1277,12 +1197,11 @@ export default {
     },
     created: function () {
         this.arrayData = this.datos;
-        this.arrayVendedores = this.getVendedores('');
-        this.arrayRifas = this.getRifas('');
-        //console.log(this.datos);
+        this.getVendedoresSelect('');
+        this.getVendedores('','nombre', true);
+        this.getRifas('');
     },
     mounted() {
-        //console.log('Component mounted.');
     },
 }
 </script>

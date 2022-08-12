@@ -267,7 +267,23 @@
                                 </tr>
                                 </tbody>
                             </table>
-                            <pagination class="mt-6" :links="arrayData.links" />
+                            <!-- Paginacion -->
+                            <section class="mt-6">
+                                <div v-if="arrayData.links.length > 3">
+                                    <div class="flex flex-wrap -mb-1">
+                                        <template v-for="(link, p) in arrayData.links" :key="p">
+                                            <div v-if="link.url === null" class="mr-1 mb-1 px-4 py-3 text-sm leading-4 text-gray-400 border rounded"
+                                                 v-html="link.label" />
+                                            <button  v-else
+                                                     class="mr-1 mb-1 px-4 py-3 text-sm leading-4 border rounded hover:bg-white focus:border-indigo-500 focus:text-indigo-500"
+                                                     :class="{ 'bg-blue-700 text-white': link.active }"
+                                                     v-on:click="this.cambiarPage(link.url, 'boletas', form)"
+                                                     v-html="link.label" />
+                                        </template>
+                                    </div>
+                                </div>
+                            </section>
+                            <!-- Paginacion -->
                         </div>
                     </section>
                     <!-- Fin Tabla de contenido -->
@@ -380,46 +396,6 @@ export default {
         }
     },
     methods: {
-        formatPrice(value) {
-            let val = (value/1).toFixed(0).replace('.', ',')
-            return '$ '+ val.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".")
-        },
-        dateTime(value) {
-            return moment(value).format('DD/MM/YYYY');
-        },
-        dateTimeFull(value) {
-            return moment(value).format('YYYY-MM-DD HH:MM:SS');
-        },
-        cleanMessage: function () {
-            this.$page.props.flash.message = '';
-        },
-        getBoletas: function (filtros = [], sortBy = 'boletas.id') {
-            if (sortBy == this.sortBy){
-                this.sortOrder = !this.sortOrder;
-            }
-            let sortOrderdesc;
-            if (this.sortOrder){
-                sortOrderdesc = 'asc';
-            } else {
-                sortOrderdesc = 'desc';
-            }
-            this.sortBy = sortBy;
-            this.ispage = true;
-
-            var url= '/rifas/indexboletas';
-            axios.get(url, {
-                params: {
-                    filtros: filtros,
-                    sortBy: this.sortBy,
-                    sortOrder: sortOrderdesc,
-                    ispage: this.ispage
-                }
-            }).then((res) => {
-                //console.log(res);
-                var respuesta = res.data;
-                this.arrayData = respuesta.datos;
-            })
-        },
         BoletasExport: function (filtros = []) {
             let fecha = moment(new Date()).format('DDMMYYYY');
             var url= '/boletas/export';
@@ -439,52 +415,13 @@ export default {
                 fileLink.click();
             })
         },
-        getRifas: async function (buscar = '', filtro = 'nombre_tecnico', paginate = false) {
-
-            var url= '/rifas/getRifasActivas';
-            axios.get(url, {
-                params: {
-                    buscar: buscar,
-                    filtro: filtro,
-                    paginate: paginate
-                }
-            }).then((res) => {
-                //console.log(res.data);
-                var respuesta = res.data;
-                this.arrayRifas = respuesta.rifas;
-
-                if (this.arrayRifas.data.length > 0) {
-                    this.existerifa = 1;
-                } else {
-                    this.existerifa = 0;
-                }
-            })
-        },
-        getVendedores: async function (buscar = '', filtro = 'nombre', paginate = false) {
-
-            var url= '/users/getVendedoresActivos';
-            axios.get(url, {
-                params: {
-                    buscar: buscar,
-                    filtro: filtro,
-                    paginate: paginate
-                }
-            }).then((res) => {
-                var respuesta = res.data;
-                this.arrayVendedores = respuesta.vendedores;
-            })
-        },
     },
     created: function () {
-        //console.log('inicio comisiones');
         this.arrayData = this.datos;
         this.arrayVendedores = this.getVendedores('', '', false);
         this.arrayRifas = this.getRifas('');
-        //console.log(this.datos);
-
     },
     mounted() {
-        //console.log('Component mounted.');
     },
 }
 </script>

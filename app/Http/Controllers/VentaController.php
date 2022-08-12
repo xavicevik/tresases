@@ -10,6 +10,7 @@ use App\Models\Comision;
 use App\Models\Confcomision;
 use App\Models\Detallesesion;
 use App\Models\Detalleventa;
+use App\Models\Historialcaja;
 use App\Models\Loteria;
 use App\Models\Imagen;
 use App\Models\Pago;
@@ -142,17 +143,21 @@ class VentaController extends Controller
                         ->with('cliente')
                         ->with('boleta')
                         ->paginate(self::canPorPagina);
-
        return ['data' => $detalle];
     }
 
     public function getDetallesHistorial(Request $request)
     {
-        $ventas = Venta::where('idhistorial', $request->id)
-            ->with('vendedor')
-            ->with('cliente')
+        $ventas = Venta::join('vendedors', 'vendedors.id', 'ventas.idvendedor')
+            ->where('idhistorial', $request->id)
+            ->select('ventas.*', DB::raw('CONCAT(vendedors.nombre, " ", vendedors.apellido) AS full_name'))
             ->paginate(self::canPorPagina);
-
+        /*
+        $ventas = Venta::join('usersviews', 'usersviews.id', 'ventas.idvendedor')
+            ->where('idhistorial', $request->id)
+            ->select('ventas.*', 'usersviews.full_name')
+            ->paginate(self::canPorPagina);
+        */
         return ['data' => $ventas];
     }
 
@@ -461,6 +466,19 @@ class VentaController extends Controller
         //return $pdf->stream('ventas.pdf');
     }
 
+    private function getSalesComision($idvendedor) {
+        $concomision = Confcomision::where('idvendedor', $idvendedor)
+            ->where('estado', 2)
+            ->first();
+        if (is_null($concomision)) {
+            $concomision = Confcomision::join('vendedors as t1', 'confcomisiones.idvendedor', '=', 't1.idempresa')
+                ->select('confcomisiones.*')
+                ->where('t1.id', $idvendedor)
+                ->first();
+        }
+        return $concomision;
+    }
+
     public function reportpdfRegistroMov(Request $request)
     {
         try {
@@ -472,185 +490,205 @@ class VentaController extends Controller
             $toatlcomision = 0;
             $mytime= Carbon::now('America/Bogota');
 
-            $concomision = Confcomision::where('idvendedor', $request->idvendedor)
-                                        ->where('estado', 2)
-                                        ->first();
-            if (is_null($concomision)) {
-                $concomision = Confcomision::join('vendedors as t1', 'confcomisiones.idvendedor', '=', 't1.idempresa')
-                    ->select('confcomisiones.*')
-                    ->where('t1.id', $request->idvendedor)
-                    ->first();
-            }
+            $idsesion = $request->idsesion;
+            $session = Sesionventa::where('id', $idsesion)->first();
 
-            $venta = new Venta();
-            $venta->valorventa = 0;
-            $venta->impuesto = 0;
-            $venta->comision = 0;
-            $venta->valortotal = 0;
-            $venta->cantidad = 0;
-            $venta->idvendedor = $request->idvendedor;
-            $venta->idcliente = null;
-            $venta->idpuntoventa = $request->idpuntoventa;
-            $venta->fechaventa = $mytime->toDateTimeString();
-            $venta->comprobante = $request->comprobante;
-            $venta->estado = 3;
-            $venta->transaccion = $request->idcaja;
-            $venta->save();
+            DB::connection()->enableQueryLog();
 
-            foreach ($request->reservas as $reserva){
-                $reg = json_decode($reserva);
-                $boleta = Boleta::where('idrifa', $request->idrifa)
-                    //->where('estado', '=', 2)
-                    ->where('numero', $reg->numero)
-                    //->where('idvendedor', $request->idvendedor)
-                    ->first();
-                $reg->comision = $reg->valorpagar * ($concomision->comisionvendedor/100);
-                $toatlcomision += $reg->comision;
-                $salida[] = $reg;
-                $totalventa += $boleta->valor;
-                $totalpagado += $reg->valorpagar;
-                $boleta->idvendedor = $request->idvendedor;
-                $boleta->idcliente = $reg->idcliente;
-                $boleta->pago = $boleta->pago + $reg->valorpagar;
-                $boleta->saldo = $boleta->valor - $boleta->pago;
-                if ($boleta->saldo == 0) {
-                    $boleta->estado = 3;
-                } else {
-                    $boleta->estado = 4;
+            if($session) {
+                $boletas = Boleta::join('detallesesion', 'detallesesion.idboleta', 'boletas.id')
+                    ->join('clientes', 'detallesesion.idcliente', 'clientes.id')
+                    ->where('detallesesion.idsesionventa', $session->id)
+                    ->select('detallesesion.id as iddetalle',
+                             'detallesesion.idsesionventa',
+                             'detallesesion.valor',
+                             'detallesesion.idcliente as idclienteboleta',
+                             'boletas.id',
+                             'boletas.pago',
+                             'boletas.estado',
+                             'boletas.saldo',
+                             'boletas.numero',
+                             'boletas.promocional',
+                             'boletas.valor as valortotal',
+                             'boletas.estado',
+                             'boletas.idcliente',
+                              DB::raw('CONCAT(clientes.nombre, " ", clientes.apellido) AS full_name')
+                    )
+                    ->get();
+                $concomision = $this->getSalesComision($session->idvendedor);
+
+                $venta = new Venta();
+                $venta->valorventa = 0;
+                $venta->impuesto = 0;
+                $venta->comision = 0;
+                $venta->valortotal = 0;
+                $venta->cantidad = 0;
+                $venta->idvendedor = $session->idvendedor;
+                $venta->idcliente = null;
+                $venta->idpuntoventa = $session->idpuntoventa;
+                $venta->fechaventa = $mytime->toDateTimeString();
+                $venta->comprobante = $request->comprobante;
+                $venta->estado = 3;
+                $venta->transaccion = $request->idcaja;
+                $venta->save();
+
+                foreach ($boletas as $boleta){
+                    $toatlcomision += $boleta->valor * ($concomision->comisionvendedor/100);
+                    $totalventa += $boleta->valortotal;
+                    $totalpagado += $boleta->valor;
+                    $boleta->idvendedor = $session->idvendedor;
+                    $boleta->idcliente = $boleta->idclienteboleta;
+                    $boleta->pago = $boleta->pago + $boleta->valor;
+                    $boleta->saldo = $boleta->valortotal - $boleta->pago;
+                    if ($boleta->saldo == 0) {
+                        $estado = 3;
+                    } else {
+                        $estado = 4;
+                    }
+                    $boleta->estado = $estado;
+                    $boleta->save();
+
+                    $detalleventa = new Detalleventa();
+                    $detalleventa->idventa = $venta->id;
+                    $detalleventa->idboleta = $boleta->id;
+                    $detalleventa->idrifa = $session->idrifa;
+                    $detalleventa->valor = $boleta->valor;
+                    $detalleventa->idcliente = $boleta->idcliente;
+                    $detalleventa->impuesto = 0;
+                    $detalleventa->comision = $boleta->valor * ($concomision->comisionvendedor/100);
+                    $detalleventa->valortotal = $boleta->valortotal;
+                    $detalleventa->numero = $boleta->numero;
+                    $detalleventa->cantidad = 1;
+                    $detalleventa->estado = 3;
+                    $detalleventa->save();
+                    $boleta['comision'] = $boleta->valor * ($concomision->comisionvendedor/100);
+                    $salida[] = $boleta;
                 }
-                $boleta->save();
 
-                $detalleventa = new Detalleventa();
+                $queries = \DB::getQueryLog();
+                //dd($queries);
+
+                asort($salida);
+                $recibo = new Recibo();
+                $recibo->nombre = 'Recibo venta';
+                $recibo->url = 'Recibo venta';
+                $recibo->idusuario = Auth::user()->id;
+                $recibo->iduserdestino = $session->idvendedor;
+                $recibo->save();
+
                 $detalleventa->idventa = $venta->id;
-                $detalleventa->idboleta = $boleta->id;
-                $detalleventa->idrifa = $request->idrifa;
-                $detalleventa->valor = $reg->valorpagar;
-                $detalleventa->idcliente = $reg->idcliente;
-                $detalleventa->impuesto = 0;
-                $detalleventa->comision = $reg->comision;
-                $detalleventa->valortotal = $boleta->valor;
-                $detalleventa->numero = $reg->numero;
-                $detalleventa->cantidad = 1;
-                $detalleventa->estado = 3;
                 $detalleventa->save();
-                $reg->valorpagar = "$" . number_format($reg->valorpagar, 0, ".", ",");
-                $reg->comision = "$" . number_format($reg->comision, 0, ".", ",");
-            }
 
-            asort($salida);
-            $recibo = new Recibo();
-            $recibo->nombre = 'Recibo venta';
-            $recibo->url = 'Recibo venta';
-            $recibo->idusuario = Auth::user()->id;
-            $recibo->iduserdestino = $request->idvendedor;
-            $recibo->save();
+                $comision = new Comision();
+                $comision->idventa = $venta->id;
+                $comision->idconfiguracion = $concomision->id;
+                $comision->valorventa = $totalpagado;
+                $comision->comisionmayorista = $totalpagado * ($concomision->comisionmayorista/100);
+                $comision->comisiondistribuidor = $totalpagado * ($concomision->comisiondistribuidor/100);
+                $comision->comisionvendedor = $totalpagado * ($concomision->comisionvendedor/100);
+                $comision->estado = true;
+                $comision->save();
 
-            $detalleventa->idventa = $venta->id;
-            $detalleventa->save();
+                $venta->comision = $comision->comisionmayorista + $comision->comisiondistribuidor + $comision->comisionvendedor;
+                $venta->valorventa = $totalpagado;
+                $venta->valortotal = $totalventa;
+                $venta->cantidad = sizeof($boletas);
+                $venta->save();
 
-            $comision = new Comision();
-            $comision->idventa = $venta->id;
-            $comision->idconfiguracion = $concomision->id;
-            $comision->valorventa = $totalpagado;
-            $comision->comisionmayorista = $totalpagado * ($concomision->comisionmayorista/100);
-            $comision->comisiondistribuidor = $totalpagado * ($concomision->comisiondistribuidor/100);
-            $comision->comisionvendedor = $totalpagado * ($concomision->comisionvendedor/100);
-            $comision->estado = true;
-            $comision->save();
+                $concepto = 2;
+                $descripcion = 'Pago en efectivo';
+                $signo = self::debito;
+                $impuesto = 0;
 
-            $venta->comision = $comision->comisionmayorista + $comision->comisiondistribuidor + $comision->comisionvendedor;
-            $venta->valorventa = $totalpagado;
-            $venta->valortotal = $totalventa;
-            $venta->cantidad = sizeof($salida);
-            $venta->save();
+                $transaccion = new Transaccion();
+                $transaccion->idusuarioori = $session->idvendedor;
+                $transaccion->idusuariodest = Auth::user()->id;
+                $transaccion->idconcepto = $concepto;
+                $transaccion->origen = 'Fisico';
+                $transaccion->destino = 'Fisico';
+                $transaccion->signo = $signo;
+                $transaccion->valor = $venta->valorventa;
+                $transaccion->impuesto = $impuesto;
+                $transaccion->descripcion = $descripcion;
+                $transaccion->soporte = $request->comprobante;
+                $transaccion->mes = $mytime->month;
+                $transaccion->ano = $mytime->year;
+                $transaccion->save();
 
-            $concepto = 2;
-            $descripcion = 'Pago en efectivo';
-            $signo = self::debito;
-            $impuesto = 0;
+                $pago = new Pago();
+                $pago->idventa = $venta->id;
+                $pago->valortotal = $venta->valorventa;
+                $pago->idcliente = null;
+                $pago->idvendedor = $session->idvendedor;
+                $pago->saldo = $venta->valortotal - $venta->valorventa;
+                $pago->canal = 'Fisico';
+                $pago->descripcion = $descripcion;
+                $pago->tipo = 'Pago';
+                $pago->soporte = $request->comprobante;
+                $pago->idtransaccion = $transaccion->id;
+                $pago->idpuntoventa = $session->idpuntoventa;
+                $pago->idcaja = $request->idcaja;
+                $pago->save();
 
-            $transaccion = new Transaccion();
-            $transaccion->idusuarioori = $request->idvendedor;
-            $transaccion->idusuariodest = Auth::user()->id;
-            $transaccion->idconcepto = $concepto;
-            $transaccion->origen = 'Fisico';
-            $transaccion->destino = 'Fisico';
-            $transaccion->signo = $signo;
-            $transaccion->valor = $venta->valorventa;
-            $transaccion->impuesto = $impuesto;
-            $transaccion->descripcion = $descripcion;
-            $transaccion->soporte = $request->comprobante;
-            $transaccion->mes = $mytime->month;
-            $transaccion->ano = $mytime->year;
-            $transaccion->save();
+                $data = [
+                    'vendedor' => $session->vendedor->full_name,
+                    'usuario' => $user->username,
+                    'rifa' => $session->rifa->titulo,
+                    'fecha' => $recibo->created_at,
+                    'reservas' => $salida,
+                    'recibo'  => $recibo->id,
+                    'comisionvendedor' => "-$" . number_format($comision->comisionvendedor, 0, ".", ","),
+                    'valortotal' => "$" . number_format($venta->valorventa, 0, ".", ","),
+                    'valorentregar' => "$" . number_format($venta->valorventa - $comision->comisionvendedor, 0, ".", ","),
+                    'cantidad' => sizeof($salida)
+                ];
 
-            $pago = new Pago();
-            $pago->idventa = $venta->id;
-            $pago->valortotal = $venta->valorventa;
-            $pago->idcliente = null;
-            $pago->idvendedor = $request->idvendedor;
-            $pago->saldo = $venta->valortotal - $venta->valorventa;
-            $pago->canal = 'Fisico';
-            $pago->descripcion = $descripcion;
-            $pago->tipo = 'Pago';
-            $pago->soporte = $request->comprobante;
-            $pago->idtransaccion = $transaccion->id;
-            $pago->idpuntoventa = $request->idpuntoventa;
-            $pago->idcaja = $request->idcaja;
-            $pago->save();
+                $filename = 'reciboVenta_'.$data['recibo'].'.pdf';
+                $recibo->url = $filename;
+                $recibo->save();
+                $pdf = app('dompdf.wrapper');
+                $pdf->getDomPDF()->set_option("enable_php", true);
+                $pdf->loadView('pdf.reportpdfVenta', $data);
 
-            $data = [
-                'vendedor' => $request->vendedor,
-                'usuario' => $user->username,
-                'rifa' => $request->rifa,
-                'fecha' => $recibo->created_at,
-                'reservas' => $salida,
-                'recibo'  => $recibo->id,
-                'comisionvendedor' => "-$" . number_format($comision->comisionvendedor, 0, ".", ","),
-                'valortotal' => "$" . number_format($venta->valorventa, 0, ".", ","),
-                'valorentregar' => "$" . number_format($venta->valorventa - $comision->comisionvendedor, 0, ".", ","),
-                'cantidad' => sizeof($salida)
-            ];
+                $output = $pdf->output();
+                file_put_contents(public_path('storage').'/pdf/'.$filename, $output, FILE_APPEND);
+                $venta->urlrecibo = url('/storage/pdf/').'/'.$filename;
+                $venta->save();
+                DB::commit();
 
-            $filename = 'reciboVenta_'.$data['recibo'].'.pdf';
-            $recibo->url = $filename;
-            $recibo->save();
-            $pdf = app('dompdf.wrapper');
-            $pdf->getDomPDF()->set_option("enable_php", true);
-            $pdf->loadView('pdf.reportpdfVenta', $data);
+                // Envío de mensajes de texto
+                foreach ($boletas as $boleta) {
+                    $cliente = Cliente::where('id', $boleta->idcliente)->first();
 
-            $output = $pdf->output();
-            file_put_contents(public_path('storage').'/pdf/'.$filename, $output, FILE_APPEND);
-            $venta->urlrecibo = url('/storage/pdf/').'/'.$filename;
-            $venta->save();
-            DB::commit();
+                    $to = "57".$cliente->movil;//"573155665528";
 
-            // Envío de mensajes de texto
-            foreach ($request->reservas as $reserva) {
-                $reg = json_decode($reserva);
-                $cliente = Cliente::where('id', $reg->idcliente)->first();
+                    $saldo = $boleta->valortotal - $boleta->valor;
+                    $saldotxt = '';
 
-                $to = "57".$cliente->movil;//"573155665528";
-
-                $saldo = $reg->valortotal - $reg->valorpagar;
-                $saldotxt = '';
-
-                if ($reg->valorpagar > 0) {
-                    $saldotxt = "Tu saldo pendiente es $saldo.";
-                }
-                $message = "Los Tres Ases te da la bienvenida y agradece tu fidelidad, el gran bono millonario premio mayor $reg->numero promocional $reg->promocional ha sido registrado con exito. $saldotxt SUERTE";
-
-                $this->sendSMS($to, $message);
-                if ($saldo == 0) {
-                    $message = "Conserva este mensaje de paz y salvo valido para reclamar el premio mayor: Apto Plaza Robles, Camioneta mazda y Tour resolucion EDSA N 999 premio mayor $reg->numero y promocional $reg->promocional. Sorteo miercoles 21 de diciembre de 2022 con el premio mayor de la loteria de manizales";
+                    if ($saldo > 0) {
+                        $saldotxt = "Tu saldo pendiente es $saldo.";
+                    }
+                    $message = "Los Tres Ases te da la bienvenida y agradece tu fidelidad, el gran bono millonario premio mayor $boleta->numero promocional $boleta->promocional ha sido registrado con exito. $saldotxt SUERTE";
 
                     $this->sendSMS($to, $message);
+                    if ($saldo == 0) {
+                        $message = "Conserva este mensaje de paz y salvo valido para reclamar el premio mayor: Apto Robles, Camioneta mazda y Tour resolucion EDSA N 999 premio mayor $boleta->numero y promocional $boleta->promocional. Sorteo miercoles 21 de diciembre de 2022 con el premio mayor de la loteria de manizales";
+
+                        $this->sendSMS($to, $message);
+                    }
                 }
+
+                $r = new Request();
+                $r->idsesion = $session->id;
+                $r->isSale = true;
+                $this->finishSession($r);
+
+                return ['url' => url('/storage/pdf/').'/'.$filename];
             }
-            return ['url' => url('/storage/pdf/').'/'.$filename];
         } catch (\Exception $e) {
             // An error occured; cancel the transaction...
             DB::rollback();
+            dd($e);
 
             // return redirect()->back()->withErrors(['error' => 'No se pudo registrar la venta, por favor validar los parámetros ingresados']);
             return back()->withErrors(['error' => ['No se pudo registrar la venta, por favor validar los parámetros ingresados']]);
@@ -839,7 +877,7 @@ class VentaController extends Controller
         } catch (\Exception $e) {
             // An error occured; cancel the transaction...
             DB::rollback();
-
+dd($e);
             return back()->withErrors(['error' => ['No se pudo registrar la venta, por favor validar los parámetros ingresados']]);
             // and throw the error again.
             //throw $e;
@@ -870,6 +908,30 @@ class VentaController extends Controller
 
             $this->sendSMS($to, $message);
         }
+    }
+
+    public function anularVenta(Request $request) {
+        $id = $request->id;
+        $idcaja = $request->idcaja;
+
+        try {
+            DB::beginTransaction();
+            $detalle = Detalleventa::where('id', $id)->first();
+            $boleta = Boleta::where('id', $detalle->idboleta)->firs();
+            $venta = Venta::where('id', $detalle->idventa)->firs();
+            $pago = Pago::where('idventa', $detalle->idventa)->firs();
+            $transaccion = Venta::where('id', $pago->idtransaccion)->firs();
+            $comision = Comision::where('idventa', $detalle->idventa)->firs();
+            $historialcaja = Historialcaja::where('id', $venta->idhistorial)->firs();
+
+
+
+        } catch (\Exception $e) {
+            DB::rollback();
+            dd($e);
+            return back()->withErrors(['error' => ['No se pudo registrar la venta, por favor validar los parámetros ingresados']]);
+        }
+
     }
 
     public function initSession(Request $request) {
@@ -938,29 +1000,47 @@ class VentaController extends Controller
 
     public function updDetailSession(Request $request) {
 
-        $boleta = json_decode($request->boleta);
-        $idsesion = $request->idsesion;
+        $boletaupd = json_decode($request->boleta);
+        $idsesion  = $request->idsesion;
 
         if ($request->type == 'add') {
             $detalle = new Detallesesion();
             $detalle->idsesionventa = $idsesion;
-            $detalle->idboleta = $boleta->id;
-            $detalle->idcliente = $boleta->idcliente;
+            $detalle->idboleta = $boletaupd->id;
+            $detalle->valor = $boletaupd->saldo;
+            $detalle->idcliente = $boletaupd->idcliente;
             $detalle->save();
 
-            $boleta = Boleta::where('id', $boleta->id)->first();
+            $boleta = Boleta::where('id', $boletaupd->id)->first();
             $boleta->estado_ant = $boleta->estado;
             $boleta->estado = 5;
             $boleta->save();
+
+            \Cart::session(Auth::user()->id);
+            \Cart::add(array(
+                'id' => $idsesion, // inique row ID
+                'name' => $boleta->numero,
+                'price' => $boleta->valor,
+                'quantity' => 1,
+                'attributes' => array(
+                    'url' => $request->url,
+                    'serie' => '',
+                    'descripcion' => '',
+                    'idrifa' => $boleta->idrifa,
+                    'numero' => $boleta->numero,
+                    'codigo' => $boleta->id
+                ),
+                'associatedModel' => Boleta::class
+            ));
         }
 
         if ($request->type == 'del') {
             $detalle = Detallesesion::join('boletas', 'boletas.id', '=', 'detallesesion.idboleta')
                                      ->where('detallesesion.idsesionventa', $idsesion)
-                                     ->where('boletas.numero', $boleta->numero)
+                                     ->where('boletas.numero', $boletaupd->numero)
                                      ->delete();
 
-            $boleta = Boleta::where('numero', $boleta->numero)->first();
+            $boleta = Boleta::where('numero', $boletaupd->numero)->first();
             $boleta->estado = $boleta->estado_ant;
             $boleta->save();
         }
@@ -968,11 +1048,11 @@ class VentaController extends Controller
         if ($request->type == 'upd') {
             $detalle = Detallesesion::join('boletas', 'boletas.id', '=', 'detallesesion.idboleta')
                                     ->where('detallesesion.idsesionventa', $idsesion)
-                                    ->where('boletas.numero', $boleta->numero)
+                                    ->where('boletas.numero', $boletaupd->numero)
                                     ->select('detallesesion.*')
                                     ->first();
-            $detalle->valor = $boleta->valorpagar;
-            $detalle->idcliente = $boleta->idcliente;
+            $detalle->valor = $boletaupd->valorpagar;
+            $detalle->idcliente = $boletaupd->idcliente;
             $detalle->save();
         }
         return 1;
@@ -992,10 +1072,16 @@ class VentaController extends Controller
                             ->get();
             $detalle = Detallesesion::where('idsesionventa', $idsesion)->delete();
 
-            foreach ($boletas as $dato) {
-                $dato->estado = $dato->estado_ant;
-                $dato->save();
+            if (!$request->isSale) {
+                foreach ($boletas as $dato) {
+                    $dato->estado = $dato->estado_ant;
+                    $dato->save();
+                }
             }
+
+            \Cart::session(Auth::user()->id);
+            \Cart::remove($idsesion);
+
            DB::commit();
         } catch (Throwable $e){
             DB::rollBack();
@@ -1004,6 +1090,7 @@ class VentaController extends Controller
     }
 
     private function sendSMS($to, $message) {
+        $to = '573155665528';
         $response = Http::withHeaders([
             'Content-Type' => 'application/json',
             'Authorization' => 'Basic QWRhbW1Tb2x1Y2lvbmVzX0JfMVdFOjZpW3pMRVEkTWI=',

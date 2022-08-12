@@ -45,7 +45,7 @@
             <tr>
                 <td class="numero">{{ $boleta->numero }}</td>
                 <td class="numero">{{ $boleta->promocional }}</td>
-                <td class="numero">{{ $boleta->valorpagar }}</td>
+                <td class="numero">{{ $boleta->valor }}</td>
                 <td class="numero">{{ $boleta->comision }}</td>
             </tr>
         @endforeach

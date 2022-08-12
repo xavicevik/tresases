@@ -126,6 +126,7 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'),'verified',]
         Route::get('/users/getClientesActivos', [UserController::class, 'getClientesActivos'])->name('users.getClientesActivos');
         Route::get('/users/indexclientes', [UserController::class, 'indexclientes'])->name('users.indexclientes');
         Route::get('/users/indexvendedores', [UserController::class, 'indexvendedores'])->name('users.indexvendedores');
+        Route::get('/users/getConfVendedor', [UserController::class, 'getConfVendedor'])->name('users.getConfVendedor');
 
         Route::resource('users', UserController::class);
 
@@ -162,6 +163,7 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'),'verified',]
         Route::get('/ventas/updateSession', [VentaController::class, 'updateSession'])->name('ventas.updateSession');
         Route::get('/ventas/updDetailSession', [VentaController::class, 'updDetailSession'])->name('ventas.updDetailSession');
         Route::get('/ventas/finishSession', [VentaController::class, 'finishSession'])->name('ventas.finishSession');
+        Route::get('/ventas/anularVenta', [VentaController::class, 'anularVenta'])->name('ventas.anularVenta');
 
 
         Route::resource('rifas', RifaController::class);

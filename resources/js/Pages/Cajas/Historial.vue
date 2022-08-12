@@ -228,6 +228,7 @@
                                 </tr>
                                 </tbody>
                             </table>
+                            <!-- Paginacion -->
                             <section class="mt-6">
                                 <div v-if="arrayCajas.links.length > 3">
                                     <div class="flex flex-wrap -mb-1">
@@ -237,12 +238,13 @@
                                             <button  v-else
                                                      class="mr-1 mb-1 px-4 py-3 text-sm leading-4 border rounded hover:bg-white focus:border-indigo-500 focus:text-indigo-500"
                                                      :class="{ 'bg-blue-700 text-white': link.active }"
-                                                     v-on:click="cambiarPage(link.url)"
+                                                     v-on:click="this.cambiarPage(link.url, 'cajas', form)"
                                                      v-html="link.label" />
                                         </template>
                                     </div>
                                 </div>
                             </section>
+                            <!-- Paginacion -->
                         </div>
                     </section>
                     <!-- Fin Tabla de contenido -->
@@ -357,7 +359,7 @@
                                 <tbody>
                                 <tr :class="dato.id === selectedRow2 ? 'bg-blue-200' : ''"  class="text-left hover:bg-blue-400" @click="rowSelect2(dato.id); getDetalles(dato.id)" text-sm v-if="arrayVentas.data" v-for="(dato, id) in arrayVentas.data" :key="id">
                                     <td class="border px-1 py-2 text-sm truncate" v-text="dato.id"></td>
-                                    <td class="border px-1 py-2 text-sm truncate" v-text="dato.vendedor.full_name"></td>
+                                    <td class="border px-1 py-2 text-sm truncate" v-text="dato.full_name"></td>
                                     <td class="border px-1 py-2 text-sm truncate" :class="{ 'text-red-400':dato.valorventa < 0 }" v-text="formatPrice(dato.valorventa)"></td>
                                     <td class="border px-1 py-2 text-sm truncate" :class="{ 'text-red-400':-dato.comision < 0 }" v-text="formatPrice(-dato.comision)"></td>
                                     <td class="border px-1 py-2 text-sm truncate" v-text="dato.cantidad"></td>
@@ -375,9 +377,27 @@
                                 </tr>
                                 </tbody>
                             </table>
+                            <!-- Paginacion -->
+                            <section class="mt-6">
+                                <div v-if="arrayVentas.links.length > 3">
+                                    <div class="flex flex-wrap -mb-1">
+                                        <template v-for="(link, p) in arrayVentas.links" :key="p">
+                                            <div v-if="link.url === null" class="mr-1 mb-1 px-4 py-3 text-sm leading-4 text-gray-400 border rounded"
+                                                 v-html="link.label" />
+                                            <button  v-else
+                                                     class="mr-1 mb-1 px-4 py-3 text-sm leading-4 border rounded hover:bg-white focus:border-indigo-500 focus:text-indigo-500"
+                                                     :class="{ 'bg-blue-700 text-white': link.active }"
+                                                     v-on:click="this.cambiarPage(link.url, 'ventas', form, idHistorial)"
+                                                     v-html="link.label" />
+                                        </template>
+                                    </div>
+                                </div>
+                            </section>
+                            <!-- Paginacion -->
                         </div>
                     </section>
                     <!-- Fin Tabla de contenido -->
+
 
                     <!-- Tabla de Detalle -->
                     <section>
@@ -444,6 +464,7 @@
                                 </tr>
                                 </tbody>
                             </table>
+                            <!-- Paginacion -->
                             <section class="mt-6">
                                 <div v-if="arrayDetalles.links.length > 3">
                                     <div class="flex flex-wrap -mb-1">
@@ -453,12 +474,13 @@
                                             <button  v-else
                                                      class="mr-1 mb-1 px-4 py-3 text-sm leading-4 border rounded hover:bg-white focus:border-indigo-500 focus:text-indigo-500"
                                                      :class="{ 'bg-blue-700 text-white': link.active }"
-                                                     v-on:click="cambiarPage(link.url)"
+                                                     v-on:click="this.cambiarPage(link.url, 'detalles', form, idVenta)"
                                                      v-html="link.label" />
                                         </template>
                                     </div>
                                 </div>
                             </section>
+                            <!-- Paginacion -->
                         </div>
                     </section>
                     <!-- Fin Tabla de Detalle -->
@@ -473,7 +495,6 @@
 import AppLayout from '@/Layouts/AppLayout.vue';
 import Swal from "sweetalert2";
 import { Icon } from '@iconify/vue';
-import Pagination from '@/Components/Pagination';
 
 import Toggle from '@vueform/toggle';
 import '@vueform/toggle/themes/default.css';
@@ -499,7 +520,6 @@ export default {
         Button,
         AppLayout,
         Icon,
-        Pagination,
         Toggle,
         QuillEditor,
         JetNavLink,
@@ -531,6 +551,8 @@ export default {
                 minimumNumberOfCharacters: 0,
             },
 
+            idHistorial: null,
+            idVenta: null,
             ispage: true,
             tituloModal: '',
             selectedRow: null,
@@ -570,44 +592,6 @@ export default {
         }
     },
     methods: {
-        actualizarRangos() {
-            let rango = null;
-            let cantidad = 0;
-
-            cantidad = Math.pow(10, this.form.cifras);
-            rango = String(0).padStart(this.form.cifras, '0') + ' - ' + (cantidad-1);
-            this.cantboletas = cantidad;
-            this.rango = rango;
-        },
-        formatPrice(value) {
-            let val = (value/1).toFixed(0).replace('.', ',')
-            return '$ '+ val.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".")
-        },
-        dateTime(value) {
-            return moment(value).format('DD/MM/YYYY');
-        },
-        dateTimeFull(value) {
-            return moment(value).format('YYYY-MM-DD HH:MM:SS');
-        },
-        cambiarPage: function (url = '') {
-            axios.get(url + '&ispage=1', {
-                params: {
-                    paginate: true,
-                    ispage: true
-                }
-            }).then((res) => {
-                //console.log(res.data.cajas);
-                var respuesta = res.data;
-                this.arrayCajas = respuesta.cajas;
-            })
-        },
-        cleanMessage: function () {
-            this.$page.props.flash.message = '';
-        },
-        previewImage(e) {
-            const file = e.target.files[0];
-            this.url = URL.createObjectURL(file);
-        },
         abrir: function (data) {
             this.isOpenAbrir = true;
             this.form = data;
@@ -833,7 +817,7 @@ export default {
             this.sortBy = sortBy;
             this.ispage = true;
 
-            var url= '/cajas/getHistorial';
+            var url= '/cajas/historial';
             axios.get(url, {
                 params: {
                     filtros: filtros,
@@ -843,7 +827,11 @@ export default {
                 }
             }).then((res) => {
                 var respuesta = res.data;
-                this.arrayCajas = respuesta.data;
+                this.arrayCajas = respuesta.cajas;
+                this.arrayVentas.data = [];
+                this.arrayDetalles.data = [];
+                this.arrayVentas.links = [];
+                this.arrayDetalles.links = [];
             })
         },
         cajasAbiertas: async function () {
@@ -884,32 +872,7 @@ export default {
                 });
             }, (5000));
         },
-        getDetallesVentas: function (id) {
-            var url= '/ventas/getDetallesHistorial';
-            axios.get(url, {
-                params: {
-                    id: id,
-                }
-            }).then((res) => {
-                var respuesta = res.data;
-                this.arrayVentas = respuesta.data;
-                this.arrayDetalles.data = [];
-                this.arrayDetalles.links = [];
-            })
-        },
-        getDetalles: function (id) {
-            var url= '/ventas/getDetalles';
-            axios.get(url, {
-                params: {
-                    id: id,
-                }
-            }).then((res) => {
-                var respuesta = res.data;
-                this.arrayDetalles = respuesta.data;
-            })
-        },
         sendSMS: function (id) {
-
             axios.get('/ventas/sendSmsSales?id='+id,).then((res) => {
                 Swal.fire({
                     icon: 'success',
@@ -918,38 +881,14 @@ export default {
                     timer: 1000
                 })
             })
-/*
-            this.$inertia.get('/ventas/sendSmsSales?id='+id, {}, {
-                onSuccess: (page) => {
-                    Swal.fire({
-                        icon: 'success',
-                        title: 'Mensaje enviado',
-                        showConfirmButton: false,
-                        timer: 1500
-                    })
-                },
-            });
-*/
-
         },
-        rowSelect(idx) {
-            console.dir(idx)
-            this.selectedRow = idx;
-        },
-        rowSelect2(idx) {
-            console.dir(idx)
-            this.selectedRow2 = idx;
-        }
     },
     created: function () {
-        //console.log('inicio');
         this.arrayCajas = this.cajas;
         this.cajasAbiertas();
-
     },
     mounted() {
         //console.log('Component mounted.');
-
         if (this.estado == 1) {
             Swal.fire({
                 icon: 'warning',
