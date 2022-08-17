@@ -10,24 +10,6 @@ use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
-/*
-use \App\Http\Controllers\UserController;
-use \App\Http\Controllers\PaisController;
-use \App\Http\Controllers\PuntoventaController;
-use \App\Http\Controllers\RifaController;
-use \App\Http\Controllers\NumeroreservadoController;
-use \App\Http\Controllers\SerieController;
-use \App\Http\Controllers\MasterController;
-use \App\Http\Controllers\VentaController;
-use \App\Http\Controllers\EmpresaController;
-use \App\Http\Controllers\CartController;
-use \App\Http\Controllers\EmailController;
-use \App\Http\Controllers\LoginController;
-use \App\Http\Controllers\RoleController;
-use \App\Http\Controllers\CajaController;
-use \App\Http\Controllers\ConfcomisionController;
-use \App\Http\Controllers\TransaccionController;
-*/
 use \App\Models\Loteria;
 use \App\Models\Rol;
 use \App\Models\Terminosycondiciones;
@@ -85,13 +67,8 @@ Route::group(['middleware'=>['guest']],function(){
 
 });
 
-
-
 Route::middleware(['auth:sanctum', config('jetstream.auth_session'),'verified',])->group(function () {
-   // Route::group(['middleware' => ['changepassword']], function () {
-    //Route::get('/changepass', [LoginController::class, 'changePassword'])->name('changepass.index');
-    //Route::post('/changepass', [LoginController::class, 'updatePassword'])->name('changepass.update');
-    //Route::post('/changepasssu', [LoginController::class, 'updatePasswordsu'])->name('changepass.updatesu');
+    Route::post('/changepasssu', [LoginController::class, 'updatePasswordsu'])->name('changepass.updatesu');
 
         Route::get('/dashboard', function () {
             return Inertia::render('Dashboard');
@@ -127,13 +104,14 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'),'verified',]
         Route::get('/users/indexclientes', [UserController::class, 'indexclientes'])->name('users.indexclientes');
         Route::get('/users/indexvendedores', [UserController::class, 'indexvendedores'])->name('users.indexvendedores');
         Route::get('/users/getConfVendedor', [UserController::class, 'getConfVendedor'])->name('users.getConfVendedor');
+        Route::put('/users/vendedor/{vendedor}', [UserController::class, 'updateVendedor'])->name('users.updateVendedor');
+        Route::put('/users/cliente/{cliente}', [UserController::class, 'updateCliente'])->name('users.updateCliente');
 
         Route::resource('users', UserController::class);
 
        // Route::resource('/puntoventas', PuntoventaController::class);
 
         Route::get('/paises/departamentos', [PaisController::class, 'departamentos']);
-
         Route::get('/paises/ciudades', [PaisController::class, 'ciudades']);
 
         Route::resource('paises', PaisController::class);

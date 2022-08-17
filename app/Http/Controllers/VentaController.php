@@ -183,25 +183,23 @@ class VentaController extends Controller
 
     }
 
-
     public function create(Request $request)
     {
         $mytime= Carbon::now('America/Bogota')->format('Y-m-d');
 
-        if (Auth::user()->idrol == 5) {
-            $caja = Caja::where('idvendedor', Auth::user()->id)
-                        ->where('estado', 1)
-                        ->where('fechaapertura', '>=', $mytime)
-                        ->where('fechacierre', null)
-                        ->first();
+        $caja = Caja::where('idvendedor', Auth::user()->id)
+            ->with('puntoventa')
+            ->where('estado', 1)
+            ->first();
 
-            if (is_null($caja)) {
-                return redirect()->route('cajas.index', ['estado' => '1']);
-            } else {
-                return Inertia::render('Ventas/Venta',  ['estado' => '0']);
-            }
+        if (is_null($caja)) {
+            return redirect()->route('cajas.index', ['estado' => '1']);
         }
-        return Inertia::render('Ventas/Venta');
+
+        return Inertia::render('Ventas/Venta', [
+            'caja' => $caja,
+            'estado' => 0,
+        ]);
     }
 
     /**
@@ -913,33 +911,174 @@ dd($e);
     public function anularVenta(Request $request) {
         $id = $request->id;
         $idcaja = $request->idcaja;
+        $mytime= Carbon::now('America/Bogota');
 
         try {
             DB::beginTransaction();
             $detalle = Detalleventa::where('id', $id)->first();
-            $boleta = Boleta::where('id', $detalle->idboleta)->firs();
-            $venta = Venta::where('id', $detalle->idventa)->firs();
-            $pago = Pago::where('idventa', $detalle->idventa)->firs();
-            $transaccion = Venta::where('id', $pago->idtransaccion)->firs();
-            $comision = Comision::where('idventa', $detalle->idventa)->firs();
-            $historialcaja = Historialcaja::where('id', $venta->idhistorial)->firs();
+            $boleta = Boleta::where('id', $detalle->idboleta)->first();
+            $venta = Venta::where('id', $detalle->idventa)->first();
 
+            // Se realiza venta negativa par anular la anterior
+            $ventanew = new Venta();
+            $ventanew->valorventa = -$detalle->valor;
+            $ventanew->valortotal = -$detalle->valortotal;
+            $ventanew->comision = -$detalle->comision;
+            $ventanew->cantidad = 1;
+            $ventanew->idvendedor = $venta->idvendedor;
+            $ventanew->idpuntoventa = $request->idpuntoventa;
+            $ventanew->fechaventa = $mytime->format('Y-m-d');
+            $ventanew->estado = 6;
+            $ventanew->impuesto = 0;
+            $ventanew->save();
 
+            $detallenew = new Detalleventa();
+            $detallenew->idventa = $ventanew->id;
+            $detallenew->idboleta = $detalle->idboleta;
+            $detallenew->idrifa = $detalle->idrifa;
+            $detallenew->idcliente = $detalle->idcliente;
+            $detallenew->valor = -$detalle->valor;
+            $detallenew->impuesto = -$detalle->impuesto;
+            $detallenew->comision = -$detalle->comision;
+            $detallenew->valortotal = -$detalle->valortotal;
+            $detallenew->numero = $detalle->numero;
+            $detallenew->cantidad = $detalle->cantidad;
+            $detallenew->estado = 6;
+            $detallenew->save();
 
+            $boleta->pago = $boleta->pago + $detallenew->valor;
+            $boleta->saldo = $boleta->valor - $boleta->pago;
+
+            if ($boleta->pago == 0) {
+                $boleta->idcliente = null;
+                $boleta->idvendedor = null;
+                $boleta->estado = 1;
+            } else {
+                $boleta->estado = 4;
+            }
+            $boleta->save();
+            $concomision = $this->getSalesComision($ventanew->idvendedor);
+
+            $comisionnew = new Comision();
+            $comisionnew->idventa = $ventanew->id;
+            $comisionnew->idconfiguracion = $concomision->id;
+            $comisionnew->valorventa = $ventanew->valorventa;
+            $comisionnew->comisionmayorista = $ventanew->valorventa * ($concomision->comisionmayorista/100);
+            $comisionnew->comisiondistribuidor = $ventanew->valorventa * ($concomision->comisiondistribuidor/100);
+            $comisionnew->comisionvendedor = $ventanew->valorventa * ($concomision->comisionvendedor/100);
+            $comisionnew->estado = 6;
+            $comisionnew->save();
+
+            $concepto = 5;
+            $descripcion = 'Anulación Pago en efectivo';
+            $signo = self::credito;
+            $impuesto = 0;
+
+            $transaccion = new Transaccion();
+            $transaccion->idusuarioori = $ventanew->idvendedor;
+            $transaccion->idusuariodest = Auth::user()->id;
+            $transaccion->idconcepto = $concepto;
+            $transaccion->origen = 'Fisico';
+            $transaccion->destino = 'Fisico';
+            $transaccion->signo = $signo;
+            $transaccion->valor = $ventanew->valorventa;
+            $transaccion->impuesto = $impuesto;
+            $transaccion->descripcion = $descripcion;
+            $transaccion->soporte = $request->comprobante;
+            $transaccion->mes = $mytime->month;
+            $transaccion->ano = $mytime->year;
+            $transaccion->save();
+
+            $ventanew->transaccion = $request->idcaja;
+            $ventanew->save();
+
+            $pago = new Pago();
+            $pago->idventa = $ventanew->id;
+            $pago->valortotal = $ventanew->valorventa;
+            $pago->idcliente = null;
+            $pago->idvendedor = $ventanew->idvendedor;
+            $pago->saldo = $ventanew->valortotal - $ventanew->valorventa;
+            $pago->canal = 'Fisico';
+            $pago->descripcion = $descripcion;
+            $pago->tipo = 'Devolucion Pago';
+            $pago->soporte = $request->comprobante;
+            $pago->idtransaccion = $transaccion->id;
+            $pago->idpuntoventa = $ventanew->idpuntoventa;
+            $pago->idcaja = $request->idcaja;
+            $pago->save();
+
+            $recibo = new Recibo();
+            $recibo->nombre = 'Recibo anulacion venta';
+            $recibo->url = 'Recibo anulacion venta';
+            $recibo->idusuario = Auth::user()->id;
+            $recibo->iduserdestino = $ventanew->idvendedor;
+            $recibo->save();
+
+            $vendedor = Vendedor::where('id', $ventanew->idvendedor)->first();
+            $rifa = Rifa::where('id', $detallenew->idrifa)->first();
+            /*
+            $salida = [[
+                            'numero' => $boleta->numero,
+                            'promocional' => $boleta->promocional,
+                            'valorpagado' => $detallenew->valor,
+                            'comision' => $detallenew->comision
+                        ]];
+            */
+            $object = new \stdClass();
+            $object->numero = $boleta->numero;
+            $object->promocional = $boleta->promocional;
+            $object->valorpagado = $detallenew->valor;
+            $object->comision = $detallenew->comision;
+            $salida = [];
+            $salida = [$object];
+
+            // se imprime pdf
+            $data = [
+                'vendedor' => $vendedor->full_name,
+                'usuario' => Auth::user()->username,
+                'rifa' => $rifa->titulo,
+                'fecha' => $recibo->created_at,
+                'reservas' => $salida,
+                'recibo'  => $recibo->id,
+                'comisionvendedor' => "$" . number_format($detallenew->comision, 0, ".", ","),
+                'valortotal' => "$" . number_format($ventanew->valorventa, 0, ".", ","),
+                'valorentregar' => "$" . number_format($ventanew->valorventa - $detallenew->comision, 0, ".", ","),
+                'cantidad' => 1
+            ];
+
+            $filename = 'reciboAnulacionVenta_'.$data['recibo'].'.pdf';
+            $recibo->url = $filename;
+            $recibo->save();
+            $pdf = app('dompdf.wrapper');
+            $pdf->getDomPDF()->set_option("enable_php", true);
+            $pdf->loadView('pdf.reportpdfAnulacionVenta', $data);
+
+            $output = $pdf->output();
+            file_put_contents(public_path('storage').'/pdf/'.$filename, $output, FILE_APPEND);
+            $ventanew->urlrecibo = url('/storage/pdf/').'/'.$filename;
+            $ventanew->save();
+
+            DB::commit();
+            return ['status' => true, 'url' => url('/storage/pdf/').'/'.$filename];
         } catch (\Exception $e) {
             DB::rollback();
-            dd($e);
-            return back()->withErrors(['error' => ['No se pudo registrar la venta, por favor validar los parámetros ingresados']]);
+            return ['status' => $e->getMessage()];
+            //return back()->withErrors(['error' => ['No se pudo registrar la venta, por favor validar los parámetros ingresados']]);
         }
-
     }
 
     public function initSession(Request $request) {
-        $time = 120;
-        $idusuario = Auth::user()->id;
+        $time = config('session.max_time_sales');
+
+        $idusuario = Auth::user();
+
+        if ($idusuario->idrol == 5) {
+            $idvendedor = $idusuario->id;
+        }
+
         $detallesession = null;
 
-        $session = Sesionventa::where('idusuario', $idusuario)
+        $session = Sesionventa::where('idusuario', $idusuario->id)
                                 ->where('idpuntoventa', $request->idpuntoventa)
                                 ->where('estado', 1)
                                 ->with('vendedor')
@@ -959,9 +1098,9 @@ dd($e);
                 }
                 $session->delete();
                 $session = new Sesionventa();
-                $session->idusuario = $idusuario;
+                $session->idusuario = $idusuario->id;
                 $session->idrifa = $request->idrifa;
-                $session->idvendedor = $request->idvendedor;
+                $session->idvendedor = $idvendedor;
                 $session->idpuntoventa = $request->idpuntoventa;
                 $session->estado = 1;
                 $session->save();
@@ -975,9 +1114,9 @@ dd($e);
             }
         } else {
             $session = new Sesionventa();
-            $session->idusuario = $idusuario;
+            $session->idusuario = $idusuario->id;
             $session->idrifa = $request->idrifa;
-            $session->idvendedor = $request->idvendedor;
+            $session->idvendedor = $idvendedor;
             $session->idpuntoventa = $request->idpuntoventa;
             $session->estado = 1;
             $session->save();

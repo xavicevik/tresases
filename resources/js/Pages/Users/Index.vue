@@ -356,7 +356,7 @@
                                                         <div>
                                                             <label class="block text-sm font-medium text-gray-700">Password</label>
                                                             <div class="mt-1">
-                                                                <input type="password" :disabled="verMode" :class="{'bg-blue-100' : verMode}" v-model="form.password" autocomplete="postal-code" class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                                                                <input type="password" v-if="!editMode" :disabled="verMode" :class="{'bg-blue-100' : verMode}" v-model="form.password" autocomplete="postal-code" class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
                                                                 <div v-if="$page.props.errors.password" class="text-red-500">{{ $page.props.errors.password }}</div>
 
                                                                 <div class="flex items-center">
@@ -422,7 +422,7 @@
                                                             <div class="mt-1">
                                                                 <select :disabled="verMode" @change="getEmpresas()" :class="{'bg-blue-100' : verMode}" class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" v-model="form.idrol">
                                                                     <option value="0" >Seleccione Rol</option>
-                                                                    <option v-show="rol.id == 5" v-for="rol in arrayRoles" :key="rol.id" :value="rol.id" v-text="rol.nombre"></option>
+                                                                    <option v-show="rol.id != 5 && rol.id != 2" v-for="rol in arrayRoles" :key="rol.id" :value="rol.id" v-text="rol.nombre"></option>
                                                                 </select>
                                                                 <div v-if="$page.props.errors.idrol" class="text-red-500">{{ $page.props.errors.idrol }}</div>
                                                             </div>
@@ -779,7 +779,6 @@ export default {
             this.openModal('ver', data);
         },
         update: function (data) {
-            //console.log(data);
             data._method = 'PUT';
             this.$inertia.post('/users/'  + data.id, data, {
                 onSuccess: (page) => {

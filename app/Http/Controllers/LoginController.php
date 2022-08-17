@@ -3,8 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Actions\Fortify\PasswordValidationRules;
+use App\Models\Cliente;
 use App\Models\Puntoventa;
 use App\Models\User;
+use App\Models\Vendedor;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -56,10 +58,18 @@ class LoginController extends Controller
             [
                 'password.required' => 'El password no cumple con las políticas establecidas'
             ]);
-        $rol = User::where('username', $credentials['username'])
-                    ->with('empresa.puntosventa')
-                    ->first();
+        $roluser = User::where('username', $credentials['username'])
+                         ->select('id', 'username', 'password', 'idrol', 'changedpassword', 'idempresa');
+        $rolcliente = Cliente::where('username', $credentials['username'])
+                         ->select('id', 'username', 'password', 'idrol', 'changedpassword', 'id');
+        $rolvendedor = Vendedor::where('username', $credentials['username'])
+                         ->with('empresa.puntosventa')
+                         ->select('id', 'username', 'password', 'idrol', 'changedpassword', 'idempresa');
 
+        $rol = $roluser->union($rolvendedor)->union($rolcliente)->first();
+        if ($rol->idrol == 5) {
+            $puntosventa = Puntoventa::where('idempresa', $rol->idempresa)->get();
+        }
         if (! is_null($rol) && is_null($rol->changedpassword)) {
             /*
             return redirect()->route('changepass.index', [
@@ -71,24 +81,26 @@ class LoginController extends Controller
 
             */
             return Inertia::render('Auth/Cambiarpassword', [
-                'puntoventas' => $rol['empresa']['puntosventa'],
+                'puntoventas' => empty($puntosventa)?[]:$puntosventa,
                 'username' => $request->username,
                 'password' => $request->password,
                 '_token' => $token
             ]);
-
         }
-
         if (! is_null($rol) && $rol['idrol'] == 5) {
             return Inertia::render('Auth/Loginvendedor', [
-                'puntoventas' => $rol['empresa']['puntosventa'],
+                'puntoventas' => empty($puntosventa)?[]:$puntosventa,
                 'username' => $request->username,
                 'password' => $request->password,
                 '_token' => $token
             ]);
         }
-
-        if (Auth::attempt($credentials, ($request->remember == 'on') ? true : false)) {
+        if ($rol->idrol == 2) {
+            $guard = Auth::guard('cliente');
+        } else {
+            $guard = Auth::guard('web');
+        }
+        if ($guard->attempt($credentials, ($request->remember == 'on') ? true : false)) {
             $request->session()->regenerate();
             return redirect()->intended('dashboard');
         }
@@ -105,7 +117,7 @@ class LoginController extends Controller
             'password' => ['required'],
         ]);
 
-        if (Auth::attempt($credentials, ($request->remember == 'on') ? true : false)) {
+        if (Auth::guard('vendedor')->attempt($credentials, ($request->remember == 'on') ? true : false)) {
             $request->session()->regenerate();
             $request->session()->push('puntodeventa', $request['puntodeventa']);
 
@@ -139,7 +151,19 @@ class LoginController extends Controller
     {
         $mytime= Carbon::now('America/Bogota');
         $input = $request;
-        $user = User::where('username', $input->username)->first();
+
+        $roluser = User::where('username', $input->username)
+            ->with('empresa.puntosventa')
+            ->select('id', 'username', 'password', 'idrol', 'changedpassword');
+        $rolcliente = Cliente::where('username', $input->username)
+            ->with('empresa.puntosventa')
+            ->select('id', 'username', 'password', 'idrol', 'changedpassword');
+        $rolvendedor = Vendedor::where('username', $input->username)
+            ->with('empresa.puntosventa')
+            ->select('id', 'username', 'password', 'idrol', 'changedpassword');
+
+        $user = $roluser->union($rolvendedor)->union($rolcliente)->first();
+
         Validator::make($request->all(), [
             'current_password' => ['required', 'string'],
             'password' => $this->passwordRules(),
@@ -171,7 +195,14 @@ class LoginController extends Controller
     {
         $mytime= Carbon::now('America/Bogota');
         $input = $request;
-        $user = User::where('id', $input->id)->first();
+
+        if($request->tipouser == 'cliente') {
+            $user = Cliente::where('id', $input->id)->first();
+        } elseif($request->tipouser == 'vendedor') {
+            $user = Vendedor::where('id', $input->id)->first();
+        } else {
+            $user = User::where('id', $input->id)->first();
+        }
 
         Validator::make($request->all(), [
             'password' => $this->passwordRules(),
@@ -187,8 +218,7 @@ class LoginController extends Controller
             'changedpassword' => $mytime->toDateString()
         ])->save();
 
-        return redirect()->back()
-            ->with('message', 'Se cambia contraseña');
+        return redirect()->back()->with('message', 'Se cambia contraseña');
     }
 
 

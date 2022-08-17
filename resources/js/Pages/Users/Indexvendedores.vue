@@ -1,50 +1,9 @@
 <template>
-    <AppLayout title="Clientes">
+    <AppLayout title="Vendedores">
         <template #header>
             <h2 class="font-semibold text-xl text-gray-800 leading-tight">
                 Lista de Vendedores
             </h2>
-        </template>
-        <template>
-            <img alt="Vue logo" src="https://flowbite.com/docs/images/logo.svg" />
-            <HelloWorld msg="Hello Vue 3 + Vite" />
-
-            <!-- Modal toggle -->
-            <button class="block text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800" type="button" data-modal-toggle="default-modal">
-                Toggle modal
-            </button>
-
-            <!-- Main modal -->
-            <div id="default-modal" aria-hidden="true" class="hidden overflow-y-auto overflow-x-hidden fixed right-0 left-0 top-4 z-50 justify-center items-center h-modal md:h-full md:inset-0">
-                <div class="relative px-4 w-full max-w-2xl h-full md:h-auto">
-                    <!-- Modal content -->
-                    <div class="relative bg-white rounded-lg shadow dark:bg-gray-700">
-                        <!-- Modal header -->
-                        <div class="flex justify-between items-start p-5 rounded-t border-b dark:border-gray-600">
-                            <h3 class="text-xl font-semibold text-gray-900 lg:text-2xl dark:text-white">
-                                Terms of Service
-                            </h3>
-                            <button type="button" class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center dark:hover:bg-gray-600 dark:hover:text-white" data-modal-toggle="default-modal">
-                                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg>
-                            </button>
-                        </div>
-                        <!-- Modal body -->
-                        <div class="p-6 space-y-6">
-                            <p class="text-base leading-relaxed text-gray-500 dark:text-gray-400">
-                                With less than a month to go before the European Union enacts new consumer privacy laws for its citizens, companies around the world are updating their terms of service agreements to comply.
-                            </p>
-                            <p class="text-base leading-relaxed text-gray-500 dark:text-gray-400">
-                                The European Union’s General Data Protection Regulation (G.D.P.R.) goes into effect on May 25 and is meant to ensure a common set of data rights in the European Union. It requires organizations to notify users as soon as possible of high-risk data breaches that could personally affect them.
-                            </p>
-                        </div>
-                        <!-- Modal footer -->
-                        <div class="flex items-center p-6 space-x-2 rounded-b border-t border-gray-200 dark:border-gray-600">
-                            <button data-modal-toggle="default-modal" type="button" class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">I accept</button>
-                            <button data-modal-toggle="default-modal" type="button" class="text-gray-500 bg-white hover:bg-gray-100 focus:ring-4 focus:ring-gray-300 rounded-lg border border-gray-200 text-sm font-medium px-5 py-2.5 hover:text-gray-900 focus:z-10 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-500 dark:hover:text-white dark:hover:bg-gray-600">Decline</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
         </template>
 
         <div class="py-4 lg:px-4 md:px-2 sm:px-2">
@@ -71,7 +30,7 @@
                             </div>
 
                             <div class="pr-2 w-1/3 text-center">
-                                <button @click="openModal('registrar')" class="bg-blue-500 text-xs  hover:bg-blue-700 text-white font-bold py-2 px-4 rounded ">CREAR USUARIO</button>
+                                <button @click="openModal('registrar')" class="bg-blue-500 text-xs  hover:bg-blue-700 text-white font-bold py-2 px-4 rounded ">Nuevo</button>
                             </div>
                         </div>
                     </section>
@@ -376,7 +335,7 @@
                                                         <div>
                                                             <label class="block text-sm font-medium text-gray-700">Password</label>
                                                             <div class="mt-1">
-                                                                <input type="password" :disabled="verMode" :class="{'bg-blue-100' : verMode}" v-model="form.password" autocomplete="postal-code" class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                                                                <input type="password" v-if="!editMode" :disabled="verMode" :class="{'bg-blue-100' : verMode}" v-model="form.password" autocomplete="postal-code" class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
                                                                 <div v-if="$page.props.errors.password" class="text-red-500">{{ $page.props.errors.password }}</div>
 
                                                                 <div class="flex items-center">
@@ -442,7 +401,7 @@
                                                             <div class="mt-1">
                                                                 <select :disabled="verMode" @change="getEmpresas()" :class="{'bg-blue-100' : verMode}" class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" v-model="form.idrol">
                                                                     <option value="0" >Seleccione Rol</option>
-                                                                    <option v-show="rol.id == 2"  v-for="rol in arrayRoles" :key="rol.id" :value="rol.id" v-text="rol.nombre"></option>
+                                                                    <option v-show="rol.id == 5" v-for="rol in arrayRoles" :key="rol.id" :value="rol.id" v-text="rol.nombre"></option>
                                                                 </select>
                                                                 <div v-if="$page.props.errors.idrol" class="text-red-500">{{ $page.props.errors.idrol }}</div>
                                                             </div>
@@ -613,6 +572,7 @@ export default {
             formpasswd: {
                 _token: usePage().props.value._token,
                 id: '',
+                tipouser: 'vendedor',
                 password: '',
                 password_confirmation: '',
             },
@@ -622,11 +582,11 @@ export default {
                 correo: null,
                 username: null,
                 apellido: null,
-                idrol: 0,
-                estado: 0,
+                idrol: 5,
+                estado: 1,
                 idtipos_documento: 0,
                 documento: null,
-                direccion: 0,
+                direccion: null,
                 indicativo: 0,
                 iddepartamento: 0,
                 idciudad: 0,
@@ -659,9 +619,9 @@ export default {
                     this.formpasswd.password = '';
                     this.formpasswd.password_confirmation = '';
                     this.isOpencambiopass = false;
-                    this.getUsers('','nombre');
-                    this.editMode = false;
-                    this.closeModal();
+                    //this.getUsers('','nombre');
+                    //this.editMode = false;
+                    //this.closeModal();
                 },
             });
         },
@@ -671,13 +631,15 @@ export default {
             switch (accion) {
                 case 'registrar':
                 {
-                    this.tituloModal = 'Crear nuevo Usuario';
+                    this.tituloModal = 'Crear nuevo Vendedor';
                     this.form.idpais = 0;
                     this.form.iddepartamento = 0;
                     this.form.idciudad = 0;
                     this.form.idtipos_documento = 0;
-                    this.form.idrol = 0;
+                    this.form.idrol = 5;
                     this.form.idempresa = 0;
+                    this.form.username = null;
+                    this.form.password = null;
                     this.getRoles();
                     this.getPaises();
                     this.getCiudades();
@@ -789,8 +751,8 @@ export default {
                         timer: 1500
                     })
                     this.reset();
-                    this.closeModal();
                     this.getUsers('','nombre');
+                    this.closeModal();
                     this.editMode = false;
                 },
             });
@@ -808,9 +770,8 @@ export default {
             this.openModal('ver', data);
         },
         update: function (data) {
-            //console.log(data);
             data._method = 'PUT';
-            this.$inertia.post('/users/'  + data.id, data, {
+            this.$inertia.post('/users/vendedor/'  + data.id, data, {
                 onSuccess: (page) => {
                     Swal.fire({
                         position: 'top-end',
@@ -827,7 +788,6 @@ export default {
                     this.newMode = false;
                 },
             });
-
         },
         getUsers: function (buscar, sortBy, filtros = []) {
             this.buscar = buscar;
@@ -844,7 +804,7 @@ export default {
             this.sortBy = sortBy;
             this.ispage = true;
 
-            var url= '/users/indexclientes';
+            var url= '/users/indexvendedores';
             axios.get(url, {
                 params: {
                     filtros: filtros,

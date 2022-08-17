@@ -29,7 +29,7 @@
                             </div>
 
                             <div class="pr-2 w-1/3 text-center">
-                                <button @click="openModal('registrar')" class="bg-blue-500 text-xs  hover:bg-blue-700 text-white font-bold py-2 px-4 rounded ">CREAR USUARIO</button>
+                                <button @click="openModal('registrar')" class="bg-blue-500 text-xs  hover:bg-blue-700 text-white font-bold py-2 px-4 rounded ">Nuevo</button>
                             </div>
                         </div>
                     </section>
@@ -337,7 +337,7 @@
                                                         <div>
                                                             <label class="block text-sm font-medium text-gray-700">Password</label>
                                                             <div class="mt-1">
-                                                                <input type="password" :disabled="verMode" :class="{'bg-blue-100' : verMode}" v-model="form.password" autocomplete="postal-code" class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                                                                <input v-if="!editMode" type="password" :disabled="verMode" :class="{'bg-blue-100' : verMode}" v-model="form.password" autocomplete="postal-code" class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
                                                                 <div v-if="$page.props.errors.password" class="text-red-500">{{ $page.props.errors.password }}</div>
 
                                                                 <div class="flex items-center">
@@ -395,28 +395,6 @@
                                                             <div class="mt-1">
                                                                 <input type="email" :disabled="verMode" :class="{'bg-blue-100' : verMode}" v-model="form.direccion" autocomplete="email" class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
                                                                 <div v-if="$page.props.errors.direccion" class="text-red-500">{{ $page.props.errors.direccion }}</div>
-                                                            </div>
-                                                        </div>
-
-                                                        <div>
-                                                            <label class="block text-sm font-medium text-gray-700">Rol</label>
-                                                            <div class="mt-1">
-                                                                <select :disabled="verMode" @change="getEmpresas()" :class="{'bg-blue-100' : verMode}" class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" v-model="form.idrol">
-                                                                    <option value="0" >Seleccione Rol</option>
-                                                                    <option v-show="rol.id == 2"  v-for="rol in arrayRoles" :key="rol.id" :value="rol.id" v-text="rol.nombre"></option>
-                                                                </select>
-                                                                <div v-if="$page.props.errors.idrol" class="text-red-500">{{ $page.props.errors.idrol }}</div>
-                                                            </div>
-                                                        </div>
-
-                                                        <div>
-                                                            <label class="block text-sm font-medium text-gray-700">Empresa</label>
-                                                            <div class="mt-1">
-                                                                <select :disabled="verMode" :class="{'bg-blue-100' : verMode}" class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" v-model="form.idempresa">
-                                                                    <option value="0" >Seleccione empresa</option>
-                                                                    <option v-for="empresa in arrayEmpresas" :key="empresa.id" :value="empresa.id" v-text="empresa.razon_social"></option>
-                                                                </select>
-                                                                <div v-if="$page.props.errors.idempresa" class="text-red-500">{{ $page.props.errors.idempresa }}</div>
                                                             </div>
                                                         </div>
                                                     </div>
@@ -565,6 +543,7 @@ export default {
                 _token: usePage().props.value._token,
                 id: '',
                 password: '',
+                tipouser: 'cliente',
                 password_confirmation: '',
             },
             form: {
@@ -573,11 +552,11 @@ export default {
                 correo: null,
                 username: null,
                 apellido: null,
-                idrol: 0,
-                estado: 0,
+                idrol: 2,
+                estado: 1,
                 idtipos_documento: 0,
                 documento: null,
-                direccion: 0,
+                direccion: null,
                 indicativo: 0,
                 iddepartamento: 0,
                 idciudad: 0,
@@ -622,13 +601,12 @@ export default {
             switch (accion) {
                 case 'registrar':
                 {
-                    this.tituloModal = 'Crear nuevo Usuario';
+                    this.tituloModal = 'Crear nuevo Cliente';
                     this.form.idpais = 0;
                     this.form.iddepartamento = 0;
                     this.form.idciudad = 0;
                     this.form.idtipos_documento = 0;
-                    this.form.idrol = 0;
-                    this.form.idempresa = 0;
+                    this.form.idrol = 2;
                     this.getRoles();
                     this.getPaises();
                     this.getCiudades();
@@ -735,7 +713,7 @@ export default {
                     Swal.fire({
                         position: 'top-end',
                         icon: 'success',
-                        title: 'El usuario se ha creado',
+                        title: 'El cliente se ha creado',
                         showConfirmButton: false,
                         timer: 1500
                     })
@@ -759,14 +737,13 @@ export default {
             this.openModal('ver', data);
         },
         update: function (data) {
-            //console.log(data);
             data._method = 'PUT';
-            this.$inertia.post('/users/'  + data.id, data, {
+            this.$inertia.post('/users/cliente/' + data.id, data, {
                 onSuccess: (page) => {
                     Swal.fire({
                         position: 'top-end',
                         icon: 'success',
-                        title: 'El usuario se ha actualizado!',
+                        title: 'El cliente se ha actualizado!',
                         showConfirmButton: false,
                         timer: 1500
                     })
@@ -778,7 +755,6 @@ export default {
                     this.newMode = false;
                 },
             });
-
         },
         getUsers: function (buscar, sortBy, filtros = []) {
             this.buscar = buscar;

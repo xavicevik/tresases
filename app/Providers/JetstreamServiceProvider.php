@@ -31,6 +31,7 @@ class JetstreamServiceProvider extends ServiceProvider
      */
     public function boot()
     {
+        /*
         $this->configurePermissions();
 
         Jetstream::createTeamsUsing(CreateTeam::class);
@@ -40,6 +41,7 @@ class JetstreamServiceProvider extends ServiceProvider
         Jetstream::removeTeamMembersUsing(RemoveTeamMember::class);
         Jetstream::deleteTeamsUsing(DeleteTeam::class);
         Jetstream::deleteUsersUsing(DeleteUser::class);
+        */
     }
 
     /**

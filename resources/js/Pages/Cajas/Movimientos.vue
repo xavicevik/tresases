@@ -312,7 +312,7 @@
                                                 <path stroke-linecap="round" stroke-linejoin="round" d="M3 19v-8.93a2 2 0 01.89-1.664l7-4.666a2 2 0 012.22 0l7 4.666A2 2 0 0121 10.07V19M3 19a2 2 0 002 2h14a2 2 0 002-2M3 19l6.75-4.5M21 19l-6.75-4.5M3 10l6.75 4.5M21 10l-6.75 4.5m0 0l-1.14.76a2 2 0 01-2.22 0l-1.14-.76" />
                                             </svg>
                                         </a>
-                                        <a href="#" @click="anularVenta(dato.id)" class="hover:bg-blue-700 text-blue-400 font-bold rounded" fill="none"
+                                        <a href="#" v-show="dato.estado != 6" @click="anularVenta(dato.id)" class="hover:bg-blue-700 text-blue-400 font-bold rounded" fill="none"
                                            viewBox="0 0 24 24" stroke="currentColor">
                                             <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                                 <path stroke-linecap="round" stroke-linejoin="round" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6" />
@@ -909,6 +909,8 @@
                                                 </tr>
                                                 </tbody>
                                             </table>
+
+                                            <!-- Paginacion -->
                                             <section class="mt-6">
                                                 <div v-if="arrayClientes.links.length > 3">
                                                     <div class="flex flex-wrap -mb-1">
@@ -918,12 +920,14 @@
                                                             <button  v-else
                                                                      class="mr-1 mb-1 px-4 py-3 text-sm leading-4 border rounded hover:bg-white focus:border-indigo-500 focus:text-indigo-500"
                                                                      :class="{ 'bg-blue-700 text-white': link.active }"
-                                                                     v-on:click="cambiarPage(link.url, 'cliente')"
+                                                                     v-on:click="this.cambiarPage(link.url, 'clientes', form, idVenta)"
                                                                      v-html="link.label" />
                                                         </template>
                                                     </div>
                                                 </div>
                                             </section>
+                                            <!-- Paginacion -->
+
 
                                         </div>
                                     </section>
@@ -1231,7 +1235,6 @@
 import AppLayout from '@/Layouts/AppLayout.vue';
 import Swal from "sweetalert2";
 import { Icon } from '@iconify/vue';
-import Pagination from '@/Components/Pagination';
 
 import Toggle from '@vueform/toggle';
 import '@vueform/toggle/themes/default.css';
@@ -1256,7 +1259,6 @@ export default {
         Button,
         AppLayout,
         Icon,
-        Pagination,
         Toggle,
         QuillEditor,
         money3: Money3Component,
@@ -1938,95 +1940,7 @@ export default {
                 this.totalcomisiones = respuesta.totalcomisionesprop;
             })
         },
-        updateSession: function (idsesion, idrifa = null, idvendedor = null) {
-            var url= '/ventas/updateSession';
-            axios.get(url, {
-                params: {
-                    idsesion: idsesion,
-                    idrifa: idrifa,
-                    idvendedor: idvendedor,
-                }
-            }).then((res) => {
-            })
-        },
-        pushSessionDetail: function (id, boleta, type) {
-            var url= '/ventas/updDetailSession';
-            axios.get(url, {
-                params: {
-                    idsesion: id,
-                    boleta: boleta,
-                    type: type
-                }
-            }).then((res) => {
-                console.log(res.data);
-            })
-        },
-        registrarSessionVenta: function (idpuntoventa = null, idrifa = null, idvendedor = null) {
-            var url= '/ventas/initSession';
-            axios.get(url, {
-                params: {
-                    idpuntoventa: idpuntoventa,
-                    idrifa: idrifa,
-                    idvendedor: idvendedor
-                }
-            }).then((res) => {
-                var respuesta = res.data;
-                this.session = respuesta.session;
-                this.detallesession = respuesta.detallesession;
-                if(this.session.rifa) this.form.idrifa = this.session.rifa;
-                if(this.session.vendedor) this.form.idvendedor = this.session.vendedor;
-                this.time = respuesta.time * 1000;
-                for (const property in this.detallesession) {
-                    this.form.reservas.push({
-                        numero: this.detallesession[property]['numero'],
-                        promocional: this.detallesession[property]['promocional'],
-                        valortotal: this.detallesession[property]['valortotal'],
-                        valorpagar: this.detallesession[property]['valor'],
-                        valorsaldo: this.detallesession[property]['saldo'],
-                        valoranular: this.detallesession[property]['pago'],
-                        valorpagado: this.detallesession[property]['pago'],
-                        idcliente: this.detallesession[property]['idcliente'],
-                        cliente: this.detallesession[property]['idcliente']?this.detallesession[property]['full_name']:'',
-                    });
-                }
-            })
-        },
-        finishSession: function () {
-            var url= '/ventas/finishSession';
-            axios.get(url, {
-                params: {
-                    idsesion: this.session.id,
-                }
-            }).then((res) => {
-                Swal.fire({
-                    position: 'top-end',
-                    icon: 'success',
-                    title: 'Se ha superado el tiempo máximo para realizar la venta',
-                    showConfirmButton: true,
-                    timer: 1000
-                })
-                //this.registrarSessionVenta(this.caja.puntoventa.id)
-                this.form.reservas = [];
-                this.form.idrifa = [];
-                this.form.idvendedor = [];
-                this.getMovimientos();
-                this.closeModal();
-                //this.$refs.countdown.start();
-            })
-        },
-        anularVenta: function (id) {
-            axios.get('/ventas/anularVenta?id='+id,).then((res) => {
-                Swal.fire({
-                    icon: 'success',
-                    title: 'Mensaje enviado',
-                    showConfirmButton: false,
-                    timer: 1000
-                })
-            })
-        },
-        onCountdownEnd: function () {
-            this.finishSession()
-        }
+
     },
     created: function () {
         this.arrayData = this.datos;
@@ -2034,7 +1948,6 @@ export default {
         this.totalcomisiones = this.totalcomisionesprop;
         this.getRifas('','titulo', true);
         this.getVendedores('','documento', true);
-
     },
     mounted() {
 

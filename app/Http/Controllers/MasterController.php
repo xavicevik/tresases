@@ -327,10 +327,12 @@ class MasterController extends Controller
 
     public function getRoles(Request $request)
     {
-        if(Auth::user()->idrol == 1) {
+        if(Auth::user()->idrol == 1 || Auth::user()->idrol == 6) {
             $roles = Rol::all();
         } else {
-            $roles = Rol::where('id', '<>', 1)->get();
+            $roles = Rol::where('id', '<>', 1)
+                        ->where('id', '<>', 6)
+                        ->get();
         }
         return ['data' => $roles];
     }

@@ -398,13 +398,11 @@ class UserController extends Controller
             'correo' => ['required', 'string', 'email', 'max:255'],
             'telefono' => ['required', 'string', 'max:255'],
             'documento' => ['required', 'string', 'max:255'],
-            'documento' => ['required', 'string', 'max:255'],
             'idtipos_documento' => 'required|numeric|gt:0',
             'idpais' => 'required|numeric|gt:0',
             'iddepartamento' => 'required|numeric|gt:0',
             'idciudad' => 'required|numeric|gt:0',
             'idrol' => 'required|numeric|gt:0',
-            'idempresa' => 'required|numeric|gt:0',
         ],
         [
             'nombre.required' => 'Ingrese el nombre',
@@ -417,7 +415,6 @@ class UserController extends Controller
             'iddepartamento.gt' => 'Seleccione un Departamento',
             'idrol.gt' => 'Seleccione un Rol',
             'idciudad.gt' => 'Seleccione una ciudad',
-            'idempresa.gt' => 'Seleccione una Empresa',
         ])->validate();
 
         $mytime= Carbon::now('America/Bogota');
@@ -429,7 +426,6 @@ class UserController extends Controller
         } else {
             $user = User::create($request->all());
         }
-
 
         if(!$request->cambiarpassword) {
             $user->changedpassword = $mytime->toDateString();
@@ -512,25 +508,145 @@ class UserController extends Controller
 
         $mytime= Carbon::now('America/Bogota');
 
-        $user = User::where('id', $request->id)->first();
+        //    $user = User::where('id', $request->id)->first();
+
         $user->update([
-                              'nombre' => $request->nombre,
-                              'apellido' => $request->apellido,
-                              'username' => $request->username,
-                              'correo' => $request->correo,
-                              'movil' => $request->movil,
-                              'telefono' => $request->telefono,
-                              'direccion' => $request->direccion,
-                              'idpais' => $request->idpais,
-                              'iddepartamento' => $request->iddepartamento,
-                              'idciudad' => $request->idciudad,
-                              'idempresa' => $request->idempresa,
-                              'idrol' => $request->idrol,
-                              'idtipos_documento' => $request->idtipos_documento,
-                              'documento' => $request->documento,
-                              'changedpassword' => $request->cambiarpassword?null:$mytime->toDateString(),
+                          'nombre' => $request->nombre,
+                          'apellido' => $request->apellido,
+                          'username' => $request->username,
+                          'correo' => $request->correo,
+                          'movil' => $request->movil,
+                          'telefono' => $request->telefono,
+                          'direccion' => $request->direccion,
+                          'idpais' => $request->idpais,
+                          'iddepartamento' => $request->iddepartamento,
+                          'idciudad' => $request->idciudad,
+                          'idempresa' => $request->idempresa,
+                          'idrol' => $request->idrol,
+                          'idtipos_documento' => $request->idtipos_documento,
+                          'documento' => $request->documento,
+                          'changedpassword' => $request->cambiarpassword?null:$mytime->toDateString(),
                           ]
                       );
+        $user->saveOrFail();
+
+        $rol = Role::where('id', $user->idrol)->first();
+        $user->syncRoles($rol);
+
+        return redirect()->back()->with('message', 'Usuario modificado satisfactoriamente');
+    }
+
+    public function updateVendedor(Request $request, Vendedor $vendedor)
+    {
+        Validator::make($request->all(), [
+            'nombre' => ['required', 'string', 'max:255'],
+            'apellido' => ['required', 'string', 'max:255'],
+            'correo' => ['required', 'string', 'email', 'max:255'],
+            'telefono' => ['required', 'string', 'max:255'],
+            'documento' => ['required', 'string', 'max:255'],
+            'documento' => ['required', 'string', 'max:255'],
+            'idtipos_documento' => 'required|numeric|gt:0',
+            'idpais' => 'required|numeric|gt:0',
+            'iddepartamento' => 'required|numeric|gt:0',
+            'idciudad' => 'required|numeric|gt:0',
+            'idrol' => 'required|numeric|gt:0',
+            'idempresa' => 'required|numeric|gt:0',
+        ],
+            [
+                'nombre.required' => 'Ingrese el nombre',
+                'apellido.required' => 'Ingrese el apellido',
+                'correo.required' => 'Ingrese el correo',
+                'telefono.required' => 'Ingrese el teléfono celular',
+                'documento.required' => 'Ingrese el número de identificacion',
+                'idtipos_documento.gt' => 'Seleccione una tipo de documento',
+                'idpais.gt' => 'Seleccione un País',
+                'iddepartamento.gt' => 'Seleccione un Departamento',
+                'idrol.gt' => 'Seleccione una Ciudad',
+                'idciudad.gt' => 'Seleccione un Rol',
+                'idempresa.gt' => 'Seleccione una Empresa',
+            ])->validate();
+
+        $mytime= Carbon::now('America/Bogota');
+
+        //$user = Vendedor::where('id', $request->id)->first();
+        $user = $vendedor;
+
+        $user->update([
+                          'nombre' => $request->nombre,
+                          'apellido' => $request->apellido,
+                          'username' => $request->username,
+                          'correo' => $request->correo,
+                          'movil' => $request->movil,
+                          'telefono' => $request->telefono,
+                          'direccion' => $request->direccion,
+                          'idpais' => $request->idpais,
+                          'iddepartamento' => $request->iddepartamento,
+                          'idciudad' => $request->idciudad,
+                          'idempresa' => $request->idempresa,
+                          'idrol' => $request->idrol,
+                          'idtipos_documento' => $request->idtipos_documento,
+                          'documento' => $request->documento,
+                          'changedpassword' => $request->cambiarpassword?null:$mytime->toDateString(),
+                          ]
+                      );
+        $user->saveOrFail();
+
+        $rol = Role::where('id', $user->idrol)->first();
+        $user->syncRoles($rol);
+
+        return redirect()->back()->with('message', 'Usuario modificado satisfactoriamente');
+    }
+
+    public function updateCliente(Request $request, Cliente $cliente)
+    {
+        Validator::make($request->all(), [
+            'nombre' => ['required', 'string', 'max:255'],
+            'apellido' => ['required', 'string', 'max:255'],
+            'correo' => ['required', 'string', 'email', 'max:255'],
+            'telefono' => ['required', 'string', 'max:255'],
+            'documento' => ['required', 'string', 'max:255'],
+            'documento' => ['required', 'string', 'max:255'],
+            'idtipos_documento' => 'required|numeric|gt:0',
+            'idpais' => 'required|numeric|gt:0',
+            'iddepartamento' => 'required|numeric|gt:0',
+            'idciudad' => 'required|numeric|gt:0',
+            'idrol' => 'required|numeric|gt:0',
+        ],
+            [
+                'nombre.required' => 'Ingrese el nombre',
+                'apellido.required' => 'Ingrese el apellido',
+                'correo.required' => 'Ingrese el correo',
+                'telefono.required' => 'Ingrese el teléfono celular',
+                'documento.required' => 'Ingrese el número de identificacion',
+                'idtipos_documento.gt' => 'Seleccione una tipo de documento',
+                'idpais.gt' => 'Seleccione un País',
+                'iddepartamento.gt' => 'Seleccione un Departamento',
+                'idrol.gt' => 'Seleccione una Ciudad',
+                'idciudad.gt' => 'Seleccione un Rol',
+            ])->validate();
+
+        $mytime= Carbon::now('America/Bogota');
+
+        //$user = Cliente::where('id', $request->id)->first();
+        $user = $cliente;
+
+        $user->update([
+                'nombre' => $request->nombre,
+                'apellido' => $request->apellido,
+                'username' => $request->username,
+                'correo' => $request->correo,
+                'movil' => $request->movil,
+                'telefono' => $request->telefono,
+                'direccion' => $request->direccion,
+                'idpais' => $request->idpais,
+                'iddepartamento' => $request->iddepartamento,
+                'idciudad' => $request->idciudad,
+                'idrol' => $request->idrol,
+                'idtipos_documento' => $request->idtipos_documento,
+                'documento' => $request->documento,
+                'changedpassword' => $request->cambiarpassword?null:$mytime->toDateString(),
+            ]
+        );
         $user->saveOrFail();
 
         $rol = Role::where('id', $user->idrol)->first();

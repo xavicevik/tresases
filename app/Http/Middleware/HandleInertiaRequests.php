@@ -42,6 +42,8 @@ class HandleInertiaRequests extends Middleware
         return array_merge(parent::share($request), [
             'auth' => function () use ($request) {
                 $permissions = [];
+                //$users = Auth::user()->getAllPermissions();
+                //dd($users);
                 if (Auth::user()) {
                     foreach (Auth::user()->getAllPermissions() as $permission) {
                         $permissions[] = $permission->name;

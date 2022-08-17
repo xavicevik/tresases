@@ -72,10 +72,6 @@ class User extends Authenticatable
         return $query->where('idrol', '<>', '2')->where('idrol', '<>', '6');
     }
 
-    public function scopeClientesApp($query) {
-        return $query->where('idrol', '=', '2');
-    }
-
     public function empresa(){
         return $this->belongsTo(Empresa::class, 'idempresa');
     }

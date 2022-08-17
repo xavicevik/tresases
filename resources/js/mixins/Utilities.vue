@@ -71,6 +71,8 @@ export default {
                 var respuesta = res.data;
                 if (entidad == 'cliente') {
                     this.arrayData = respuesta.clientes;
+                } else if (entidad == 'clientes') {
+                    this.arrayClientes = respuesta.clientes;
                 } else if (entidad == 'rifas') {
                     this.arrayRifas = respuesta.data;
                 } else if (entidad == 'vendedores') {
@@ -360,6 +362,105 @@ export default {
         selTipoSerie: function (data){
             this.isIndividual = data;
         },
+        updateSession: function (idsesion, idrifa = null, idvendedor = null) {
+            var url= '/ventas/updateSession';
+            axios.get(url, {
+                params: {
+                    idsesion: idsesion,
+                    idrifa: idrifa,
+                    idvendedor: idvendedor,
+                }
+            }).then((res) => {
+            })
+        },
+        pushSessionDetail: function (id, boleta, type) {
+            var url= '/ventas/updDetailSession';
+            axios.get(url, {
+                params: {
+                    idsesion: id,
+                    boleta: boleta,
+                    type: type
+                }
+            }).then((res) => {
+                console.log(res.data);
+            })
+        },
+        registrarSessionVenta: function (idpuntoventa = null, idrifa = null, idvendedor = null) {
+            var url= '/ventas/initSession';
+            axios.get(url, {
+                params: {
+                    idpuntoventa: idpuntoventa,
+                    idrifa: idrifa,
+                    idvendedor: idvendedor
+                }
+            }).then((res) => {
+                var respuesta = res.data;
+                this.session = respuesta.session;
+                this.detallesession = respuesta.detallesession;
+                if(this.session.rifa) this.form.idrifa = this.session.rifa;
+                if(this.session.vendedor) this.form.idvendedor = this.session.vendedor;
+                this.time = respuesta.time * 1000;
+                for (const property in this.detallesession) {
+                    this.form.reservas.push({
+                        numero: this.detallesession[property]['numero'],
+                        promocional: this.detallesession[property]['promocional'],
+                        valortotal: this.detallesession[property]['valortotal'],
+                        valorpagar: this.detallesession[property]['valor'],
+                        valorsaldo: this.detallesession[property]['saldo'],
+                        valoranular: this.detallesession[property]['pago'],
+                        valorpagado: this.detallesession[property]['pago'],
+                        idcliente: this.detallesession[property]['idcliente'],
+                        cliente: this.detallesession[property]['idcliente']?this.detallesession[property]['full_name']:'',
+                    });
+                }
+            })
+        },
+        finishSession: function () {
+            var url= '/ventas/finishSession';
+            axios.get(url, {
+                params: {
+                    idsesion: this.session.id,
+                }
+            }).then((res) => {
+                Swal.fire({
+                    position: 'top-end',
+                    icon: 'success',
+                    title: 'Se ha superado el tiempo máximo para realizar la venta',
+                    showConfirmButton: true,
+                    timer: 1000
+                })
+                //this.registrarSessionVenta(this.caja.puntoventa.id)
+                this.form.reservas = [];
+                this.form.idrifa = [];
+                this.form.idvendedor = [];
+                this.getMovimientos();
+                this.closeModal();
+                //this.$refs.countdown.start();
+            })
+        },
+        anularVenta: function (id) {
+            axios.get('/ventas/anularVenta?id='+id+'&idcaja='+this.caja.id+'&idpuntoventa='+this.caja.puntoventa.id,)
+                .then((res) => {
+                    if (res.data.status == true) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Se ha realizado la anulación de la venta',
+                            showConfirmButton: true,
+                        })
+                        window.open(res.data.url, '_blank');
+                        this.getMovimientos();
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: res.data.status,
+                            showConfirmButton: true,
+                        })
+                    }
+                })
+        },
+        onCountdownEnd: function () {
+            this.finishSession()
+        }
     },
 };
 </script>

@@ -195,7 +195,16 @@ return [
     | Supported: "lax", "strict", "none", null
     |
     */
-
     'same_site' => 'lax',
+
+    /*
+    |--------------------------------------------------------------------------
+    | MAX_TIME_SALES
+    |--------------------------------------------------------------------------
+    |
+    | This is the max time available to doing each transaction
+    |
+    */
+    'max_time_sales' => env('MAX_TIME_SALES', 120),
 
 ];

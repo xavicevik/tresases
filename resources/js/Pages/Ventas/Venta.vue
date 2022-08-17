@@ -1,6 +1,5 @@
 <template>
     <AppLayout title="Ventas" :total="total">
-        <Statscards></Statscards>
         <template #header>
             <h2 class="font-semibold text-xl text-gray-800 leading-tight">
                 Nueva venta
@@ -28,14 +27,123 @@
                                         <!-- Fin Mensajes Flash -->
                                         <!-- Formulario -->
                                         <section>
+                                            <div class="mx-auto text-center w-full border-0">
+                                                <vue-countdown ref="countdown" class="p-2 pb-4 border-2 border-gray-800 rounded-md mx-auto text-blue-700" :time="time" v-slot="{ minutes, seconds }" @end="onCountdownEnd">
+                                                    Tiempo restante：{{ minutes }} min, {{ seconds }} seg.
+                                                </vue-countdown>
+                                            </div>
                                             <div class="">
                                                 <img v-show="form.idrifa.urlimagen1 != null" :src="'/storage/'+form.idrifa.urlimagen1" alt="image" class="mx-auto w-4/12"/>
                                             </div>
+
                                             <div class="flex py-1">
                                                 <div class="mb-4 w-full pr-2">
-                                                    <label class="block bg-blue-50 text-gray-700 text-sm font-bold mb-2">Rifa</label>
-                                                    <input v-model="form.idrifa.nombre_tecnico" @click="selectRifa()" type="text" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" placeholder="Seleccione Rifa">
-                                                    <div v-if="$page.props.errors.nombre_tecnico" class="text-red-500">{{ $page.props.errors.rifa }}</div>
+                                                    <label class="block text-gray-700 text-sm font-bold mb-2">Rifa</label>
+
+                                                    <input v-model="form.idrifa.titulo" @click="selectRifa()" type="text" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" placeholder="Seleccione Rifa">
+
+                                                    <div v-if="$page.props.errors.rifa" class="text-red-500">{{ $page.props.errors.rifa }}</div>
+                                                </div>
+                                            </div>
+
+                                        </section>
+                                        <section>
+
+                                            <div class="flex py-1 w-full max-h-fit overflow-y-scroll">
+                                                <div class="mb-4 w-full">
+                                                    <label class="block text-gray-700 text-sm font-bold mb-2">Número</label>
+
+                                                    <div class="container flex justify-center items-center">
+                                                        <div class="relative pt-4">
+                                                            <div class="absolute top-4 left-3">
+                                                                <i class="fa fa-search text-gray-400 z-20 hover:text-gray-500"></i> </div>
+                                                            <money3 v-bind="configMoney2" v-model="form.reserva.numero" @keypress.enter="valBoletaDisponible(form.reserva.numero, form.idrifa.id, form.idvendedor.id, form.idcliente.id)" class="h-8 w-96 pl-4 pr-4 rounded-lg z-0 focus:shadow focus:outline-none"></money3>
+                                                            <a @click="valBoletaDisponible(form.reserva.numero, form.idrifa.id, form.idvendedor.id, form.idcliente.id)">
+                                                                <div class="absolute top-6 right-4">
+                                                                    <Icon icon="fe:search" class="h-4"  />
+                                                                </div>
+                                                            </a>
+                                                        </div>
+                                                        <div v-if="true" class="flex pl-8 pt-8">
+                                                            <button @click="generarReciboAsignar()" class="hover:bg-green-700 text-green-400 font-bold rounded" fill="none"
+                                                                    viewBox="0 0 24 24" stroke="currentColor">
+                                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                                                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                                                </svg>
+                                                            </button>
+                                                            <label>Registrar e Imprimir</label>
+
+                                                        </div>
+                                                        <div v-if="eliminarMode" class="flex pl-8 pt-8">
+                                                            <button @click="generarReciboEliminar()" class="hover:bg-red-700 text-red-400 font-bold rounded" fill="none"
+                                                                    viewBox="0 0 24 24" stroke="currentColor">
+                                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                                                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                                                </svg>
+                                                            </button>
+                                                            <label>Anular e Imprimir</label>
+
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="flex py-1 px-2 font-bold">
+                                                        <div class="w-1/5">
+                                                            Número
+                                                        </div>
+                                                        <div class="w-1/5 px-2">
+                                                            Promocional
+                                                        </div>
+                                                        <div class="w-1/5 px-2">
+                                                            Valor Total
+                                                        </div>
+                                                        <div class="w-2/5 px-2">
+                                                            {{ asignarMode?'Valor a pagar':'Valor a anular' }}
+                                                        </div>
+                                                        <div class="w-1/5 px-2">
+                                                            Eliminar
+                                                        </div>
+                                                    </div>
+                                                    <div v-for="(reserva, index) in form.reservas" :key="reserva.numero" class="bg-blue-200 rounded-md flex py-1 px-2">
+                                                        <div class="w-1/5">
+                                                            {{ reserva.numero }}
+                                                        </div>
+                                                        <div class="w-1/5 px-2">
+                                                            {{ reserva.promocional }}
+                                                        </div>
+                                                        <div class="w-1/5 px-2">
+                                                            {{ formatPrice(reserva.valortotal) }}
+                                                        </div>
+                                                        <div class="w-2/5 px-2">
+                                                            <money3 v-if="asignarMode" v-bind="configMoney" @focusout="pushSessionDetail(session.id, reserva, 'upd')" :max="reserva.valorsaldo" v-model="reserva.valorpagar" class="h-8 w-full pl-4 pr-4 rounded-md z-0 focus:shadow focus:outline-none"></money3>
+                                                            <money3 v-else v-bind="configMoney" :max="reserva.valoranular" v-model="reserva.valorpagado" class="h-8 w-full pl-4 pr-4 rounded-md z-0 focus:shadow focus:outline-none"></money3>
+                                                        </div>
+                                                        <div class="w-1/10 px-2">
+                                                            <svg xmlns="http://www.w3.org/2000/svg" @click="eliminarReserva(reserva, index)" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                                                <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                                            </svg>
+                                                        </div>
+                                                    </div>
+                                                    <div class="bg-blue-400 rounded-md flex py-1 px-2 font-bold">
+                                                        <div class="w-1/5">
+                                                            Total:
+                                                        </div>
+                                                        <div class="w-1/5 px-2">
+
+                                                        </div>
+                                                        <div class="w-1/5 px-2">
+                                                            {{ formatPrice(totalmovimiento) }}
+                                                        </div>
+                                                        <div class="w-2/5 px-2">
+                                                            {{ formatPrice(totalapagar) }}
+                                                        </div>
+                                                        <div class="w-3/5 px-2">
+                                                            Cantidad:
+                                                        </div>
+                                                        <div class="w-1/5 px-2">
+                                                            {{ form.reservas.length }}
+                                                        </div>
+                                                    </div>
+
                                                 </div>
                                             </div>
                                         </section>
@@ -864,8 +972,10 @@ import 'vue3-form-wizard/dist/style.css';
 import ThemifyIcon from "vue-themify-icons";
 
 import VueQrcode from '@chenfengyuan/vue-qrcode';
+import VueCountdown from '@chenfengyuan/vue-countdown';
 
 export default {
+    name: 'App',
 
     components: {
         Submenu,
@@ -880,11 +990,19 @@ export default {
         FormWizard,
         TabContent,
         VueQrcode,
-        ThemifyIcon
+        ThemifyIcon,
+        VueCountdown
     },
     props:{
-        data: [],
+        datos : [],
+        caja:[],
+        numerosreservados : [],
+        rifas: [],
+        vendedores: [],
         errors: Object,
+        totaltransaccionprop: 0,
+        totalcomisionesprop: 0,
+        totalboletas: 0
     },
     computed: {
         calcularSubtotal(){
@@ -901,6 +1019,8 @@ export default {
     },
     data() {
         return {
+            time: 2 * 60 * 1000,
+            session: [],
             loadingWizard: false,
             inputValue: null,
             configMoney: {
@@ -967,6 +1087,16 @@ export default {
                 comprobante: null,
                 paymentmethod: 0,
                 valorpagar: 0,
+                reservas:[],
+                reserva: {
+                    numero: null,
+                    promocional: null,
+                    valortotal:null,
+                    valorpagar:null,
+                    valorsaldo: null,
+                    idcliente:null,
+                    cliente:null
+                },
             },
             configMoney2: {
                 masked: true,
@@ -1022,56 +1152,6 @@ export default {
         }
     },
     methods: {
-        cambiarPage: function (url = '') {
-            axios.get(url, {
-                params: {
-                    paginate: true,
-                    ispage: true
-                }
-            }).then((res) => {
-                var respuesta = res.data;
-                this.arrayData = respuesta.data;
-
-                if (this.arrayData.data.length > 0) {
-                    this.existedata = 1;
-                } else {
-                    this.existedata = 0;
-                }
-            })
-        },
-        formatPrice: function(value) {
-            let val = (value/1).toFixed(0).replace('.', ',')
-            return '$ '+ val.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".")
-        },
-        dateTime: function(value) {
-            return moment(value).format('DD/MM/YYYY');
-        },
-        dateTimeFull: function(value) {
-            return moment(value).format('YYYY-MM-DD HH:MM:SS');
-        },
-        actualizarRangos: function() {
-            let cantidad = 0;
-            let rangoinicial = '';
-            let rangofinal = '';
-
-            cantidad = Math.pow(10, this.form.idrifa.cifras);
-            rangoinicial = '' + String('0'.toString()).padStart(this.form.idrifa.cifras, '0'.toString());
-            rangofinal = (cantidad - 1);
-            console.log(rangoinicial);
-            if(this.isIndividual == 1) {
-                this.form.numero = rangoinicial + ' - ' + rangofinal;
-                this.form.rangoinicial = null;
-                this.form.rangofinal = null;
-            } else {
-                this.form.rangoinicial = rangoinicial.toString();
-                this.form.rangofinal = rangofinal.toString();
-                this.form.numero = null;
-            }
-            this.configMoney2.min = this.form.rangoinicial;
-            this.configMoney2.max = this.form.rangofinal;
-            this.configMoney2.minimumNumberOfCharacters = this.form.idrifa.cifras;
-
-        },
         selectNumero: async function(tipo) {
             this.numerotmp = this.form.numero;
             const { value: ipAddress } = await Swal.fire({
@@ -1686,49 +1766,17 @@ export default {
             console.log('validate ok');
             return true;
         },
-        getPaises: function () {
-            axios.get('/paises',).then((res) => {
-                this.arrayPaises = res.data.paises;
-                console.log(res.data.paises)
-            })
-        },
-        getDepartamentos: function () {
-            axios.get('/paises/departamentos', {
-                params: {
-                    idpais: this.form.cliente.idpais
-                }
-            }).then((res) => {
-                this.arrayDepartamentos = res.data.departamentos;
-                console.log(res.data.departamentos)
-            })
-        },
-        getCiudades: function () {
-            axios.get('/paises/ciudades', {
-                params: {
-                    idpais: this.form.cliente.idpais,
-                    iddepartamento: this.form.cliente.iddepartamento
-                }
-            }).then((res) => {
-                this.arrayCiudades = res.data.ciudades;
-                console.log(res.data.ciudades)
-            })
-        },
-        getTiposdocumento: function () {
-            axios.get('/master/tiposdocsearch',).then((res) => {
-                this.arrayTiposdocumento = res.data.data;
-                console.log(res.data.data)
-            })
-        },
+
     },
     created: function () {
         this.getCart();
-        this.getPaises();
-        this.getClientes();
-        this.getTiposdocumento();
+        //this.getPaises();
+        //this.getClientes();
+        //this.getTiposdocumento();
     },
     mounted() {
-        console.log('Component mounted.');
-        this.getCart()
+        this.getCart();
+        this.registrarSessionVenta(this.caja.puntoventa.id)
     },
 }
 </script>
