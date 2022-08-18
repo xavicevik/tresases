@@ -311,7 +311,7 @@ export default {
     },
     data() {
         return {
-            selectedRow: null,
+
             configMoney: {
                 masked: false,
                 prefix: '$ ',

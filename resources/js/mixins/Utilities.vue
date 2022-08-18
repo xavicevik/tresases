@@ -298,6 +298,18 @@ export default {
                 this.idVenta = id;
             })
         },
+        getHistorialBoleta: function (id) {
+            var url= '/rifas/getHistorialBoleta';
+            axios.get(url, {
+                params: {
+                    id: id,
+                }
+            }).then((res) => {
+                var respuesta = res.data;
+                this.arrayDetalles = respuesta.data;
+                this.idVenta = id;
+            })
+        },
         deleteRow: function (data) {
             let mensaje = '';
             let title = '';

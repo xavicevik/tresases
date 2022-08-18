@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Jobs\CrearBoletasJob;
 use App\Models\Boleta;
+use App\Models\Detalleventa;
 use App\Models\Loteria;
 use App\Models\Imagen;
 use App\Models\Promocional;
@@ -137,6 +138,12 @@ class RifaController extends Controller
         }
     }
 
+    public function getHistorialBoleta(Request $request)
+    {
+        $boletas = Detalleventa::where('idboleta', $request->id)
+                                 ->paginate(self::canPorPagina);
+        return ['data' => $boletas];
+    }
 
     public function getRifasActivas(Request $request)
     {

@@ -228,7 +228,7 @@
                                 </tr>
                                 </thead>
                                 <tbody>
-                                <tr class="text-center" text-sm v-if="arrayData.data" v-for="(dato, id) in arrayData.data" :key="id">
+                                <tr :class="dato.id === selectedRow ? 'bg-blue-200' : ''"  class="text-center hover:bg-blue-400" @click="rowSelect(dato.id); getHistorialBoleta(dato.id)" text-sm v-if="arrayData.data" v-for="(dato, id) in arrayData.data" :key="dato.id">
                                     <td class="border px-1 py-2 text-sm truncate" v-text="dato.rifa.titulo"></td>
                                     <td class="border px-1 py-2 text-sm truncate" v-text="dato.numero"></td>
                                     <td class="border px-1 py-2 text-sm truncate" v-text="dato.promocional"></td>
@@ -284,6 +284,64 @@
                                 </div>
                             </section>
                             <!-- Paginacion -->
+                        </div>
+                    </section>
+                    <!-- Fin Tabla de contenido -->
+
+                    <!-- Tabla de contenido -->
+                    <section>
+                        <div class="lg:px-4 md:px-2 sm:px-0 py-2 pb-6 overflow-y-auto h-50">
+                            <h2 class="font-semibold text-xl text-gray-800 leading-tight">
+                                Historial
+                            </h2>
+                            <table class="table-fixed w-full">
+                                <thead>
+                                <tr class="bg-gray-100">
+                                    <th class="px-4 py-2 w-2/12 text-sm font-bold hover:bg-blue-500 hover:text-gray-50 rounded-b">
+                                        Id
+                                    </th>
+                                    <th class="px-4 py-2 w-2/12 text-sm font-bold hover:bg-blue-500 hover:text-gray-50 rounded-b">
+                                        Venta
+                                    </th>
+                                    <th class="px-4 py-2 w-2/12 text-sm font-bold hover:bg-blue-500 hover:text-gray-50 rounded-b">
+                                        Valor pagado
+                                    </th>
+                                    <th class="px-4 py-2 text-sm font-bold w-2/12 hover:bg-blue-500 hover:text-gray-50 rounded-b">
+                                        Comisión pagada
+                                    </th>
+                                    <th class="px-4 py-2 text-sm font-bold w-2/12 hover:bg-blue-500 hover:text-gray-50 rounded-b">
+                                        Fecha actualización
+                                    </th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr class="text-center" text-sm v-if="arrayDetalles.data" v-for="(dato, id) in arrayDetalles.data" :key="id">
+                                    <td class="border px-1 py-2 text-sm truncate" v-text="dato.id"></td>
+                                    <td class="border px-1 py-2 text-sm truncate" v-text="dato.idventa"></td>
+                                    <td class="border px-1 py-2 text-sm truncate" v-text="formatPrice(dato.valor)"></td>
+                                    <td class="border px-1 py-2 text-sm truncate" v-text="formatPrice(dato.comision)"></td>
+                                    <td class="border px-1 py-2 text-sm truncate" v-text="dateTimeFull(dato.updated_at)"></td>
+                                </tr>
+                                <tr v-else>
+                                    <td class="border px-4 py-2 text-xs text-center" colspan="7"> La consulta no obtuvo datos</td>
+                                </tr>
+                                </tbody>
+                            </table>
+                            <section class="mt-6">
+                                <div v-if="arrayDetalles.links.length > 3">
+                                    <div class="flex flex-wrap -mb-1">
+                                        <template v-for="(link, p) in arrayDetalles.links" :key="p">
+                                            <div v-if="link.url === null" class="mr-1 mb-1 px-4 py-3 text-sm leading-4 text-gray-400 border rounded"
+                                                 v-html="link.label" />
+                                            <button  v-else
+                                                     class="mr-1 mb-1 px-4 py-3 text-sm leading-4 border rounded hover:bg-white focus:border-indigo-500 focus:text-indigo-500"
+                                                     :class="{ 'bg-blue-700 text-white': link.active }"
+                                                     v-on:click="cambiarPage(link.url)"
+                                                     v-html="link.label" />
+                                        </template>
+                                    </div>
+                                </div>
+                            </section>
                         </div>
                     </section>
                     <!-- Fin Tabla de contenido -->
