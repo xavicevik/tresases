@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\DB;
 
 class Userview extends Model
 {
-    protected $table = 'transacciones';
+    protected $table = 'usersviews';
     protected $fillable =[
         'id',
         'full_name',

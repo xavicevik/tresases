@@ -1669,18 +1669,16 @@ export default {
                     montocierre: data.montocierre
                 }
             }).then((res) => {
-                    //console.log(res.data);
                     Swal.fire({
                         icon: 'success',
                         title: 'Se ha realizado el cierre de caja',
                         showConfirmButton: true,
                     })
-                    this.recaudocaja = res.data.histocaja;
+                    this.recaudocaja = res.data.histocaja; console.log(res.data.histocaja);
                     this.isOpenCerrar = false;
                     this.tituloModal = 'Detalle del cierre de caja'
                     this.isOpenDetalle = true;
                 }).catch(function (error) {
-                //console.log(error);
             });
 
             /*
