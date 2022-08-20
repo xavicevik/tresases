@@ -67,7 +67,7 @@ class LoginController extends Controller
                          ->select('id', 'username', 'password', 'idrol', 'changedpassword', 'idempresa');
 
         $rol = $roluser->union($rolvendedor)->union($rolcliente)->first();
-        if ($rol->idrol == 5) {
+        if (! is_null($rol) && $rol->idrol == 5) {
             $puntosventa = Puntoventa::where('idempresa', $rol->idempresa)->get();
         }
         if (! is_null($rol) && is_null($rol->changedpassword)) {
@@ -95,7 +95,7 @@ class LoginController extends Controller
                 '_token' => $token
             ]);
         }
-        if ($rol->idrol == 2) {
+        if (! is_null($rol) && $rol->idrol == 2) {
             $guard = Auth::guard('cliente');
         } else {
             $guard = Auth::guard('web');

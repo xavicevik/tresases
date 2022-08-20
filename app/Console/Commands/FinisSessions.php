@@ -41,7 +41,7 @@ class FinisSessions extends Command
      * @return int
      */
     public function handle() {
-        $time = 120;
+        $time = config('session.max_time_sales');
         try {
             DB::beginTransaction();
 

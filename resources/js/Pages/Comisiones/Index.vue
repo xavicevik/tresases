@@ -221,7 +221,23 @@
                                 </tr>
                                 </tbody>
                             </table>
-                            <pagination class="mt-6" :links="arrayData.links" />
+                            <!-- Paginacion -->
+                            <section class="mt-6">
+                                <div v-if="arrayData.links.length > 3">
+                                    <div class="flex flex-wrap -mb-1">
+                                        <template v-for="(link, p) in arrayData.links" :key="p">
+                                            <div v-if="link.url === null" class="mr-1 mb-1 px-4 py-3 text-sm leading-4 text-gray-400 border rounded"
+                                                 v-html="link.label" />
+                                            <button  v-else
+                                                     class="mr-1 mb-1 px-4 py-3 text-sm leading-4 border rounded hover:bg-white focus:border-indigo-500 focus:text-indigo-500"
+                                                     :class="{ 'bg-blue-700 text-white': link.active }"
+                                                     v-on:click="this.cambiarPage(link.url, 'comisiones', form)"
+                                                     v-html="link.label" />
+                                        </template>
+                                    </div>
+                                </div>
+                            </section>
+                            <!-- Paginacion -->
                         </div>
                     </section>
                     <!-- Fin Tabla de contenido -->
@@ -477,28 +493,6 @@ export default {
         distComisiond: function() {
             this.form.comisionvendedor = this.maxcomision.valornum - this.form.comisionmayorista - this.form.comisiondistribuidor;
         },
-        actualizarRangos: function() {
-            let rango = null;
-            let cantidad = 0;
-
-            cantidad = Math.pow(10, this.form.cifras);
-            rango = String(0).padStart(this.form.cifras, '0') + ' - ' + (cantidad-1);
-            this.cantboletas = cantidad;
-            this.rango = rango;
-        },
-        formatPrice(value) {
-            let val = (value/1).toFixed(0).replace('.', ',')
-            return '$ '+ val.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".")
-        },
-        dateTime(value) {
-            return moment(value).format('DD/MM/YYYY');
-        },
-        dateTimeFull(value) {
-            return moment(value).format('YYYY-MM-DD HH:MM:SS');
-        },
-        cleanMessage: function () {
-            this.$page.props.flash.message = '';
-        },
         editar: function (data){
             this.openModal('actualizar', data)
         },
@@ -608,39 +602,32 @@ export default {
                     ispage: this.ispage
                 }
             }).then((res) => {
-               // console.log(res);
                 var respuesta = res.data;
                 this.arrayData = respuesta.datos;
             })
         },
         getMayoristas: function () {
             axios.get('/master/getEmpresas?idrol=4', ).then((res) => {
-                //console.log(res.data);
                 this.arrayMayoristas = res.data.data;
             })
         },
         getDistribuidores: function () {
             axios.get('/master/getEmpresas?idrol=3&idpadre=' + this.form.idmayorista, ).then((res) => {
-                //console.log(res.data);
                 this.arrayDistribuidor = res.data.data;
             })
         },
         getVendedores: function () {
             axios.get('/master/getEmpresas?estado='+this.form.estado+'&idrol=5&idpadre=' + this.form.iddistribuidor,
             ).then((res) => {
-                //console.log(res.data);
                 this.arrayVendedores = res.data.data;
             })
         },
     },
     created: function () {
-        //console.log('inicio comisiones');
         this.arrayData = this.datos;
-        //console.log(this.datos);
 
     },
     mounted() {
-        //console.log('Component mounted.');
     },
 }
 </script>

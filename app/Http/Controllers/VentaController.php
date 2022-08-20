@@ -1074,6 +1074,8 @@ dd($e);
 
         if ($idusuario->idrol == 5) {
             $idvendedor = $idusuario->id;
+        } else {
+            $idvendedor = null;
         }
 
         $detallesession = null;

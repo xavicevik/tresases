@@ -43,15 +43,11 @@ class TransaccionController extends Controller
 
         if (is_null($filtros)){
             $transacciones = Transaccion::orderBy($sortBy, $sortOrder)
-                ->with('usuarioorigen')
-                ->with('usuariodestino')
                 ->with('concepto')
                 ->paginate(self::canPorPagina);
         } else {
 
             $transacciones = Transaccion::orderBy($sortBy, $sortOrder)
-                                          ->with('usuarioorigen')
-                                          ->with('usuariodestino')
                                           ->with('concepto');
 
             if(!is_null($filtros->fechainicio)) {

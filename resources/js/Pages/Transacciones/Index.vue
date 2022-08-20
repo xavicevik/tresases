@@ -1,5 +1,5 @@
 <template>
-    <AppLayout title="Comisiones">
+    <AppLayout title="Transacciones">
 
         <template #header>
             <h2 class="font-semibold text-xl text-gray-800 leading-tight">
@@ -280,8 +280,8 @@
                                 <tbody>
                                 <tr class="text-center" text-sm v-if="arrayData.data" v-for="(dato, id) in arrayData.data" :key="id">
                                     <td class="border px-1 py-2 text-sm truncate" v-text="dato.id"></td>
-                                    <td class="border px-1 py-2 text-sm truncate" v-text="dato.usuarioorigen.username"></td>
-                                    <td class="border px-1 py-2 text-sm truncate" v-text="dato.usuariodestino.username"></td>
+                                    <td class="border px-1 py-2 text-sm truncate" v-text="dato.idusuarioori"></td>
+                                    <td class="border px-1 py-2 text-sm truncate" v-text="dato.idusuarioodest"></td>
                                     <td class="border px-1 py-2 text-sm truncate" v-text="dato.concepto.nombre"></td>
                                     <td class="border px-1 py-2 text-sm truncate" v-text="dato.origen"></td>
                                     <td class="border px-1 py-2 text-sm truncate" v-text="dato.destino"></td>
@@ -297,7 +297,25 @@
                                 </tr>
                                 </tbody>
                             </table>
-                            <pagination class="mt-6" :links="arrayData.links" />
+
+                            <!-- Paginacion -->
+                            <section class="mt-6">
+                                <div v-if="arrayData.links.length > 3">
+                                    <div class="flex flex-wrap -mb-1">
+                                        <template v-for="(link, p) in arrayData.links" :key="p">
+                                            <div v-if="link.url === null" class="mr-1 mb-1 px-4 py-3 text-sm leading-4 text-gray-400 border rounded"
+                                                 v-html="link.label" />
+                                            <button  v-else
+                                                     class="mr-1 mb-1 px-4 py-3 text-sm leading-4 border rounded hover:bg-white focus:border-indigo-500 focus:text-indigo-500"
+                                                     :class="{ 'bg-blue-700 text-white': link.active }"
+                                                     v-on:click="this.cambiarPage(link.url, 'transacciones', form)"
+                                                     v-html="link.label" />
+                                        </template>
+                                    </div>
+                                </div>
+                            </section>
+                            <!-- Paginacion -->
+
                         </div>
                     </section>
                     <!-- Fin Tabla de contenido -->
@@ -404,19 +422,6 @@ export default {
         }
     },
     methods: {
-        formatPrice(value) {
-            let val = (value/1).toFixed(0).replace('.', ',')
-            return '$ '+ val.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".")
-        },
-        dateTime(value) {
-            return moment(value).format('DD/MM/YYYY');
-        },
-        dateTimeFull(value) {
-            return moment(value).format('YYYY-MM-DD HH:MM:SS');
-        },
-        cleanMessage: function () {
-            this.$page.props.flash.message = '';
-        },
         getTransacciones: function (filtros = [], sortBy = 'transacciones.id') {
             if (sortBy == this.sortBy){
                 this.sortOrder = !this.sortOrder;
@@ -439,7 +444,6 @@ export default {
                     ispage: this.ispage
                 }
             }).then((res) => {
-                //console.log(res);
                 var respuesta = res.data;
                 this.arrayData = respuesta.datos;
             })
@@ -447,13 +451,9 @@ export default {
 
     },
     created: function () {
-        //console.log('inicio comisiones');
         this.arrayData = this.datos;
-        //console.log(this.datos);
-
     },
     mounted() {
-        //console.log('Component mounted.');
     },
 }
 </script>

@@ -328,7 +328,23 @@
                                 </tr>
                                 </tbody>
                             </table>
-                            <pagination class="mt-6" :links="arrayData.links" />
+                            <!-- Paginacion -->
+                            <section class="mt-6">
+                                <div v-if="arrayData.links.length > 3">
+                                    <div class="flex flex-wrap -mb-1">
+                                        <template v-for="(link, p) in arrayData.links" :key="p">
+                                            <div v-if="link.url === null" class="mr-1 mb-1 px-4 py-3 text-sm leading-4 text-gray-400 border rounded"
+                                                 v-html="link.label" />
+                                            <button  v-else
+                                                     class="mr-1 mb-1 px-4 py-3 text-sm leading-4 border rounded hover:bg-white focus:border-indigo-500 focus:text-indigo-500"
+                                                     :class="{ 'bg-blue-700 text-white': link.active }"
+                                                     v-on:click="this.cambiarPage(link.url, 'pagos', form)"
+                                                     v-html="link.label" />
+                                        </template>
+                                    </div>
+                                </div>
+                            </section>
+                            <!-- Paginacion -->
                         </div>
                     </section>
                     <!-- Fin Tabla de contenido -->

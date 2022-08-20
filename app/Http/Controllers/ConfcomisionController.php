@@ -44,7 +44,7 @@ class ConfcomisionController extends Controller
 
         if ($buscar == ''){
             $comision = Confcomision::orderBy($sortBy, $sortOrder)
-                ->with('vendedor')
+                ->with('salesman')
                 ->with('agente')
                 ->with('mayorista')
                 ->with('distribuidor')
@@ -52,7 +52,7 @@ class ConfcomisionController extends Controller
         } else {
             $comision = Confcomision::orderBy($sortBy, $sortOrder)
                 ->join('users', 'users.id', 'confcomisiones.idvendedor')
-                ->with('vendedor')
+                ->with('salesman')
                 ->with('agente')
                 ->with('mayorista')
                 ->with('distribuidor')

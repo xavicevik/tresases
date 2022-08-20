@@ -24,16 +24,6 @@ class Transaccion extends Model
         'ano',
     ];
 
-    public function usuarioorigen()
-    {
-        return $this->belongsTo(User::class, 'idusuarioori');
-    }
-
-    public function usuariodestino()
-    {
-        return $this->belongsTo(User::class, 'idusuariodest');
-    }
-
     public function concepto()
     {
         return $this->belongsTo(Concepto::class, 'idconcepto');

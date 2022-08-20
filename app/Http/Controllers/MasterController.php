@@ -11,6 +11,7 @@ use App\Models\Serie;
 use App\Models\Terminosycondiciones;
 use App\Models\TiposDocumento;
 use App\Models\User;
+use App\Models\Vendedor;
 use Illuminate\Http\Request;
 
 use Illuminate\Support\Facades\Auth;
@@ -342,10 +343,10 @@ class MasterController extends Controller
         $estado = $request->estado;
 
         if($request->has('estado') && $estado == 2) {
-            $empresas = User::join('empresas', 'users.idempresa', '=', 'empresas.id')
-                              ->where('users.idrol', 5)
+            $empresas = Vendedor::join('empresas', 'vendedors.idempresa', '=', 'empresas.id')
+                              ->where('vendedors.idrol', 5)
                               ->where('empresas.idpadre', $request->idpadre)
-                              ->select('users.id as id', DB::raw('CONCAT(users.nombre, " ", users.apellido) AS razon_social'))
+                              ->select('vendedors.id as id', DB::raw('CONCAT(vendedors.nombre, " ", vendedors.apellido) AS razon_social'))
                               ->get();
         } else {
             if (!$request->has('idpadre')) {
