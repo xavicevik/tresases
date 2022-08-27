@@ -1,0 +1,121 @@
+modificar modelos
+separar usuarios
+crear clientes, usuarios, vendedores
+crera tablas nuevas
+modificar modelo de roles has permisions
+
+
+DB
+Boletas
+Estado ANT
+
+ALTER TABLE `boletas` ADD `estado_ant` TINYINT(1) NULL AFTER `estado`;
+
+Copiar users a vendedors
+
+Eliminar otros usuarios
+DELETE FROM `vendedors` WHERE idrol <> 5;
+
+Copiar users a clientes
+ALTER TABLE `clientes`
+  DROP `isnatural`,
+  DROP `camaracomercio`,
+  DROP `rut`,
+  DROP `url`,
+  DROP `idempresa`;
+  
+  DELETE FROM `clientes` WHERE idrol <> 2;
+  
+
+CREATE TABLE `sesionventas` (
+  `id` bigint UNSIGNED NOT NULL,
+  `idusuario` bigint UNSIGNED NOT NULL,
+  `idrifa` int UNSIGNED DEFAULT NULL,
+  `idvendedor` bigint UNSIGNED DEFAULT NULL,
+  `idpuntoventa` int UNSIGNED DEFAULT NULL,
+  `estado` tinyint(1) NOT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+
+ALTER TABLE `sesionventas`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `idvendedor` (`idvendedor`),
+  ADD KEY `idpuntoventa` (`idpuntoventa`),
+  ADD KEY `idusuario` (`idusuario`);
+
+
+ALTER TABLE `sesionventas`
+  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT;
+
+
+ALTER TABLE `sesionventas`
+  ADD CONSTRAINT `sesionventas_ibfk_1` FOREIGN KEY (`idvendedor`) REFERENCES `vendedors` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT,
+  ADD CONSTRAINT `sesionventas_ibfk_2` FOREIGN KEY (`idpuntoventa`) REFERENCES `puntos_ventas` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT;
+  
+  CREATE TABLE `detallesesion` (
+  `id` bigint NOT NULL,
+  `idsesionventa` bigint UNSIGNED NOT NULL,
+  `idboleta` bigint UNSIGNED NOT NULL,
+  `valor` decimal(10,2) DEFAULT NULL,
+  `idcliente` bigint UNSIGNED DEFAULT NULL,
+  `created_at` timestamp NOT NULL,
+  `updated_at` timestamp NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+
+ALTER TABLE `detallesesion`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `idboleta` (`idboleta`),
+  ADD UNIQUE KEY `UI_idboleta` (`idboleta`),
+  ADD KEY `idcliente` (`idcliente`),
+  ADD KEY `idsesionventa` (`idsesionventa`);
+
+
+ALTER TABLE `detallesesion`
+  MODIFY `id` bigint NOT NULL AUTO_INCREMENT;
+
+
+ALTER TABLE `detallesesion`
+  ADD CONSTRAINT `detallesesion_ibfk_2` FOREIGN KEY (`idboleta`) REFERENCES `boletas` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT,
+  ADD CONSTRAINT `detallesesion_ibfk_3` FOREIGN KEY (`idcliente`) REFERENCES `clientes` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT;
+
+DELETE FROM `users` WHERE idrol in (2, 5);
+
+ALTER TABLE `boletas` DROP FOREIGN KEY `boletas_ibfk_1`; ALTER TABLE `boletas` ADD CONSTRAINT `boletas_ibfk_1` FOREIGN KEY (`idcliente`) REFERENCES `clientes`(`id`) ON DELETE RESTRICT ON UPDATE RESTRICT; ALTER TABLE `boletas` DROP FOREIGN KEY `boletas_ibfk_2`; ALTER TABLE `boletas` ADD CONSTRAINT `boletas_ibfk_2` FOREIGN KEY (`idvendedor`) REFERENCES `vendedors`(`id`) ON DELETE RESTRICT ON UPDATE RESTRICT;
+
+ALTER TABLE detalle_ventas DROP FOREIGN KEY detalle_ventas_ibfk_2;
+
+ALTER TABLE `detalle_ventas` DROP FOREIGN KEY `detalle_ventas_ibfk_4`; ALTER TABLE `detalle_ventas` ADD CONSTRAINT `detalle_ventas_ibfk_4` FOREIGN KEY (`idcliente`) REFERENCES `clientes`(`id`) ON DELETE RESTRICT ON UPDATE RESTRICT;
+
+ALTER TABLE historialcajas DROP FOREIGN KEY historialcajas_idvendedor_foreign;
+
+UPDATE `model_has_roles` SET model_type = 'App\Models\Vendedor' WHERE role_id = 5;
+UPDATE `model_has_roles` SET model_type = 'App\Models\Cliente' WHERE role_id = 2;
+
+ALTER TABLE model_has_roles DROP FOREIGN KEY model_has_roles_ibfk_1
+
+ALTER TABLE `pagos` DROP FOREIGN KEY `pagos_idcliente_foreign`; ALTER TABLE `pagos` ADD CONSTRAINT `pagos_idcliente_foreign` FOREIGN KEY (`idcliente`) REFERENCES `clientes`(`id`) ON DELETE RESTRICT ON UPDATE RESTRICT; ALTER TABLE `pagos` DROP FOREIGN KEY `pagos_idvendedor_foreign`; ALTER TABLE `pagos` ADD CONSTRAINT `pagos_idvendedor_foreign` FOREIGN KEY (`idvendedor`) REFERENCES `vendedors`(`id`) ON DELETE RESTRICT ON UPDATE RESTRICT;
+
+ALTER TABLE recibos DROP FOREIGN KEY recibos_iduserdestino_foreign;
+
+ALTER TABLE recibos DROP FOREIGN KEY recibos_idusuario_foreign;
+
+ALTER TABLE transacciones DROP FOREIGN KEY transacciones_idconcepto_foreign;
+
+ALTER TABLE transacciones DROP FOREIGN KEY transacciones_idusuariodest_foreign;
+
+ALTER TABLE transacciones DROP FOREIGN KEY transacciones_idusuarioori_foreign;
+
+ALTER TABLE `ventas` DROP FOREIGN KEY `ventas_idcliente_foreign`; ALTER TABLE `ventas` ADD CONSTRAINT `ventas_idcliente_foreign` FOREIGN KEY (`idcliente`) REFERENCES `clientes`(`id`) ON DELETE RESTRICT ON UPDATE RESTRICT; ALTER TABLE `ventas` DROP FOREIGN KEY `ventas_idvendedor_foreign`; ALTER TABLE `ventas` ADD CONSTRAINT `ventas_idvendedor_foreign` FOREIGN KEY (`idvendedor`) REFERENCES `vendedors`(`id`) ON DELETE RESTRICT ON UPDATE RESTRICT;
+
+
+CREATE  VIEW `usersviews`  AS SELECT `users`.`id` AS `id`, concat(`users`.`nombre`,' ',`users`.`apellido`) AS `full_name`, `users`.`documento` AS `documento`, `users`.`correo` AS `correo`, `users`.`username` AS `username`, `users`.`idrol` AS `idrol`, `users`.`estado` AS `estado`, `users`.`idtipos_documento` AS `idtipos_documento`, `users`.`movil` AS `movil` FROM `users` union select `vendedors`.`id` AS `id`,concat(`vendedors`.`nombre`,' ',`vendedors`.`apellido`) AS `full_name`,`vendedors`.`documento` AS `documento`,`vendedors`.`correo` AS `correo`,`vendedors`.`username` AS `username`,`vendedors`.`idrol` AS `idrol`,`vendedors`.`estado` AS `estado`,`vendedors`.`idtipos_documento` AS `idtipos_documento`,`vendedors`.`movil` AS `movil` from `vendedors`  ;
+
+
+
+Activiar mensajes de texto
+Activar crontab
+
+* * * * * cd /var/www/html && php artisan schedule:run >> /var/log/cron.log 2>&1

@@ -254,6 +254,11 @@
                                             Pendiente
                                         </span>
                                     </td>
+                                    <td class="border px-2 py-2 text-sm truncate" v-if="dato.estado==5">
+                                        <span class="inline-flex px-2 text-sm font-semibold leading-5 text-blue-800 bg-blue-100 rounded-full">
+                                            En proceso
+                                        </span>
+                                    </td>
                                     <td class="border px-2 py-2 text-sm" v-if="dato.estado==0">
                                         <span class="inline-flex px-2 text-xs font-semibold leading-5 text-red-800 bg-red-100 rounded-full">
                                             Inactivo
