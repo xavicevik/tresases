@@ -438,7 +438,7 @@ class UserController extends Controller
         $user->saveOrFail();
 
         $rol = Rol::where('id', $user->idrol)->first();
-        $user->assignRole($rol->nombre);
+        //$user->assignRole($rol->nombre);
 
         if ($user->observaciones == 'Creado por movimiento de caja') {
             return ['user' => $user];

@@ -1578,8 +1578,6 @@ export default {
             formData.append('idciudad', 1017001);
             formData.append('telefono', this.form.cliente.movil);
             formData.append('movil', this.form.cliente.movil);
-            formData.append('isnatural', 1);
-            formData.append('idempresa', 3);
             formData.append('observaciones', 'Creado por movimiento de caja');
 
             //console.log(formData);
