@@ -215,7 +215,7 @@
                                 <tr :class="dato.id === selectedRow ? 'bg-blue-200' : '', (dato.recaudoefectivo - dato.comisionventa - dato.montocierre) != 0? 'text-red-600' : ''"  class="text-left hover:bg-blue-400" @click="rowSelect(dato.id); getDetallesVentas(dato.id)" text-sm v-if="arrayCajas.data" v-for="(dato, id) in arrayCajas.data" :key="id">
                                     <td class="border px-1 py-2 text-sm truncate" v-text="dato.id"></td>
                                     <td class="border px-1 py-2 text-sm truncate" v-text="dato.puntoventa.nombre"></td>
-                                    <td class="border px-1 py-2 text-sm truncate" v-text="dato.fechaapertura"></td>
+                                    <td class="border px-1 py-2 text-sm truncate" v-text="dato.vendedor.full_name"></td>
                                     <td class="border px-1 py-2 text-sm truncate" v-text="dato.fechaapertura"></td>
                                     <td class="border px-1 py-2 text-sm truncate" v-text="dato.fechacierre"></td>
                                     <td class="border px-1 py-2 text-sm truncate" v-text="formatPrice(dato.recaudoefectivo)"></td>

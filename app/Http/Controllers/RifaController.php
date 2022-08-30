@@ -121,10 +121,12 @@ class RifaController extends Controller
             if(!is_null($filtros->estado) && $filtros->estado <> '') {
                 $boletas = $boletas->where('boletas.estado', 'like', '%'.$filtros->estado.'%');
             }
+
             if(!is_null($filtros->cliente) && $filtros->cliente <> '') {
-                $boletas = $boletas->join('users as t1', 'boletas.idcliente', '=', 't1.id')
+                $boletas = $boletas->join('clientes as t1', 'boletas.idcliente', '=', 't1.id')
                     ->where('t1.nombre', 'like', '%'.$filtros->cliente.'%')
-                    ->orWhere('t1.apellido', 'like', '%'.$filtros->cliente.'%');
+                    ->orWhere('t1.apellido', 'like', '%'.$filtros->cliente.'%')
+                    ->orWhere('t1.documento', 'like', '%'.$filtros->cliente.'%');
             }
 
             $boletas = $boletas->select('boletas.*')->paginate(self::canPorPagina);

@@ -1379,8 +1379,7 @@ export default {
                 }
             }).then((res) => {
                 let configuracion = res.data;
-
-                if (configuracion.comision && configuracion.comision !== null && configuracion.comision.comisionvendedor > 0) {
+                if (configuracion.comision && configuracion.comision !== null && configuracion.comision.comisionvendedor >= 0) {
                     this.form.idvendedor = data;
                     this.closeMoodalVendedor();
                     this.updateSession(this.session.id, this.form.idrifa.id, this.form.idvendedor.id);
@@ -1389,7 +1388,7 @@ export default {
                         icon: 'error',
                         title: 'El vendedor no cuenta con al configuración de las comisiones',
                         showConfirmButton: false,
-                        timer: 1500
+                        timer: 2000
                     })
                 }
             })
