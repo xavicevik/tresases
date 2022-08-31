@@ -87,7 +87,7 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'),'verified',]
         })->name('reservas.export');
 
         Route::post('/numerosreservados/import', function (Request $request) {
-            Excel::import(new NumeroreservadoImport($request), $request->file('file')->getRealPath());
+            Excel::import(new NumeroreservadoImport($request), $request->file('file'));
 
             return redirect()->back()->with('message', 'Archivo importado correctamente');
         })->name('numerosreservados.import');

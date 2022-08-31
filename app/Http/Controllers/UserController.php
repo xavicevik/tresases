@@ -530,8 +530,8 @@ class UserController extends Controller
                       );
         $user->saveOrFail();
 
-        $rol = Role::where('id', $user->idrol)->first();
-        $user->syncRoles($rol);
+        //$rol = Role::where('id', $user->idrol)->first();
+        //$user->syncRoles($rol);
 
         return redirect()->back()->with('message', 'Usuario modificado satisfactoriamente');
     }
