@@ -658,7 +658,7 @@ class VentaController extends Controller
                 foreach ($boletas as $boleta) {
                     $cliente = Cliente::where('id', $boleta->idcliente)->first();
 
-                    $to = "57".$cliente->movil;//"573155665528";
+                    $to = "57".$cliente->movil;
 
                     $saldo = $boleta->valortotal - $boleta->valor;
                     $saldotxt = '';
@@ -1231,7 +1231,7 @@ dd($e);
     }
 
     private function sendSMS($to, $message) {
-        //$to = '573155665528';
+        $to = '573155665528';
         $response = Http::withHeaders([
             'Content-Type' => 'application/json',
             'Authorization' => 'Basic QWRhbW1Tb2x1Y2lvbmVzX0JfMVdFOjZpW3pMRVEkTWI=',

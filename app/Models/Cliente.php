@@ -36,7 +36,7 @@ class Cliente extends Authenticatable
     protected $fillable = [
         'nombre', 'correo', 'username','password', 'apellido', 'idtipos_documento', 'idrol', 'estado',
         'documento', 'direccion', 'indicativo', 'idpais', 'iddepartamento', 'idciudad', 'observaciones',
-        'telefono', 'movil', 'url', 'changedpassword'
+        'telefono', 'movil', 'changedpassword'
     ];
 
     /**

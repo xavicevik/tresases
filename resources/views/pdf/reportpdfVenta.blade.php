@@ -55,7 +55,8 @@
     </table>
 <hr>
 <p class="left">
-    <strong>Valor boletas Total:</strong> {{ $valortotal }}
+    <strong>Cantidad de boletas:</strong> {{ $cantidad }}
+    <br><strong>Valor boletas Total:</strong> {{ $valortotal }}
     <br><strong>Valor Total:</strong> {{ $comisionvendedor }}
     <br>
     <br><strong>Valor Entregar:</strong> {{ $valorentregar }}
