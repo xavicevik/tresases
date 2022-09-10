@@ -181,6 +181,13 @@ export default {
                 this.arrayClientes = respuesta.clientes;
             })
         },
+        showClient: async function (id) {
+            var url= '/users/cliente/' + id;
+            axios.get(url).then((res) => {
+                var respuesta = res.data;
+                this.form.cliente = respuesta.cliente;
+            })
+        },
         getBoletasreservas: function (filtros = [], sortBy = 'boletas.id') {
             if (sortBy == this.sortBy){
                 this.sortOrder = !this.sortOrder;
@@ -397,6 +404,18 @@ export default {
                 console.log(res.data);
             })
         },
+        pushSessionDetailClient: function (id, cliente, type) {
+            var url= '/ventas/updDetailSessionClient';
+            axios.get(url, {
+                params: {
+                    idsesion: id,
+                    idcliente: cliente,
+                    type: type
+                }
+            }).then((res) => {
+                console.log(res.data);
+            })
+        },
         registrarSessionVenta: function (idpuntoventa = null, idrifa = null, idvendedor = null) {
             var url= '/ventas/initSession';
             axios.get(url, {
@@ -409,6 +428,14 @@ export default {
                 var respuesta = res.data;
                 this.session = respuesta.session;
                 this.detallesession = respuesta.detallesession;
+
+                if (respuesta.cliente) {
+                    this.form.cliente = respuesta.cliente;
+                    this.getDepartamentos();
+                    this.getCiudades();
+                    this.form.metacliente = respuesta.cliente.documento + ' - ' + respuesta.cliente.nombre + ' ' + respuesta.cliente.apellido;
+                }
+
                 if(this.session.rifa) this.form.idrifa = this.session.rifa;
                 if(this.session.vendedor) this.form.idvendedor = this.session.vendedor;
                 this.time = respuesta.time * 1000;
@@ -425,6 +452,22 @@ export default {
                         cliente: this.detallesession[property]['idcliente']?this.detallesession[property]['full_name']:'',
                     });
                 }
+            })
+        },
+        updateTimeSession: function () {
+            var url= '/ventas/updateTimeSession';
+            axios.get(url, {
+                params: {
+                    idsesion: this.session.id,
+                }
+            }).then((res) => {
+                Swal.fire({
+                    position: 'top-end',
+                    icon: 'success',
+                    title: 'Se ha reiniciado el tiempo para la venta',
+                    showConfirmButton: true,
+                    timer: 1000
+                })
             })
         },
         finishSession: function () {
@@ -471,7 +514,23 @@ export default {
                 })
         },
         onCountdownEnd: function () {
-            this.finishSession()
+            Swal.fire({
+                icon: 'warning',
+                title: 'Se ha agotado el tiempo para realizar la compra, desea continuar?',
+                showConfirmButton: true,
+                showCancelButton: true,
+                confirmButtonText: 'Continuar',
+                cancelButtonText: 'Cancelar',
+                timer: 4500
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    //Swal.fire('Saved!', '', 'success')
+                    this.updateTimeSession();
+                } else if (result.isDenied) {
+                    this.finishSession();
+                }
+            })
+            //this.finishSession()
         }
     },
 };

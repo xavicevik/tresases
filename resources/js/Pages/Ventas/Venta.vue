@@ -19,7 +19,7 @@
                                  @on-error="onError"
                     >
                         <tab-content title="Detalle de Rifa" icon="ti-ticket" :before-change="validateRifa" >
-                            <form>
+                            <!-- <form> -->
                                 <div class="bg-white px-4 pb-2">
                                     <div class="">
                                         <!-- Mensajes Flash -->
@@ -27,8 +27,11 @@
                                         <!-- Fin Mensajes Flash -->
                                         <!-- Formulario -->
                                         <section>
-                                            <div class="mx-auto text-center w-full border-0">
-                                                <vue-countdown ref="countdown" class="p-2 pb-4 border-2 border-gray-800 rounded-md mx-auto text-blue-700" :time="time" v-slot="{ minutes, seconds }" @end="onCountdownEnd">
+                                                <div class="cho-container">
+
+                                                </div>
+                                            <div class="mx-auto text-right w-full border-0">
+                                                <vue-countdown ref="countdown" class="p-2 pb-4 mx-auto text-blue-700" :time="time" v-slot="{ minutes, seconds }" @end="onCountdownEnd">
                                                     Tiempo restante：{{ minutes }} min, {{ seconds }} seg.
                                                 </vue-countdown>
                                             </div>
@@ -57,22 +60,21 @@
                                                         <div class="relative pt-4">
                                                             <div class="absolute top-4 left-3">
                                                                 <i class="fa fa-search text-gray-400 z-20 hover:text-gray-500"></i> </div>
-                                                            <money3 v-bind="configMoney2" v-model="form.reserva.numero" @keypress.enter="valBoletaDisponible(form.reserva.numero, form.idrifa.id, form.idvendedor.id, form.idcliente.id)" class="h-8 w-96 pl-4 pr-4 rounded-lg z-0 focus:shadow focus:outline-none"></money3>
-                                                            <a @click="valBoletaDisponible(form.reserva.numero, form.idrifa.id, form.idvendedor.id, form.idcliente.id)">
-                                                                <div class="absolute top-6 right-4">
-                                                                    <Icon icon="fe:search" class="h-4"  />
-                                                                </div>
-                                                            </a>
+                                                                <money3 v-bind="configMoney2" v-model="form.reserva.numero" @keypress.enter="valBoletaDisponible(form.reserva.numero, form.idrifa.id, form.idvendedor.id, form.idcliente.id)" class="h-8 w-96 pl-4 pr-4 rounded-lg z-0 focus:shadow focus:outline-none"></money3>
+                                                                <a @click="valBoletaDisponible(form.reserva.numero, form.idrifa.id, form.idvendedor.id, form.idcliente.id)">
+                                                                    <div class="absolute top-6 right-4">
+                                                                        <Icon icon="fe:search" class="h-4"  />
+                                                                    </div>
+                                                                </a>
                                                         </div>
-                                                        <div v-if="true" class="flex pl-8 pt-8">
-                                                            <button @click="generarReciboAsignar()" class="hover:bg-green-700 text-green-400 font-bold rounded" fill="none"
+                                                        <div class="flex pl-8 pt-8">
+                                                            <button @click="generarAleatorio()" class="hover:bg-red-700 text-red-400 font-bold rounded" fill="none"
                                                                     viewBox="0 0 24 24" stroke="currentColor">
-                                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                                                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+                                                                    <path stroke-linecap="round" stroke-linejoin="round" d="M21 7.5l-9-5.25L3 7.5m18 0l-9 5.25m9-5.25v9l-9 5.25M3 7.5l9 5.25M3 7.5v9l9 5.25m0-9v9" />
                                                                 </svg>
                                                             </button>
-                                                            <label>Registrar e Imprimir</label>
-
+                                                            <label>Random</label>
                                                         </div>
                                                         <div v-if="eliminarMode" class="flex pl-8 pt-8">
                                                             <button @click="generarReciboEliminar()" class="hover:bg-red-700 text-red-400 font-bold rounded" fill="none"
@@ -147,131 +149,18 @@
                                                 </div>
                                             </div>
                                         </section>
-                                        <section>
-                                            <div class="flex flex-wrap mx-auto py-4">
-                                                <div class="flex items-center mr-4">
-                                                    <input type="radio" value="0" v-model="isRandom" class="w-4 h-4 text-red-600 border-gray-300 focus:ring-red-500 focus:ring-2 ">
-                                                    <label class="ml-2 text-sm font-medium ">Seleccionar número</label>
-                                                </div>
-                                                <div class="flex items-center mr-4">
-                                                    <input type="radio" value="1" v-model="isRandom" class="w-4 h-4 text-green-600 border-gray-300 focus:ring-green-500 dark:ring-offset-gray-800 ">
-                                                    <label class="ml-2 text-sm font-medium ">Aleatorio</label>
-                                                </div>
-                                            </div>
-                                            <div class="py-1 w-full">
-
-                                                <div class="container flex justify-center items-center">
-                                                    <div class="relative">
-                                                        <div class="absolute top-4 left-3">
-                                                            <i class="fa fa-search text-gray-400 z-20 hover:text-gray-500"></i> </div>
-                                                        <money3 v-bind="configMoney2" v-model="form.numero" @keypress.enter="valBoletaLibre(form.numero, form.idrifa.id, form.idrifa.cifras)" class="h-8 w-96 pl-4 pr-4 rounded-lg z-0 focus:shadow focus:outline-none" :placeholder="'Buscar (' + form.rangoinicial?form.rangoinicial : '' + ' - ' + form.rangofinal +')'"></money3>
-                                                        <a @click="valBoletaLibre(form.numero, form.idrifa.id, form.idrifa.cifras)">
-                                                            <div class="absolute top-2 right-2">
-                                                                <Icon icon="fe:search" class="h-4"  />
-                                                            </div>
-                                                        </a>
-                                                    </div>
-                                                </div>
-
-                                                <section>
-                                                    <div class="w-full p-2">
-                                                        <h1 class="font-bold text-xl text-black-800 leading-tight">
-                                                            Premio Mayor
-                                                        </h1>
-                                                    </div>
-                                                    <div class="lg:px-4 md:px-2 sm:px-0 py-2 pb-2 overflow-y-auto h-40">
-                                                        <table class="table-fixed w-full">
-                                                            <thead>
-                                                            <tr class="bg-gray-100">
-                                                                <th class="px-4 py-2 w-2/12 text-sm font-bold hover:bg-blue-500 hover:text-gray-50 rounded-b">
-                                                                    Premio
-                                                                </th>
-                                                                <th class="px-4 py-2 w-2/12 text-sm font-bold hover:bg-blue-500 hover:text-gray-50 rounded-b">
-                                                                    Serie
-                                                                </th>
-                                                                <th class="px-4 py-2 w-2/12 text-sm font-bold hover:bg-blue-500 hover:text-gray-50 rounded-b">
-                                                                    Fecha sorteo
-                                                                </th>
-                                                                <th class="px-4 py-2 w-2/12 text-sm font-bold hover:bg-blue-500 hover:text-gray-50 rounded-b">
-                                                                    Loteria
-                                                                </th>
-                                                                <th class="px-4 py-2 text-sm font-bold w-2/12 hover:bg-blue-500 hover:text-gray-50 rounded-b">
-                                                                    Número boleta
-                                                                </th>
-                                                                <th class="px-4 py-2 text-sm font-bold w-1/12 hover:bg-blue-500 hover:text-gray-50 rounded-b">
-                                                                    +/-
-                                                                </th>
-                                                            </tr>
-                                                            </thead>
-                                                            <tbody>
-                                                            <tr class="text-center text-sm" :class="{'hover:bg-blue-100' : form.boleta.numero }">
-                                                                <td v-text="form.idrifa.nombre_tecnico" class="border px-1 py-2 text-sm truncate" ></td>
-                                                                <td v-text="form.idrifa.serie" class="border px-1 py-2 text-sm truncate" ></td>
-                                                                <td v-text="form.idrifa.fechafin" class="border px-2 py-2 text-sm truncate" ></td>
-                                                                <td v-text="form.idrifa.loteria.nombre" class="border px-2 py-2 text-sm truncate" ></td>
-                                                                <td v-text="form.boleta.numero" class="border px-2 py-2 text-sm truncate" ></td>
-                                                                <td @click="selectNumero('boleta')" class="border px-2 py-2 text-sm truncate mx-auto" >
-                                                                        <Icon icon="carbon:add" class="h-4 mx-auto"  />
-                                                                </td>
-                                                            </tr>
-                                                            </tbody>
-                                                        </table>
-
-                                                    </div>
-                                                </section>
-                                                <section>
-                                                    <div class="w-full p-2">
-                                                        <h1 class="font-bold text-xl text-black-800 leading-tight">
-                                                            Premios promocionales
-                                                        </h1>
-                                                    </div>
-                                                    <div class="lg:px-4 md:px-2 sm:px-0 py-1 pb-1 overflow-y-auto h-32">
-                                                        <table class="table-fixed w-full">
-                                                            <thead>
-                                                            <tr class="bg-gray-100">
-                                                                <th class="px-4 py-2 w-2/12 text-sm font-bold hover:bg-blue-500 hover:text-gray-50 rounded-b">
-                                                                    Premio
-                                                                </th>
-                                                                <th class="px-4 py-2 w-2/12 text-sm font-bold hover:bg-blue-500 hover:text-gray-50 rounded-b">
-                                                                    Fecha sorteo
-                                                                </th>
-                                                                <th class="px-4 py-2 w-2/12 text-sm font-bold hover:bg-blue-500 hover:text-gray-50 rounded-b">
-                                                                    Loteria
-                                                                </th>
-                                                                <th class="px-4 py-2 text-sm font-bold w-2/12 hover:bg-blue-500 hover:text-gray-50 rounded-b">
-                                                                    Número boleta
-                                                                </th>
-                                                                <th class="px-4 py-2 text-sm font-bold w-1/12 hover:bg-blue-500 hover:text-gray-50 rounded-b">
-                                                                    +/-
-                                                                </th>
-                                                            </tr>
-                                                            </thead>
-                                                            <tbody>
-                                                            <tr class="text-center" text-sm v-if="form.idrifa.promocionales.length > 0" v-for="(dato, id) in form.idrifa.promocionales" :key="id">
-                                                                <td class="border px-1 py-2 text-sm truncate" v-text="dato.premio"></td>
-                                                                <td class="border px-2 py-2 text-sm truncate" v-text="dato.idloteria"></td>
-                                                                <td class="border px-2 py-2 text-sm truncate" v-text="dato.fecha"></td>
-                                                                <td class="border px-2 py-2 text-sm truncate" ></td>
-                                                                <td class="border px-2 py-2 text-sm truncate" ><Icon icon="carbon:add" class="h-4"  /></td>
-                                                            </tr>
-                                                            <tr v-else>
-                                                                <td class="border px-4 py-2 text-xs text-center" colspan="5"> La rifa no tiene promociones</td>
-                                                            </tr>
-                                                            </tbody>
-                                                        </table>
-
-                                                    </div>
-                                                </section>
-
-                                            </div>
-                                        </section>
                                         <!-- Fin formulario -->
                                     </div>
                                 </div>
-                            </form>
+                            <!-- </form> -->
                         </tab-content>
                         <tab-content title="Registrar pago" icon="ti-money" >
                             <div class="w-full mx-auto pb-5">
+                                <div class="mx-auto text-right w-full border-0">
+                                    <vue-countdown ref="countdown" class="p-2 pb-4 mx-auto text-blue-700" :time="time" v-slot="{ minutes, seconds }" @end="onCountdownEnd">
+                                        Tiempo restante：{{ minutes }} min, {{ seconds }} seg.
+                                    </vue-countdown>
+                                </div>
                                 <h1 class="sr-only">Resumen de la transacción</h1>
 
                                 <form class="lg:grid lg:gap-x-12 xl:gap-x-16">
@@ -290,17 +179,17 @@
                                                     </div>
                                                     <div class="min-w-0 flex-1">
                                                         <h4 class="text-sm">
-                                                            QR
-                                                        </h4>
-                                                    </div>
-                                                    <div class="min-w-0 flex-1">
-                                                        <h4 class="text-sm">
                                                             Rifa
                                                         </h4>
                                                     </div>
                                                     <div class="min-w-0 flex-1">
                                                         <h4 class="text-sm">
-                                                            Boleta
+                                                            Número
+                                                        </h4>
+                                                    </div>
+                                                    <div class="min-w-0 flex-1">
+                                                        <h4 class="text-sm">
+                                                            promocional
                                                         </h4>
                                                     </div>
                                                     <div class="min-w-0 flex-1">
@@ -310,39 +199,49 @@
                                                     </div>
                                                     <div class="min-w-0 flex-1">
                                                         <h4 class="text-sm">
-                                                            Total
+                                                            Saldo actual
+                                                        </h4>
+                                                    </div>
+                                                    <div class="min-w-0 flex-1">
+                                                        <h4 class="text-sm">
+                                                            Valor a pagar
                                                         </h4>
                                                     </div>
                                                 </li>
-                                                <li class="flex py-6 px-4 sm:px-6" v-for="(dato, id) in cart" :key="id">
+                                                <li class="flex py-6 px-4 sm:px-6" v-for="(dato, id) in form.reservas" :key="id">
                                                     <div class="min-w-0 flex-1">
                                                         <h4 class="text-sm">
-                                                            <img :src="dato.attributes?'/storage/'+dato.attributes.url:''" alt="Front of men&#039;s Basic Tee in black." class="w-20 rounded-md">
+                                                            <img v-show="form.idrifa.urlimagen1 != null" :src="'/storage/'+form.idrifa.urlimagen1" alt="image" class="mx-auto" width="80"/>
                                                         </h4>
                                                     </div>
                                                     <div class="min-w-0 flex-1">
                                                         <h4 class="text-sm">
-                                                            <vue-qrcode v-model="dato.attributes.codigo" :options="{ width: 50 }"></vue-qrcode>
+                                                            <a href="#" class="font-medium text-gray-700 hover:text-gray-800"> {{ form.idrifa.titulo }} </a>
                                                         </h4>
                                                     </div>
                                                     <div class="min-w-0 flex-1">
                                                         <h4 class="text-sm">
-                                                            <a href="#" class="font-medium text-gray-700 hover:text-gray-800"> {{ dato.name }} </a>
+                                                            <a href="#" class="font-medium text-gray-700 hover:text-gray-800"> {{ dato.numero }} </a>
                                                         </h4>
                                                     </div>
                                                     <div class="min-w-0 flex-1">
                                                         <h4 class="text-sm">
-                                                            <a href="#" class="font-medium text-gray-700 hover:text-gray-800"> {{ dato.attributes.numero }} </a>
+                                                            <a href="#" class="font-medium text-gray-700 hover:text-gray-800"> {{ dato.promocional }} </a>
                                                         </h4>
                                                     </div>
                                                     <div class="min-w-0 flex-1">
                                                         <h4 class="text-sm">
-                                                        <p class="mt-1 text-sm font-medium text-gray-900">${{ dato.price }}</p>
+                                                        <p class="mt-1 text-sm font-medium text-gray-900">{{ formatPrice(dato.valortotal) }}</p>
                                                         </h4>
                                                     </div>
                                                     <div class="min-w-0 flex-1">
                                                         <h4 class="text-sm">
-                                                            <p class="mt-1 text-sm font-medium text-gray-900">${{ dato.price }}</p>
+                                                            <p class="mt-1 text-sm font-medium text-gray-900">{{ formatPrice(dato.valorsaldo) }}</p>
+                                                        </h4>
+                                                    </div>
+                                                    <div class="min-w-0 flex-1">
+                                                        <h4 class="text-sm">
+                                                            <p class="mt-1 text-sm font-medium text-gray-900">{{ formatPrice(dato.valorpagar) }}</p>
                                                         </h4>
                                                     </div>
                                                 </li>
@@ -351,7 +250,7 @@
                                             <dl class="border-t border-gray-200 py-6 px-4 space-y-6 sm:px-6">
                                                 <div class="flex items-center justify-between border-t border-gray-200 pt-6">
                                                     <dt class="text-base font-medium font-bold">Total</dt>
-                                                    <dd class="text-base font-medium text-gray-900 font-bold">{{ formatPrice(calcularSubtotal) }}</dd>
+                                                    <dd class="text-base font-medium text-gray-900 font-bold">{{ formatPrice(totalapagar) }}</dd>
                                                 </div>
                                             </dl>
                                             <div class="flex w-10/12 mx-auto justify-items-center pb-4">
@@ -361,7 +260,7 @@
                                                 </div>
                                                 <label class="block text-sm font-medium font-bold text-gray-700">Valor a pagar</label>
                                                 <div class="mt-1 px-2">
-                                                    <money3 v-bind="configMoney" v-model="form.valorpagar" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"></money3>
+                                                    {{ formatPrice(totalapagar) }}
                                                 </div>
                                             </div>
                                         </div>
@@ -370,7 +269,11 @@
                             </div>
                         </tab-content>
                         <tab-content title="Checkout" icon="ti-credit-card" :before-change="validateCheckout">
-
+                            <div class="mx-auto text-right w-full border-0">
+                                <vue-countdown ref="countdown" class="p-2 pb-4 mx-auto text-blue-700" :time="time" v-slot="{ minutes, seconds }" @end="onCountdownEnd">
+                                    Tiempo restante：{{ minutes }} min, {{ seconds }} seg.
+                                </vue-countdown>
+                            </div>
                             <div class="max-w-2xl mx-auto lg:max-w-none pb-5">
                                 <h1 class="sr-only">Checkout</h1>
 
@@ -486,20 +389,20 @@
                                         <div class="mt-4 bg-white border border-gray-200 rounded-lg shadow-sm">
                                             <h3 class="sr-only">Boletas en el carro</h3>
                                             <ul role="list" class="divide-y divide-gray-200">
-                                                <li class="flex py-6 px-4 sm:px-6" v-for="(dato, id) in cart" :key="id">
+                                                <li class="flex py-6 px-4 sm:px-6" v-for="(dato, id) in form.reservas" :key="id">
                                                     <div class="flex-shrink-0">
-                                                        <img :src="dato.attributes?'/storage/'+dato.attributes.url:''" alt="Front of men&#039;s Basic Tee in black." class="w-20 rounded-md">
+                                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 6v.75m0 3v.75m0 3v.75m0 3V18m-9-5.25h5.25M7.5 15h3M3.375 5.25c-.621 0-1.125.504-1.125 1.125v3.026a2.999 2.999 0 010 5.198v3.026c0 .621.504 1.125 1.125 1.125h17.25c.621 0 1.125-.504 1.125-1.125v-3.026a2.999 2.999 0 010-5.198V6.375c0-.621-.504-1.125-1.125-1.125H3.375z" />
+                                                        </svg>
+
                                                     </div>
 
                                                     <div class="ml-6 flex-1 flex flex-col">
                                                         <div class="flex">
-                                                            <div class="min-w-0 flex-1">
-                                                                <h4 class="text-sm">
-                                                                    <a href="#" class="font-medium text-gray-700 hover:text-gray-800"> {{ dato.name }} </a>
-                                                                </h4>
-                                                                <p class="mt-1 text-sm text-gray-500">{{ dato.attributes.numero }}</p>
+                                                            <div class="flex-1 pt-2 flex items-end justify-between">
+                                                                <p class="mt-1 text-sm font-medium text-gray-900">Número: </p>
+                                                                <p class="mt-1 text-sm text-gray-500">{{ dato.numero }}</p>
                                                             </div>
-
                                                             <div class="ml-4 flex-shrink-0 flow-root">
                                                                 <button type="button" @click="delCartItem(dato)" class="-m-2.5 bg-white p-2.5 flex items-center justify-center text-gray-400 hover:text-gray-500">
                                                                     <span class="sr-only">Eliminar</span>
@@ -512,21 +415,8 @@
                                                         </div>
 
                                                         <div class="flex-1 pt-2 flex items-end justify-between">
-                                                            <p class="mt-1 text-sm font-medium text-gray-900">${{ dato.price }}</p>
-
-                                                            <div class="ml-4">
-                                                                <label class="sr-only">Cantidad</label>
-                                                                <select v-model="dato.quantity" class="rounded-md border border-gray-300 text-base font-medium text-gray-700 text-left shadow-sm focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
-                                                                    <option value="1">1</option>
-                                                                    <option value="2">2</option>
-                                                                    <option value="3">3</option>
-                                                                    <option value="4">4</option>
-                                                                    <option value="5">5</option>
-                                                                    <option value="6">6</option>
-                                                                    <option value="7">7</option>
-                                                                    <option value="8">8</option>
-                                                                </select>
-                                                            </div>
+                                                            <p class="mt-1 text-sm font-medium text-gray-900">Valor a pagar: </p>
+                                                            <p class="mt-1 text-sm font-medium text-gray-900">${{ dato.valorpagar }}</p>
                                                         </div>
                                                     </div>
                                                 </li>
@@ -536,7 +426,7 @@
                                             <dl class="border-t border-gray-200 py-6 px-4 space-y-6 sm:px-6">
                                                 <div class="flex items-center justify-between border-t border-gray-200 pt-6">
                                                     <dt class="text-base text-bold font-medium">Total</dt>
-                                                    <dd class="text-base font-medium text-gray-900">{{ calcularSubtotal }}</dd>
+                                                    <dd class="text-base font-medium text-gray-900">{{ totalapagar }}</dd>
                                                 </div>
                                             </dl>
 
@@ -787,21 +677,29 @@
                     <section>
                         <div class="fixed z-10 inset-0 overflow-y-auto ease-out duration-400" v-if="isOpenCliente">
                             <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-
-                                <div class="fixed inset-0 transition-opacity" @click="closeMoodalCliente()">
+                                <div class="fixed inset-0 transition-opacity" @click="closeModalCliente()">
                                     <div class="absolute inset-0 bg-gray-500 opacity-75"></div>
                                 </div>
+
                                 <!-- This element is to trick the browser into centering the modal contents. -->
                                 <span class="hidden sm:inline-block sm:align-middle sm:h-screen"></span>
 
                                 <!-- Contenido modal -->
-                                <div class="inline-block lg:w-8/12 align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:w-full" role="dialog" aria-modal="true" aria-labelledby="modal-headline">
+                                <div class="inline-block lg:w-6/12 align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:w-full" role="dialog" aria-modal="true" aria-labelledby="modal-headline">
+                                    <button type="button" @click="closeModalCliente()" class="absolute top-3 right-2.5 text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center dark:hover:bg-gray-800 dark:hover:text-white" data-modal-toggle="authentication-modal">
+                                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg>
+                                    </button>
                                     <section>
                                         <div class="flex justify-between mx-auto p-4">
                                             <div class="w-1/2">
                                                 <h1 class="font-bold text-xl text-black-800 leading-tight">
                                                     Buscar Clientes
                                                 </h1>
+                                                <a href="#" @click="crearCliente()">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-blue-500" viewBox="0 0 20 20" fill="currentColor">
+                                                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v2H7a1 1 0 100 2h2v2a1 1 0 102 0v-2h2a1 1 0 100-2h-2V7z" clip-rule="evenodd" />
+                                                    </svg>
+                                                </a>
                                             </div>
 
                                             <div class="w-1/2 pr-2">
@@ -809,8 +707,8 @@
                                                     <div class="relative">
                                                         <div class="absolute top-4 left-3">
                                                             <i class="fa fa-search text-gray-400 z-20 hover:text-gray-500"></i> </div>
-                                                        <input type="text" v-model="buscar" @keyup="getClientes(buscar,'documento', true)" class="h-8 w-26 pl-4 pr-4 rounded-lg z-0 focus:shadow focus:outline-none" placeholder="Buscar (documento)">
-                                                        <button @click="getClientes(buscar,'documento', true)">
+                                                        <input type="text" v-model="buscarcliente" @keyup.enter="getClientes(buscarcliente,'documento, nombre', true)" class="h-8 w-26 pl-4 pr-4 rounded-lg z-0 focus:shadow focus:outline-none" placeholder="Buscar (documento, nombre)">
+                                                        <button @click="getClientes(buscarcliente,'documento, nombre', true)">
                                                             <div class="absolute top-2 right-2">
                                                                 <Icon icon="fe:search" class="h-4"  />
                                                             </div>
@@ -864,7 +762,7 @@
                                                     </th>
                                                     <th class="px-4 py-2 w-1/12 text-sm font-bold rounded-b">
                                                         <button @click="getRifas(buscar, 'serie')" class="font-bold">
-                                                            Teléfono
+                                                            Movil
                                                             <div v-show="sortBy == 'serie'">
                                                             <span v-show="!sortOrder">
                                                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
@@ -879,38 +777,21 @@
                                                             </div>
                                                         </button>
                                                     </th>
-                                                    <th class="px-4 py-2 w-4/12 text-sm font-bold rounded-b">
-                                                        <button @click="getRifas('', '.nombre_tecnico')" class="font-bold">
-                                                            Correo
-                                                            <div v-show="sortBy == 'nombre_tecnico'">
-                                                            <span v-show="!sortOrder">
-                                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
-                                                                    <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
-                                                                </svg>
-                                                            </span>
-                                                                <span v-show="sortOrder">
-                                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
-                                                                  <path fill-rule="evenodd" d="M14.707 12.707a1 1 0 01-1.414 0L10 9.414l-3.293 3.293a1 1 0 01-1.414-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 010 1.414z" clip-rule="evenodd" />
-                                                                </svg>
-                                                            </span>
-                                                            </div>
-                                                        </button>
-                                                    </th>
-
                                                 </tr>
                                                 </thead>
                                                 <tbody>
-                                                <tr @click="onSelectCliente(cliente)" class="hover:bg-blue-50 text-center" text-sm v-if="existecliente > 0" v-for="(cliente, id) in arrayClientes.data" :key="id">
-                                                    <td class="border px-1 py-2 text-sm truncate" v-text="cliente.nombre"></td>
+                                                <tr @click="onSelectCliente(cliente)" class="hover:bg-blue-100 text-center" text-sm v-if="arrayClientes.data" v-for="(cliente, id) in arrayClientes.data" :key="id">
+                                                    <td class="border px-1 py-2 text-sm truncate" v-text="cliente.nombre + ' ' + cliente.apellido"></td>
                                                     <td class="border px-1 py-2 text-sm truncate" v-text="cliente.documento"></td>
                                                     <td class="border px-1 py-2 text-sm truncate" v-text="cliente.movil"></td>
-                                                    <td class="border px-1 py-2 text-sm truncate" v-text="cliente.correo"></td>
                                                 </tr>
                                                 <tr v-else>
                                                     <td class="border px-4 py-2 text-xs text-center" colspan="4"> La consulta no obtuvo datos</td>
                                                 </tr>
                                                 </tbody>
                                             </table>
+
+                                            <!-- Paginacion -->
                                             <section class="mt-6">
                                                 <div v-if="arrayClientes.links.length > 3">
                                                     <div class="flex flex-wrap -mb-1">
@@ -920,12 +801,14 @@
                                                             <button  v-else
                                                                      class="mr-1 mb-1 px-4 py-3 text-sm leading-4 border rounded hover:bg-white focus:border-indigo-500 focus:text-indigo-500"
                                                                      :class="{ 'bg-blue-700 text-white': link.active }"
-                                                                     v-on:click="cambiarPage(link.url)"
+                                                                     v-on:click="this.cambiarPage(link.url, 'clientes', form, idVenta)"
                                                                      v-html="link.label" />
                                                         </template>
                                                     </div>
                                                 </div>
                                             </section>
+                                            <!-- Paginacion -->
+
 
                                         </div>
                                     </section>
@@ -944,7 +827,23 @@
     </AppLayout>
 </template>
 
+
 <script>
+
+    const mp = new MercadoPago("TEST-d5d36e04-7513-41d8-af7a-93a4e5ce874e", {
+        locale: 'es-CO'
+    });
+
+    mp.checkout({
+        preference: {
+            id: '{{ $preference->id }}',
+        },
+        render: {
+            container: '.cho-container',
+            label: 'Pagar',
+        }
+    });
+
 import AppLayout from '@/Layouts/AppLayout.vue';
 import Swal from "sweetalert2";
 import { Icon } from '@iconify/vue';
@@ -1002,18 +901,43 @@ export default {
         errors: Object,
         totaltransaccionprop: 0,
         totalcomisionesprop: 0,
-        totalboletas: 0
+        totalboletas: 0,
+        vendedor: []
     },
     computed: {
         calcularSubtotal(){
             var total = 0.0;
-            for (var i = 0; i < Object.keys(this.cart).length; i++) {
-                total += Object.values(this.cart)[i]['price'];
+
+            for (var i = 0; i < this.form.reservas.length; i++) {
+                console.log(this.form.reservas);
+                total += this.form.reservas[i]['valorapagar'];
             }
             this.total = this.formatPrice(total)
             this.totalnoparseado = total;
             this.form.valorpagar = total;
             return (total);
+        },
+        totalmovimiento: function () {
+            const sumWithInitial = this.form.reservas.reduce(
+                (accumulator, currentValue) => parseFloat(accumulator) + parseFloat(currentValue.valortotal),
+                0
+            );
+            return sumWithInitial;
+        },
+        totalapagar: function () {
+            if (this.asignarMode) {
+                const sumWithInitial = this.form.reservas.reduce(
+                    (accumulator, currentValue) => parseFloat(accumulator) + parseFloat(currentValue.valorpagar),
+                    0
+                );
+                return sumWithInitial;
+            } else if (this.eliminarMode) {
+                const sumWithInitial = this.form.reservas.reduce(
+                    (accumulator, currentValue) => parseFloat(accumulator) + parseFloat(currentValue.valorpagado),
+                    0
+                );
+                return sumWithInitial;
+            }
         },
 
     },
@@ -1108,11 +1032,10 @@ export default {
                 disableNegative: true,
                 disabled: false,
                 min: 0,
-                max: 0,
+                max: 9999,
                 allowBlank: false,
-                minimumNumberOfCharacters: 0,
+                minimumNumberOfCharacters: 4,
             },
-
             editMode: false,
             verMode: false,
             isOpen: false,
@@ -1148,7 +1071,8 @@ export default {
             subtotal: 0.0,
             isComplete: false,
             isBussyCart: 0,
-            isNewCliente: false
+            isNewCliente: false,
+            asignarMode: true
         }
     },
     methods: {
@@ -1172,6 +1096,36 @@ export default {
                     this.form.boleta.idrifa = this.form.idrifa.id;
                 }
             })
+        },
+        generarAleatorio: function () {
+            if(!this.form.idrifa.id || this.form.idrifa.id == 0 || this.form.idrifa.id == '') {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Primero debe seleccionar una rifa',
+                    showConfirmButton: true,
+                })
+            } else {
+                var tiporifa = 'Boleta';
+                /*
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Se buscará un número libre de manera aleatoria',
+                    showConfirmButton: true,
+                    timer: 1500
+                })
+                */
+                var url = '/ventas/getRandBoletaLibre';
+                axios.get(url, {
+                    params: {
+                        rifa: this.form.idrifa.id,
+                        tiporifa: tiporifa
+                    }
+                }).then((res) => {
+                    var respuesta = res.data;
+                    this.boleta = respuesta.boleta;
+                    this.form.reserva.numero = this.boleta.numero;
+                })
+            }
         },
         valBoletaLibre: function (buscar, rifa, cifras, tiporifa = 'boletas'){
 
@@ -1318,6 +1272,7 @@ export default {
             this.form.idrifa = data;
             this.closeMoodalRifa();
             this.actualizarRangos();
+            this.updateSession(this.session.id, this.form.idrifa.id, this.form.idvendedor.id);
         },
         selectCliente: function () {
             this.isOpenCliente = true;
@@ -1355,9 +1310,9 @@ export default {
             this.form.cliente = data;
             this.getDepartamentos();
             this.getCiudades();
-            this.form.metacliente = data.tipodocumento.nombre_corto + ' ' + data.documento + ' - ' + data.nombre + ' ' + data.apellido
-                                        + ' Tel: ' + data.movil + ' (' + data.ciudad.nombre + ')';
+            this.form.metacliente = data.documento + ' - ' + data.nombre + ' ' + data.apellido;
             this.isNewCliente = false;
+            this.pushSessionDetailClient(this.session.id, this.form.cliente.id, 'upd');
             this.closeMoodalCliente();
         },
         crearCliente: function (){
@@ -1488,6 +1443,7 @@ export default {
             });
         },
         onValidateRifa: function(isValid, tabIndex){
+            /*
             console.log('Termino validar rifa, se registrar cart '+ tabIndex);
             switch (tabIndex) {
                 case 0:
@@ -1553,30 +1509,28 @@ export default {
                     console.log('Se valida pago');
                     break;
             }
-
+            */
         },
         validateRifa:function() {
             console.log('Validando Rifa');
-
+            /*
             if (Object.keys(this.cart).length > 0) {
                 return true;
             }
-            if (!this.form.boleta.idrifa) {
+             */
+            if (!this.form.idrifa.id || this.form.idrifa.id == 0) {
                 Swal.fire({
                     icon: 'error',
                     title: 'Primero debe seleccionar una rifa',
                     showConfirmButton: true,
-                    //timer: 1500
                 })
                 return false;
             }
-            if (!this.form.boleta.numero) {
+            if (this.form.reservas.length == 0) {
                 Swal.fire({
-                    //position: 'top-end',
                     icon: 'error',
                     title: 'Seleccione un número de boleta',
                     showConfirmButton: true,
-                    //timer: 1500
                 })
                 return false;
             }
@@ -1596,6 +1550,8 @@ export default {
                 })
                 return false;
             }
+
+            /*
             if (Object.keys(this.cart).length == 0) {
                 Swal.fire({
                     icon: 'error',
@@ -1604,7 +1560,7 @@ export default {
                 })
                 return false;
             }
-
+*/
             return true;
         },
         validatePago:function() {
@@ -1766,20 +1722,89 @@ export default {
             console.log('validate ok');
             return true;
         },
+        valBoletaDisponible: function (numero, rifa, idvendedor, idcliente){
+            if(!this.form.idrifa.id) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Primero debe seleccionar una rifa',
+                    showConfirmButton: true,
+                    //timer: 1500
+                })
+            } else if(this.form.reserva.numero == '') {
+                Swal.fire({
+                    //position: 'top-end',
+                    icon: 'warning',
+                    title: 'Ingrese un número válido',
+                    showConfirmButton: true,
+                    //timer: 1500
+                })
+            } else {
+                if (this.asignarMode) {
+                    var url = '/numerosreservados/getBoletaOcupadaVenta';
+                } else if (this.eliminarMode) {
+                    var url = '/numerosreservados/getBoletaVendida';
+                }
+                axios.get(url, {
+                    params: {
+                        numero: numero,
+                        rifa: rifa,
+                        idvendedor: idvendedor,
+                        idcliente: idcliente
+                    }
+                }).then((res) => {
+                    //console.log(res.data);
+                    var respuesta = res.data;
+                    let isocupado = respuesta.isocupado;
+                    if (isocupado) {
+                        this.form.reservas.push({
+                            numero: respuesta.boleta.numero,
+                            promocional: respuesta.boleta.promocional,
+                            valortotal: respuesta.boleta.valor,
+                            valorpagar: respuesta.boleta.saldo,
+                            valorsaldo: respuesta.boleta.saldo,
+                            valoranular: respuesta.boleta.pago,
+                            valorpagado: respuesta.boleta.pago,
+                            idcliente: respuesta.boleta.idcliente,
+                            cliente: respuesta.boleta.cliente?respuesta.boleta.cliente.full_name:'',
+                        });
+                        this.form.reserva.numero = null;
+                        this.form.reserva.promocional = null;
+                        this.pushSessionDetail(this.session.id, respuesta.boleta, 'add');
+                    } else {
+                        Swal.fire({
+                            //position: 'top-end',
+                            icon: 'warning',
+                            title: 'El número no se puede utilizar',
+                            showConfirmButton: true,
+                            //timer: 1500
+                        })
+                    }
+                })
+            }
+        },
+        eliminarReserva: function(boleta, index){
+            this.form.reservas.splice(index, 1);
+            this.pushSessionDetail(this.session.id, boleta, 'del');
+        },
 
     },
     created: function () {
         this.getCart();
-        //this.getPaises();
+        this.getPaises();
         //this.getClientes();
-        //this.getTiposdocumento();
+        this.getTiposdocumento();
     },
     mounted() {
         this.getCart();
-        this.registrarSessionVenta(this.caja.puntoventa.id)
+        this.form.idvendedor = this.vendedor;
+        this.registrarSessionVenta(this.caja.puntoventa.id, null, this.form.idvendedor.id)
+        //console.log(this.form.cliente.id);
+        //this.showClient(this.form.cliente.id);
     },
 }
 </script>
+
+
 <style>
 * {
     margin: 0;

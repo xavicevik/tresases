@@ -435,7 +435,7 @@ export default {
                     <img class="w-5 h-5 md:w-10 md:h-7 mr-2 rounded-md overflow-hidden" src="https://therminic2018.eu/wp-content/uploads/2018/07/dummy-avatar.jpg" />
                     <span class="hidden md:block">
                         {{ $page.props.auth.user.roles[0].name }}<br>
-                        {{ $page.props.user.full_name }}
+                        {{ $page.props.user.username }}
                     </span>
 
                 </div>

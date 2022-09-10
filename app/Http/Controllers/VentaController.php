@@ -196,9 +196,24 @@ class VentaController extends Controller
             return redirect()->route('cajas.index', ['estado' => '1']);
         }
 
+        require base_path('vendor/autoload.php');
+        // Agrega credenciales
+        \MercadoPago\SDK::setAccessToken("TEST-527760229179050-091011-a9b62330235cb5d7a47b2b59968ac474-1195821039");
+
+        $preference = new \MercadoPago\Preference();
+
+        // Crea un ítem en la preferencia
+        $item = new \MercadoPago\Item();
+        $item->title = 'Mi producto';
+        $item->quantity = 1;
+        $item->unit_price = 75;
+        $preference->items = array($item);
+        $preference->save();
+
         return Inertia::render('Ventas/Venta', [
             'caja' => $caja,
             'estado' => 0,
+            'vendedor' => Auth::user()
         ]);
     }
 
@@ -426,8 +441,8 @@ class VentaController extends Controller
         $tiporifa = $request->tiporifa;
 
         $bolval = Boleta::where('estado', 1)
-                           ->where('idrifa', $idrifa)
-                           ->count();
+                          ->where('idrifa', $idrifa)
+                          ->count();
         if ($bolval == 0) {
             $boleta = -99;
         } else {
@@ -1079,6 +1094,7 @@ dd($e);
         }
 
         $detallesession = null;
+        $cliente = null;
 
         $session = Sesionventa::where('idusuario', $idusuario->id)
                                 ->where('idpuntoventa', $request->idpuntoventa)
@@ -1112,7 +1128,11 @@ dd($e);
                                                ->where('detallesesion.idsesionventa', $session->id)
                                                ->select('detallesesion.*', 'boletas.pago', 'boletas.saldo', 'boletas.numero', 'boletas.promocional', 'boletas.valor as valortotal', DB::raw('CONCAT(clientes.nombre, " ", clientes.apellido) AS full_name'))
                                                ->get();
+                $idcliente = $detallesession->first()->idcliente;
                 $time = $time - $session->created_at->diffInSeconds();
+                if (isset($idcliente)) {
+                    $cliente = Cliente::where('id', $idcliente)->first();
+                }
             }
         } else {
             $session = new Sesionventa();
@@ -1124,7 +1144,7 @@ dd($e);
             $session->save();
         }
 
-        return ['session' => $session, 'time' => $time, 'detallesession' => $detallesession ];
+        return ['session' => $session, 'time' => $time, 'detallesession' => $detallesession, 'cliente' => $cliente ];
     }
 
     public function updateSession(Request $request) {
@@ -1199,6 +1219,18 @@ dd($e);
         return 1;
     }
 
+    public function updDetailSessionClient(Request $request) {
+
+        $idsesion  = $request->idsesion;
+        $idcliente = $request->idcliente;
+
+        if ($request->type == 'upd') {
+            $detalle = Detallesesion::where('detallesesion.idsesionventa', $idsesion)
+                                    ->update(['idcliente'=> $idcliente]);
+        }
+        return 1;
+    }
+
     public function finishSession(Request $request) {
 
         try {
@@ -1224,6 +1256,22 @@ dd($e);
             \Cart::remove($idsesion);
 
            DB::commit();
+        } catch (Throwable $e){
+            DB::rollBack();
+        }
+        return 1;
+    }
+
+    public function updateTimeSession(Request $request) {
+        try {
+            DB::beginTransaction();
+
+            $idsesion = $request->idsesion;
+            $session = Sesionventa::where('id', $idsesion)->first();
+            $session->created_at = Carbon::now('America/Bogota')->format('Y-m-d');
+            $detalle = Detallesesion::where('idsesionventa', $idsesion)->update(['created_at' => Carbon::now('America/Bogota')->format('Y-m-d')]);
+
+            DB::commit();
         } catch (Throwable $e){
             DB::rollBack();
         }

@@ -106,6 +106,7 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'),'verified',]
         Route::get('/users/getConfVendedor', [UserController::class, 'getConfVendedor'])->name('users.getConfVendedor');
         Route::put('/users/vendedor/{vendedor}', [UserController::class, 'updateVendedor'])->name('users.updateVendedor');
         Route::put('/users/cliente/{cliente}', [UserController::class, 'updateCliente'])->name('users.updateCliente');
+        Route::get('/users/cliente/{cliente}', [UserController::class, 'showClient'])->name('users.showClient');
 
         Route::resource('users', UserController::class);
 
@@ -141,7 +142,9 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'),'verified',]
         Route::get('/ventas/initSession', [VentaController::class, 'initSession'])->name('ventas.initSession');
         Route::get('/ventas/updateSession', [VentaController::class, 'updateSession'])->name('ventas.updateSession');
         Route::get('/ventas/updDetailSession', [VentaController::class, 'updDetailSession'])->name('ventas.updDetailSession');
+        Route::get('/ventas/updDetailSessionClient', [VentaController::class, 'updDetailSessionClient'])->name('ventas.updDetailSessionClient');
         Route::get('/ventas/finishSession', [VentaController::class, 'finishSession'])->name('ventas.finishSession');
+        Route::get('/ventas/updateTimeSession', [VentaController::class, 'updateTimeSession'])->name('ventas.updateTimeSession');
         Route::get('/ventas/anularVenta', [VentaController::class, 'anularVenta'])->name('ventas.anularVenta');
 
 
