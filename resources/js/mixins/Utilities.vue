@@ -464,10 +464,11 @@ export default {
                 Swal.fire({
                     position: 'top-end',
                     icon: 'success',
-                    title: 'Se ha reiniciado el tiempo para la venta',
+                    title: 'Se ha reiniciado el contador para la venta',
                     showConfirmButton: true,
                     timer: 1000
                 })
+                this.$inertia.visit('/ventas/create');
             })
         },
         finishSession: function () {
@@ -518,13 +519,14 @@ export default {
                 icon: 'warning',
                 title: 'Se ha agotado el tiempo para realizar la compra, desea continuar?',
                 showConfirmButton: true,
-                showCancelButton: true,
+                showCancelButton: false,
+                showDenyButton: true,
                 confirmButtonText: 'Continuar',
-                cancelButtonText: 'Cancelar',
-                timer: 4500
+                denyButtonText: 'Cancelar',
+                //timer: 4500
             }).then((result) => {
                 if (result.isConfirmed) {
-                    //Swal.fire('Saved!', '', 'success')
+                    //Swal.fire('Saved!', '', 'success');
                     this.updateTimeSession();
                 } else if (result.isDenied) {
                     this.finishSession();

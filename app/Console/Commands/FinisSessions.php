@@ -45,7 +45,7 @@ class FinisSessions extends Command
         try {
             DB::beginTransaction();
 
-            $sessions = Sesionventa::whereRaw('TIMESTAMPDIFF(SECOND, created_at, NOW()) > 120')->get();
+            $sessions = Sesionventa::whereRaw('TIMESTAMPDIFF(SECOND, created_at, NOW()) > '.$time)->get();
             foreach ($sessions as $session) {
                 $idsesion = $session->id;
                 $boletas = Boleta::join('detallesesion', 'boletas.id', '=', 'detallesesion.idboleta')

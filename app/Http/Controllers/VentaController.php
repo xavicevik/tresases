@@ -1280,10 +1280,12 @@ dd($e);
                                                ->where('detallesesion.idsesionventa', $session->id)
                                                ->select('detallesesion.*', 'boletas.pago', 'boletas.saldo', 'boletas.numero', 'boletas.promocional', 'boletas.valor as valortotal', DB::raw('CONCAT(clientes.nombre, " ", clientes.apellido) AS full_name'))
                                                ->get();
-                $idcliente = $detallesession->first()->idcliente;
                 $time = $time - $session->created_at->diffInSeconds();
-                if (isset($idcliente)) {
-                    $cliente = Cliente::where('id', $idcliente)->first();
+                if (!$detallesession->isEmpty()) {
+                    $idcliente = $detallesession->first()->idcliente;
+                    if (isset($idcliente)) {
+                        $cliente = Cliente::where('id', $idcliente)->first();
+                    }
                 }
             }
         } else {
@@ -1420,12 +1422,14 @@ dd($e);
 
             $idsesion = $request->idsesion;
             $session = Sesionventa::where('id', $idsesion)->first();
-            $session->created_at = Carbon::now('America/Bogota')->format('Y-m-d');
-            $detalle = Detallesesion::where('idsesionventa', $idsesion)->update(['created_at' => Carbon::now('America/Bogota')->format('Y-m-d')]);
+            $session->created_at = Carbon::now('America/Bogota')->subSeconds(10);
+            $session->save();
+            $detalle = Detallesesion::where('idsesionventa', $idsesion)->update(['created_at' => Carbon::now('America/Bogota')->subSeconds(10)]);
 
             DB::commit();
         } catch (Throwable $e){
             DB::rollBack();
+            dd('error');
         }
         return 1;
     }
@@ -1467,6 +1471,7 @@ dd($e);
             $checkout->idcliente = $product->idcliente;
             $checkout->estado = 4;
             $checkout->preference_id = $preference->id;
+            $checkout->urlpago = $preference->init_point;
             $checkout->save();
         }
 

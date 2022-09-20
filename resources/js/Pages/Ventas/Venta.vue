@@ -27,7 +27,7 @@
                                         <!-- Fin Mensajes Flash -->
                                         <!-- Formulario -->
                                         <section>
-                                            <div class="mx-auto text-right w-full border-0">
+                                            <div id="countd" class="mx-auto text-right w-full border-0">
                                                 <vue-countdown ref="countdown" class="p-2 pb-4 mx-auto text-blue-700" :time="time" v-slot="{ minutes, seconds }" @end="onCountdownEnd">
                                                     Tiempo restante：{{ minutes }} min, {{ seconds }} seg.
                                                 </vue-countdown>

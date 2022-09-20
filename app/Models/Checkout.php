@@ -25,7 +25,8 @@ class Checkout extends Model
         'site_id',
         'processing_mode',
         'merchant_account_id',
-        'estado'
+        'estado',
+        'urlpago'
     ];
 
     public function detallesesion(){
