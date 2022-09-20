@@ -1440,7 +1440,6 @@ dd($e);
         \MercadoPago\SDK::setAccessToken("TEST-527760229179050-091011-a9b62330235cb5d7a47b2b59968ac474-1195821039");
 
         $preference = new \MercadoPago\Preference();
-        $preference->auto_return = "approved";
 
         $preference->back_urls = array(
             "success" => "https://dllo.shoppingred.com.co/ventas/paynotifysuccess",

@@ -25,7 +25,7 @@
         @env ('local')
             <script src="http://localhost:3000/browser-sync/browser-sync-client.js"></script>
         @endenv
-        <script src="https://sdk.mercadopago.com/js/v2"></script>
+            <script src="https://sdk.mercadopago.com/js/v2"></script>
 
 
     </body>
