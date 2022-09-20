@@ -747,7 +747,7 @@ class VentaController extends Controller
                 $venta->fechaventa = $mytime->toDateTimeString();
                 $venta->comprobante = $request->comprobante;
                 $venta->estado = 3;
-                $venta->transaccion = $request->idcaja;
+                $venta->transaccion = 1;//$request->idcaja;
                 $venta->save();
 
                 foreach ($boletas as $boleta){
@@ -1495,30 +1495,32 @@ dd($e);
     public function paynotifysuccess(Request $request) {
 
         $checkouts = Checkout::where('preference_id', $request->preference_id)->get();
-        $r = new Request();
-        $r->idsesion = $checkouts[0]['idsesionventa'];
-        $r->isSale = true;
-        $idventa = $this->newSale($r);
-        $this->finishSession($r);
-        foreach ($checkouts as $checkout) {
-            $checkout->collection_id = $request->collection_id;
-            $checkout->collection_status = $request->collection_status;
-            $checkout->payment_id = $request->payment_id;
-            $checkout->status = $request->status;
-            $checkout->estado = 1;
-            $checkout->payment_type = $request->payment_type;
-            $checkout->merchant_order_id = $request->merchant_order_id;
-            $checkout->site_id = $request->site_id;
-            $checkout->processing_mode = $request->processing_mode;
-            $checkout->merchant_account_id = $request->merchant_account_id;
-            $checkout->idventa = $idventa;
-            $checkout->save();
-        }
-        $checkouts = Checkout::where('preference_id', $request->preference_id)
-                               ->with('boleta')
-                               ->with('venta')
-                               ->get();
 
+        if (!isEmpty($checkouts)) {
+            $r = new Request();
+            $r->idsesion = $checkouts[0]['idsesionventa'];
+            $r->isSale = true;
+            $idventa = $this->newSale($r);
+            $this->finishSession($r);
+            foreach ($checkouts as $checkout) {
+                $checkout->collection_id = $request->collection_id;
+                $checkout->collection_status = $request->collection_status;
+                $checkout->payment_id = $request->payment_id;
+                $checkout->status = $request->status;
+                $checkout->estado = 1;
+                $checkout->payment_type = $request->payment_type;
+                $checkout->merchant_order_id = $request->merchant_order_id;
+                $checkout->site_id = $request->site_id;
+                $checkout->processing_mode = $request->processing_mode;
+                $checkout->merchant_account_id = $request->merchant_account_id;
+                $checkout->idventa = $idventa;
+                $checkout->save();
+            }
+            $checkouts = Checkout::where('preference_id', $request->preference_id)
+                ->with('boleta')
+                ->with('venta')
+                ->get();
+        }
         return Inertia::render('Ventas/Finishsale', ['checkouts' => $checkouts]);
     }
 
