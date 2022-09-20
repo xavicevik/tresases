@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Jobs\SendEmailJob;
 use App\Models\Boleta;
 use App\Models\Caja;
+use App\Models\Checkout;
 use App\Models\Cliente;
 use App\Models\Comision;
 use App\Models\Confcomision;
@@ -493,7 +494,7 @@ class VentaController extends Controller
             $idsesion = $request->idsesion;
             $session = Sesionventa::where('id', $idsesion)->first();
 
-            DB::connection()->enableQueryLog();
+            //DB::connection()->enableQueryLog();
 
             if($session) {
                 $boletas = Boleta::join('detallesesion', 'detallesesion.idboleta', 'boletas.id')
@@ -693,6 +694,175 @@ class VentaController extends Controller
             // return redirect()->back()->withErrors(['error' => 'No se pudo registrar la venta, por favor validar los parámetros ingresados']);
             return back()->withErrors(['error' => ['No se pudo registrar la venta, por favor validar los parámetros ingresados']]);
             // and throw the error again.
+            //throw $e;
+        }
+    }
+
+    public function newSale(Request $request)
+    {
+        try {
+            // Begin a transaction
+            DB::beginTransaction();
+            $user = Auth::user();
+            $totalventa = 0;
+            $totalpagado = 0;
+            $toatlcomision = 0;
+            $mytime= Carbon::now('America/Bogota');
+
+            $idsesion = $request->idsesion;
+            $session = Sesionventa::where('id', $idsesion)->first();
+
+            //DB::connection()->enableQueryLog();
+            if($session) {
+                $boletas = Boleta::join('detallesesion', 'detallesesion.idboleta', 'boletas.id')
+                    ->join('clientes', 'detallesesion.idcliente', 'clientes.id')
+                    ->where('detallesesion.idsesionventa', $session->id)
+                    ->select('detallesesion.id as iddetalle',
+                        'detallesesion.idsesionventa',
+                        'detallesesion.valor',
+                        'detallesesion.idcliente as idclienteboleta',
+                        'boletas.id',
+                        'boletas.pago',
+                        'boletas.estado',
+                        'boletas.saldo',
+                        'boletas.numero',
+                        'boletas.promocional',
+                        'boletas.valor as valortotal',
+                        'boletas.estado',
+                        'boletas.idcliente',
+                        DB::raw('CONCAT(clientes.nombre, " ", clientes.apellido) AS full_name')
+                    )
+                    ->get();
+                $concomision = $this->getSalesComision($session->idvendedor);
+
+                $venta = new Venta();
+                $venta->valorventa = 0;
+                $venta->impuesto = 0;
+                $venta->comision = 0;
+                $venta->valortotal = 0;
+                $venta->cantidad = 0;
+                $venta->idvendedor = $session->idvendedor;
+                $venta->idcliente = null;
+                $venta->idpuntoventa = $session->idpuntoventa;
+                $venta->fechaventa = $mytime->toDateTimeString();
+                $venta->comprobante = $request->comprobante;
+                $venta->estado = 3;
+                $venta->transaccion = $request->idcaja;
+                $venta->save();
+
+                foreach ($boletas as $boleta){
+                    $toatlcomision += $boleta->valor * ($concomision->comisionvendedor/100);
+                    $totalventa += $boleta->valortotal;
+                    $totalpagado += $boleta->valor;
+                    $boleta->idvendedor = $session->idvendedor;
+                    $boleta->idcliente = $boleta->idclienteboleta;
+                    $boleta->pago = $boleta->pago + $boleta->valor;
+                    $boleta->saldo = $boleta->valortotal - $boleta->pago;
+                    if ($boleta->saldo == 0) {
+                        $estado = 3;
+                    } else {
+                        $estado = 4;
+                    }
+                    $boleta->estado = $estado;
+                    $boleta->save();
+
+                    $detalleventa = new Detalleventa();
+                    $detalleventa->idventa = $venta->id;
+                    $detalleventa->idboleta = $boleta->id;
+                    $detalleventa->idrifa = $session->idrifa;
+                    $detalleventa->valor = $boleta->valor;
+                    $detalleventa->idcliente = $boleta->idcliente;
+                    $detalleventa->impuesto = 0;
+                    $detalleventa->comision = $boleta->valor * ($concomision->comisionvendedor/100);
+                    $detalleventa->valortotal = $boleta->valortotal;
+                    $detalleventa->numero = $boleta->numero;
+                    $detalleventa->cantidad = 1;
+                    $detalleventa->estado = 3;
+                    $detalleventa->save();
+                    $boleta['comision'] = $boleta->valor * ($concomision->comisionvendedor/100);
+                    $salida[] = $boleta;
+                }
+
+                $queries = \DB::getQueryLog();
+                //dd($queries);
+
+                asort($salida);
+                $recibo = new Recibo();
+                $recibo->nombre = 'Recibo venta';
+                $recibo->url = 'Recibo venta';
+                $recibo->idusuario = Auth::user()->id;
+                $recibo->iduserdestino = $session->idvendedor;
+                $recibo->save();
+
+                $detalleventa->idventa = $venta->id;
+                $detalleventa->save();
+
+                $comision = new Comision();
+                $comision->idventa = $venta->id;
+                $comision->idconfiguracion = $concomision->id;
+                $comision->valorventa = $totalpagado;
+                $comision->comisionmayorista = $totalpagado * ($concomision->comisionmayorista/100);
+                $comision->comisiondistribuidor = $totalpagado * ($concomision->comisiondistribuidor/100);
+                $comision->comisionvendedor = $totalpagado * ($concomision->comisionvendedor/100);
+                $comision->estado = true;
+                $comision->save();
+
+                $venta->comision = $comision->comisionmayorista + $comision->comisiondistribuidor + $comision->comisionvendedor;
+                $venta->valorventa = $totalpagado;
+                $venta->valortotal = $totalventa;
+                $venta->cantidad = sizeof($boletas);
+                $venta->save();
+
+                $concepto = 2;
+                $descripcion = 'Pago en efectivo';
+                $signo = self::debito;
+                $impuesto = 0;
+
+                $transaccion = new Transaccion();
+                $transaccion->idusuarioori = $session->idvendedor;
+                $transaccion->idusuariodest = Auth::user()->id;
+                $transaccion->idconcepto = $concepto;
+                $transaccion->origen = 'Fisico';
+                $transaccion->destino = 'Fisico';
+                $transaccion->signo = $signo;
+                $transaccion->valor = $venta->valorventa;
+                $transaccion->impuesto = $impuesto;
+                $transaccion->descripcion = $descripcion;
+                $transaccion->soporte = $request->comprobante;
+                $transaccion->mes = $mytime->month;
+                $transaccion->ano = $mytime->year;
+                $transaccion->save();
+
+                $pago = new Pago();
+                $pago->idventa = $venta->id;
+                $pago->valortotal = $venta->valorventa;
+                $pago->idcliente = null;
+                $pago->idvendedor = $session->idvendedor;
+                $pago->saldo = $venta->valortotal - $venta->valorventa;
+                $pago->canal = 'Fisico';
+                $pago->descripcion = $descripcion;
+                $pago->tipo = 'Pago';
+                $pago->soporte = $request->comprobante;
+                $pago->idtransaccion = $transaccion->id;
+                $pago->idpuntoventa = $session->idpuntoventa;
+                $pago->idcaja = $request->idcaja;
+                $pago->save();
+
+                DB::commit();
+
+                $r = new Request();
+                $r->idsesion = $session->id;
+                $r->isSale = true;
+                $this->finishSession($r);
+
+                return ['status' => 'venta'];
+            }
+        } catch (\Exception $e) {
+            // An error occured; cancel the transaction...
+            DB::rollback();
+            dd($e);
+            // return redirect()->back()->withErrors(['error' => 'No se pudo registrar la venta, por favor validar los parámetros ingresados']);
+            return back()->withErrors(['error' => ['No se pudo registrar la venta, por favor validar los parámetros ingresados']]);
             //throw $e;
         }
     }
@@ -1271,7 +1441,6 @@ dd($e);
         $detallesesion = Detallesesion::where('idsesionventa', $request->idsesion)
                                         ->with('boleta')
                                         ->get();
-
         // Agrega credenciales
         \MercadoPago\SDK::setAccessToken("TEST-527760229179050-091011-a9b62330235cb5d7a47b2b59968ac474-1195821039");
 
@@ -1282,24 +1451,29 @@ dd($e);
         //$preference->expiration_date_from = "2016-02-01T12:00:00.000-04:00";
         //$preference->expiration_date_to = "2016-02-28T12:00:00.000-04:00";
 
-        // Crea un ítem en la preferencia
+        $preference->back_urls = array(
+            "success" => "http://3.143.233.133/ventas/paynotify",
+        );
+
+        $preference->notification_url = "http://3.143.233.133/ventas/paynotify";
+        $preference->save();
+
         foreach ($detallesesion as $product) {
             $item = new \MercadoPago\Item();
             $item->title = $product->boleta->numero;
             $item->quantity = 1;
             $item->unit_price = $product->valor;
             $products[] = $item;
+
+            $checkout = new Checkout();
+            $checkout->idsesionventa = $request->idsesion;
+            $checkout->iddetallesesion = $product->id;
+            $checkout->idboleta = $product->idboleta;
+            $checkout->valor = $product->valor;
+            $checkout->idcliente = $product->idcliente;
+            $checkout->estado = 4;
+            $checkout->preference_id = $preference->id;
         }
-
-
-        $preference->back_urls = array(
-            "success" => "http://3.143.233.133/ventas/paynotify",
-            //"failure" => "http://www.failure.com",
-            //"pending" => "http://www.pending.com"
-        );
-
-        $preference->notification_url = "http://3.143.233.133/ventas/paynotify";
-
         $preference->items = $products;
         $preference->save();
 
@@ -1325,13 +1499,21 @@ dd($e);
     }
 
     public function paynotify(Request $request) {
-        $configuracion = new Configuración();
-        $configuracion->nombre = 'prueba';
-        $configuracion->valornum = 1;
-        $configuracion->valorstr = 'prueba';
-        $configuracion->detalle = 'prueba';
-        $configuracion->save();
 
+        $checkout = Checkout::where('preference_id', $request->preference_id);
+        $checkout->collection_id = $request->collection_id;
+        $checkout->collection_status = $request->collection_status;
+        $checkout->payment_id = $request->payment_id;
+        $checkout->status = $request->status;
+        $checkout->estado = 1;
+        $checkout->payment_type = $request->payment_type;
+        $checkout->merchant_order_id = $request->merchant_order_id;
+        $checkout->site_id = $request->site_id;
+        $checkout->processing_mode = $request->processing_mode;
+        $checkout->merchant_account_id = $request->merchant_account_id;
+        $checkout->save();
+
+        return redirect()->route('ventas.index');
     }
 
 

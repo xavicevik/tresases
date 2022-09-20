@@ -65,6 +65,7 @@ Route::group(['middleware'=>['guest']],function(){
 
     Route::get('/ventas/sumary', [VentaController::class, 'sumary'])->name('sumary');
     Route::post('/ventas/paynotify', [VentaController::class, 'paynotify'])->name('paynotify');
+    Route::get('/ventas/paynotify', [VentaController::class, 'paynotify'])->name('paynotify');
 
 });
 
@@ -153,6 +154,9 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'),'verified',]
         Route::post('/ventas/failurePay', [VentaController::class, 'failurePay'])->name('ventas.failurePay');
         Route::post('/ventas/pendingPay', [VentaController::class, 'pendingPay'])->name('ventas.pendingPay');
         Route::post('webhooks', [WebhooksController::class, 'webhooks'])->name('webhooks');
+
+        Route::post('/ventas/paynotify', [VentaController::class, 'paynotify'])->name('paynotify');
+        Route::get('/ventas/paynotify', [VentaController::class, 'paynotify'])->name('paynotify');
 
 
         Route::resource('rifas', RifaController::class);
