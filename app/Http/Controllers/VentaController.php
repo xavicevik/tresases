@@ -850,12 +850,7 @@ class VentaController extends Controller
 
                 DB::commit();
 
-                $r = new Request();
-                $r->idsesion = $session->id;
-                $r->isSale = true;
-                $this->finishSession($r);
-
-                return ['status' => 'venta'];
+                return $venta->id;
             }
         } catch (\Exception $e) {
             // An error occured; cancel the transaction...
@@ -1445,20 +1440,20 @@ dd($e);
         \MercadoPago\SDK::setAccessToken("TEST-527760229179050-091011-a9b62330235cb5d7a47b2b59968ac474-1195821039");
 
         $preference = new \MercadoPago\Preference();
-        //$preference->auto_return = "approved";
-        //$preference->expires = "true";
-        //$preference->expiration_date_from = "2016-02-01T12:00:00.000-04:00";
-        //$preference->expiration_date_to = "2016-02-28T12:00:00.000-04:00";
+        $preference->auto_return = "approved";
 
         $preference->back_urls = array(
-            "success" => "http://3.143.233.133/ventas/paynotify",
+            "success" => "https://dllo.shoppingred.com.co/ventas/paynotifysuccess",
+            "failure" => "https://dllo.shoppingred.com.co/ventas/paynotifyfailure",
+   	        "pending" => "https://dllo.shoppingred.com.co/ventas/paynotifypending",
         );
 
-        $preference->notification_url = "http://3.143.233.133/ventas/paynotify";
+        //$preference->notification_url = "https://dllo.shoppingred.com.co/ventas/paynotify";
         foreach ($detallesesion as $product) {
             $item = new \MercadoPago\Item();
             $item->title = $product->boleta->numero;
             $item->quantity = 1;
+            $item->description = $product->boleta->numero;
             $item->unit_price = $product->valor;
             $products[] = $item;
         }
@@ -1473,6 +1468,7 @@ dd($e);
             $checkout->idcliente = $product->idcliente;
             $checkout->estado = 4;
             $checkout->preference_id = $preference->id;
+            $checkout->save();
         }
 
         return ['idpreferencia' => $preference->id];
@@ -1496,10 +1492,42 @@ dd($e);
         return $response;
     }
 
-    public function paynotify(Request $request) {
+    public function paynotifysuccess(Request $request) {
 
         $checkouts = Checkout::where('preference_id', $request->preference_id)->get();
+        $r = new Request();
+        $r->idsesion = $checkouts[0]['idsesionventa'];
+        $r->isSale = true;
+        $idventa = $this->newSale($r);
+        $this->finishSession($r);
         foreach ($checkouts as $checkout) {
+            $checkout->collection_id = $request->collection_id;
+            $checkout->collection_status = $request->collection_status;
+            $checkout->payment_id = $request->payment_id;
+            $checkout->status = $request->status;
+            $checkout->estado = 1;
+            $checkout->payment_type = $request->payment_type;
+            $checkout->merchant_order_id = $request->merchant_order_id;
+            $checkout->site_id = $request->site_id;
+            $checkout->processing_mode = $request->processing_mode;
+            $checkout->merchant_account_id = $request->merchant_account_id;
+            $checkout->idventa = $idventa;
+            $checkout->save();
+        }
+        $checkouts = Checkout::where('preference_id', $request->preference_id)
+                               ->with('boleta')
+                               ->with('venta')
+                               ->get();
+
+        return Inertia::render('Ventas/Finishsale', ['checkouts' => $checkouts]);
+    }
+
+    public function paynotifyfailure(Request $request) {
+
+        $checkouts = Checkout::where('preference_id', $request->preference_id)->get();
+        $session = null;
+        foreach ($checkouts as $checkout) {
+            $session = $checkout->idsesionventa;
             $checkout->collection_id = $request->collection_id;
             $checkout->collection_status = $request->collection_status;
             $checkout->payment_id = $request->payment_id;
@@ -1513,9 +1541,14 @@ dd($e);
             $checkout->save();
         }
 
+        $r = new Request();
+        $r->idsesion = $session;
+        $r->isSale = true;
+        $this->newSale($r);
+        $this->finishSession($r);
+
         return redirect()->route('ventas.index');
     }
-
 
 
 }

@@ -155,9 +155,9 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'),'verified',]
         Route::post('/ventas/pendingPay', [VentaController::class, 'pendingPay'])->name('ventas.pendingPay');
         Route::post('webhooks', [WebhooksController::class, 'webhooks'])->name('webhooks');
 
-        Route::post('/ventas/paynotify', [VentaController::class, 'paynotify'])->name('paynotify');
-        Route::get('/ventas/paynotify', [VentaController::class, 'paynotify'])->name('paynotify');
-
+        Route::get('/ventas/paynotifysuccess', [VentaController::class, 'paynotifysuccess'])->name('paynotifysuccess');
+        Route::get('/ventas/paynotifyfailure', [VentaController::class, 'paynotifyfailure'])->name('paynotifyfailure');
+        Route::get('/ventas/paynotifypending', [VentaController::class, 'paynotifypending'])->name('paynotifypending');
 
         Route::resource('rifas', RifaController::class);
         Route::resource('confcomisiones',ConfcomisionController::class);
