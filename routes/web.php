@@ -64,6 +64,7 @@ Route::group(['middleware'=>['guest']],function(){
 */
 
     Route::get('/ventas/sumary', [VentaController::class, 'sumary'])->name('sumary');
+    Route::post('/ventas/paynotify', [VentaController::class, 'paynotify'])->name('paynotify');
 
 });
 

@@ -8,6 +8,7 @@ use App\Models\Caja;
 use App\Models\Cliente;
 use App\Models\Comision;
 use App\Models\Confcomision;
+use App\Models\Configuración;
 use App\Models\Detallesesion;
 use App\Models\Detalleventa;
 use App\Models\Historialcaja;
@@ -1290,13 +1291,14 @@ dd($e);
             $products[] = $item;
         }
 
-        /*
+
         $preference->back_urls = array(
-            "success" => "https://www.success.com",
-            "failure" => "http://www.failure.com",
-            "pending" => "http://www.pending.com"
+            "success" => "http://3.143.233.133/ventas/paynotify",
+            //"failure" => "http://www.failure.com",
+            //"pending" => "http://www.pending.com"
         );
-        */
+
+        $preference->notification_url = "http://3.143.233.133/ventas/paynotify";
 
         $preference->items = $products;
         $preference->save();
@@ -1320,6 +1322,16 @@ dd($e);
         ]);
 
         return $response;
+    }
+
+    public function paynotify(Request $request) {
+        $configuracion = new Configuración();
+        $configuracion->nombre = 'prueba';
+        $configuracion->valornum = 1;
+        $configuracion->valorstr = 'prueba';
+        $configuracion->detalle = 'prueba';
+        $configuracion->save();
+
     }
 
 
