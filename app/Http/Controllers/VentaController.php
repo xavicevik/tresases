@@ -845,7 +845,7 @@ class VentaController extends Controller
                 $pago->soporte = $request->comprobante;
                 $pago->idtransaccion = $transaccion->id;
                 $pago->idpuntoventa = $session->idpuntoventa;
-                $pago->idcaja = $request->idcaja;
+                $pago->idcaja = 1;//$request->idcaja;
                 $pago->save();
 
                 DB::commit();
@@ -1496,40 +1496,13 @@ dd($e);
 
         $checkouts = Checkout::where('preference_id', $request->preference_id)->get();
 
-        if (!isEmpty($checkouts)) {
-            $r = new Request();
-            $r->idsesion = $checkouts[0]['idsesionventa'];
-            $r->isSale = true;
-            $idventa = $this->newSale($r);
-            $this->finishSession($r);
-            foreach ($checkouts as $checkout) {
-                $checkout->collection_id = $request->collection_id;
-                $checkout->collection_status = $request->collection_status;
-                $checkout->payment_id = $request->payment_id;
-                $checkout->status = $request->status;
-                $checkout->estado = 1;
-                $checkout->payment_type = $request->payment_type;
-                $checkout->merchant_order_id = $request->merchant_order_id;
-                $checkout->site_id = $request->site_id;
-                $checkout->processing_mode = $request->processing_mode;
-                $checkout->merchant_account_id = $request->merchant_account_id;
-                $checkout->idventa = $idventa;
-                $checkout->save();
-            }
-            $checkouts = Checkout::where('preference_id', $request->preference_id)
-                ->with('boleta')
-                ->with('venta')
-                ->get();
-        }
-        return Inertia::render('Ventas/Finishsale', ['checkouts' => $checkouts]);
-    }
+        $r = new Request();
+        $r->idsesion = $checkouts[0]['idsesionventa'];
+        $r->isSale = true;
+        $idventa = $this->newSale($r);
+        $this->finishSession($r);
 
-    public function paynotifyfailure(Request $request) {
-
-        $checkouts = Checkout::where('preference_id', $request->preference_id)->get();
-        $session = null;
         foreach ($checkouts as $checkout) {
-            $session = $checkout->idsesionventa;
             $checkout->collection_id = $request->collection_id;
             $checkout->collection_status = $request->collection_status;
             $checkout->payment_id = $request->payment_id;
@@ -1540,17 +1513,44 @@ dd($e);
             $checkout->site_id = $request->site_id;
             $checkout->processing_mode = $request->processing_mode;
             $checkout->merchant_account_id = $request->merchant_account_id;
+            $checkout->idventa = $idventa;
             $checkout->save();
         }
+        $checkout = Checkout::where('preference_id', $request->preference_id)
+                              ->first();
 
-        $r = new Request();
-        $r->idsesion = $session;
-        $r->isSale = true;
-        $this->newSale($r);
-        $this->finishSession($r);
-
-        return redirect()->route('ventas.index');
+        return Inertia::render('Ventas/Finishsale', [
+                        'payment_id' => $checkout->payment_id,
+                        'idventa' => $checkout->idventa,
+                        'estado' => 'aprobado',
+                        'mensajePago' => 'Gracias por comprar en Shoppingred.com!'
+        ]);
     }
 
+    public function paynotifyfailure(Request $request) {
+
+        $checkout = Checkout::where('preference_id', $request->preference_id)
+                              ->first();
+
+        return Inertia::render('Ventas/Finishsale', [
+            'payment_id' => $checkout->payment_id,
+            'idventa' => null,
+            'estado' => 'rechazado',
+            'mensajePago' => 'El pago fue rechazado!'
+        ]);
+    }
+
+    public function paynotifypending(Request $request) {
+
+        $checkout = Checkout::where('preference_id', $request->preference_id)
+            ->first();
+
+        return Inertia::render('Ventas/Finishsale', [
+            'payment_id' => $checkout->payment_id,
+            'idventa' => null,
+            'estado' => 'pendiente',
+            'mensajePago' => 'El pago se encuentra pendiente'
+        ]);
+    }
 
 }
