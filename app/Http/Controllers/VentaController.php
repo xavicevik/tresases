@@ -1445,7 +1445,6 @@ dd($e);
         \MercadoPago\SDK::setAccessToken("TEST-527760229179050-091011-a9b62330235cb5d7a47b2b59968ac474-1195821039");
 
         $preference = new \MercadoPago\Preference();
-
         //$preference->auto_return = "approved";
         //$preference->expires = "true";
         //$preference->expiration_date_from = "2016-02-01T12:00:00.000-04:00";
@@ -1456,15 +1455,16 @@ dd($e);
         );
 
         $preference->notification_url = "http://3.143.233.133/ventas/paynotify";
-        $preference->save();
-
         foreach ($detallesesion as $product) {
             $item = new \MercadoPago\Item();
             $item->title = $product->boleta->numero;
             $item->quantity = 1;
             $item->unit_price = $product->valor;
             $products[] = $item;
-
+        }
+        $preference->items = $products;
+        $preference->save();
+        foreach ($detallesesion as $product) {
             $checkout = new Checkout();
             $checkout->idsesionventa = $request->idsesion;
             $checkout->iddetallesesion = $product->id;
@@ -1474,8 +1474,6 @@ dd($e);
             $checkout->estado = 4;
             $checkout->preference_id = $preference->id;
         }
-        $preference->items = $products;
-        $preference->save();
 
         return ['idpreferencia' => $preference->id];
     }
@@ -1500,18 +1498,20 @@ dd($e);
 
     public function paynotify(Request $request) {
 
-        $checkout = Checkout::where('preference_id', $request->preference_id);
-        $checkout->collection_id = $request->collection_id;
-        $checkout->collection_status = $request->collection_status;
-        $checkout->payment_id = $request->payment_id;
-        $checkout->status = $request->status;
-        $checkout->estado = 1;
-        $checkout->payment_type = $request->payment_type;
-        $checkout->merchant_order_id = $request->merchant_order_id;
-        $checkout->site_id = $request->site_id;
-        $checkout->processing_mode = $request->processing_mode;
-        $checkout->merchant_account_id = $request->merchant_account_id;
-        $checkout->save();
+        $checkouts = Checkout::where('preference_id', $request->preference_id)->get();
+        foreach ($checkouts as $checkout) {
+            $checkout->collection_id = $request->collection_id;
+            $checkout->collection_status = $request->collection_status;
+            $checkout->payment_id = $request->payment_id;
+            $checkout->status = $request->status;
+            $checkout->estado = 1;
+            $checkout->payment_type = $request->payment_type;
+            $checkout->merchant_order_id = $request->merchant_order_id;
+            $checkout->site_id = $request->site_id;
+            $checkout->processing_mode = $request->processing_mode;
+            $checkout->merchant_account_id = $request->merchant_account_id;
+            $checkout->save();
+        }
 
         return redirect()->route('ventas.index');
     }
