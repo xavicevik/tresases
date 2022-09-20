@@ -196,20 +196,6 @@ class VentaController extends Controller
             return redirect()->route('cajas.index', ['estado' => '1']);
         }
 
-        require base_path('vendor/autoload.php');
-        // Agrega credenciales
-        \MercadoPago\SDK::setAccessToken("TEST-527760229179050-091011-a9b62330235cb5d7a47b2b59968ac474-1195821039");
-
-        $preference = new \MercadoPago\Preference();
-
-        // Crea un ítem en la preferencia
-        $item = new \MercadoPago\Item();
-        $item->title = 'Mi producto';
-        $item->quantity = 1;
-        $item->unit_price = 75;
-        $preference->items = array($item);
-        $preference->save();
-
         return Inertia::render('Ventas/Venta', [
             'caja' => $caja,
             'estado' => 0,
@@ -1276,6 +1262,46 @@ dd($e);
             DB::rollBack();
         }
         return 1;
+    }
+
+    public function preparePay(Request $request) {
+        require base_path('vendor/autoload.php');
+
+        $detallesesion = Detallesesion::where('idsesionventa', $request->idsesion)
+                                        ->with('boleta')
+                                        ->get();
+
+        // Agrega credenciales
+        \MercadoPago\SDK::setAccessToken("TEST-527760229179050-091011-a9b62330235cb5d7a47b2b59968ac474-1195821039");
+
+        $preference = new \MercadoPago\Preference();
+
+        //$preference->auto_return = "approved";
+        //$preference->expires = "true";
+        //$preference->expiration_date_from = "2016-02-01T12:00:00.000-04:00";
+        //$preference->expiration_date_to = "2016-02-28T12:00:00.000-04:00";
+
+        // Crea un ítem en la preferencia
+        foreach ($detallesesion as $product) {
+            $item = new \MercadoPago\Item();
+            $item->title = $product->boleta->numero;
+            $item->quantity = 1;
+            $item->unit_price = $product->valor;
+            $products[] = $item;
+        }
+
+        /*
+        $preference->back_urls = array(
+            "success" => "https://www.success.com",
+            "failure" => "http://www.failure.com",
+            "pending" => "http://www.pending.com"
+        );
+        */
+
+        $preference->items = $products;
+        $preference->save();
+
+        return ['idpreferencia' => $preference->id];
     }
 
     private function sendSMS($to, $message) {

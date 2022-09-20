@@ -27,9 +27,6 @@
                                         <!-- Fin Mensajes Flash -->
                                         <!-- Formulario -->
                                         <section>
-                                                <div class="cho-container">
-
-                                                </div>
                                             <div class="mx-auto text-right w-full border-0">
                                                 <vue-countdown ref="countdown" class="p-2 pb-4 mx-auto text-blue-700" :time="time" v-slot="{ minutes, seconds }" @end="onCountdownEnd">
                                                     Tiempo restante：{{ minutes }} min, {{ seconds }} seg.
@@ -162,9 +159,6 @@
                                     </vue-countdown>
                                 </div>
                                 <h1 class="sr-only">Resumen de la transacción</h1>
-
-                                <form class="lg:grid lg:gap-x-12 xl:gap-x-16">
-
                                     <!-- Order summary -->
                                     <div class="mt-5 mb-10 lg:mt-0">
                                         <h2 class="text-lg font-bold font-medium text-gray-900">Resumen de la transacción</h2>
@@ -262,10 +256,11 @@
                                                 <div class="mt-1 px-2">
                                                     {{ formatPrice(totalapagar) }}
                                                 </div>
+                                                <div class="cho-container">
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
-                                </form>
                             </div>
                         </tab-content>
                         <tab-content title="Checkout" icon="ti-credit-card" :before-change="validateCheckout">
@@ -830,20 +825,6 @@
 
 <script>
 
-    const mp = new MercadoPago("TEST-d5d36e04-7513-41d8-af7a-93a4e5ce874e", {
-        locale: 'es-CO'
-    });
-
-    mp.checkout({
-        preference: {
-            id: '{{ $preference->id }}',
-        },
-        render: {
-            container: '.cho-container',
-            label: 'Pagar',
-        }
-    });
-
 import AppLayout from '@/Layouts/AppLayout.vue';
 import Swal from "sweetalert2";
 import { Icon } from '@iconify/vue';
@@ -944,6 +925,7 @@ export default {
     data() {
         return {
             time: 2 * 60 * 1000,
+            idpreferencia: 0,
             session: [],
             loadingWizard: false,
             inputValue: null,
@@ -1561,9 +1543,36 @@ export default {
                 return false;
             }
 */
+            var url= '/ventas/preparePay';
+            axios.get(url, {
+                params: {
+                    idsesion: this.session.id
+                }
+            }).then((res) => {
+                console.log(res.data);
+                var respuesta = res.data;
+                this.idpreferencia = respuesta.idpreferencia;
+
+                const mp = new MercadoPago("TEST-d5d36e04-7513-41d8-af7a-93a4e5ce874e", {
+                    locale: 'es-CO'
+                });
+
+                mp.checkout({
+                    preference: {
+                        id: this.idpreferencia,
+                    },
+                    render: {
+                        container: '.cho-container',
+                        label: 'Pagar',
+                    }
+                });
+
+                console.log("Validar pago id " + this.idpreferencia);
+            })
             return true;
         },
         validatePago:function() {
+            /*
             console.log("onComplete");
             if (this.form.valorpagar > this.totalnoparseado) {
                 Swal.fire({
@@ -1645,6 +1654,7 @@ export default {
                     }
                 })
             }
+             */
         },
         onValidateCliente: function(isValid, tabIndex){
             console.log('registrar cart');

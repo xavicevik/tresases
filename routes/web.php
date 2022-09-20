@@ -146,6 +146,12 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'),'verified',]
         Route::get('/ventas/finishSession', [VentaController::class, 'finishSession'])->name('ventas.finishSession');
         Route::get('/ventas/updateTimeSession', [VentaController::class, 'updateTimeSession'])->name('ventas.updateTimeSession');
         Route::get('/ventas/anularVenta', [VentaController::class, 'anularVenta'])->name('ventas.anularVenta');
+        Route::get('/ventas/preparePay', [VentaController::class, 'preparePay'])->name('ventas.preparePay');
+
+        Route::post('/ventas/successPay', [VentaController::class, 'successPay'])->name('ventas.successPay');
+        Route::post('/ventas/failurePay', [VentaController::class, 'failurePay'])->name('ventas.failurePay');
+        Route::post('/ventas/pendingPay', [VentaController::class, 'pendingPay'])->name('ventas.pendingPay');
+        Route::post('webhooks', [WebhooksController::class, 'webhooks'])->name('webhooks');
 
 
         Route::resource('rifas', RifaController::class);
