@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Jobs\SendEmailJob;
+use App\Jobs\SendSMSJob;
 use App\Models\Boleta;
 use App\Models\Caja;
 use App\Models\Checkout;
@@ -199,6 +200,35 @@ class VentaController extends Controller
         }
 
         return Inertia::render('Ventas/Venta', [
+            'caja' => $caja,
+            'estado' => 0,
+            'vendedor' => Auth::user()
+        ]);
+    }
+
+    public function createapp(Request $request)
+    {
+        $caja = Caja::where('idvendedor', Auth::user()->id)
+            ->with('puntoventa')
+            ->where('estado', 1)
+            ->first();
+
+        if (is_null($caja)) {
+        //    return redirect()->route('cajas.index', ['estado' => '1']);
+            $mytime= Carbon::now('America/Bogota');
+
+            $cajas = Caja::where('id', Auth::user()->id)
+                            ->firstOrFail();
+            $cajas->estado = 1;
+            $cajas->idvendedor = Auth::user()->id;
+            $cajas->montoapertura = 0;
+            $cajas->fechaapertura = $mytime->toDateTimeString();
+            $cajas->fechacierre = null;
+            $cajas->montocierre = 0.0;
+            $cajas->save();
+        }
+
+        return Inertia::render('Ventas/Ventaapp', [
             'caja' => $caja,
             'estado' => 0,
             'vendedor' => Auth::user()
@@ -663,7 +693,7 @@ class VentaController extends Controller
 
                     $to = "57".$cliente->movil;
 
-                    $saldo = $boleta->valortotal - $boleta->valor;
+                    $saldo = $boleta->saldo;
                     $saldotxt = '';
 
                     if ($saldo > 0) {
@@ -671,11 +701,13 @@ class VentaController extends Controller
                     }
                     $message = "Los Tres Ases te da la bienvenida y agradece tu fidelidad, el gran bono millonario premio mayor $boleta->numero promocional $boleta->promocional ha sido registrado con exito. $saldotxt SUERTE";
 
-                    $this->sendSMS($to, $message);
+                    //$this->sendSMS($to, $message);
+                    SendSMSJob::dispatch($to, $message);
                     if ($saldo == 0) {
                         $message = "Conserva este mensaje de paz y salvo valido para reclamar el premio mayor: Apto Robles, Camioneta mazda y Tour resolucion EDSA N 999 premio mayor $boleta->numero y promocional $boleta->promocional. Sorteo miercoles 21 de diciembre de 2022 con el premio mayor de la loteria de manizales";
 
-                        $this->sendSMS($to, $message);
+                        //$this->sendSMS($to, $message);
+                        SendSMSJob::dispatch($to, $message);
                     }
                 }
 
@@ -1067,11 +1099,13 @@ dd($e);
         }
         $message = "Los Tres Ases te da la bienvenida y agradece tu fidelidad, el gran bono millonario premio mayor ".$detalle->boleta->numero." promocional ".$detalle->boleta->promocional." ha sido registrado con exito. $saldotxt SUERTE";
 
-        $this->sendSMS($to, $message);
+        //$this->sendSMS($to, $message);
+        SendSMSJob::dispatch($to, $message);
         if ($saldo == 0) {
             $message = "Conserva este mensaje de paz y salvo valido para reclamar el premio mayor: Apto Plaza Robles, Camioneta mazda y Tour resolucion EDSA N 999 premio mayor ".$detalle->boleta->numero." y promocional ".$detalle->boleta->promocional.". Sorteo miercoles 21 de diciembre de 2022 con el premio mayor de la loteria de manizales";
 
-            $this->sendSMS($to, $message);
+            //$this->sendSMS($to, $message);
+            SendSMSJob::dispatch($to, $message);
         }
     }
 
@@ -1478,7 +1512,7 @@ dd($e);
         return ['idpreferencia' => $preference->id];
     }
 
-    private function sendSMS($to, $message) {
+    public function sendSMS($to, $message) {
         $to = '573155665528';
         $response = Http::withHeaders([
             'Content-Type' => 'application/json',

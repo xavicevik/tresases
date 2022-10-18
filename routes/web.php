@@ -40,6 +40,10 @@ Route::group(['middleware'=>['guest']],function(){
 
     Route::get('/', [LoginController::class, 'index'])->name('login.index');
     Route::post('/', [LoginController::class, 'authenticate'])->name('login.authenticate');
+
+    Route::get('/app', [LoginController::class, 'indexApp'])->name('loginapp.index');
+    Route::post('/app', [LoginController::class, 'authenticateapp'])->name('loginapp.authenticate');
+
     Route::get('/loginvendedor', [LoginController::class, 'indexVendedor'])->name('loginvendedor.index');
     Route::post('/loginvendedor', [LoginController::class, 'authenticatevendedor'])->name('loginvendedor.authenticate');
 
@@ -186,6 +190,8 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'),'verified',]
         Route::get('/ventas/getRandBoletaLibre', [VentaController::class, 'getRandBoletaLibre'])->name('ventas.getRandBoletaLibre');
 
         Route::get('/ventas/reportpdf', [VentaController::class, 'reportpdf'])->name('reportpdf');
+
+        Route::get('/app/ventas', [VentaController::class, 'createapp'])->name('ventas.createapp');
         Route::resource('ventas', VentaController::class);
 
         Route::get('/cart/validarId', [CartController::class, 'validarId'])->name('validarId');

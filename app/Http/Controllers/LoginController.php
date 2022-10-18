@@ -221,6 +221,34 @@ class LoginController extends Controller
         return redirect()->back()->with('message', 'Se cambia contraseña');
     }
 
+    // APP Movil
+    public function indexapp()
+    {
+        $token = csrf_token();
+        return Inertia::render('Auth/Loginapp', [
+            'canLogin' => Route::has('login'),
+            'canRegister' => Route::has('register'),
+            '_token' => $token
+        ]);
+    }
 
+    public function authenticateapp(Request $request)
+    {
+        $credentials = $request->validate([
+            'username' => ['required'],
+            'password' => ['required'],
+        ]);
+
+        if (Auth::guard('vendedor')->attempt($credentials, ($request->remember == 'on') ? true : false)) {
+            $request->session()->regenerate();
+            $request->session()->push('puntodeventa', 2);
+
+            return redirect()->intended('/app/ventas');
+        }
+
+        return back()->withErrors([
+            'username' => 'Las credenciales ingresadas no corresponden con un usuario registrado',
+        ])->onlyInput('username');
+    }
 
 }
