@@ -50,6 +50,9 @@ Route::group(['middleware'=>['guest']],function(){
     Route::get('/changepass', [LoginController::class, 'changePassword'])->name('changepass.index');
     Route::post('/changepass', [LoginController::class, 'updatePassword'])->name('changepass.update');
 
+    //Enlace QR para la venta del usuario
+    Route::get('/app/authenticatelink/{vendedor}', [LoginController::class, 'authenticatelink'])->name('ventas.authenticatelink');
+
 
     /*
     Route::get('/', function () {
@@ -113,6 +116,7 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'),'verified',]
         Route::put('/users/vendedor/{vendedor}', [UserController::class, 'updateVendedor'])->name('users.updateVendedor');
         Route::put('/users/cliente/{cliente}', [UserController::class, 'updateCliente'])->name('users.updateCliente');
         Route::get('/users/cliente/{cliente}', [UserController::class, 'showClient'])->name('users.showClient');
+        Route::get('/users/showClientDoc', [UserController::class, 'showClientDoc'])->name('users.showClientDoc');
 
         Route::resource('users', UserController::class);
 
@@ -191,7 +195,7 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'),'verified',]
 
         Route::get('/ventas/reportpdf', [VentaController::class, 'reportpdf'])->name('reportpdf');
 
-        Route::get('/app/ventas', [VentaController::class, 'createapp'])->name('ventas.createapp');
+        Route::get('/app/ventas', [VentaController::class, 'createappp'])->name('ventas.createapp');
         Route::resource('ventas', VentaController::class);
 
         Route::get('/cart/validarId', [CartController::class, 'validarId'])->name('validarId');

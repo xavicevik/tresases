@@ -11,14 +11,14 @@
                     <!-- Fin Mensajes Flash -->
 
                     <form-wizard v-if="!isComplete" next-button-text="Siguiente" subtitle="sub" color="#009db0"
-                                 back-button-text="Volver" step-size="xs" finishButtonText="Confirmar orden"
+                                 back-button-text="Volver" step-size="xs" finishButtonText="Pagar"
                                  validateOnBack="true"
                                  @on-complete="validatePago"
                                  @on-change="onChange"
                                  @on-validate="onValidateRifa"
                                  @on-error="onError"
                     >
-                        <tab-content title="Detalle de Rifa" icon="ti-ticket" :before-change="validateRifa" >
+                        <tab-content title="Detalle" icon="ti-ticket" :before-change="validateRifa" >
                             <!-- <form> -->
                                 <div class="bg-white pb-1">
                                     <div class="">
@@ -28,20 +28,16 @@
                                         <!-- Formulario -->
                                         <section>
                                             <div id="countd" class="mx-auto text-center w-full border-0">
-                                                <vue-countdown ref="countdown" class="p-2 pb-4 text-sm mx-auto text-blue-700" :time="time" v-slot="{ minutes, seconds }" @end="onCountdownEnd">
+                                                <vue-countdown ref="countdown" class="pb-4 text-sm mx-auto text-blue-700" :time="time" v-slot="{ minutes, seconds }" @end="onCountdownEnd">
                                                     Restan：{{ minutes }} min, {{ seconds }} seg.
                                                 </vue-countdown>
                                             </div>
-                                            <div class="">
-                                                <img v-show="form.idrifa.urlimagen1 != null" :src="'/storage/'+form.idrifa.urlimagen1" alt="image" class="mx-auto w-3/12"/>
+                                            <div class="py-2">
+                                                <img v-show="form.idrifa.urlimagen1 != null" :src="'/storage/'+form.idrifa.urlimagen1" alt="image" class="mx-auto w-10/12 h-22"/>
                                             </div>
 
-                                            <div class="py-1">
-                                                <div class="mb-4 w-full pr-2 text-center">
-                                                    <label class="block text-gray-700 text-sm text-left font-bold mb-2">Rifa</label>
-                                                    <input v-model="form.idrifa.titulo" @click="selectRifa()" type="text" class="shadow appearance-none border rounded w-8/12 py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" placeholder="Seleccione Rifa">
-                                                    <div v-if="$page.props.errors.rifa" class="text-red-500">{{ $page.props.errors.rifa }}</div>
-                                                </div>
+                                            <div class="py-2 text-xs">
+                                                <p>Ingrese el número deseado o presione el dado para obtener un número de manera aleatoria</p>
                                             </div>
 
                                             <div class="py-1">
@@ -56,7 +52,7 @@
                                                                  <money3 v-bind="configMoney2" v-model="form.reserva.numero" @keypress.enter="valBoletaDisponible(form.reserva.numero, form.idrifa.id, form.idvendedor.id, form.idcliente.id)" class="h-8 w-1/8 pl-2 pr-2 rounded-lg z-0 focus:shadow focus:outline-none"></money3>
                                                                 <a @click="valBoletaDisponible(form.reserva.numero, form.idrifa.id, form.idvendedor.id, form.idcliente.id)">
                                                                     <div class="absolute top-3 right-2">
-                                                                        <Icon icon="fe:search" class="h-4"  />
+                                                                        <Icon icon="fe:plus" class="h-4"  />
                                                                     </div>
                                                                 </a>
                                                         </div>
@@ -80,7 +76,7 @@
                                                 <div class="mb-4 w-full">
                                                     <div class="flex py-1 text-xs font-bold align-middle">
                                                         <div class="w-4/12">
-                                                            Número
+                                                            Núm/Prom
                                                         </div>
                                                         <div class="w-3/12 px-1">
                                                             Total
@@ -131,7 +127,7 @@
                                 </div>
                             <!-- </form> -->
                         </tab-content>
-                        <tab-content title="Registrar pago" icon="ti-money" >
+                        <tab-content title="Pago" icon="ti-money" >
                             <div class="w-full mx-auto pb-5">
                                 <div class="mx-auto text-center w-full border-0">
                                     <vue-countdown ref="countdown" class="p-2 pb-4 text-sm mx-auto text-blue-700" :time="time" v-slot="{ minutes, seconds }" @end="onCountdownEnd">
@@ -153,11 +149,6 @@
                                                     </div>
                                                     <div class="min-w-0 flex-1">
                                                         <h4 class="text-xs">
-                                                            Precio
-                                                        </h4>
-                                                    </div>
-                                                    <div class="min-w-0 flex-1">
-                                                        <h4 class="text-xs">
                                                             Saldo
                                                         </h4>
                                                     </div>
@@ -175,11 +166,6 @@
                                                     </div>
                                                     <div class="min-w-0 flex-1">
                                                         <h4 class="text-xs">
-                                                        <p class="mt-1 text-xs font-medium text-gray-900">{{ formatPrice(dato.valortotal) }}</p>
-                                                        </h4>
-                                                    </div>
-                                                    <div class="min-w-0 flex-1">
-                                                        <h4 class="text-xs">
                                                             <p class="mt-1 text-xs text-gray-900">{{ formatPrice(dato.valorsaldo) }}</p>
                                                         </h4>
                                                     </div>
@@ -191,21 +177,17 @@
                                                 </li>
                                                 <!-- More products... -->
                                             </ul>
-                                            <dl class="border-t border-gray-200 py-4 px-2 space-y-6 sm:px-6">
-                                                <div class="flex items-center justify-between border-t border-gray-200 pt-6">
-                                                    <dt class="text-base font-medium font-bold">Total</dt>
-                                                    <dd class="text-base font-medium text-gray-900 font-bold">{{ formatPrice(totalapagar) }}</dd>
-                                                </div>
-                                            </dl>
+                                            <div class="flex border-t border-gray-200 py-4 px-2 sm:px-6">
+                                                <div class="w-1/3 text-base font-medium font-bold">Total</div>
+                                                <div class="w-1/3 text-base font-medium font-bold"></div>
+                                                <div class="w-1/3 text-base font-medium text-gray-900 font-bold">{{ formatPrice(totalapagar) }}</div>
+                                            </div>
+                                            <div class="flex border-t border-gray-200 py-2 px-2 sm:px-6">
+                                                <div class="text-base font-medium w-1/3">Comprobante</div>
+                                                <div class="text-base font-medium w-1/3"></div>
+                                                <div class="text-base font-medium text-gray-900 w-1/3"><input type="text" v-model="form.comprobante" autocomplete="family-name" class="block h-10/12 w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"></div>
+                                            </div>
                                             <div class="flex w-10/12 mx-auto justify-items-center pb-4">
-                                                <label class="block text-sm font-medium font-bold text-gray-700">Comprobante de pago</label>
-                                                <div class="mt-1 px-2">
-                                                    <input type="text" v-model="form.comprobante" autocomplete="family-name" class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
-                                                </div>
-                                                <label class="block text-sm font-medium font-bold text-gray-700">Valor a pagar</label>
-                                                <div class="mt-1 px-2">
-                                                    {{ formatPrice(totalapagar) }}
-                                                </div>
                                                 <div class="cho-container">
                                                 </div>
                                             </div>
@@ -213,7 +195,7 @@
                                     </div>
                             </div>
                         </tab-content>
-                        <tab-content title="Checkout" icon="ti-credit-card" :before-change="validateCheckout">
+                        <tab-content title="Checkout" icon="ti-user" :before-change="validateCheckout">
                             <div class="mx-auto text-center w-full border-0">
                                 <vue-countdown ref="countdown" class="p-2 pb-4 mx-auto text-blue-700" :time="time" v-slot="{ minutes, seconds }" @end="onCountdownEnd">
                                     Restan：{{ minutes }} min, {{ seconds }} seg.
@@ -239,13 +221,14 @@
                                                 </a>
                                             </div>
                                             <div v-if="$page.props.flash.message" class="text-red-500">{{ $page.props.flash.message }}</div>
-                                            <div class="sm:col-span-2 py-2 border-b-2">
-                                                <label class="block text-xs font-medium text-gray-700">Seleccionar cliente</label>
+                                            <div>
+                                                <label class="block text-xs font-medium text-gray-700">Documento</label>
                                                 <div class="mt-1">
-                                                    <input type="text" @click="selectCliente()" v-model="form.metacliente" autocomplete="street-address" class="block w-full bg-gray-200 border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 text-xs sm:text-sm">
+                                                    <input type="text" @keyup.enter="selectClienteFull(form.cliente.documento)" v-model="form.cliente.documento" autocomplete="postal-code" class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 text-xs sm:text-sm">
+                                                    <div v-if="$page.props.errors.documento" class="text-red-500">{{ $page.props.errors.docuemnto }}</div>
                                                 </div>
                                             </div>
-                                            <div class="mt-2 grid grid-cols-1 gap-y-6 sm:grid-cols-2 sm:gap-x-4">
+                                            <div v-show="form.cliente.id" class="mt-2 grid grid-cols-1 gap-y-6 sm:grid-cols-2 sm:gap-x-4">
                                                 <div>
                                                     <label class="block text-xs font-medium text-gray-700">Nombre</label>
                                                     <div class="mt-1">
@@ -280,13 +263,7 @@
                                                     </div>
                                                 </div>
 
-                                                <div>
-                                                    <label class="block text-xs font-medium text-gray-700">Documento</label>
-                                                    <div class="mt-1">
-                                                        <input type="text" :disabled="!isNewCliente" :class="{'bg-blue-100' : !isNewCliente}" v-model="form.cliente.documento" autocomplete="postal-code" class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 text-xs sm:text-sm">
-                                                        <div v-if="$page.props.errors.documento" class="text-red-500">{{ $page.props.errors.docuemnto }}</div>
-                                                    </div>
-                                                </div>
+
 
                                                 <div>
                                                     <label class="block text-xs font-medium text-gray-700">País</label>
@@ -381,22 +358,22 @@
 
                                                 <fieldset class="mt-2">
                                                     <legend class="sr-only">Payment type</legend>
-                                                    <div class="space-y-4 sm:flex sm:items-center sm:space-y-0 sm:space-x-10">
+                                                    <div class="p-2 space-y-4 sm:flex sm:items-center sm:space-y-0 sm:space-x-10">
                                                         <div class="flex items-center">
-                                                            <input v-model="form.paymentmethod" value="0" type="radio" checked class="focus:ring-indigo-500 h-4 w-4 text-indigo-600 border-gray-300">
-                                                            <svg class="w-10" style="enable-background:new 0 0 48 48;" version="1.1" viewBox="0 0 48 48" xml:space="preserve" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"><g id="Icons"><g><path d="M16.3872,34.6633l-6.71-10.09c-0.86-1.42-0.41-3.26,1.01-4.13l14.15-8.6    c1.42-0.86,3.26-0.41,4.13,1l3.68,6.06l1.18,2.11" style="fill:#F43735;"/><path d="M35.7572,36.5934h-16.569c-1.6568,0-3-1.3432-3-3V24.01c0-1.6568,1.3432-3,3-3h16.569    c1.6569,0,3,1.3432,3,3v9.5834C38.7572,35.2502,37.4141,36.5934,35.7572,36.5934z" style="fill:#F9F9F9;"/><rect height="3.1331" style="fill:#383838;" width="22.5712" x="16.1879" y="24.4404"/><g><line style="fill:none;stroke:#303030;stroke-width:0.5;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;" x1="36.6873" x2="34.0623" y1="31.6485" y2="31.6485"/><line style="fill:none;stroke:#303030;stroke-width:0.5;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;" x1="36.6873" x2="34.0623" y1="32.7735" y2="32.7735"/><line style="fill:none;stroke:#303030;stroke-width:0.5;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;" x1="36.6873" x2="34.0623" y1="33.9402" y2="33.9402"/></g><path d="M25.6898,29.138c-1.0925,0-2.0289,0.659-2.44,1.6c-0.4111-0.941-1.3475-1.6-2.44-1.6    c-1.4715,0-2.6642,1.1928-2.6642,2.6641c0,1.4714,1.1927,2.6642,2.6642,2.6642c1.0925,0,2.0289-0.6591,2.44-1.6001    c0.4111,0.941,1.3475,1.6001,2.44,1.6001c1.4714,0,2.6641-1.1928,2.6641-2.6642C28.3539,30.3308,27.1612,29.138,25.6898,29.138z" style="fill:#FFC601;"/><path d="    M35.7572,36.5934h-16.569c-1.6568,0-3-1.3432-3-3V24.01c0-1.6568,1.3432-3,3-3h16.569c1.6569,0,3,1.3432,3,3v9.5834    C38.7572,35.2502,37.4141,36.5934,35.7572,36.5934z" style="fill:none;stroke:#303030;stroke-width:0.5;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;"/><line style="fill:none;stroke:#303030;stroke-width:0.5;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;" x1="38.7591" x2="16.1879" y1="24.4404" y2="24.4404"/><line style="fill:none;stroke:#303030;stroke-width:0.5;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;" x1="38.7591" x2="16.1879" y1="27.5735" y2="27.5735"/><line style="fill:none;stroke:#303030;stroke-width:0.5;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;" x1="17.1372" x2="17.1272" y1="35.7833" y2="35.7733"/><path d="    M16.3872,34.6633l-6.71-10.09c-0.86-1.42-0.41-3.26,1.01-4.13l14.15-8.6c1.42-0.86,3.26-0.41,4.13,1l3.68,6.06l1.18,2.11" style="fill:none;stroke:#303030;stroke-width:0.5;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;"/><g><path d="     M11.5128,25.096c0,0-1.9506-2.1279-0.14779-3.5182l5.77659-3.5273" style="fill:none;stroke:#303030;stroke-width:0.5;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;"/><line style="fill:none;stroke:#303030;stroke-width:0.5;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;" x1="18.4377" x2="19.0404" y1="17.309" y2="16.8798"/><line style="fill:none;stroke:#303030;stroke-width:0.5;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;" x1="32.2411" x2="30.6115" y1="21.01" y2="18.3804"/></g><circle cx="20.79519" cy="31.80215" r="2.64959" style="fill:#F43735;"/></g></g></svg>
+                                                            <input v-model="form.paymentmethod" value="0" type="radio" checked class="px-2 focus:ring-indigo-500 h-4 w-4 text-indigo-600 border-gray-300">
+                                                            <svg class="px-2 w-10" style="enable-background:new 0 0 48 48;" version="1.1" viewBox="0 0 48 48" xml:space="preserve" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"><g id="Icons"><g><path d="M16.3872,34.6633l-6.71-10.09c-0.86-1.42-0.41-3.26,1.01-4.13l14.15-8.6    c1.42-0.86,3.26-0.41,4.13,1l3.68,6.06l1.18,2.11" style="fill:#F43735;"/><path d="M35.7572,36.5934h-16.569c-1.6568,0-3-1.3432-3-3V24.01c0-1.6568,1.3432-3,3-3h16.569    c1.6569,0,3,1.3432,3,3v9.5834C38.7572,35.2502,37.4141,36.5934,35.7572,36.5934z" style="fill:#F9F9F9;"/><rect height="3.1331" style="fill:#383838;" width="22.5712" x="16.1879" y="24.4404"/><g><line style="fill:none;stroke:#303030;stroke-width:0.5;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;" x1="36.6873" x2="34.0623" y1="31.6485" y2="31.6485"/><line style="fill:none;stroke:#303030;stroke-width:0.5;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;" x1="36.6873" x2="34.0623" y1="32.7735" y2="32.7735"/><line style="fill:none;stroke:#303030;stroke-width:0.5;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;" x1="36.6873" x2="34.0623" y1="33.9402" y2="33.9402"/></g><path d="M25.6898,29.138c-1.0925,0-2.0289,0.659-2.44,1.6c-0.4111-0.941-1.3475-1.6-2.44-1.6    c-1.4715,0-2.6642,1.1928-2.6642,2.6641c0,1.4714,1.1927,2.6642,2.6642,2.6642c1.0925,0,2.0289-0.6591,2.44-1.6001    c0.4111,0.941,1.3475,1.6001,2.44,1.6001c1.4714,0,2.6641-1.1928,2.6641-2.6642C28.3539,30.3308,27.1612,29.138,25.6898,29.138z" style="fill:#FFC601;"/><path d="    M35.7572,36.5934h-16.569c-1.6568,0-3-1.3432-3-3V24.01c0-1.6568,1.3432-3,3-3h16.569c1.6569,0,3,1.3432,3,3v9.5834    C38.7572,35.2502,37.4141,36.5934,35.7572,36.5934z" style="fill:none;stroke:#303030;stroke-width:0.5;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;"/><line style="fill:none;stroke:#303030;stroke-width:0.5;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;" x1="38.7591" x2="16.1879" y1="24.4404" y2="24.4404"/><line style="fill:none;stroke:#303030;stroke-width:0.5;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;" x1="38.7591" x2="16.1879" y1="27.5735" y2="27.5735"/><line style="fill:none;stroke:#303030;stroke-width:0.5;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;" x1="17.1372" x2="17.1272" y1="35.7833" y2="35.7733"/><path d="    M16.3872,34.6633l-6.71-10.09c-0.86-1.42-0.41-3.26,1.01-4.13l14.15-8.6c1.42-0.86,3.26-0.41,4.13,1l3.68,6.06l1.18,2.11" style="fill:none;stroke:#303030;stroke-width:0.5;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;"/><g><path d="     M11.5128,25.096c0,0-1.9506-2.1279-0.14779-3.5182l5.77659-3.5273" style="fill:none;stroke:#303030;stroke-width:0.5;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;"/><line style="fill:none;stroke:#303030;stroke-width:0.5;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;" x1="18.4377" x2="19.0404" y1="17.309" y2="16.8798"/><line style="fill:none;stroke:#303030;stroke-width:0.5;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;" x1="32.2411" x2="30.6115" y1="21.01" y2="18.3804"/></g><circle cx="20.79519" cy="31.80215" r="2.64959" style="fill:#F43735;"/></g></g></svg>
                                                             <label class="ml-3 block text-sm font-medium text-gray-700"> TC /TD </label>
                                                         </div>
 
                                                         <div class="flex items-center">
-                                                            <input v-model="form.paymentmethod" value="1" type="radio" class="focus:ring-indigo-500 h-4 w-4 text-indigo-600 border-gray-300">
+                                                            <input v-model="form.paymentmethod" value="1" type="radio" class="px-2 focus:ring-indigo-500 h-4 w-4 text-indigo-600 border-gray-300">
 
                                                             <label class="ml-3 block text-sm font-medium text-gray-700"> Transferencia </label>
                                                         </div>
 
                                                         <div class="flex items-center">
-                                                            <input v-model="form.paymentmethod" value="3" type="radio" class="focus:ring-indigo-500 h-4 w-4 text-indigo-600 border-gray-300">
-                                                            <svg class="w-10" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="48px" height="48px" viewBox="0 0 48 48"><g >
+                                                            <input v-model="form.paymentmethod" value="3" type="radio" class="px-2 focus:ring-indigo-500 h-4 w-4 text-indigo-600 border-gray-300">
+                                                            <svg class="px-2 w-10" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="48px" height="48px" viewBox="0 0 48 48"><g >
                                                                 <path fill="#307730" d="M40,22H8c-0.55228,0-1-0.44772-1-1V6c0-0.55228,0.44772-1,1-1h32c0.55228,0,1,0.44772,1,1v15
 	C41,21.55228,40.55228,22,40,22z"/>
                                                                 <path fill="#3F8E3F" d="M43,22H5c-0.55228,0-1-0.44772-1-1V10c0-0.55229,0.44772-1,1-1h38c0.55228,0,1,0.44771,1,1v11
@@ -753,7 +730,8 @@ export default {
         totaltransaccionprop: 0,
         totalcomisionesprop: 0,
         totalboletas: 0,
-        vendedor: []
+        vendedor: [],
+        rifa: []
     },
     computed: {
         calcularSubtotal(){
@@ -796,6 +774,7 @@ export default {
         return {
             time: 2 * 60 * 1000,
             idpreferencia: 0,
+            urlpago: null,
             session: [],
             loadingWizard: false,
             inputValue: null,
@@ -1126,6 +1105,29 @@ export default {
             this.actualizarRangos();
             this.updateSession(this.session.id, this.form.idrifa.id, this.form.idvendedor.id);
         },
+        selectClienteFull: function (documento) {
+            var url= '/users/showClientDoc';
+            axios.get(url, {
+                params: {
+                    documento: documento
+                }
+            }).then((res) => {
+                var respuesta = res.data;
+                if (respuesta.cliente) {
+                    this.form.cliente = respuesta.cliente;
+                    this.isNewCliente = false;
+                    this.pushSessionDetailClient(this.session.id, this.form.cliente.id, 'upd');
+                } else {
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'El cliente no existe',
+                        showConfirmButton: false,
+                        timer: 1500
+                    })
+                }
+
+            })
+        },
         selectCliente: function () {
             this.isOpenCliente = true;
             this.getClientes('','documento','true');
@@ -1255,45 +1257,7 @@ export default {
                 }
             })
         },
-        getCart: async function() {
-            var url = '/cart/1' + '';
-            axios.get(url, {
-            }).then((res) => {
-                console.log(res.data);
-                var respuesta = res.data;
-                this.cart = respuesta.cart;
-            })
-        },
-        delCartItem: async function(data) {
-            data._method = 'DELETE';
-            var url = '/cart';
-            axios.delete(url, { data: { id: data.id }}
-            ).then((res) => {
-                console.log(res.data);
-                var respuesta = res.data;
-                this.cart = respuesta.cart;
-            })
 
-            data._method = 'DELETE';
-            this.$inertia.post('/cart/'  + data.id, data, {
-                onBefore: (visit) => { console.log('onBefore');},
-                onStart: (visit) => {console.log('onStart');},
-                onProgress: (progress) => {console.log('onProgress');},
-                onSuccess: (page) => {
-                    Swal.fire({
-                        position: 'top-end',
-                        icon: 'success',
-                        title: 'Se ha eliminado el artículo del carrito',
-                        showConfirmButton: false,
-                        timer: 1500
-                    })
-                    this.getCart();
-                },
-                onError: (errors) => {console.log('onError');},
-                onCancel: () => {console.log('onCancel');},
-                onFinish: visit => {console.log('onFinish');},
-            });
-        },
         onValidateRifa: function(isValid, tabIndex){
             /*
             console.log('Termino validar rifa, se registrar cart '+ tabIndex);
@@ -1403,16 +1367,6 @@ export default {
                 return false;
             }
 
-            /*
-            if (Object.keys(this.cart).length == 0) {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Selecciones al menos una boleta',
-                    showConfirmButton: true,
-                })
-                return false;
-            }
-*/
             var url= '/ventas/preparePay';
             axios.get(url, {
                 params: {
@@ -1422,7 +1376,9 @@ export default {
                 console.log(res.data);
                 var respuesta = res.data;
                 this.idpreferencia = respuesta.idpreferencia;
+                this.urlpago = respuesta.urlpago;
 
+                /*
                 const mp = new MercadoPago("TEST-d5d36e04-7513-41d8-af7a-93a4e5ce874e", {
                     locale: 'es-CO'
                 });
@@ -1436,12 +1392,13 @@ export default {
                         label: 'Pagar',
                     }
                 });
-
+                 */
                 console.log("Validar pago id " + this.idpreferencia);
             })
             return true;
         },
         validatePago:function() {
+            window.location.href = this.urlpago;
             /*
             console.log("onComplete");
             if (this.form.valorpagar > this.totalnoparseado) {
@@ -1669,15 +1626,18 @@ export default {
 
     },
     created: function () {
-        this.getCart();
+        //this.getCart();
         this.getPaises();
+        this.getDepartamentos();
+        this.getCiudades();
         //this.getClientes();
         this.getTiposdocumento();
     },
     mounted() {
-        this.getCart();
+        //this.getCart();
         this.form.idvendedor = this.vendedor;
-        this.registrarSessionVenta(this.caja.puntoventa.id, null, this.form.idvendedor.id)
+        this.registrarSessionVenta(this.caja.puntoventa.id, this.rifa.id, this.form.idvendedor.id);
+        this.form.idrifa = this.rifa;
         //console.log(this.form.cliente.id);
         //this.showClient(this.form.cliente.id);
     },

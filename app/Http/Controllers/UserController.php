@@ -374,6 +374,17 @@ class UserController extends Controller
         return ['clientes' => $users];
     }
 
+    public function showClientDoc(Request $request)
+    {
+        $users = Cliente::where('documento', $request->documento)
+                    ->with('tipodocumento')
+                    ->with('ciudad')
+                    ->where('estado', 1)
+                    ->first();
+
+        return ['cliente' => $users];
+    }
+
     /**
      * Show the form for creating a new resource.
      *

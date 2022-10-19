@@ -206,7 +206,7 @@ class VentaController extends Controller
         ]);
     }
 
-    public function createapp(Request $request)
+    public function createappp(Request $request)
     {
         $caja = Caja::where('idvendedor', Auth::user()->id)
             ->with('puntoventa')
@@ -228,8 +228,11 @@ class VentaController extends Controller
             $cajas->save();
         }
 
+        $rifa = Rifa::where('id', 4)->first();
+
         return Inertia::render('Ventas/Ventaapp', [
             'caja' => $caja,
+            'rifa' => $rifa,
             'estado' => 0,
             'vendedor' => Auth::user()
         ]);
@@ -1480,12 +1483,21 @@ dd($e);
         $preference = new \MercadoPago\Preference();
 
         $preference->back_urls = array(
-            "success" => "https://dllo.shoppingred.com.co/ventas/paynotifysuccess",
+            "success" => "http://localhost/ventas/paynotifysuccess",
+            "failure" => "http://localhost/ventas/paynotifyfailure",
+   	        "pending" => "http://localhost/ventas/paynotifypending",
+        );
+        /*
+         * "success" => "https://dllo.shoppingred.com.co/ventas/paynotifysuccess",
             "failure" => "https://dllo.shoppingred.com.co/ventas/paynotifyfailure",
    	        "pending" => "https://dllo.shoppingred.com.co/ventas/paynotifypending",
-        );
+         */
 
-        //$preference->notification_url = "https://dllo.shoppingred.com.co/ventas/paynotify";
+        $mytime= Carbon::now('America/Bogota');
+        $preference->expires = true;
+        $preference->expiration_date_from = $mytime->toIso8601String();
+        $preference->expiration_date_to = $mytime->addHours(config('mercadopago.expirationpay'))->toIso8601String();
+
         foreach ($detallesesion as $product) {
             $item = new \MercadoPago\Item();
             $item->title = $product->boleta->numero;
@@ -1503,13 +1515,14 @@ dd($e);
             $checkout->idboleta = $product->idboleta;
             $checkout->valor = $product->valor;
             $checkout->idcliente = $product->idcliente;
+            $checkout->idvendedor = Auth::user()->id;
             $checkout->estado = 4;
             $checkout->preference_id = $preference->id;
             $checkout->urlpago = $preference->init_point;
             $checkout->save();
         }
 
-        return ['idpreferencia' => $preference->id];
+        return ['idpreferencia' => $preference->id, 'urlpago' => $preference->init_point];
     }
 
     public function sendSMS($to, $message) {
@@ -1566,9 +1579,30 @@ dd($e);
     }
 
     public function paynotifyfailure(Request $request) {
+        $checkouts = Checkout::where('preference_id', $request->preference_id)->get();
 
+        //$r = new Request();
+        //$r->idsesion = $checkouts[0]['idsesionventa'];
+        //$r->isSale = true;
+        //$idventa = $this->newSale($r);
+        //$this->finishSession($r);
+
+        foreach ($checkouts as $checkout) {
+            $checkout->collection_id = $request->collection_id;
+            $checkout->collection_status = $request->collection_status;
+            $checkout->payment_id = $request->payment_id;
+            $checkout->status = $request->status;
+            $checkout->estado = 2;
+            $checkout->payment_type = $request->payment_type;
+            $checkout->merchant_order_id = $request->merchant_order_id;
+            $checkout->site_id = $request->site_id;
+            $checkout->processing_mode = $request->processing_mode;
+            $checkout->merchant_account_id = $request->merchant_account_id;
+            $checkout->idventa = null;
+            $checkout->save();
+        }
         $checkout = Checkout::where('preference_id', $request->preference_id)
-                              ->first();
+            ->first();
 
         return Inertia::render('Ventas/Finishsale', [
             'payment_id' => $checkout->payment_id,
@@ -1579,7 +1613,32 @@ dd($e);
     }
 
     public function paynotifypending(Request $request) {
+        $checkouts = Checkout::where('preference_id', $request->preference_id)->get();
 
+        //$r = new Request();
+        //$r->idsesion = $checkouts[0]['idsesionventa'];
+        //$r->isSale = true;
+        //$idventa = $this->newSale($r);
+        //$this->finishSession($r);
+
+        $sesionventa = Sesionventa::where('id', $checkouts[0]['idsesionventa'])->first();
+        $sesionventa->estado = 4;
+        $sesionventa->save();
+
+        foreach ($checkouts as $checkout) {
+            $checkout->collection_id = $request->collection_id;
+            $checkout->collection_status = $request->collection_status;
+            $checkout->payment_id = $request->payment_id;
+            $checkout->status = $request->status;
+            $checkout->estado = 3;
+            $checkout->payment_type = $request->payment_type;
+            $checkout->merchant_order_id = $request->merchant_order_id;
+            $checkout->site_id = $request->site_id;
+            $checkout->processing_mode = $request->processing_mode;
+            $checkout->merchant_account_id = $request->merchant_account_id;
+            $checkout->idventa = null;
+            $checkout->save();
+        }
         $checkout = Checkout::where('preference_id', $request->preference_id)
             ->first();
 

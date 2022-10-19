@@ -251,4 +251,13 @@ class LoginController extends Controller
         ])->onlyInput('username');
     }
 
+    public function authenticatelink(Request $request, Vendedor $vendedor)
+    {
+        Auth::guard('vendedor')->login($vendedor, $remember = true);
+        $request->session()->regenerate();
+        $request->session()->push('puntodeventa', 2);
+
+        return redirect()->intended('/app/ventas');
+    }
+
 }

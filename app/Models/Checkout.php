@@ -15,6 +15,7 @@ class Checkout extends Model
         'valor',
         'idcliente',
         'idventa',
+        'idvendedor',
         'preference_id',
         'collection_id',
         'collection_status',
@@ -35,6 +36,10 @@ class Checkout extends Model
 
     public function sesionventa(){
         return $this->belongsTo(Sesionventa::class, 'idsesionventa');
+    }
+
+    public function vendedor(){
+        return $this->belongsTo(Vendedor::class, 'idvendedor');
     }
 
     public function boleta(){

@@ -1293,6 +1293,9 @@ select {
 .h-24 {
   height: 6rem;
 }
+.h-1\/2 {
+  height: 50%;
+}
 .max-h-fit {
   max-height: -webkit-fit-content;
   max-height: -moz-fit-content;
@@ -1423,9 +1426,6 @@ select {
 }
 .w-8\/12 {
   width: 66.666667%;
-}
-.w-5\/12 {
-  width: 41.666667%;
 }
 .min-w-0 {
   min-width: 0px;
