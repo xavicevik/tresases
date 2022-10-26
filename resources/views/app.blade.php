@@ -27,12 +27,6 @@
             <script src="http://localhost:3000/browser-sync/browser-sync-client.js"></script>
         @endenv
             <script src="https://sdk.mercadopago.com/js/v2"></script>
-        <script>
-            Echo.channel('sales').listen('SaleApp', (e) => {
-                console.log(e.message);
-            })
-        </script>
-
 
     </body>
 </html>
