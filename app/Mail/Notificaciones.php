@@ -30,7 +30,7 @@ class Notificaciones extends Mailable
     public function build()
     {
         return $this->subject($this->data['subject'])
-                    ->from("info@tresases.com.co","Info TresAses")
-                    ->view('emails.detalleventa');
+            ->from("info@tresases.com.co","Info Shoppingred")
+            ->view('vendor.mail.message', $this->data['datos']);
     }
 }

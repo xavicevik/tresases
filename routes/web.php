@@ -167,6 +167,10 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'),'verified',]
         Route::get('/ventas/paynotifyfailure', [VentaController::class, 'paynotifyfailure'])->name('paynotifyfailure');
         Route::get('/ventas/paynotifypending', [VentaController::class, 'paynotifypending'])->name('paynotifypending');
 
+        Route::get('/app/ventas/paynotifysuccess', [VentaController::class, 'paynotifysuccessapp'])->name('paynotifysuccessapp');
+        Route::get('/app/ventas/paynotifyfailure', [VentaController::class, 'paynotifyfailureapp'])->name('paynotifyfailureapp');
+        Route::get('/app/ventas/paynotifypending', [VentaController::class, 'paynotifypendingapp'])->name('paynotifypendingapp');
+
         Route::resource('rifas', RifaController::class);
         Route::resource('confcomisiones',ConfcomisionController::class);
         Route::resource('comisiones',ComisionController::class);

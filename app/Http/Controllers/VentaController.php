@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\SaleApp;
 use App\Jobs\SendEmailJob;
 use App\Jobs\SendSMSJob;
 use App\Models\Boleta;
@@ -26,7 +27,9 @@ use App\Models\Transaccion;
 use App\Models\User;
 use App\Models\Vendedor;
 use App\Models\Venta;
+use App\Notifications\EmailcodeNotification;
 use Darryldecode\Cart\Cart;
+use Illuminate\Notifications\Notification;
 use Illuminate\Routing\Route;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Http;
@@ -820,7 +823,6 @@ class VentaController extends Controller
 
                 $queries = \DB::getQueryLog();
                 //dd($queries);
-
                 asort($salida);
                 $recibo = new Recibo();
                 $recibo->nombre = 'Recibo venta';
@@ -848,8 +850,26 @@ class VentaController extends Controller
                 $venta->cantidad = sizeof($boletas);
                 $venta->save();
 
-                $concepto = 2;
-                $descripcion = 'Pago en efectivo';
+                // pendiente el método de pago
+                $request->paymentmethod = 1;
+                switch ($request->paymentmethod) {
+                    case 1:
+                        $concepto = 4;
+                        $descripcion = 'Pago con tarjeta crédito/debito';
+                        break;
+                    case 2:
+                        $concepto = 6;
+                        $descripcion = 'Pago con transferencia';
+                        break;
+                    case 3:
+                        $concepto = 2;
+                        $descripcion = 'Pago en efectivo';
+                        break;
+                    default:
+                        $concepto = 0;
+                        $descripcion = '';
+                        break;
+                }
                 $signo = self::debito;
                 $impuesto = 0;
 
@@ -1483,9 +1503,9 @@ dd($e);
         $preference = new \MercadoPago\Preference();
 
         $preference->back_urls = array(
-            "success" => "http://localhost/ventas/paynotifysuccess",
-            "failure" => "http://localhost/ventas/paynotifyfailure",
-   	        "pending" => "http://localhost/ventas/paynotifypending",
+            "success" => "http://localhost/app/ventas/paynotifysuccess",
+            "failure" => "http://localhost/app/ventas/paynotifyfailure",
+   	        "pending" => "http://localhost/app/ventas/paynotifypending",
         );
         /*
          * "success" => "https://dllo.shoppingred.com.co/ventas/paynotifysuccess",
@@ -1643,6 +1663,163 @@ dd($e);
             ->first();
 
         return Inertia::render('Ventas/Finishsale', [
+            'payment_id' => $checkout->payment_id,
+            'idventa' => null,
+            'estado' => 'pendiente',
+            'mensajePago' => 'El pago se encuentra pendiente'
+        ]);
+    }
+
+    // Notificaciones ventas app
+    public function paynotifysuccessapp(Request $request) {
+
+        $checkouts = Checkout::where('preference_id', $request->preference_id)->get();
+
+        $r = new Request();
+        $r->idsesion = $checkouts[0]['idsesionventa'];
+        $r->isSale = true;
+        $idventa = $this->newSale($r);
+        $this->finishSession($r);
+
+        foreach ($checkouts as $checkout) {
+            $checkout->collection_id = $request->collection_id;
+            $checkout->collection_status = $request->collection_status;
+            $checkout->payment_id = $request->payment_id;
+            $checkout->status = $request->status;
+            $checkout->estado = 1;
+            $checkout->payment_type = $request->payment_type;
+            $checkout->merchant_order_id = $request->merchant_order_id;
+            $checkout->site_id = $request->site_id;
+            $checkout->processing_mode = $request->processing_mode;
+            $checkout->merchant_account_id = $request->merchant_account_id;
+            $checkout->idventa = $idventa;
+            $checkout->save();
+
+            $cliente = Cliente::where('id', $checkout->idcliente)->first();
+            $boleta = Boleta::where('id', $checkout->idboleta)->first();
+            $to = "57".$cliente->movil;
+
+            $saldo = $boleta->saldo;
+            $saldotxt = '';
+
+            if ($saldo > 0) {
+                $saldotxt = "Tu saldo pendiente es $saldo.";
+            }
+            $message = "Shopingred agradece tu fidelidad, el gran bono millonario premio mayor $boleta->numero promocional $boleta->promocional ha sido registrado con exito. $saldotxt SUERTE";
+            $mensaje = $saldotxt;
+
+            $this->sendSMS($to, $message);
+            if ($saldo == 0) {
+                $mensaje = "Conserva este mensaje de paz y salvo valido para reclamar el premio mayor: Apto Robles, Camioneta mazda y Tour resolucion EDSA N 999 premio mayor $boleta->numero y promocional $boleta->promocional. Sorteo miercoles 21 de diciembre de 2022 con el premio mayor de la loteria de manizales";
+                $this->sendSMS($to, $mensaje);
+            }
+
+            $subject = 'Shoppingred - Compra boletas';
+            $action = "$boleta->numero / $boleta->promocional";
+            $line1 = $message;
+            $line2 = $mensaje;
+
+            //$cliente->notify(new EmailcodeNotification($boleta->numero, $boleta->promocional));
+            \Illuminate\Support\Facades\Notification::route('mail', 'javier.minotta.h@gmail.com')->notify(new EmailcodeNotification($subject, $line1, $action, $line2, $boleta->numero, $boleta->promocional));
+        }
+        $checkout = Checkout::where('preference_id', $request->preference_id)
+            ->first();
+
+        event(new SaleApp('Hola mundo'));
+
+        return Inertia::render('Ventas/Finishsaleapp', [
+            'payment_id' => $checkout->payment_id,
+            'idventa' => $checkout->idventa,
+            'estado' => 'aprobado',
+            'mensajePago' => 'Gracias por comprar en Shoppingred.com!'
+        ]);
+    }
+
+    public function paynotifyfailureapp(Request $request) {
+        $checkouts = Checkout::where('preference_id', $request->preference_id)->get();
+
+        foreach ($checkouts as $checkout) {
+            $checkout->collection_id = $request->collection_id;
+            $checkout->collection_status = $request->collection_status;
+            $checkout->payment_id = $request->payment_id;
+            $checkout->status = $request->status;
+            $checkout->estado = 2;
+            $checkout->payment_type = $request->payment_type;
+            $checkout->merchant_order_id = $request->merchant_order_id;
+            $checkout->site_id = $request->site_id;
+            $checkout->processing_mode = $request->processing_mode;
+            $checkout->merchant_account_id = $request->merchant_account_id;
+            $checkout->idventa = null;
+            $checkout->save();
+
+            $cliente = Cliente::where('id', $checkout->idcliente)->first();
+            $boleta = Boleta::where('id', $checkout->idboleta)->first();
+            $to = "57".$cliente->movil;
+
+            $message = "Shopingred le informa que el gran bono millonario premio mayor $boleta->numero promocional $boleta->promocional NO ha sido registrado con exito. debido que el pago fue rechazado";
+
+            $this->sendSMS($to, $message);
+
+            $subject = 'Shoppingred - Compra boletas';
+            $action = "$boleta->numero / $boleta->promocional";
+            $line1 = $message;
+            $line2 = "";
+
+            //$cliente->notify(new EmailcodeNotification($boleta->numero, $boleta->promocional));
+            \Illuminate\Support\Facades\Notification::route('mail', 'javier.minotta.h@gmail.com')->notify(new EmailcodeNotification($subject, $line1, $action, $line2, $boleta->numero, $boleta->promocional));
+        }
+        $checkout = Checkout::where('preference_id', $request->preference_id)
+            ->first();
+
+        return Inertia::render('Ventas/Finishsaleapp', [
+            'payment_id' => $checkout->payment_id,
+            'idventa' => null,
+            'estado' => 'rechazado',
+            'mensajePago' => 'El pago fue rechazado!'
+        ]);
+    }
+
+    public function paynotifypendingapp(Request $request) {
+        $checkouts = Checkout::where('preference_id', $request->preference_id)->get();
+
+        $sesionventa = Sesionventa::where('id', $checkouts[0]['idsesionventa'])->first();
+        $sesionventa->estado = 4;
+        $sesionventa->save();
+
+        foreach ($checkouts as $checkout) {
+            $checkout->collection_id = $request->collection_id;
+            $checkout->collection_status = $request->collection_status;
+            $checkout->payment_id = $request->payment_id;
+            $checkout->status = $request->status;
+            $checkout->estado = 3;
+            $checkout->payment_type = $request->payment_type;
+            $checkout->merchant_order_id = $request->merchant_order_id;
+            $checkout->site_id = $request->site_id;
+            $checkout->processing_mode = $request->processing_mode;
+            $checkout->merchant_account_id = $request->merchant_account_id;
+            $checkout->idventa = null;
+            $checkout->save();
+
+            $cliente = Cliente::where('id', $checkout->idcliente)->first();
+            $boleta = Boleta::where('id', $checkout->idboleta)->first();
+            $to = "57".$cliente->movil;
+
+            $message = "Shopingred le informa que el gran bono millonario premio mayor $boleta->numero promocional $boleta->promocional se encuentra en proceso pendiente de recibir el pago";
+
+            $this->sendSMS($to, $message);
+
+            $subject = 'Shoppingred - Compra boletas';
+            $action = "$boleta->numero / $boleta->promocional";
+            $line1 = $message;
+            $line2 = "";
+
+            //$cliente->notify(new EmailcodeNotification($boleta->numero, $boleta->promocional));
+            \Illuminate\Support\Facades\Notification::route('mail', 'javier.minotta.h@gmail.com')->notify(new EmailcodeNotification($subject, $line1, $action, $line2, $boleta->numero, $boleta->promocional));
+        }
+        $checkout = Checkout::where('preference_id', $request->preference_id)
+            ->first();
+
+        return Inertia::render('Ventas/Finishsaleapp', [
             'payment_id' => $checkout->payment_id,
             'idventa' => null,
             'estado' => 'pendiente',

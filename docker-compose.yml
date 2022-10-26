@@ -16,6 +16,7 @@ services:
             - '${VITE_PORT:-5173}:${VITE_PORT:-5173}'
             - '3001:3001'
             - '3000:3000'
+            - '6001:6001'
         environment:
             WWWUSER: '${WWWUSER}'
             LARAVEL_SAIL: 1

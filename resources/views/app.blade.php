@@ -3,6 +3,7 @@
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="csrf-token" content="{{ csrf_token() }}" />
 
         <title inertia>{{ config('app.name', 'Laravel') }}</title>
 
@@ -26,6 +27,11 @@
             <script src="http://localhost:3000/browser-sync/browser-sync-client.js"></script>
         @endenv
             <script src="https://sdk.mercadopago.com/js/v2"></script>
+        <script>
+            Echo.channel('sales').listen('SaleApp', (e) => {
+                console.log(e.message);
+            })
+        </script>
 
 
     </body>
