@@ -166,7 +166,7 @@ return [
         Illuminate\Validation\ValidationServiceProvider::class,
         Illuminate\View\ViewServiceProvider::class,
 
-        Darryldecode\Cart\CartServiceProvider::class,
+        //Darryldecode\Cart\CartServiceProvider::class,
         Spatie\Permission\PermissionServiceProvider::class,
 
         /*
@@ -200,7 +200,7 @@ return [
 
     'aliases' => Facade::defaultAliases()->merge([
         // 'ExampleClass' => App\Example\ExampleClass::class,
-        'Cart' => Darryldecode\Cart\Facades\CartFacade::class,
+        //'Cart' => Darryldecode\Cart\Facades\CartFacade::class,
     ])->toArray(),
 
 ];
