@@ -1198,7 +1198,6 @@ export default {
             formData.append('isnatural', 1);
             formData.append('idempresa', 3);
 
-            console.log(formData);
             this.$inertia.post('/users', formData, {
                 onBefore: (visit) => { console.log('onBefore');},
                 onStart: (visit) => {console.log('onStart');},
@@ -1211,7 +1210,7 @@ export default {
                         showConfirmButton: false,
                         timer: 1500
                     })
-                    this.onSelectCliente(data);
+                    this.onSelectCliente(formData);
                 },
                 onError: (errors) => {console.log('onError');},
                 onCancel: () => {console.log('onCancel');},
