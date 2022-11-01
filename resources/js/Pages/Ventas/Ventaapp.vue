@@ -228,7 +228,7 @@
                                                     <div v-if="$page.props.errors.documento" class="text-red-500">{{ $page.props.errors.docuemnto }}</div>
                                                 </div>
                                             </div>
-                                            <div v-show="form.cliente.id" class="mt-2 grid grid-cols-1 gap-y-6 sm:grid-cols-2 sm:gap-x-4">
+                                            <div v-show="form.cliente.id || isNewCliente" class="mt-2 grid grid-cols-1 gap-y-6 sm:grid-cols-2 sm:gap-x-4">
                                                 <div>
                                                     <label class="block text-xs font-medium text-gray-700">Nombre</label>
                                                     <div class="mt-1">
@@ -262,8 +262,6 @@
                                                         </select>
                                                     </div>
                                                 </div>
-
-
 
                                                 <div>
                                                     <label class="block text-xs font-medium text-gray-700">País</label>
@@ -1124,6 +1122,7 @@ export default {
                         showConfirmButton: false,
                         timer: 1500
                     })
+                    this.isNewCliente = true;
                 }
 
             })
