@@ -1556,17 +1556,13 @@ class VentaController extends Controller
         // Agrega credenciales
         SDK::setAccessToken("TEST-527760229179050-091011-a9b62330235cb5d7a47b2b59968ac474-1195821039");
         $preference = new Preference();
+        $url = config('mercadopago.urlretorno');
 
         $preference->back_urls = array(
-            "success" => "http://localhost/app/ventas/paynotifysuccess",
-            "failure" => "http://localhost/app/ventas/paynotifyfailure",
-   	        "pending" => "http://localhost/app/ventas/paynotifypending",
+            "success" => $url."/app/ventas/paynotifysuccess",
+            "failure" => $url."/app/ventas/paynotifyfailure",
+   	        "pending" => $url."/app/ventas/paynotifypending",
         );
-        /*
-         * "success" => "https://dllo.shoppingred.com.co/ventas/paynotifysuccess",
-            "failure" => "https://dllo.shoppingred.com.co/ventas/paynotifyfailure",
-   	        "pending" => "https://dllo.shoppingred.com.co/ventas/paynotifypending",
-         */
 
         $mytime= Carbon::now('America/Bogota');
         $preference->expires = true;

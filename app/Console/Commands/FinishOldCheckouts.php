@@ -2,30 +2,29 @@
 
 namespace App\Console\Commands;
 
-use App\Http\Controllers\VentaController;
-use App\Jobs\ValidarVentasJob;
 use App\Models\Boleta;
+use App\Models\Checkout;
 use App\Models\Detallesesion;
 use App\Models\Sesionventa;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
-class ProcessPayments extends Command
+class FinishOldCheckouts extends Command
 {
     /**
      * The name and signature of the console command.
      *
      * @var string
      */
-    protected $signature = 'ventas:processpayments';
+    protected $signature = 'sessions:clearcheckout';
 
     /**
      * The console command description.
      *
      * @var string
      */
-    protected $description = 'Procesar pagos pendientes y en proceso';
+    protected $description = 'Eliminar checkouts antiguos';
 
     /**
      * Create a new command instance.
@@ -43,6 +42,10 @@ class ProcessPayments extends Command
      * @return int
      */
     public function handle() {
-        $timer  = (new VentaController)->ProcessPayments();
+        $dias = config('mercadopago.diascheckout');
+
+        $checkouts = Checkout::whereRaw('TIMESTAMPDIFF(DAY, updated_at, NOW()) > '.$dias)
+                                ->whereNull('status')
+                                ->delete();
     }
 }

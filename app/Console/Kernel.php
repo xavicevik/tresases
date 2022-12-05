@@ -17,10 +17,9 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
-        // $schedule->command('inspire')->hourly();
         $schedule->command('sessions:finish')->everyMinute();
         $schedule->command('cajas:openclose')->daily();
-
+        $schedule->command('sessions:clearcheckout')->sundays();
         $schedule->command('ventas:processpayments')->everyTwoMinutes();
         //$schedule->job(new ValidarVentasJob())->everyTwoMinutes();
     }
