@@ -1142,7 +1142,7 @@ export default {
             formData.append('idempresa', 3);
             formData.append('idsesion', this.session.id)
 
-          /*
+
             await axios.post('/users/storeCliente', formData)
                 .then((res) => {
                     console.log('Se creo cliente');
@@ -1159,7 +1159,7 @@ export default {
                     return true;
             });
 
-            */
+            /*
             this.$inertia.post('/users/storeCliente', formData, {
                 onBefore: (visit) => { console.log('onBefore');},
                 onStart: (visit) => {console.log('onStart');},
@@ -1176,7 +1176,7 @@ export default {
                 onCancel: () => {console.log('onCancel');},
                 onFinish: visit => {console.log('onFinish'); return true},
             });
-
+            */
 
         },
         reset: function () {
