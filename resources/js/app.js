@@ -1,3 +1,5 @@
+import Popper from "vue3-popper";
+
 require('./bootstrap');
 
 import { createApp, h } from 'vue';
@@ -22,6 +24,7 @@ createInertiaApp({
             .component('Datepicker', Datepicker)
             .component('Submenu', Submenu)
             .component('Statscards', Statscards)
+            .component('Popper', Popper)
             .mixin(Permissions)
             .mixin(Utilities)
             .mount(el);

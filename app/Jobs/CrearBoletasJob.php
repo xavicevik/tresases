@@ -38,6 +38,7 @@ class CrearBoletasJob implements ShouldQueue
      */
     public function handle()
     {
-        RifaController::crearBoleteria($this->id, $this->isFisica, $this->cifras, $this->serie, $this->precio);
+        $result = new RifaController();
+        $result->crearBoleteria($this->id, $this->isFisica, $this->cifras, $this->serie, $this->precio);
     }
 }

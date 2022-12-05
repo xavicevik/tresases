@@ -2,6 +2,8 @@
 
 namespace App\Console;
 
+use App\Jobs\GestionCajasJob;
+use App\Jobs\ValidarVentasJob;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 
@@ -17,6 +19,10 @@ class Kernel extends ConsoleKernel
     {
         // $schedule->command('inspire')->hourly();
         $schedule->command('sessions:finish')->everyMinute();
+        $schedule->command('cajas:openclose')->daily();
+
+        //$schedule->command('ventas:processpayments')->everyMinute();
+        $schedule->job(new ValidarVentasJob())->everyTwoMinutes();
     }
 
     /**

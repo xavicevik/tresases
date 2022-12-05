@@ -14,6 +14,7 @@ use App\Models\Confcomision;
 use App\Models\Configuración;
 use App\Models\Detallesesion;
 use App\Models\Detalleventa;
+use App\Models\Estado;
 use App\Models\Historialcaja;
 use App\Models\Loteria;
 use App\Models\Imagen;
@@ -41,6 +42,9 @@ use Illuminate\Support\Facades\DB;;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Validator;
 use Inertia\Inertia;
+use MercadoPago\Payment;
+use MercadoPago\Preference;
+use MercadoPago\SDK;
 use Spatie\Permission\Models\Permission;
 use function PHPUnit\Framework\isEmpty;
 
@@ -57,13 +61,21 @@ class VentaController extends Controller
         */
         //$this->middleware(['role:Administrador','permission:ventas-list']);
         //$this->middleware('permission:ventas-list|ventas-create|ventas-edit|ventas-delete', ['only' => ['index','show']]);
-
     }
 
     const canPorPagina = 10;
     const debito = 'DB';
     const credito = 'CR';
     const pago = 'PA';
+    // lista de estados
+    const inactivo = 0;
+    const activo = 1;
+    const reservado = 2;
+    const vendido = 3;
+    const pendiente = 4;
+    const enproceso = 5;
+    const cancelado = 6;
+    const anulado = 9;
     /**
      * Display a listing of the resource.
      *
@@ -209,8 +221,10 @@ class VentaController extends Controller
         ]);
     }
 
-    public function createappp(Request $request)
+    public function createappp(Request $request, Vendedor $vendedor)
     {
+        $caja = Caja::where('id', 5)->with('puntoventa')->first();
+        /*
         $caja = Caja::where('idvendedor', Auth::user()->id)
             ->with('puntoventa')
             ->where('estado', 1)
@@ -230,14 +244,18 @@ class VentaController extends Controller
             $cajas->montocierre = 0.0;
             $cajas->save();
         }
+        */
 
-        $rifa = Rifa::where('id', 4)->first();
+        // Virtual es solo Rifa Taxia
+        $rifa = Rifa::where('id', $request->idrifa)->first();
 
         return Inertia::render('Ventas/Ventaapp', [
             'caja' => $caja,
             'rifa' => $rifa,
             'estado' => 0,
-            'vendedor' => Auth::user()
+            'username' => 'ID '.$vendedor->id,
+            'vendedor' => $vendedor,
+            'tipoventa' => 'userapp'
         ]);
     }
 
@@ -307,12 +325,12 @@ class VentaController extends Controller
             $venta->idpuntoventa = $request->idpuntoventa;
             $venta->fechaventa = $mytime->toDateString();//$request->fechaventa;
             $venta->comprobante = $request->comprobante;
-            $venta->estado = true;
+            $venta->estado = 1;
             $venta->transaccion = 1;
             $venta->saveOrFail();
 
-            \Cart::session(Auth::user()->id);
-            $boletas = \Cart::getContent();
+            //\Cart::session(Auth::user()->id);
+            //$boletas = \Cart::getContent();
 
             if (isset($boletas) && sizeof($boletas) > 0) {
                 foreach($boletas as $ep=>$det)
@@ -440,23 +458,26 @@ class VentaController extends Controller
         $estado = true;
 
         $boleta = Boleta::where('idrifa', $idrifa)
-                          ->where('estado', '<>', 1)
+                          //->whereNotIn('estado', array(self::activo))
+                          ->where('estado', '<>', self::activo)
                           ->where('numero', $numero)
                           ->first();
 
+        /*
         $promoboleta = Promoboleta::where('idrifa', $idrifa)
-                              ->where('estado', '<>', 1)
+                              ->whereIn('estatus', array(1, 2, 3))
                               ->where('numero', $numero)
                               ->get();
+        */
 
         if (is_null($boleta)) {
             $estado = false;
             $boleta = Boleta::where('idrifa', $idrifa)
-                ->where('estado', '=', 1)
+                ->where('estado', '=', self::activo)
                 ->where('numero', $numero)
                 ->first();
         }
-        return ['boleta' => $boleta, 'promoboleta' => $promoboleta, 'isocupado' => $estado];
+        return ['boleta' => $boleta, 'promoboleta' => null, 'isocupado' => $estado];
 
     }
 
@@ -464,13 +485,13 @@ class VentaController extends Controller
         $idrifa = $request->rifa;
         $tiporifa = $request->tiporifa;
 
-        $bolval = Boleta::where('estado', 1)
+        $bolval = Boleta::where('estado', self::activo)
                           ->where('idrifa', $idrifa)
                           ->count();
         if ($bolval == 0) {
             $boleta = -99;
         } else {
-            $boleta = Boleta::where('estado', 1)
+            $boleta = Boleta::where('estado', self::activo)
                                 ->where('idrifa', $idrifa)
                                 ->inRandomOrder()
                                 ->first();
@@ -505,7 +526,7 @@ class VentaController extends Controller
 
     private function getSalesComision($idvendedor) {
         $concomision = Confcomision::where('idvendedor', $idvendedor)
-            ->where('estado', 2)
+            ->where('estado', self::reservado)
             ->first();
         if (is_null($concomision)) {
             $concomision = Confcomision::join('vendedors as t1', 'confcomisiones.idvendedor', '=', 't1.idempresa')
@@ -565,7 +586,7 @@ class VentaController extends Controller
                 $venta->idpuntoventa = $session->idpuntoventa;
                 $venta->fechaventa = $mytime->toDateTimeString();
                 $venta->comprobante = $request->comprobante;
-                $venta->estado = 3;
+                $venta->estado = self::vendido;
                 $venta->transaccion = $request->idcaja;
                 $venta->save();
 
@@ -578,9 +599,9 @@ class VentaController extends Controller
                     $boleta->pago = $boleta->pago + $boleta->valor;
                     $boleta->saldo = $boleta->valortotal - $boleta->pago;
                     if ($boleta->saldo == 0) {
-                        $estado = 3;
+                        $estado = self::vendido;
                     } else {
-                        $estado = 4;
+                        $estado = self::pendiente;
                     }
                     $boleta->estado = $estado;
                     $boleta->save();
@@ -596,7 +617,7 @@ class VentaController extends Controller
                     $detalleventa->valortotal = $boleta->valortotal;
                     $detalleventa->numero = $boleta->numero;
                     $detalleventa->cantidad = 1;
-                    $detalleventa->estado = 3;
+                    $detalleventa->estado = self::vendido;
                     $detalleventa->save();
                     $boleta['comision'] = $boleta->valor * ($concomision->comisionvendedor/100);
                     $salida[] = $boleta;
@@ -623,7 +644,7 @@ class VentaController extends Controller
                 $comision->comisionmayorista = $totalpagado * ($concomision->comisionmayorista/100);
                 $comision->comisiondistribuidor = $totalpagado * ($concomision->comisiondistribuidor/100);
                 $comision->comisionvendedor = $totalpagado * ($concomision->comisionvendedor/100);
-                $comision->estado = true;
+                $comision->estado = self::activo;
                 $comision->save();
 
                 $venta->comision = $comision->comisionmayorista + $comision->comisiondistribuidor + $comision->comisionvendedor;
@@ -749,6 +770,8 @@ class VentaController extends Controller
 
             $idsesion = $request->idsesion;
             $session = Sesionventa::where('id', $idsesion)->first();
+            $session->estado = self::activo;
+            $session->save();
 
             //DB::connection()->enableQueryLog();
             if($session) {
@@ -784,8 +807,8 @@ class VentaController extends Controller
                 $venta->idpuntoventa = $session->idpuntoventa;
                 $venta->fechaventa = $mytime->toDateTimeString();
                 $venta->comprobante = $request->comprobante;
-                $venta->estado = 3;
-                $venta->transaccion = 1;//$request->idcaja;
+                $venta->estado = self::vendido;
+                $venta->transaccion = 5;//$request->idcaja;
                 $venta->save();
 
                 foreach ($boletas as $boleta){
@@ -797,9 +820,9 @@ class VentaController extends Controller
                     $boleta->pago = $boleta->pago + $boleta->valor;
                     $boleta->saldo = $boleta->valortotal - $boleta->pago;
                     if ($boleta->saldo == 0) {
-                        $estado = 3;
+                        $estado = self::vendido;
                     } else {
-                        $estado = 4;
+                        $estado = self::pendiente;
                     }
                     $boleta->estado = $estado;
                     $boleta->save();
@@ -815,7 +838,7 @@ class VentaController extends Controller
                     $detalleventa->valortotal = $boleta->valortotal;
                     $detalleventa->numero = $boleta->numero;
                     $detalleventa->cantidad = 1;
-                    $detalleventa->estado = 3;
+                    $detalleventa->estado = self::vendido;
                     $detalleventa->save();
                     $boleta['comision'] = $boleta->valor * ($concomision->comisionvendedor/100);
                     $salida[] = $boleta;
@@ -841,7 +864,7 @@ class VentaController extends Controller
                 $comision->comisionmayorista = $totalpagado * ($concomision->comisionmayorista/100);
                 $comision->comisiondistribuidor = $totalpagado * ($concomision->comisiondistribuidor/100);
                 $comision->comisionvendedor = $totalpagado * ($concomision->comisionvendedor/100);
-                $comision->estado = true;
+                $comision->estado = self::activo;
                 $comision->save();
 
                 $venta->comision = $comision->comisionmayorista + $comision->comisiondistribuidor + $comision->comisionvendedor;
@@ -951,7 +974,7 @@ class VentaController extends Controller
             $venta->idpuntoventa = $request->idpuntoventa;
             $venta->fechaventa = $mytime->toDateTimeString();
             $venta->comprobante = $request->comprobante;
-            $venta->estado = 9;
+            $venta->estado = self::anulado;
             $venta->transaccion = $request->idcaja;
             $venta->save();
 
@@ -959,7 +982,7 @@ class VentaController extends Controller
                 $reg = json_decode($reserva);
 
                 $boleta = Boleta::where('idrifa', $request->idrifa)
-                    ->whereIn('estado', [3,4])
+                    ->whereIn('estado', [self::vendido, self::pendiente, self::enproceso])
                     ->where('numero', $reg->numero)
                     ->where('idvendedor', $request->idvendedor)
                     ->first();
@@ -973,17 +996,17 @@ class VentaController extends Controller
 
                 $idclientetmp = $boleta->idcliente;
                 if ($boleta->pago == 0) {
-                    $boleta->estado = 2;
+                    $boleta->estado = self::reservado;
                     $boleta->idvendedor = $request->idvendedor;
                     $boleta->idcliente = null;
                 } else {
-                    $boleta->estado = 3;
+                    $boleta->estado = self::vendido;
                     $boleta->idvendedor = $request->idvendedor;
                 }
                 if ($boleta->saldo == 0) {
-                    $boleta->estado = 3;
+                    $boleta->estado = self::vendido;
                 } else {
-                    $boleta->estado = 4;
+                    $boleta->estado = self::pendiente;
                 }
                 $boleta->save();
 
@@ -998,7 +1021,7 @@ class VentaController extends Controller
                 $detalleventa->valortotal = $boleta->valor;
                 $detalleventa->numero = $reg->numero;
                 $detalleventa->cantidad = 1;
-                $detalleventa->estado = 9;
+                $detalleventa->estado = self::anulado;
                 $detalleventa->save();
 
                 $reg->valorpagado = "$" . number_format($reg->valorpagado, 0, ".", ",");
@@ -1097,7 +1120,7 @@ class VentaController extends Controller
         } catch (\Exception $e) {
             // An error occured; cancel the transaction...
             DB::rollback();
-dd($e);
+            dd($e);
             return back()->withErrors(['error' => ['No se pudo registrar la venta, por favor validar los parámetros ingresados']]);
             // and throw the error again.
             //throw $e;
@@ -1152,7 +1175,7 @@ dd($e);
             $ventanew->idvendedor = $venta->idvendedor;
             $ventanew->idpuntoventa = $request->idpuntoventa;
             $ventanew->fechaventa = $mytime->format('Y-m-d');
-            $ventanew->estado = 6;
+            $ventanew->estado = self::anulado;
             $ventanew->impuesto = 0;
             $ventanew->save();
 
@@ -1167,7 +1190,7 @@ dd($e);
             $detallenew->valortotal = -$detalle->valortotal;
             $detallenew->numero = $detalle->numero;
             $detallenew->cantidad = $detalle->cantidad;
-            $detallenew->estado = 6;
+            $detallenew->estado = self::anulado;
             $detallenew->save();
 
             $boleta->pago = $boleta->pago + $detallenew->valor;
@@ -1176,9 +1199,9 @@ dd($e);
             if ($boleta->pago == 0) {
                 $boleta->idcliente = null;
                 $boleta->idvendedor = null;
-                $boleta->estado = 1;
+                $boleta->estado = self::activo;
             } else {
-                $boleta->estado = 4;
+                $boleta->estado = self::pendiente;
             }
             $boleta->save();
             $concomision = $this->getSalesComision($ventanew->idvendedor);
@@ -1190,7 +1213,7 @@ dd($e);
             $comisionnew->comisionmayorista = $ventanew->valorventa * ($concomision->comisionmayorista/100);
             $comisionnew->comisiondistribuidor = $ventanew->valorventa * ($concomision->comisiondistribuidor/100);
             $comisionnew->comisionvendedor = $ventanew->valorventa * ($concomision->comisionvendedor/100);
-            $comisionnew->estado = 6;
+            $comisionnew->estado = self::anulado;
             $comisionnew->save();
 
             $concepto = 5;
@@ -1294,23 +1317,43 @@ dd($e);
     public function initSession(Request $request) {
         $time = config('session.max_time_sales');
 
-        $idusuario = Auth::user();
-
-        if ($idusuario->idrol == 5) {
+        if ($request->tipoventa == 'userapp') {
+            $idusuario = Vendedor::where('id',$request->idvendedor)->first();
             $idvendedor = $idusuario->id;
         } else {
-            $idvendedor = null;
+            $idusuario = Auth::user();
+
+            if ($idusuario->idrol == 5) {
+                $idvendedor = $idusuario->id;
+            } else {
+                $idvendedor = null;
+            }
         }
 
         $detallesession = null;
         $cliente = null;
+        $salesession = session('salesession');
 
-        $session = Sesionventa::where('idusuario', $idusuario->id)
-                                ->where('idpuntoventa', $request->idpuntoventa)
-                                ->where('estado', 1)
-                                ->with('vendedor')
-                                ->with('rifa')
-                                ->first();
+        $session = null;
+        if($request->tipoventa == 'userapp') {
+            if ($salesession) {
+                $session = Sesionventa::where('idusuario', $idusuario->id)
+                    ->where('idpuntoventa', $request->idpuntoventa)
+                    ->where('estado', self::activo)
+                    ->with('vendedor')
+                    ->with('rifa')
+                    ->where('session', $salesession)
+                    ->first();
+            }
+        } else {
+            $session = Sesionventa::where('idusuario', $idusuario->id)
+                ->where('idpuntoventa', $request->idpuntoventa)
+                ->where('estado', self::activo)
+                ->with('vendedor')
+                ->with('rifa')
+                ->first();
+        }
+
         if($session) {
             if ($session->created_at->diffInSeconds() > $time) {
                 $boletas = Boleta::join('detallesesion', 'boletas.id', '=', 'detallesesion.idboleta')
@@ -1329,7 +1372,7 @@ dd($e);
                 $session->idrifa = $request->idrifa;
                 $session->idvendedor = $idvendedor;
                 $session->idpuntoventa = $request->idpuntoventa;
-                $session->estado = 1;
+                $session->estado = self::activo;
                 $session->save();
             } else {
                 $detallesession = Detallesesion::join('boletas', 'detallesesion.idboleta', 'boletas.id')
@@ -1351,7 +1394,12 @@ dd($e);
             $session->idrifa = $request->idrifa;
             $session->idvendedor = $idvendedor;
             $session->idpuntoventa = $request->idpuntoventa;
-            $session->estado = 1;
+            $session->estado = self::activo;
+            if($request->tipoventa == 'userapp') {
+                $salesession = $idvendedor.Carbon::now()->timestamp;
+                session(['salesession' => $salesession]);
+                $session->session = $salesession;
+            }
             $session->save();
         }
 
@@ -1385,9 +1433,10 @@ dd($e);
 
             $boleta = Boleta::where('id', $boletaupd->id)->first();
             $boleta->estado_ant = $boleta->estado;
-            $boleta->estado = 5;
+            $boleta->estado = self::enproceso;
             $boleta->save();
 
+            /*
             \Cart::session(Auth::user()->id);
             \Cart::add(array(
                 'id' => $idsesion, // inique row ID
@@ -1404,6 +1453,7 @@ dd($e);
                 ),
                 'associatedModel' => Boleta::class
             ));
+            */
         }
 
         if ($request->type == 'del') {
@@ -1443,7 +1493,6 @@ dd($e);
     }
 
     public function finishSession(Request $request) {
-
         try {
             DB::beginTransaction();
 
@@ -1463,8 +1512,9 @@ dd($e);
                 }
             }
 
-            \Cart::session(Auth::user()->id);
-            \Cart::remove($idsesion);
+            //\Cart::session(Auth::user()->id);
+            //\Cart::remove($idsesion);
+            session()->forget('session');
 
            DB::commit();
         } catch (Throwable $e){
@@ -1497,10 +1547,15 @@ dd($e);
         $detallesesion = Detallesesion::where('idsesionventa', $request->idsesion)
                                         ->with('boleta')
                                         ->get();
-        // Agrega credenciales
-        \MercadoPago\SDK::setAccessToken("TEST-527760229179050-091011-a9b62330235cb5d7a47b2b59968ac474-1195821039");
 
-        $preference = new \MercadoPago\Preference();
+        // Se bloquea la sesión para que no se borre
+        $session = Sesionventa::where('id', $request->idsesion)->first();
+        $session->estado = self::enproceso; // En proceso
+        $session->save();
+
+        // Agrega credenciales
+        SDK::setAccessToken("TEST-527760229179050-091011-a9b62330235cb5d7a47b2b59968ac474-1195821039");
+        $preference = new Preference();
 
         $preference->back_urls = array(
             "success" => "http://localhost/app/ventas/paynotifysuccess",
@@ -1517,6 +1572,7 @@ dd($e);
         $preference->expires = true;
         $preference->expiration_date_from = $mytime->toIso8601String();
         $preference->expiration_date_to = $mytime->addHours(config('mercadopago.expirationpay'))->toIso8601String();
+        $preference->date_of_expiration = $preference->expiration_date_to;
 
         foreach ($detallesesion as $product) {
             $item = new \MercadoPago\Item();
@@ -1536,7 +1592,7 @@ dd($e);
             $checkout->valor = $product->valor;
             $checkout->idcliente = $product->idcliente;
             $checkout->idvendedor = Auth::user()->id;
-            $checkout->estado = 4;
+            $checkout->estado = self::enproceso;
             $checkout->preference_id = $preference->id;
             $checkout->urlpago = $preference->init_point;
             $checkout->save();
@@ -1578,7 +1634,7 @@ dd($e);
             $checkout->collection_status = $request->collection_status;
             $checkout->payment_id = $request->payment_id;
             $checkout->status = $request->status;
-            $checkout->estado = 1;
+            $checkout->estado = self::vendido;
             $checkout->payment_type = $request->payment_type;
             $checkout->merchant_order_id = $request->merchant_order_id;
             $checkout->site_id = $request->site_id;
@@ -1601,18 +1657,17 @@ dd($e);
     public function paynotifyfailure(Request $request) {
         $checkouts = Checkout::where('preference_id', $request->preference_id)->get();
 
-        //$r = new Request();
-        //$r->idsesion = $checkouts[0]['idsesionventa'];
-        //$r->isSale = true;
-        //$idventa = $this->newSale($r);
-        //$this->finishSession($r);
+        $r = new Request();
+        $r->idsesion = $checkouts[0]['idsesionventa'];
+        $r->isSale = false;
+        $this->finishSession($r);
 
         foreach ($checkouts as $checkout) {
             $checkout->collection_id = $request->collection_id;
             $checkout->collection_status = $request->collection_status;
             $checkout->payment_id = $request->payment_id;
             $checkout->status = $request->status;
-            $checkout->estado = 2;
+            $checkout->estado = self::cancelado;
             $checkout->payment_type = $request->payment_type;
             $checkout->merchant_order_id = $request->merchant_order_id;
             $checkout->site_id = $request->site_id;
@@ -1642,7 +1697,7 @@ dd($e);
         //$this->finishSession($r);
 
         $sesionventa = Sesionventa::where('id', $checkouts[0]['idsesionventa'])->first();
-        $sesionventa->estado = 4;
+        $sesionventa->estado = self::enproceso;
         $sesionventa->save();
 
         foreach ($checkouts as $checkout) {
@@ -1650,7 +1705,7 @@ dd($e);
             $checkout->collection_status = $request->collection_status;
             $checkout->payment_id = $request->payment_id;
             $checkout->status = $request->status;
-            $checkout->estado = 3;
+            $checkout->estado = self::enproceso;
             $checkout->payment_type = $request->payment_type;
             $checkout->merchant_order_id = $request->merchant_order_id;
             $checkout->site_id = $request->site_id;
@@ -1686,7 +1741,7 @@ dd($e);
             $checkout->collection_status = $request->collection_status;
             $checkout->payment_id = $request->payment_id;
             $checkout->status = $request->status;
-            $checkout->estado = 1;
+            $checkout->estado = self::vendido;
             $checkout->payment_type = $request->payment_type;
             $checkout->merchant_order_id = $request->merchant_order_id;
             $checkout->site_id = $request->site_id;
@@ -1720,12 +1775,12 @@ dd($e);
             $line2 = $mensaje;
 
             //$cliente->notify(new EmailcodeNotification($boleta->numero, $boleta->promocional));
-            \Illuminate\Support\Facades\Notification::route('mail', 'javier.minotta.h@gmail.com')->notify(new EmailcodeNotification($subject, $line1, $action, $line2, $boleta->numero, $boleta->promocional));
+            //\Illuminate\Support\Facades\Notification::route('mail', 'javier.minotta.h@gmail.com')->notify(new EmailcodeNotification($subject, $line1, $action, $line2, $boleta->numero, $boleta->promocional));
         }
         $checkout = Checkout::where('preference_id', $request->preference_id)
             ->first();
 
-        event(new SaleApp('Hola mundo'));
+        //event(new SaleApp('Hola mundo'));
 
         return Inertia::render('Ventas/Finishsaleapp', [
             'payment_id' => $checkout->payment_id,
@@ -1738,12 +1793,17 @@ dd($e);
     public function paynotifyfailureapp(Request $request) {
         $checkouts = Checkout::where('preference_id', $request->preference_id)->get();
 
+        $r = new Request();
+        $r->idsesion = $checkouts[0]['idsesionventa'];
+        $r->isSale = false;
+        $this->finishSession($r);
+
         foreach ($checkouts as $checkout) {
             $checkout->collection_id = $request->collection_id;
             $checkout->collection_status = $request->collection_status;
             $checkout->payment_id = $request->payment_id;
             $checkout->status = $request->status;
-            $checkout->estado = 2;
+            $checkout->estado = self::cancelado;
             $checkout->payment_type = $request->payment_type;
             $checkout->merchant_order_id = $request->merchant_order_id;
             $checkout->site_id = $request->site_id;
@@ -1766,7 +1826,7 @@ dd($e);
             $line2 = "";
 
             //$cliente->notify(new EmailcodeNotification($boleta->numero, $boleta->promocional));
-            \Illuminate\Support\Facades\Notification::route('mail', 'javier.minotta.h@gmail.com')->notify(new EmailcodeNotification($subject, $line1, $action, $line2, $boleta->numero, $boleta->promocional));
+            //\Illuminate\Support\Facades\Notification::route('mail', 'javier.minotta.h@gmail.com')->notify(new EmailcodeNotification($subject, $line1, $action, $line2, $boleta->numero, $boleta->promocional));
         }
         $checkout = Checkout::where('preference_id', $request->preference_id)
             ->first();
@@ -1783,7 +1843,7 @@ dd($e);
         $checkouts = Checkout::where('preference_id', $request->preference_id)->get();
 
         $sesionventa = Sesionventa::where('id', $checkouts[0]['idsesionventa'])->first();
-        $sesionventa->estado = 4;
+        $sesionventa->estado = self::enproceso;
         $sesionventa->save();
 
         foreach ($checkouts as $checkout) {
@@ -1791,7 +1851,7 @@ dd($e);
             $checkout->collection_status = $request->collection_status;
             $checkout->payment_id = $request->payment_id;
             $checkout->status = $request->status;
-            $checkout->estado = 3;
+            $checkout->estado = self::enproceso;
             $checkout->payment_type = $request->payment_type;
             $checkout->merchant_order_id = $request->merchant_order_id;
             $checkout->site_id = $request->site_id;
@@ -1825,6 +1885,64 @@ dd($e);
             'estado' => 'pendiente',
             'mensajePago' => 'El pago se encuentra pendiente'
         ]);
+    }
+
+    public function paynotifysuccessappjob($preference_id) {
+
+        $checkouts = Checkout::where('preference_id', $preference_id)->get();
+
+        $r = new Request();
+        $r->idsesion = $checkouts[0]['idsesionventa'];
+        $r->isSale = true;
+        $idventa = $this->newSale($r);
+        $this->finishSession($r);
+
+        foreach ($checkouts as $checkout) {
+            $checkout->idventa = $idventa;
+            $checkout->save();
+
+            $cliente = Cliente::where('id', $checkout->idcliente)->first();
+            $boleta = Boleta::where('id', $checkout->idboleta)->first();
+            $to = "57".$cliente->movil;
+
+            $saldo = $boleta->saldo;
+            $saldotxt = '';
+
+            if ($saldo > 0) {
+                $saldotxt = "Tu saldo pendiente es $saldo.";
+            }
+            $message = "Shopingred agradece tu fidelidad, el gran bono millonario premio mayor $boleta->numero promocional $boleta->promocional ha sido registrado con exito. $saldotxt SUERTE";
+            $mensaje = $saldotxt;
+
+            $this->sendSMS($to, $message);
+            if ($saldo == 0) {
+                $mensaje = "Conserva este mensaje de paz y salvo valido para reclamar el premio mayor: Apto Robles, Camioneta mazda y Tour resolucion EDSA N 999 premio mayor $boleta->numero y promocional $boleta->promocional. Sorteo miercoles 21 de diciembre de 2022 con el premio mayor de la loteria de manizales";
+                $this->sendSMS($to, $mensaje);
+            }
+        }
+    }
+
+    public function ProcessPayments() {
+        $checkouts = Checkout::whereIn('status', array('in_process','pending'))->get();
+
+        foreach ($checkouts as $checkout) {
+            SDK::setAccessToken("TEST-527760229179050-091011-a9b62330235cb5d7a47b2b59968ac474-1195821039");
+            $response = Payment::get($checkout->payment_id);
+
+            if ($response->status == 'cancelled') {
+                $checkout->estado = self::cancelado;
+                $checkout->status = 'cancelled';
+                $r = new Request();
+                $r->idsesion = $checkout->idsesionventa;
+                $r->isSale = false;
+                $this->finishSession($r);
+            } elseif ($response->status == 'approved') {
+                $checkout->estado = self::vendido;
+                $checkout->status = 'approved';
+                $this->paynotifysuccessappjob($checkout->preference_id);
+            }
+            $checkout->save();
+        }
     }
 
 }

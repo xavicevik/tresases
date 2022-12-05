@@ -26,7 +26,7 @@ class Cliente extends Authenticatable
     use TwoFactorAuthenticatable;
     use HasRoles;
 
-    protected $guard = 'cliente';
+    //protected $guard = 'clientes';
 
     /**
      * The attributes that are mass assignable.

@@ -458,6 +458,36 @@ class UserController extends Controller
         }
     }
 
+    public function storeCliente(Request $request)
+    {
+        Validator::make($request->all(), [
+            'nombre' => ['required', 'string', 'max:255'],
+            'movil' => ['required', 'string', 'max:255'],
+            'documento' => ['required', 'string', 'max:255'],
+        ],
+            [
+                'nombre.required' => 'Ingrese el nombre',
+                'movil.required' => 'Ingrese el teléfono celular',
+                'documento.required' => 'Ingrese el número de identificacion',
+            ])->validate();
+
+        $mytime= Carbon::now('America/Bogota');
+
+        $user = Cliente::create($request->all());
+        $user->changedpassword = null;
+
+        $user->password = Hash::make($user->password);
+        $user->estado = true;
+        $user->observaciones = 'Creado por app movil';
+
+        $user->saveOrFail();
+        $rol = Rol::where('id', $user->idrol)->first();
+        //$user->assignRole('cliente');
+
+        return ['cliente' => $user];
+        //return redirect()->back()->with('message', 'Cliente creado satisfactoriamente');
+    }
+
     /**
      * Display the specified resource.
      *

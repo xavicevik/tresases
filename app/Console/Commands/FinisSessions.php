@@ -62,7 +62,7 @@ class FinisSessions extends Command
                 }
                 $session->delete();
 
-                \Cart::remove($idsesion);
+                //\Cart::remove($idsesion);
             }
 
             DB::commit();

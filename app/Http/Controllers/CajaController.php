@@ -384,4 +384,65 @@ class CajaController extends Controller
         return ['url' => url('/storage/pdf/').'/'.$filename];
     }
 
+    public static function AbrirCerrarDefault() {
+        // Cierre
+        $mytime= Carbon::now('America/Bogota');
+        $cajas = Caja::where('id', 5)->firstOrFail();
+        $cajas->estado = 0;
+        $cajas->montocierre = 0;
+        $cajas->fechacierre = $mytime->toDateTimeString();;
+        $cajas->save();
+
+        $ventas = Venta::with('puntoventa')
+            ->with('cliente')
+            ->with('vendedor')
+            ->where('idpuntoventa', $cajas->idpuntoventa)
+            ->where('transaccion', $cajas->id)
+            ->where('fechaventa', '>=', Carbon::create($cajas->fechaapertura)->toDateTimeString())
+            ->get();
+
+        $histocaja = new Historialcaja();
+        $histocaja->idcaja = $cajas->id;
+        $histocaja->idvendedor = null;
+        $histocaja->idpuntoventa = $cajas->idpuntoventa;
+        $histocaja->montoapertura = $cajas->montoapertura;
+        $histocaja->montocierre = $cajas->montocierre;
+        $histocaja->recaudoefectivo = 0;
+        $histocaja->fechaapertura = $cajas->fechaapertura;
+        $histocaja->fechacierre = $cajas->fechacierre;
+        $histocaja->faltante = 0;
+        $histocaja->sobrante = 0;
+        $histocaja->estado = true;
+        $histocaja->save();
+
+        $totaltransaccion = 0;
+        $totalcomisiones = 0;
+        $totalboletas = 0;
+        foreach($ventas as $venta) {
+            $totaltransaccion += $venta->valorventa;
+            $totalcomisiones += $venta->comision;
+            $totalboletas += $venta->cantidad;
+            $venta->idhistorial = $histocaja->id;
+            $venta->save();
+        }
+
+        $histocaja->comisionventa = $totalcomisiones;
+        $histocaja->recaudoefectivo = $totaltransaccion;
+        $histocaja->faltante = ($totaltransaccion - $totalcomisiones - $cajas->montocierre) > 0? ($totaltransaccion - $totalcomisiones - $cajas->montocierre):0;
+        $histocaja->sobrante = ($cajas->montocierre - $totaltransaccion + $totalcomisiones) > 0? ($cajas->montocierre - $totaltransaccion + $totalcomisiones):0;
+        $histocaja->save();
+
+        // Apertura
+        $mytime= Carbon::now('America/Bogota');
+        $cajas = Caja::where('id', 5)->firstOrFail();
+
+        $cajas->estado = 1;
+        $cajas->idvendedor = null;
+        $cajas->montoapertura = 0;
+        $cajas->fechaapertura = $mytime->toDateTimeString();
+        $cajas->fechacierre = null;
+        $cajas->montocierre = 0.0;
+        $cajas->save();
+    }
+
 }

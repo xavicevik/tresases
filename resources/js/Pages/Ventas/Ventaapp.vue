@@ -1,5 +1,5 @@
 <template>
-    <AppLayout title="Ventas" :total="total">
+    <AppLayout title="Ventas" :username="username">
         <template #header>
             <h2 class="font-semibold text-xl text-gray-800 leading-tight">
                 Nueva venta
@@ -28,7 +28,7 @@
                                         <!-- Formulario -->
                                         <section>
                                             <div id="countd" class="mx-auto text-center w-full border-0">
-                                                <vue-countdown ref="countdown" class="pb-4 text-sm mx-auto text-blue-700" :time="time" v-slot="{ minutes, seconds }" @end="onCountdownEnd">
+                                                <vue-countdown ref="countdown" class="pb-4 text-sm mx-auto text-blue-700" :time="time" v-slot="{ minutes, seconds }" @end="onCountdownEnd('userapp')">
                                                     Restan：{{ minutes }} min, {{ seconds }} seg.
                                                 </vue-countdown>
                                             </div>
@@ -50,19 +50,23 @@
                                                             <div class="absolute top-4 left-3">
                                                                 <i class="fa fa-search text-gray-400 z-20 hover:text-gray-500"></i> </div>
                                                                  <money3 v-bind="configMoney2" v-model="form.reserva.numero" @keypress.enter="valBoletaDisponible(form.reserva.numero, form.idrifa.id, form.idvendedor.id, form.idcliente.id)" class="h-8 w-1/8 pl-2 pr-2 rounded-lg z-0 focus:shadow focus:outline-none"></money3>
-                                                                <a @click="valBoletaDisponible(form.reserva.numero, form.idrifa.id, form.idvendedor.id, form.idcliente.id)">
-                                                                    <div class="absolute top-3 right-2">
-                                                                        <Icon icon="fe:plus" class="h-4"  />
-                                                                    </div>
-                                                                </a>
+                                                                <Popper content="Seleccionar" hover=true placement="top" arrow=true>
+                                                                    <a @click="valBoletaDisponible(form.reserva.numero, form.idrifa.id, form.idvendedor.id, form.idcliente.id)">
+                                                                        <div class="absolute top-3 right-2">
+                                                                            <Icon icon="fe:import" class="h-5"  />
+                                                                        </div>
+                                                                    </a>
+                                                                </Popper>
                                                         </div>
                                                         <div class="pl-2">
-                                                            <button @click="generarAleatorio()" class="hover:bg-red-700 text-red-400 font-bold rounded" fill="none"
-                                                                    viewBox="0 0 24 24" stroke="currentColor">
-                                                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
-                                                                    <path stroke-linecap="round" stroke-linejoin="round" d="M21 7.5l-9-5.25L3 7.5m18 0l-9 5.25m9-5.25v9l-9 5.25M3 7.5l9 5.25M3 7.5v9l9 5.25m0-9v9" />
-                                                                </svg>
-                                                            </button>
+                                                            <Popper content="Generar" hover=true placement="top" arrow=true>
+                                                                <button @click="generarAleatorio()" class="hover:bg-red-700 text-red-400 font-bold rounded" fill="none"
+                                                                        viewBox="0 0 24 24" stroke="currentColor">
+                                                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+                                                                        <path stroke-linecap="round" stroke-linejoin="round" d="M21 7.5l-9-5.25L3 7.5m18 0l-9 5.25m9-5.25v9l-9 5.25M3 7.5l9 5.25M3 7.5v9l9 5.25m0-9v9" />
+                                                                    </svg>
+                                                                </button>
+                                                            </Popper>
                                                         </div>
                                                     </div>
 
@@ -209,22 +213,12 @@
                                         <div class=" mt-5 mb-10 lg:mt-0">
                                             <div class="flex">
                                                 <h2 class="text-sm font-bold text-gray-900">Información del cliente</h2>
-                                                <a href="#" v-if="!isNewCliente" @click="crearCliente()">
-                                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-blue-500" viewBox="0 0 20 20" fill="currentColor">
-                                                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v2H7a1 1 0 100 2h2v2a1 1 0 102 0v-2h2a1 1 0 100-2h-2V7z" clip-rule="evenodd" />
-                                                    </svg>
-                                                </a>
-                                                <a href="#" v-else @click="saveCliente(form.cliente)">
-                                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                                        <path stroke-linecap="round" stroke-linejoin="round" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />
-                                                    </svg>
-                                                </a>
                                             </div>
-                                            <div v-if="$page.props.flash.message" class="text-red-500">{{ $page.props.flash.message }}</div>
-                                            <div>
+                                            <div v-if="$page.props.flash.message" class="text-green-500">{{ $page.props.flash.message }}</div>
+                                            <div class="mt-2">
                                                 <label class="block text-xs font-medium text-gray-700">Documento</label>
                                                 <div class="mt-1">
-                                                    <input type="text" @keyup.enter="selectClienteFull(form.cliente.documento)" v-model="form.cliente.documento" autocomplete="postal-code" class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 text-xs sm:text-sm">
+                                                    <input type="text" @change="selectClienteFull(form.cliente.documento)" @keyup.enter="selectClienteFull(form.cliente.documento)" v-model="form.cliente.documento" autocomplete="postal-code" class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 text-xs sm:text-sm">
                                                     <div v-if="$page.props.errors.documento" class="text-red-500">{{ $page.props.errors.docuemnto }}</div>
                                                 </div>
                                             </div>
@@ -232,69 +226,15 @@
                                                 <div>
                                                     <label class="block text-xs font-medium text-gray-700">Nombre</label>
                                                     <div class="mt-1">
-                                                        <input type="text" :disabled="!isNewCliente" :class="{'bg-blue-100' : !isNewCliente}" v-model="form.cliente.nombre" autocomplete="given-name" class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 text-xs sm:text-sm">
+                                                        <input type="text" :disabled="!isNewCliente" :class="{'bg-blue-100' : !isNewCliente}" v-model="form.cliente.nombre" v-text="form.cliente.nombre + ' ' + form.cliente.apellido" autocomplete="given-name" class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 text-xs sm:text-sm">
                                                         <div v-if="$page.props.errors.nombre" class="text-red-500">{{ $page.props.errors.nombre }}</div>
                                                     </div>
                                                 </div>
-
                                                 <div>
-                                                    <label class="block text-xs font-medium text-gray-700">Apellido</label>
+                                                    <label class="block text-xs font-medium text-gray-700">Celular</label>
                                                     <div class="mt-1">
-                                                        <input type="text" :disabled="!isNewCliente" :class="{'bg-blue-100' : !isNewCliente}" v-model="form.cliente.apellido" autocomplete="family-name" class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 text-xs sm:text-sm">
-                                                        <div v-if="$page.props.errors.apellido" class="text-red-500">{{ $page.props.errors.apellido }}</div>
-                                                    </div>
-                                                </div>
-
-                                                <div class="sm:col-span-2">
-                                                    <label class="block text-xs font-medium text-gray-700">Teléfono</label>
-                                                    <div class="mt-1">
-                                                        <input type="text" :disabled="!isNewCliente" :class="{'bg-blue-100' : !isNewCliente}" v-model="form.cliente.movil" autocomplete="street-address" class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 text-xs sm:text-sm">
-                                                        <div v-if="$page.props.errors.telefono" class="text-red-500">{{ $page.props.errors.telefono }}</div>
-                                                    </div>
-                                                </div>
-
-                                                <div>
-                                                    <label class="block text-xs font-medium text-gray-700">Tipo documento</label>
-                                                    <div class="mt-1">
-                                                        <select :disabled="!isNewCliente" :class="{'bg-blue-100' : !isNewCliente}" class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 text-xs sm:text-sm" v-model="form.cliente.idtipos_documento">
-                                                            <option value="0" >Seleccione</option>
-                                                            <option v-for="tipodoc in arrayTiposdocumento" :key="tipodoc.id" :value="tipodoc.id" v-text="tipodoc.nombre_corto"></option>
-                                                        </select>
-                                                    </div>
-                                                </div>
-
-                                                <div>
-                                                    <label class="block text-xs font-medium text-gray-700">País</label>
-                                                    <div class="mt-1">
-                                                        <select :disabled="!isNewCliente" :class="{'bg-blue-100' : !isNewCliente}" class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 text-xs sm:text-sm" v-model="form.cliente.idpais" @change="getDepartamentos()">
-                                                            <option value="0" >Seleccione País</option>
-                                                            <option v-for="pais in arrayPaises" :key="pais.id" :value="pais.id" v-text="pais.nombre"></option>
-                                                        </select>
-                                                    </div>
-                                                </div>
-                                                <div>
-                                                    <label class="block text-xs font-medium text-gray-700">Departamento</label>
-                                                    <div class="mt-1">
-                                                        <select :disabled="!isNewCliente" :class="{'bg-blue-100' : !isNewCliente}" class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 text-xs sm:text-sm" v-model="form.cliente.iddepartamento" @change="getCiudades">
-                                                            <option value="0" >Seleccione departamento</option>
-                                                            <option v-for="departamento in arrayDepartamentos" :key="departamento.id" :value="departamento.id" v-text="departamento.nombre"></option>
-                                                        </select>
-                                                    </div>
-                                                </div>
-                                                <div>
-                                                    <label class="block text-xs font-medium text-gray-700">Ciudad</label>
-                                                    <div class="mt-1">
-                                                        <select :disabled="!isNewCliente" :class="{'bg-blue-100' : !isNewCliente}" class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 text-xs sm:text-sm" v-model="form.cliente.idciudad">
-                                                            <option value="0" >Seleccione Ciudad</option>
-                                                            <option v-for="ciudad in arrayCiudades" :key="ciudad.id" :value="ciudad.id" v-text="ciudad.nombre"></option>
-                                                        </select>
-                                                    </div>
-                                                </div>
-                                                <div>
-                                                    <label class="block text-xs font-medium text-gray-700">Correo</label>
-                                                    <div class="mt-1">
-                                                        <input type="email" :disabled="!isNewCliente" :class="{'bg-blue-100' : !isNewCliente}" v-model="form.cliente.correo" autocomplete="email" class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 text-xs sm:text-sm">
-                                                        <div v-if="$page.props.errors.correo" class="text-red-500">{{ $page.props.errors.correo }}</div>
+                                                        <input type="text" :disabled="!isNewCliente" :class="{'bg-blue-100' : !isNewCliente}" v-model="form.cliente.movil" autocomplete="family-name" class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 text-xs sm:text-sm">
+                                                        <div v-if="$page.props.errors.movil" class="text-red-500">{{ $page.props.errors.movil }}</div>
                                                     </div>
                                                 </div>
                                             </div>
@@ -307,7 +247,7 @@
                                         <h2 class="text-lg font-bold font-medium text-gray-900">Resumen de la orden</h2>
 
                                         <div class="mt-4 bg-white border border-gray-200 rounded-lg shadow-sm">
-                                            <h3 class="sr-only">Boletas en el carro</h3>
+                                            <h3 class="sr-only">Boletas seleccionadas</h3>
                                             <ul role="list" class="divide-y divide-gray-200">
                                                 <li class="flex py-6 px-4 sm:px-6" v-for="(dato, id) in form.reservas" :key="id">
                                                     <div class="flex-shrink-0">
@@ -322,15 +262,6 @@
                                                             <div class="flex-1 pt-2 flex items-end justify-between">
                                                                 <p class="mt-1 text-sm font-medium text-gray-900">Número: </p>
                                                                 <p class="mt-1 text-sm text-gray-500">{{ dato.numero }}</p>
-                                                            </div>
-                                                            <div class="ml-4 flex-shrink-0 flow-root">
-                                                                <button type="button" @click="delCartItem(dato)" class="-m-2.5 bg-white p-2.5 flex items-center justify-center text-gray-400 hover:text-gray-500">
-                                                                    <span class="sr-only">Eliminar</span>
-                                                                    <!-- Heroicon name: solid/trash -->
-                                                                    <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                                                                        <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" />
-                                                                    </svg>
-                                                                </button>
                                                             </div>
                                                         </div>
 
@@ -351,7 +282,7 @@
                                             </dl>
 
                                             <!-- Payment -->
-                                            <div class="mt-2 border-t border-gray-200 pt-2">
+                                            <div v-show="false" class="mt-2 border-t border-gray-200 pt-2">
                                                 <h2 class="text-lg font-bold border-b-2 font-medium text-gray-900">Método de pago</h2>
 
                                                 <fieldset class="mt-2">
@@ -719,6 +650,8 @@ export default {
         VueCountdown
     },
     props:{
+        username: null,
+        tipoventa: null,
         datos : [],
         caja:[],
         numerosreservados : [],
@@ -807,6 +740,7 @@ export default {
                    cifras: 0
                 },
                 cliente: {
+                    id: 0,
                     nombre: null,
                     apellido: null,
                     correo: null,
@@ -1116,12 +1050,14 @@ export default {
                     this.isNewCliente = false;
                     this.pushSessionDetailClient(this.session.id, this.form.cliente.id, 'upd');
                 } else {
+                    /*
                     Swal.fire({
                         icon: 'warning',
                         title: 'El cliente no existe',
                         showConfirmButton: false,
                         timer: 1500
                     })
+                     */
                     this.isNewCliente = true;
                 }
 
@@ -1160,13 +1096,13 @@ export default {
             this.$page.props.errors = [];
         },
         onSelectCliente: function(data){
-            this.form.cliente = data;
-            this.getDepartamentos();
-            this.getCiudades();
-            this.form.metacliente = data.documento + ' - ' + data.nombre + ' ' + data.apellido;
+            this.form.cliente.id = data;
+            //this.getDepartamentos();
+            //this.getCiudades();
+            //this.form.metacliente = data.documento + ' - ' + data.nombre + ' ' + data.apellido;
             this.isNewCliente = false;
             this.pushSessionDetailClient(this.session.id, this.form.cliente.id, 'upd');
-            this.closeMoodalCliente();
+            //this.closeMoodalCliente();
         },
         crearCliente: function (){
             this.isCliente = true;
@@ -1178,31 +1114,57 @@ export default {
             this.form.cliente.idtipos_documento = 1;
             this.form.metacliente = null;
         },
-        saveCliente: function(data) {
+        saveCliente: async function(data) {
+            if (this.form.cliente.nombre == '' || this.form.cliente.documento == '' || this.form.cliente.movil == '') {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Ingrese los datos del cliente',
+                    showConfirmButton: false,
+                })
+            }
             var formData = new FormData();
             formData.append('nombre', this.form.cliente.nombre);
-            formData.append('apellido', this.form.cliente.apellido);
-            formData.append('correo', this.form.cliente.correo);
-            formData.append('password', this.form.cliente.documento);
+            //formData.append('apellido', this.form.cliente.apellido);
+            //formData.append('correo', this.form.cliente.correo);
+            //formData.append('password', this.form.cliente.documento);
             formData.append('username', this.form.cliente.documento);
             formData.append('idrol', 2);
             formData.append('estado', 1);
-            formData.append('idtipos_documento', this.form.cliente.idtipos_documento);
+            formData.append('idtipos_documento', 1);
             formData.append('documento', this.form.cliente.documento);
-            formData.append('direccion', this.form.cliente.direccion);
-            formData.append('idpais', this.form.cliente.idpais);
-            formData.append('iddepartamento', this.form.cliente.iddepartamento);
-            formData.append('idciudad', this.form.cliente.idciudad);
-            formData.append('telefono', this.form.cliente.telefono);
+            //formData.append('direccion', this.form.cliente.direccion);
+            //formData.append('idpais', this.form.cliente.idpais);
+            //formData.append('iddepartamento', this.form.cliente.iddepartamento);
+            //formData.append('idciudad', this.form.cliente.idciudad);
+            //formData.append('telefono', this.form.cliente.telefono);
             formData.append('movil', this.form.cliente.movil);
             formData.append('isnatural', 1);
             formData.append('idempresa', 3);
 
-            this.$inertia.post('/users', formData, {
+            let status = false;
+
+            await axios.post('/users/storeCliente', formData)
+                .then((res) => {
+                    console.log('Se creo cliente');
+                    this.onSelectCliente(res.data.cliente.id);
+                }).catch(function (error) {
+                    console.log(error);
+                    status = true;
+                }).finally(() => {
+                    console.log("Finish cliente");
+                    this.preparePay();
+                    status = true;
+            });
+
+            return status;
+
+            /*
+            this.$inertia.post('/users/storeCliente', formData, {
                 onBefore: (visit) => { console.log('onBefore');},
                 onStart: (visit) => {console.log('onStart');},
                 onProgress: (progress) => {console.log('onProgress');},
                 onSuccess: (page) => {
+                    /*
                     Swal.fire({
                         position: 'top-end',
                         icon: 'success',
@@ -1210,12 +1172,16 @@ export default {
                         showConfirmButton: false,
                         timer: 1500
                     })
-                    this.onSelectCliente(formData);
+
+                    console.log('Se creo cliente');
+                    this.onSelectCliente(page.data.cliente.id);
                 },
                 onError: (errors) => {console.log('onError');},
                 onCancel: () => {console.log('onCancel');},
                 onFinish: visit => {console.log('onFinish');},
             });
+
+             */
         },
         reset: function () {
             this.tituloModal = 'Crear nueva reserva';
@@ -1351,49 +1317,63 @@ export default {
 
             return true;
         },
+        delCartItem: async function(data) {
+            data._method = 'DELETE';
+            var url = '/cart';
+            axios.delete(url, { data: { id: data.id }}
+            ).then((res) => {
+                console.log(res.data);
+                var respuesta = res.data;
+                this.cart = respuesta.cart;
+            })
+
+            data._method = 'DELETE';
+            this.$inertia.post('/cart/'  + data.id, data, {
+                onBefore: (visit) => { console.log('onBefore');},
+                onStart: (visit) => {console.log('onStart');},
+                onProgress: (progress) => {console.log('onProgress');},
+                onSuccess: (page) => {
+                    Swal.fire({
+                        position: 'top-end',
+                        icon: 'success',
+                        title: 'Se ha eliminado el artículo del carrito',
+                        showConfirmButton: false,
+                        timer: 1500
+                    })
+                    this.getCart();
+                },
+                onError: (errors) => {console.log('onError');},
+                onCancel: () => {console.log('onCancel');},
+                onFinish: visit => {console.log('onFinish');},
+            });
+        },
         onError:function(error){
             console.log('error ?' + error)
         },
-        validateCheckout:function() {
+        validateCheckout: async function() {
             console.log('Validando checkout');
-            if (!this.form.cliente.id) {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Selecciones un cliente',
-                    showConfirmButton: true,
-                })
-                return false;
-            }
+            await this.saveCliente(this.form.cliente);
 
+            return true;
+        },
+        preparePay: async function() {
+            let status = false;
             var url= '/ventas/preparePay';
-            axios.get(url, {
+            await axios.get(url, {
                 params: {
                     idsesion: this.session.id
                 }
             }).then((res) => {
-                console.log(res.data);
                 var respuesta = res.data;
                 this.idpreferencia = respuesta.idpreferencia;
                 this.urlpago = respuesta.urlpago;
-
-                /*
-                const mp = new MercadoPago("TEST-d5d36e04-7513-41d8-af7a-93a4e5ce874e", {
-                    locale: 'es-CO'
-                });
-
-                mp.checkout({
-                    preference: {
-                        id: this.idpreferencia,
-                    },
-                    render: {
-                        container: '.cho-container',
-                        label: 'Pagar',
-                    }
-                });
-                 */
                 console.log("Validar pago id " + this.idpreferencia);
+            }).finally(() => {
+                console.log("Finish cliente");
+                status = true;
             })
-            return true;
+
+            return status;
         },
         validatePago:function() {
             window.location.href = this.urlpago;
@@ -1634,7 +1614,7 @@ export default {
     mounted() {
         //this.getCart();
         this.form.idvendedor = this.vendedor;
-        this.registrarSessionVenta(this.caja.puntoventa.id, this.rifa.id, this.form.idvendedor.id);
+        this.registrarSessionVenta(this.caja.puntoventa.id, this.rifa.id, this.form.idvendedor.id, this.tipoventa);
         this.form.idrifa = this.rifa;
         //console.log(this.form.cliente.id);
         //this.showClient(this.form.cliente.id);

@@ -51,7 +51,9 @@ Route::group(['middleware'=>['guest']],function(){
     Route::post('/changepass', [LoginController::class, 'updatePassword'])->name('changepass.update');
 
     //Enlace QR para la venta del usuario
-    Route::get('/app/authenticatelink/{vendedor}', [LoginController::class, 'authenticatelink'])->name('ventas.authenticatelink');
+    //Route::get('/app/authenticatelink/{vendedor}', [LoginController::class, 'authenticatelink'])->name('ventas.authenticatelink');
+    Route::get('/app/authenticatelink/{vendedor}', [VentaController::class, 'createappp'])->name('ventas.authenticatelink');
+
 
 
     /*
@@ -83,6 +85,7 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'),'verified',]
             return Inertia::render('Dashboard');
         })->name('dashboard');
 
+        Route::post('/users/storeCliente', [UserController::class, 'storeCliente'])->name('users.storeCliente');
         // export
         Route::get('/users/export', [UserController::class, 'UsersExport'])->name('users.export');
         Route::get('/clientes/export', [UserController::class, 'ClientesExport'])->name('clientes.export');
@@ -144,6 +147,9 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'),'verified',]
 
         Route::resource('transacciones',TransaccionController::class);
         Route::resource('pagos',Pagocontroller::class);
+
+
+        Route::get('/ventas/processpayments', [VentaController::class, 'ProcessPayments'])->name('ventas.processpayments');
 
         Route::get('/ventas/getComisiones', [VentaController::class, 'getComisiones'])->name('ventas.getComisiones');
         Route::get('/ventas/reportpdfRegistroMov', [VentaController::class, 'reportpdfRegistroMov'])->name('ventas.reportpdfRegistroMov');

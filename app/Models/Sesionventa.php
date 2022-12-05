@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class Sesionventa extends Model
 {
     protected $table = 'sesionventas';
-    protected $fillable = ['idusuario','idrifa','idvendedor', 'idpuntoventa', 'estado'];
+    protected $fillable = ['idusuario','idrifa','idvendedor', 'idpuntoventa', 'estado', 'session'];
 
     public function user(){
         return $this->belongsTo(User::class, 'idusuario');

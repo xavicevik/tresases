@@ -416,13 +416,14 @@ export default {
                 console.log(res.data);
             })
         },
-        registrarSessionVenta: function (idpuntoventa = null, idrifa = null, idvendedor = null) {
+        registrarSessionVenta: function (idpuntoventa = null, idrifa = null, idvendedor = null, tipoventa = null) {
             var url= '/ventas/initSession';
             axios.get(url, {
                 params: {
                     idpuntoventa: idpuntoventa,
                     idrifa: idrifa,
-                    idvendedor: idvendedor
+                    idvendedor: idvendedor,
+                    tipoventa: tipoventa
                 }
             }).then((res) => {
                 var respuesta = res.data;
@@ -454,7 +455,7 @@ export default {
                 }
             })
         },
-        updateTimeSession: function () {
+        updateTimeSession: function (tipoventa = null) {
             var url= '/ventas/updateTimeSession';
             axios.get(url, {
                 params: {
@@ -468,7 +469,12 @@ export default {
                     showConfirmButton: true,
                     timer: 1000
                 })
-                this.$inertia.visit('/ventas/create');
+                const {
+                    host, hostname, href, origin, pathname, port, protocol, search
+                } = window.location;
+
+                console.log(pathname + search);
+                this.$inertia.visit(pathname + search);
             })
         },
         finishSession: function () {
@@ -514,7 +520,7 @@ export default {
                     }
                 })
         },
-        onCountdownEnd: function () {
+        onCountdownEnd: function (tipoventa = null) {
             Swal.fire({
                 icon: 'warning',
                 title: 'Se ha agotado el tiempo para realizar la compra, desea continuar?',
@@ -526,14 +532,33 @@ export default {
                 //timer: 4500
             }).then((result) => {
                 if (result.isConfirmed) {
-                    //Swal.fire('Saved!', '', 'success');
-                    this.updateTimeSession();
+                    this.updateTimeSession(tipoventa);
                 } else if (result.isDenied) {
-                    this.finishSession();
+                    this.finishSession(tipoventa);
                 }
             })
             //this.finishSession()
+        },
+        __delay__: function (timer) {
+            return new Promise(resolve => {
+                timer = timer || 2000;
+                setTimeout(function () {
+                    resolve();
+                }, timer);
+            });
         }
     },
 };
 </script>
+<style>
+:root {
+    --popper-theme-background-color: blue;
+    --popper-theme-background-color-hover: #333333;
+    --popper-theme-text-color: #ffffff;
+    --popper-theme-border-width: 0px;
+    --popper-theme-border-style: solid;
+    --popper-theme-border-radius: 6px;
+    --popper-theme-padding: 4px;
+    --popper-theme-box-shadow: 0 6px 30px -6px rgba(0, 0, 0, 0.25);
+}
+</style>
