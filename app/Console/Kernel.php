@@ -21,8 +21,8 @@ class Kernel extends ConsoleKernel
         $schedule->command('sessions:finish')->everyMinute();
         $schedule->command('cajas:openclose')->daily();
 
-        //$schedule->command('ventas:processpayments')->everyMinute();
-        $schedule->job(new ValidarVentasJob())->everyTwoMinutes();
+        $schedule->command('ventas:processpayments')->everyTwoMinutes();
+        //$schedule->job(new ValidarVentasJob())->everyTwoMinutes();
     }
 
     /**
