@@ -1142,6 +1142,7 @@ export default {
             formData.append('idempresa', 3);
             formData.append('idsesion', this.session.id)
 
+          /*
             await axios.post('/users/storeCliente', formData)
                 .then((res) => {
                     console.log('Se creo cliente');
@@ -1158,20 +1159,12 @@ export default {
                     return true;
             });
 
-            /*
+            */
             this.$inertia.post('/users/storeCliente', formData, {
                 onBefore: (visit) => { console.log('onBefore');},
                 onStart: (visit) => {console.log('onStart');},
                 onProgress: (progress) => {console.log('onProgress');},
                 onSuccess: (res) => {
-
-                    Swal.fire({
-                        position: 'top-end',
-                        icon: 'success',
-                        title: 'El cliente se ha creado satisfactoriamene',
-                        showConfirmButton: false,
-                        timer: 1500
-                    })
                     console.log('Se creo cliente');
                     var respuesta = res.data;
                     this.onSelectCliente(respuesta.cliente.id);
@@ -1183,7 +1176,7 @@ export default {
                 onCancel: () => {console.log('onCancel');},
                 onFinish: visit => {console.log('onFinish'); return true},
             });
-            */
+
 
         },
         reset: function () {
