@@ -1559,9 +1559,9 @@ class VentaController extends Controller
         $url = config('mercadopago.urlretorno');
 
         $preference->back_urls = array(
-            "success" => $url."/app/ventas/paynotifysuccess",
-            "failure" => $url."/app/ventas/paynotifyfailure",
-   	        "pending" => $url."/app/ventas/paynotifypending",
+            "success" => $url."app/ventas/paynotifysuccess",
+            "failure" => $url."app/ventas/paynotifyfailure",
+   	        "pending" => $url."app/ventas/paynotifypending",
         );
 
         $mytime= Carbon::now('America/Bogota');
