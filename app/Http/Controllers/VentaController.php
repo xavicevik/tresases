@@ -762,7 +762,6 @@ class VentaController extends Controller
         try {
             // Begin a transaction
             DB::beginTransaction();
-            $user = Auth::user();
             $totalventa = 0;
             $totalpagado = 0;
             $toatlcomision = 0;
@@ -844,13 +843,13 @@ class VentaController extends Controller
                     $salida[] = $boleta;
                 }
 
-                $queries = \DB::getQueryLog();
+                //$queries = \DB::getQueryLog();
                 //dd($queries);
                 asort($salida);
                 $recibo = new Recibo();
                 $recibo->nombre = 'Recibo venta';
                 $recibo->url = 'Recibo venta';
-                $recibo->idusuario = Auth::user()->id;
+                $recibo->idusuario = $session->idusuario;
                 $recibo->iduserdestino = $session->idvendedor;
                 $recibo->save();
 
@@ -898,7 +897,7 @@ class VentaController extends Controller
 
                 $transaccion = new Transaccion();
                 $transaccion->idusuarioori = $session->idvendedor;
-                $transaccion->idusuariodest = Auth::user()->id;
+                $transaccion->idusuariodest = $session->idusuario;
                 $transaccion->idconcepto = $concepto;
                 $transaccion->origen = 'Fisico';
                 $transaccion->destino = 'Fisico';

@@ -43,6 +43,6 @@ class ProcessPayments extends Command
      * @return int
      */
     public function handle() {
-        $timer  = (new VentaController)->ProcessPayments();
+        $status  = (new VentaController)->ProcessPayments();
     }
 }
