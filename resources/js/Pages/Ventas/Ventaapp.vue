@@ -1140,31 +1140,31 @@ export default {
             formData.append('movil', this.form.cliente.movil);
             formData.append('isnatural', 1);
             formData.append('idempresa', 3);
-
-            let status = false;
+            formData.append('idsesion', this.session.id)
 
             await axios.post('/users/storeCliente', formData)
                 .then((res) => {
                     console.log('Se creo cliente');
-                    this.onSelectCliente(res.data.cliente.id);
+                    var respuesta = res.data;
+                    this.onSelectCliente(respuesta.cliente.id);
+                    this.idpreferencia = respuesta.idpreferencia;
+                    this.urlpago = respuesta.urlpago;
+                    console.log("Validar pago id " + this.idpreferencia);
                 }).catch(function (error) {
                     console.log(error);
-                    status = true;
                 }).finally(() => {
-                    console.log("Finish cliente");
-                    this.preparePay();
-                    status = true;
+                    console.log("Finish cliente - preparepay");
+                    //this.preparePay();
+                    return true;
             });
-
-            return status;
 
             /*
             this.$inertia.post('/users/storeCliente', formData, {
                 onBefore: (visit) => { console.log('onBefore');},
                 onStart: (visit) => {console.log('onStart');},
                 onProgress: (progress) => {console.log('onProgress');},
-                onSuccess: (page) => {
-                    /*
+                onSuccess: (res) => {
+
                     Swal.fire({
                         position: 'top-end',
                         icon: 'success',
@@ -1172,16 +1172,19 @@ export default {
                         showConfirmButton: false,
                         timer: 1500
                     })
-
                     console.log('Se creo cliente');
-                    this.onSelectCliente(page.data.cliente.id);
+                    var respuesta = res.data;
+                    this.onSelectCliente(respuesta.cliente.id);
+                    this.idpreferencia = respuesta.idpreferencia;
+                    this.urlpago = respuesta.urlpago;
+                    console.log("Validar pago id " + this.idpreferencia);
                 },
                 onError: (errors) => {console.log('onError');},
                 onCancel: () => {console.log('onCancel');},
-                onFinish: visit => {console.log('onFinish');},
+                onFinish: visit => {console.log('onFinish'); return true},
             });
+            */
 
-             */
         },
         reset: function () {
             this.tituloModal = 'Crear nueva reserva';

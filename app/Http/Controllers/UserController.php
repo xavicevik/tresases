@@ -6,10 +6,12 @@ use App\Exports\ClientesExport;
 use App\Exports\UsersExport;
 use App\Models\Cliente;
 use App\Models\Confcomision;
+use App\Models\Detallesesion;
 use App\Models\Rifa;
 use App\Models\Rol;
 use App\Models\User;
 use App\Models\Vendedor;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Http\Request;
@@ -460,31 +462,53 @@ class UserController extends Controller
 
     public function storeCliente(Request $request)
     {
-        Validator::make($request->all(), [
-            'nombre' => ['required', 'string', 'max:255'],
-            'movil' => ['required', 'string', 'max:255'],
-            'documento' => ['required', 'string', 'max:255'],
-        ],
-            [
-                'nombre.required' => 'Ingrese el nombre',
-                'movil.required' => 'Ingrese el teléfono celular',
-                'documento.required' => 'Ingrese el número de identificacion',
-            ])->validate();
+        try{
+            DB::beginTransaction();
+            Validator::make($request->all(), [
+                'nombre' => ['required', 'string', 'max:255'],
+                'movil' => ['required', 'string', 'max:255'],
+                'documento' => ['required', 'string', 'max:255'],
+            ],
+                [
+                    'nombre.required' => 'Ingrese el nombre',
+                    'movil.required' => 'Ingrese el teléfono celular',
+                    'documento.required' => 'Ingrese el número de identificacion',
+                ])->validate();
 
-        $mytime= Carbon::now('America/Bogota');
+            $mytime= Carbon::now('America/Bogota');
 
-        $user = Cliente::create($request->all());
-        $user->changedpassword = null;
+            $user = Cliente::create($request->all());
+            $user->changedpassword = null;
 
-        $user->password = Hash::make($user->password);
-        $user->estado = true;
-        $user->observaciones = 'Creado por app movil';
+            $user->password = Hash::make($user->password);
+            $user->estado = true;
+            $user->observaciones = 'Creado por app movil';
 
-        $user->saveOrFail();
-        $rol = Rol::where('id', $user->idrol)->first();
-        //$user->assignRole('cliente');
+            $user->saveOrFail();
+            $rol = Rol::where('id', $user->idrol)->first();
+            //$user->assignRole('cliente');
 
-        return ['cliente' => $user];
+            // Actualizar el cliente en la sesion
+            $detalles = Detallesesion::where('idsesionventa', $request->idsesion)
+                                     ->get();
+
+            foreach ($detalles as $detalle) {
+                $detalle->idcliente = $user->id;
+                $detalle->save();
+            }
+
+            $r = new Request();
+            $r->idsesion = $request->idsesion;
+            $prepare = new VentaController();
+            $resultadoprepare = $prepare->preparePay($r);
+
+            DB::commit();
+        } catch (Throwable $e){
+            dd($e);
+            DB::rollBack();
+        }
+
+        return ['cliente' => $user, 'idpreferencia' => $resultadoprepare['idpreferencia'], 'urlpago' => $resultadoprepare['urlpago']];
         //return redirect()->back()->with('message', 'Cliente creado satisfactoriamente');
     }
 

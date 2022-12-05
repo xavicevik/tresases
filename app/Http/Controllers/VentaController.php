@@ -1869,7 +1869,7 @@ class VentaController extends Controller
             $line2 = "";
 
             //$cliente->notify(new EmailcodeNotification($boleta->numero, $boleta->promocional));
-            \Illuminate\Support\Facades\Notification::route('mail', 'javier.minotta.h@gmail.com')->notify(new EmailcodeNotification($subject, $line1, $action, $line2, $boleta->numero, $boleta->promocional));
+            //\Illuminate\Support\Facades\Notification::route('mail', 'javier.minotta.h@gmail.com')->notify(new EmailcodeNotification($subject, $line1, $action, $line2, $boleta->numero, $boleta->promocional));
         }
         $checkout = Checkout::where('preference_id', $request->preference_id)
             ->first();
