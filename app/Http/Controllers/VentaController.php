@@ -30,6 +30,7 @@ use App\Models\Vendedor;
 use App\Models\Venta;
 use App\Notifications\EmailcodeNotification;
 use Darryldecode\Cart\Cart;
+use Illuminate\Http\Response;
 use Illuminate\Notifications\Notification;
 use Illuminate\Routing\Route;
 use Illuminate\Support\Facades\Auth;
@@ -1941,8 +1942,10 @@ class VentaController extends Controller
     }
 
     public function paynotify(Request $request) {
-        dd($request);
-        SDK::setAccessToken("ENV_ACCESS_TOKEN");
+        //dd($request);
+        SDK::setAccessToken("TEST-527760229179050-091011-a9b62330235cb5d7a47b2b59968ac474-1195821039");
+        $status = $request->type;
+        /*
         switch($request->type) {
             case "payment":
                 $payment = Payment::find_by_id($_POST["data"]["id"]);
@@ -1960,6 +1963,11 @@ class VentaController extends Controller
                 // $_POST contiene la informaciòn relacionada a la notificaciòn.
                 break;
         }
+        */
+
+        return response()->json(['message' => $status], Response::HTTP_OK);
+
+
         /*
         $checkouts = Checkout::where('preference_id', $request->preference_id)->get();
 
@@ -1985,13 +1993,15 @@ class VentaController extends Controller
         }
         $checkout = Checkout::where('preference_id', $request->preference_id)
             ->first();
-*/
+
         return Inertia::render('Ventas/Finishsale', [
             'payment_id' => $checkout->payment_id,
             'idventa' => $checkout->idventa,
             'estado' => 'aprobado',
             'mensajePago' => 'Gracias por comprar en Shoppingred.com!'
         ]);
+        */
     }
+
 
 }
