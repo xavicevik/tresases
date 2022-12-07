@@ -1940,4 +1940,58 @@ class VentaController extends Controller
         }
     }
 
+    public function paynotify(Request $request) {
+        dd($request);
+        SDK::setAccessToken("ENV_ACCESS_TOKEN");
+        switch($request->type) {
+            case "payment":
+                $payment = Payment::find_by_id($_POST["data"]["id"]);
+                break;
+            case "plan":
+                $plan = Plan::find_by_id($_POST["data"]["id"]);
+                break;
+            case "subscription":
+                $plan = Subscription::find_by_id($_POST["data"]["id"]);
+                break;
+            case "invoice":
+                $plan = Invoice::find_by_id($_POST["data"]["id"]);
+                break;
+            case "point_integration_wh":
+                // $_POST contiene la informaciòn relacionada a la notificaciòn.
+                break;
+        }
+        /*
+        $checkouts = Checkout::where('preference_id', $request->preference_id)->get();
+
+        $r = new Request();
+        $r->idsesion = $checkouts[0]['idsesionventa'];
+        $r->isSale = true;
+        $idventa = $this->newSale($r);
+        $this->finishSession($r);
+
+        foreach ($checkouts as $checkout) {
+            $checkout->collection_id = $request->collection_id;
+            $checkout->collection_status = $request->collection_status;
+            $checkout->payment_id = $request->payment_id;
+            $checkout->status = $request->status;
+            $checkout->estado = self::vendido;
+            $checkout->payment_type = $request->payment_type;
+            $checkout->merchant_order_id = $request->merchant_order_id;
+            $checkout->site_id = $request->site_id;
+            $checkout->processing_mode = $request->processing_mode;
+            $checkout->merchant_account_id = $request->merchant_account_id;
+            $checkout->idventa = $idventa;
+            $checkout->save();
+        }
+        $checkout = Checkout::where('preference_id', $request->preference_id)
+            ->first();
+*/
+        return Inertia::render('Ventas/Finishsale', [
+            'payment_id' => $checkout->payment_id,
+            'idventa' => $checkout->idventa,
+            'estado' => 'aprobado',
+            'mensajePago' => 'Gracias por comprar en Shoppingred.com!'
+        ]);
+    }
+
 }
