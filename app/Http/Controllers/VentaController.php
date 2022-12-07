@@ -28,6 +28,7 @@ use App\Models\Transaccion;
 use App\Models\User;
 use App\Models\Vendedor;
 use App\Models\Venta;
+use App\Models\Whmercadopago;
 use App\Notifications\EmailcodeNotification;
 use Darryldecode\Cart\Cart;
 use Illuminate\Http\Response;
@@ -1942,9 +1943,15 @@ class VentaController extends Controller
     }
 
     public function paynotify(Request $request) {
+        $filtros = json_decode($request->post);
+
+        $notify = new Whmercadopago();
+        $notify->response = $request->post();
+        $notify->save();
+
         //dd($request);
-        SDK::setAccessToken("TEST-527760229179050-091011-a9b62330235cb5d7a47b2b59968ac474-1195821039");
-        $status = $request->type;
+        //SDK::setAccessToken("TEST-527760229179050-091011-a9b62330235cb5d7a47b2b59968ac474-1195821039");
+        //$status = $request->type;
         /*
         switch($request->type) {
             case "payment":
@@ -1965,7 +1972,7 @@ class VentaController extends Controller
         }
         */
 
-        return response()->json(['message' => $status], Response::HTTP_OK);
+        return response()->json(["success" =>"true", "message" => "Successfully Done."], Response::HTTP_OK);
 
 
         /*

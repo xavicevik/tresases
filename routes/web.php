@@ -36,6 +36,8 @@ Route::get('/', function () {
 });
 */
 
+Route::post('/app/ventas/paynotify', [VentaController::class, 'paynotify'])->name('paynotify');
+
 Route::group(['middleware'=>['guest']],function(){
 
     Route::get('/', [LoginController::class, 'index'])->name('login.index');
