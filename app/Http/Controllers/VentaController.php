@@ -1570,6 +1570,7 @@ class VentaController extends Controller
         $preference->expiration_date_from = $mytime->toIso8601String();
         $preference->expiration_date_to = $mytime->addHours(config('mercadopago.expirationpay'))->toIso8601String();
         $preference->date_of_expiration = $preference->expiration_date_to;
+        $preference->notification_url = 'https://dllo.shoppingred.com.co/app/ventas/paynotify';
 
         foreach ($detallesesion as $product) {
             $item = new \MercadoPago\Item();
@@ -1946,16 +1947,17 @@ class VentaController extends Controller
         $filtros = json_decode($request->post);
 
         $notify = new Whmercadopago();
-        $notify->response = $request->post();
+        $notify->response = $request->post;
         $notify->save();
 
-        //dd($request);
-        //SDK::setAccessToken("TEST-527760229179050-091011-a9b62330235cb5d7a47b2b59968ac474-1195821039");
-        //$status = $request->type;
-        /*
+        SDK::setAccessToken("TEST-527760229179050-091011-a9b62330235cb5d7a47b2b59968ac474-1195821039");
+
         switch($request->type) {
             case "payment":
-                $payment = Payment::find_by_id($_POST["data"]["id"]);
+                $payment = Payment::find_by_id($request->data->id);
+                $notify = new Whmercadopago();
+                $notify->response = $payment;
+                $notify->save();
                 break;
             case "plan":
                 $plan = Plan::find_by_id($_POST["data"]["id"]);
@@ -1970,7 +1972,6 @@ class VentaController extends Controller
                 // $_POST contiene la informaciòn relacionada a la notificaciòn.
                 break;
         }
-        */
 
         return response()->json(["success" =>"true", "message" => "Successfully Done."], Response::HTTP_OK);
 
