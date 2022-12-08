@@ -1734,7 +1734,7 @@ class VentaController extends Controller
         if ($request->external_reference) {
             $checkouts = Checkout::where('idsesionventa', $request->external_reference)->get();
             $r = new Request();
-            $r->idsesion = $request->external_reference];
+            $r->idsesion = $request->external_reference;
             $r->isSale = true;
             $idventa = $this->newSale($r);
             $this->finishSession($r);
