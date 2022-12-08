@@ -1743,6 +1743,7 @@ class VentaController extends Controller
                 $checkout->collection_id = $request->collection_id;
                 $checkout->collection_status = $request->collection_status;
                 $checkout->payment_id = $request->payment_id;
+                $payment_id = $request->payment_id;
                 $checkout->status = $request->status;
                 $checkout->estado = self::vendido;
                 $checkout->payment_type = $request->payment_type;
@@ -1772,17 +1773,16 @@ class VentaController extends Controller
                     $this->sendSMS($to, $mensaje);
                 }
             }
-            $checkout = Checkout::where('preference_id', $request->preference_id)
-                ->first();
+            $checkout = Checkout::where('preference_id', $request->preference_id)->first();
         }
 
         //event(new SaleApp('Hola mundo'));
 
         return Inertia::render('Ventas/Finishsaleapp', [
-            'payment_id' => $checkout->payment_id,
-            'idventa' => $checkout->idventa,
-            'estado' => 'aprobado',
-            'mensajePago' => 'Gracias por comprar en Shoppingred.com!'
+            'payment_id' => $payment_id?$payment_id:null,
+            'idventa' => $idventa?$idventa:null,
+            'estado' => $payment_id?'aprobado':'Esperando',
+            'mensajePago' => $payment_id?'Gracias por comprar en Shoppingred.com!':'En espera del pago'
         ]);
     }
 
