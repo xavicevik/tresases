@@ -1950,6 +1950,10 @@ class VentaController extends Controller
     }
 
     public function paynotify(Request $request) {
+        $notify = new Whmercadopago();
+        $notify->response = $request;
+        $notify->save();
+        /*
         $params =  json_decode(json_encode($request->post()));
         $data = json_decode(json_encode($params->data));
 
@@ -2009,7 +2013,7 @@ class VentaController extends Controller
                 }
             }
         }
-
+*/
         return response()->json(["success" =>"true", "message" => "Successfully Done."], Response::HTTP_OK);
     }
 
