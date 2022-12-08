@@ -1555,7 +1555,7 @@ class VentaController extends Controller
         $session->save();
 
         // Agrega credenciales
-        SDK::setAccessToken("TEST-527760229179050-091011-a9b62330235cb5d7a47b2b59968ac474-1195821039");
+        SDK::setAccessToken(config('mercadopago.AccessToken'));
         $preference = new Preference();
         $url = config('mercadopago.urlretorno');
 
@@ -1570,7 +1570,13 @@ class VentaController extends Controller
         $preference->expiration_date_from = $mytime->toIso8601String();
         $preference->expiration_date_to = $mytime->addHours(config('mercadopago.expirationpay'))->toIso8601String();
         $preference->date_of_expiration = $preference->expiration_date_to;
-        $preference->notification_url = 'https://dllo.shoppingred.com.co/app/ventas/paynotify';
+        $preference->notification_url = $url.'app/ventas/paynotify';
+        $preference->external_reference = $request->idsesion;
+        //$payer = new \MercadoPago\Payer();
+        //$payer->email = "recibos@hola.com";
+        //$payer->name
+        //$payer->first_name
+        //$preference->payer = $payer;
 
         foreach ($detallesesion as $product) {
             $item = new \MercadoPago\Item();
@@ -1582,6 +1588,7 @@ class VentaController extends Controller
         }
         $preference->items = $products;
         $preference->save();
+
         foreach ($detallesesion as $product) {
             $checkout = new Checkout();
             $checkout->idsesionventa = $request->idsesion;
@@ -1589,13 +1596,12 @@ class VentaController extends Controller
             $checkout->idboleta = $product->idboleta;
             $checkout->valor = $product->valor;
             $checkout->idcliente = $product->idcliente;
-            $checkout->idvendedor = Auth::user()->id;
+            $checkout->idvendedor = $session->idvendedor;
             $checkout->estado = self::enproceso;
             $checkout->preference_id = $preference->id;
             $checkout->urlpago = $preference->init_point;
             $checkout->save();
         }
-
         return ['idpreferencia' => $preference->id, 'urlpago' => $preference->init_point];
     }
 
@@ -1944,71 +1950,67 @@ class VentaController extends Controller
     }
 
     public function paynotify(Request $request) {
-        $filtros = json_decode($request->post);
+        $params =  json_decode(json_encode($request->post()));
+        $data = json_decode(json_encode($params->data));
 
         $notify = new Whmercadopago();
-        $notify->response = $request->post;
+        $notify->response = $data->id;
         $notify->save();
 
-        SDK::setAccessToken("TEST-527760229179050-091011-a9b62330235cb5d7a47b2b59968ac474-1195821039");
+        if ($request->type == 'payment') {
+            SDK::setAccessToken(config('mercadopago.AccessToken'));
+            $payment = Payment::find_by_id($data->id);
+            $notify = new Whmercadopago();
+            $notify->response = $payment;
+            $notify->save();
 
-        switch($request->type) {
-            case "payment":
-                $payment = Payment::find_by_id($request->data->id);
-                $notify = new Whmercadopago();
-                $notify->response = $payment;
-                $notify->save();
-                break;
-            case "plan":
-                $plan = Plan::find_by_id($_POST["data"]["id"]);
-                break;
-            case "subscription":
-                $plan = Subscription::find_by_id($_POST["data"]["id"]);
-                break;
-            case "invoice":
-                $plan = Invoice::find_by_id($_POST["data"]["id"]);
-                break;
-            case "point_integration_wh":
-                // $_POST contiene la informaciòn relacionada a la notificaciòn.
-                break;
+            if ($payment->status == 'cancelled' || $payment->status == 'rejected') {
+                $checkouts = Checkout::where('idsesionventa', $request->external_reference)->get();
+                foreach ($checkouts as $checkout) {
+                    $checkout->estado = self::cancelado;
+                    $checkout->save();
+                    $r = new Request();
+                    $r->idsesion = $checkout->idsesionventa;
+                    $r->isSale = false;
+                    $this->finishSession($r);
+                }
+            }
+            if ($payment->status == 'in_process' || $payment->status == 'pending'){
+                $checkouts = Checkout::where('idsesionventa', $request->external_reference)->get();
+                foreach ($checkouts as $checkout) {
+                    $checkout->estado = self::enproceso;
+                    $checkout->save();
+                }
+            }
+            if ($payment->status == 'approved') {
+                $checkouts = Checkout::where('idsesionventa', $request->external_reference)->get();
+                if ($checkouts[0]['collection_status'] != 'approved') {
+                    $r = new Request();
+                    $r->idsesion = $request->external_reference;
+                    $r->isSale = true;
+                    $idventa = $this->newSale($r);
+                    $this->finishSession($r);
+
+                    foreach ($checkouts as $checkout) {
+                        $checkout->collection_id = $request->collection_id;
+                        $checkout->collection_status = $request->collection_status;
+                        $checkout->payment_id = $request->payment_id;
+                        $checkout->status = $request->status;
+                        $checkout->estado = self::vendido;
+                        $checkout->payment_type = $request->payment_type;
+                        $checkout->merchant_order_id = $request->merchant_order_id;
+                        $checkout->site_id = $request->site_id;
+                        $checkout->processing_mode = $request->processing_mode;
+                        $checkout->merchant_account_id = $request->merchant_account_id;
+                        $checkout->idventa = $idventa;
+                        $checkout->save();
+                        $this->paynotifysuccessappjob($checkout->preference_id);
+                    }
+                }
+            }
         }
 
         return response()->json(["success" =>"true", "message" => "Successfully Done."], Response::HTTP_OK);
-
-
-        /*
-        $checkouts = Checkout::where('preference_id', $request->preference_id)->get();
-
-        $r = new Request();
-        $r->idsesion = $checkouts[0]['idsesionventa'];
-        $r->isSale = true;
-        $idventa = $this->newSale($r);
-        $this->finishSession($r);
-
-        foreach ($checkouts as $checkout) {
-            $checkout->collection_id = $request->collection_id;
-            $checkout->collection_status = $request->collection_status;
-            $checkout->payment_id = $request->payment_id;
-            $checkout->status = $request->status;
-            $checkout->estado = self::vendido;
-            $checkout->payment_type = $request->payment_type;
-            $checkout->merchant_order_id = $request->merchant_order_id;
-            $checkout->site_id = $request->site_id;
-            $checkout->processing_mode = $request->processing_mode;
-            $checkout->merchant_account_id = $request->merchant_account_id;
-            $checkout->idventa = $idventa;
-            $checkout->save();
-        }
-        $checkout = Checkout::where('preference_id', $request->preference_id)
-            ->first();
-
-        return Inertia::render('Ventas/Finishsale', [
-            'payment_id' => $checkout->payment_id,
-            'idventa' => $checkout->idventa,
-            'estado' => 'aprobado',
-            'mensajePago' => 'Gracias por comprar en Shoppingred.com!'
-        ]);
-        */
     }
 
 

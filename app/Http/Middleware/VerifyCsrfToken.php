@@ -13,8 +13,6 @@ class VerifyCsrfToken extends Middleware
      */
     protected $except = [
         '/webhooks',
-        'localhost',
-        'dllo.shoppingred.com.co',
         '/app/ventas/paynotify',
         'app/ventas/paynotify'
     ];

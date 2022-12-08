@@ -1097,12 +1097,8 @@ export default {
         },
         onSelectCliente: function(data){
             this.form.cliente.id = data;
-            //this.getDepartamentos();
-            //this.getCiudades();
-            //this.form.metacliente = data.documento + ' - ' + data.nombre + ' ' + data.apellido;
             this.isNewCliente = false;
             this.pushSessionDetailClient(this.session.id, this.form.cliente.id, 'upd');
-            //this.closeMoodalCliente();
         },
         crearCliente: function (){
             this.isCliente = true;
@@ -1115,33 +1111,40 @@ export default {
             this.form.metacliente = null;
         },
         saveCliente: async function(data) {
-            if (this.form.cliente.nombre == '' || this.form.cliente.documento == '' || this.form.cliente.movil == '') {
+            if (this.form.cliente.nombre == '' || this.form.cliente.nombre === null ||
+                this.form.cliente.documento == '' || this.form.cliente.documento === null ||
+                this.form.cliente.movil == '' || this.form.cliente.movil === null) {
                 Swal.fire({
                     icon: 'warning',
                     title: 'Ingrese los datos del cliente',
-                    showConfirmButton: false,
+                    showConfirmButton: true,
                 })
             }
             var formData = new FormData();
             formData.append('nombre', this.form.cliente.nombre);
-            //formData.append('apellido', this.form.cliente.apellido);
-            //formData.append('correo', this.form.cliente.correo);
-            //formData.append('password', this.form.cliente.documento);
+            formData.append('apellido', '');
             formData.append('username', this.form.cliente.documento);
             formData.append('idrol', 2);
             formData.append('estado', 1);
             formData.append('idtipos_documento', 1);
             formData.append('documento', this.form.cliente.documento);
-            //formData.append('direccion', this.form.cliente.direccion);
-            //formData.append('idpais', this.form.cliente.idpais);
-            //formData.append('iddepartamento', this.form.cliente.iddepartamento);
-            //formData.append('idciudad', this.form.cliente.idciudad);
-            //formData.append('telefono', this.form.cliente.telefono);
             formData.append('movil', this.form.cliente.movil);
             formData.append('isnatural', 1);
             formData.append('idempresa', 3);
             formData.append('idsesion', this.session.id)
 
+            /*
+            params: {
+                    nombre: this.form.cliente.nombre,
+                    username: this.form.cliente.documento,
+                    documento: this.form.cliente.documento,
+                    idrol: 2,
+                    movil: this.form.cliente.movil,
+                    idsesion: this.session.id,
+                    idtipos_documento: 1
+
+                }
+             */
 
             await axios.post('/users/storeCliente', formData)
                 .then((res) => {
@@ -1600,20 +1603,11 @@ export default {
 
     },
     created: function () {
-        //this.getCart();
-        this.getPaises();
-        this.getDepartamentos();
-        this.getCiudades();
-        //this.getClientes();
-        this.getTiposdocumento();
     },
     mounted() {
-        //this.getCart();
         this.form.idvendedor = this.vendedor;
         this.registrarSessionVenta(this.caja.puntoventa.id, this.rifa.id, this.form.idvendedor.id, this.tipoventa);
         this.form.idrifa = this.rifa;
-        //console.log(this.form.cliente.id);
-        //this.showClient(this.form.cliente.id);
     },
 }
 </script>

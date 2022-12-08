@@ -25,18 +25,43 @@ use Maatwebsite\Excel\Facades\Excel;
 | contains the "web" middleware group. Now create something great!
 |
 */
-/*
-Route::get('/', function () {
-    return Inertia::render('Welcome', [
-        'canLogin' => Route::has('login'),
-        'canRegister' => Route::has('register'),
-        'laravelVersion' => Application::VERSION,
-        'phpVersion' => PHP_VERSION,
-    ]);
-});
-*/
 
 Route::post('/app/ventas/paynotify', [VentaController::class, 'paynotify'])->name('paynotify');
+
+Route::get('/ventas/initSession', [VentaController::class, 'initSession'])->name('ventas.initSession');
+Route::get('/ventas/getRandBoletaLibre', [VentaController::class, 'getRandBoletaLibre'])->name('ventas.getRandBoletaLibre');
+
+Route::post('/users/storeCliente', [UserController::class, 'storeCliente'])->name('users.storeCliente');
+Route::get('/users/storeCliente', [UserController::class, 'storeCliente'])->name('users.storeCliente');
+
+Route::get('/numerosreservados/getBoletaOcupadaVenta', [NumeroreservadoController::class, 'getBoletaOcupadaVenta'])->name('numerosreservados.getBoletaOcupadaVenta');
+Route::get('/ventas/updDetailSession', [VentaController::class, 'updDetailSession'])->name('ventas.updDetailSession');
+Route::get('/ventas/updDetailSessionClient', [VentaController::class, 'updDetailSessionClient'])->name('ventas.updDetailSessionClient');
+Route::get('/users/showClientDoc', [UserController::class, 'showClientDoc'])->name('users.showClientDoc');
+Route::get('/ventas/updateTimeSession', [VentaController::class, 'updateTimeSession'])->name('ventas.updateTimeSession');
+Route::get('/paises/departamentos', [PaisController::class, 'departamentos']);
+Route::get('/paises/ciudades', [PaisController::class, 'ciudades']);
+Route::resource('paises', PaisController::class);
+Route::get('/ventas/processpayments', [VentaController::class, 'ProcessPayments'])->name('ventas.processpayments');
+Route::get('/ventas/getComisiones', [VentaController::class, 'getComisiones'])->name('ventas.getComisiones');
+Route::get('/ventas/reportpdfRegistroMov', [VentaController::class, 'reportpdfRegistroMov'])->name('ventas.reportpdfRegistroMov');
+Route::get('/ventas/reportpdfAnulaMov', [VentaController::class, 'reportpdfAnulaMov'])->name('ventas.reportpdfAnulaMov');
+Route::get('/ventas/sendSmsSales', [VentaController::class, 'sendSmsSales'])->name('ventas.sendSmsSales');
+Route::get('/ventas/updateSession', [VentaController::class, 'updateSession'])->name('ventas.updateSession');
+Route::get('/ventas/finishSession', [VentaController::class, 'finishSession'])->name('ventas.finishSession');
+Route::get('/ventas/anularVenta', [VentaController::class, 'anularVenta'])->name('ventas.anularVenta');
+Route::get('/ventas/preparePay', [VentaController::class, 'preparePay'])->name('ventas.preparePay');
+Route::post('/ventas/successPay', [VentaController::class, 'successPay'])->name('ventas.successPay');
+Route::post('/ventas/failurePay', [VentaController::class, 'failurePay'])->name('ventas.failurePay');
+Route::post('/ventas/pendingPay', [VentaController::class, 'pendingPay'])->name('ventas.pendingPay');
+Route::get('/ventas/paynotifysuccess', [VentaController::class, 'paynotifysuccess'])->name('paynotifysuccess');
+Route::get('/ventas/paynotifyfailure', [VentaController::class, 'paynotifyfailure'])->name('paynotifyfailure');
+Route::get('/ventas/paynotifypending', [VentaController::class, 'paynotifypending'])->name('paynotifypending');
+Route::get('/app/ventas/paynotifysuccess', [VentaController::class, 'paynotifysuccessapp'])->name('paynotifysuccessapp');
+Route::get('/app/ventas/paynotifyfailure', [VentaController::class, 'paynotifyfailureapp'])->name('paynotifyfailureapp');
+Route::get('/app/ventas/paynotifypending', [VentaController::class, 'paynotifypendingapp'])->name('paynotifypendingapp');
+Route::get('/app/ventas', [VentaController::class, 'createappp'])->name('ventas.createapp');
+
 
 Route::group(['middleware'=>['guest']],function(){
 
@@ -56,24 +81,6 @@ Route::group(['middleware'=>['guest']],function(){
     //Route::get('/app/authenticatelink/{vendedor}', [LoginController::class, 'authenticatelink'])->name('ventas.authenticatelink');
     Route::get('/app/authenticatelink/{vendedor}', [VentaController::class, 'createappp'])->name('ventas.authenticatelink');
 
-
-
-    /*
-    Route::get('/', function () {
-        return Inertia::render('Auth/Login', [
-            'canLogin' => Route::has('login'),
-            'canRegister' => Route::has('register'),
-        ]);
-    });
-
-    Route::post('/', function () {
-        return Inertia::render('Auth/Login', [
-            'canLogin' => Route::has('login'),
-            'canRegister' => Route::has('register')
-        ]);
-    });
-*/
-
     Route::get('/ventas/sumary', [VentaController::class, 'sumary'])->name('sumary');
     Route::post('/app/ventas/paynotify', [VentaController::class, 'paynotify'])->name('paynotify');
     Route::get('/app/ventas/paynotify', [VentaController::class, 'paynotify'])->name('paynotify');
@@ -87,7 +94,6 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'),'verified',]
             return Inertia::render('Dashboard');
         })->name('dashboard');
 
-        Route::post('/users/storeCliente', [UserController::class, 'storeCliente'])->name('users.storeCliente');
         // export
         Route::get('/users/export', [UserController::class, 'UsersExport'])->name('users.export');
         Route::get('/clientes/export', [UserController::class, 'ClientesExport'])->name('clientes.export');
@@ -106,7 +112,6 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'),'verified',]
             return redirect()->back()->with('message', 'Archivo importado correctamente');
         })->name('numerosreservados.import');
 
-
         Route::get('/loterias', [MasterController::class, 'loterias'])->name('loterias');
         Route::get('/terminos', [MasterController::class, 'terminos'])->name('terminos');
         Route::get('/users/getClientes', [UserController::class, 'getClientes'])->name('users.clientes');
@@ -121,16 +126,10 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'),'verified',]
         Route::put('/users/vendedor/{vendedor}', [UserController::class, 'updateVendedor'])->name('users.updateVendedor');
         Route::put('/users/cliente/{cliente}', [UserController::class, 'updateCliente'])->name('users.updateCliente');
         Route::get('/users/cliente/{cliente}', [UserController::class, 'showClient'])->name('users.showClient');
-        Route::get('/users/showClientDoc', [UserController::class, 'showClientDoc'])->name('users.showClientDoc');
 
         Route::resource('users', UserController::class);
 
        // Route::resource('/puntoventas', PuntoventaController::class);
-
-        Route::get('/paises/departamentos', [PaisController::class, 'departamentos']);
-        Route::get('/paises/ciudades', [PaisController::class, 'ciudades']);
-
-        Route::resource('paises', PaisController::class);
 
         Route::post('/rifas/copy', [RifaController::class, 'copy'])->name('rifas.copy');
         Route::get('/rifas/getRifasActivas', [RifaController::class, 'getRifasActivas'])->name('rifas.getRifasActivas');
@@ -151,38 +150,11 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'),'verified',]
         Route::resource('pagos',Pagocontroller::class);
 
 
-        Route::get('/ventas/processpayments', [VentaController::class, 'ProcessPayments'])->name('ventas.processpayments');
-
-        Route::get('/ventas/getComisiones', [VentaController::class, 'getComisiones'])->name('ventas.getComisiones');
-        Route::get('/ventas/reportpdfRegistroMov', [VentaController::class, 'reportpdfRegistroMov'])->name('ventas.reportpdfRegistroMov');
-        Route::get('/ventas/reportpdfAnulaMov', [VentaController::class, 'reportpdfAnulaMov'])->name('ventas.reportpdfAnulaMov');
-        Route::get('/ventas/sendSmsSales', [VentaController::class, 'sendSmsSales'])->name('ventas.sendSmsSales');
-        Route::get('/ventas/initSession', [VentaController::class, 'initSession'])->name('ventas.initSession');
-        Route::get('/ventas/updateSession', [VentaController::class, 'updateSession'])->name('ventas.updateSession');
-        Route::get('/ventas/updDetailSession', [VentaController::class, 'updDetailSession'])->name('ventas.updDetailSession');
-        Route::get('/ventas/updDetailSessionClient', [VentaController::class, 'updDetailSessionClient'])->name('ventas.updDetailSessionClient');
-        Route::get('/ventas/finishSession', [VentaController::class, 'finishSession'])->name('ventas.finishSession');
-        Route::get('/ventas/updateTimeSession', [VentaController::class, 'updateTimeSession'])->name('ventas.updateTimeSession');
-        Route::get('/ventas/anularVenta', [VentaController::class, 'anularVenta'])->name('ventas.anularVenta');
-        Route::get('/ventas/preparePay', [VentaController::class, 'preparePay'])->name('ventas.preparePay');
-
-        Route::post('/ventas/successPay', [VentaController::class, 'successPay'])->name('ventas.successPay');
-        Route::post('/ventas/failurePay', [VentaController::class, 'failurePay'])->name('ventas.failurePay');
-        Route::post('/ventas/pendingPay', [VentaController::class, 'pendingPay'])->name('ventas.pendingPay');
-        Route::post('webhooks', [WebhooksController::class, 'webhooks'])->name('webhooks');
-
-        Route::get('/ventas/paynotifysuccess', [VentaController::class, 'paynotifysuccess'])->name('paynotifysuccess');
-        Route::get('/ventas/paynotifyfailure', [VentaController::class, 'paynotifyfailure'])->name('paynotifyfailure');
-        Route::get('/ventas/paynotifypending', [VentaController::class, 'paynotifypending'])->name('paynotifypending');
-
-        Route::get('/app/ventas/paynotifysuccess', [VentaController::class, 'paynotifysuccessapp'])->name('paynotifysuccessapp');
-        Route::get('/app/ventas/paynotifyfailure', [VentaController::class, 'paynotifyfailureapp'])->name('paynotifyfailureapp');
-        Route::get('/app/ventas/paynotifypending', [VentaController::class, 'paynotifypendingapp'])->name('paynotifypendingapp');
-
         Route::resource('rifas', RifaController::class);
         Route::resource('confcomisiones',ConfcomisionController::class);
         Route::resource('comisiones',ComisionController::class);
         Route::resource('transacciones',TransaccionController::class);
+        Route::post('webhooks', [WebhooksController::class, 'webhooks'])->name('webhooks');
 
         Route::resource('roles', RoleController::class);
 
@@ -195,19 +167,17 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'),'verified',]
         Route::get('/numerosreservados/reportpdfCliente', [NumeroreservadoController::class, 'reportpdfCliente'])->name('numerosreservados.reportpdfCliente');
 
 
-        Route::get('/numerosreservados/getBoletaOcupadaVenta', [NumeroreservadoController::class, 'getBoletaOcupadaVenta'])->name('numerosreservados.getBoletaOcupadaVenta');
-        Route::get('/numerosreservados/getBoletaVendida', [NumeroreservadoController::class, 'getBoletaVendida'])->name('numerosreservados.getBoletaVendida');
 
+        Route::get('/numerosreservados/getBoletaVendida', [NumeroreservadoController::class, 'getBoletaVendida'])->name('numerosreservados.getBoletaVendida');
         Route::resource('numerosreservados', NumeroreservadoController::class);
 
         Route::get('/ventas/getDetalles', [VentaController::class, 'getDetalles'])->name('ventas.getDetalles');
         Route::get('/ventas/getDetallesHistorial', [VentaController::class, 'getDetallesHistorial'])->name('ventas.getDetallesHistorial');
         Route::get('/ventas/valBoletaLibre', [VentaController::class, 'valBoletaLibre'])->name('ventas.valBoletaLibre');
-        Route::get('/ventas/getRandBoletaLibre', [VentaController::class, 'getRandBoletaLibre'])->name('ventas.getRandBoletaLibre');
 
         Route::get('/ventas/reportpdf', [VentaController::class, 'reportpdf'])->name('reportpdf');
 
-        Route::get('/app/ventas', [VentaController::class, 'createappp'])->name('ventas.createapp');
+
         Route::resource('ventas', VentaController::class);
 
         Route::get('/cart/validarId', [CartController::class, 'validarId'])->name('validarId');

@@ -475,18 +475,19 @@ class UserController extends Controller
                     'documento.required' => 'Ingrese el número de identificacion',
                 ])->validate();
 
-            $mytime= Carbon::now('America/Bogota');
-
-            $user = Cliente::create($request->all());
-            $user->changedpassword = null;
-
-            $user->password = Hash::make($user->password);
-            $user->estado = true;
-            $user->observaciones = 'Creado por app movil';
-
-            $user->saveOrFail();
-            $rol = Rol::where('id', $user->idrol)->first();
-            //$user->assignRole('cliente');
+            $user = Cliente::where('documento', $request->documento)->first();
+            if ($user) {
+                $user->nombre = $request->nombre;
+                $user->movil = $request->movil;
+                $user->observaciones = $user->observaciones.' Cliente actualizado';
+            } else {
+                $user = Cliente::create($request->all());
+                $user->changedpassword = null;
+                $user->password = Hash::make($user->password);
+                $user->estado = true;
+                $user->observaciones = 'Creado por app movil';
+            }
+            $user->save();
 
             // Actualizar el cliente en la sesion
             $detalles = Detallesesion::where('idsesionventa', $request->idsesion)
@@ -504,7 +505,6 @@ class UserController extends Controller
 
             DB::commit();
         } catch (Throwable $e){
-            dd($e);
             DB::rollBack();
         }
 
