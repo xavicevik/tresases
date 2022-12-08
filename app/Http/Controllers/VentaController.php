@@ -1953,15 +1953,15 @@ class VentaController extends Controller
         $notify = new Whmercadopago();
         $notify->response = $request;
         $notify->save();
-        /*
-        $params =  json_decode(json_encode($request->post()));
-        $data = json_decode(json_encode($params->data));
-
-        $notify = new Whmercadopago();
-        $notify->response = $data->id;
-        $notify->save();
 
         if ($request->type == 'payment') {
+            $params =  json_decode(json_encode($request->post()));
+            $data = json_decode(json_encode($params->data));
+
+            $notify = new Whmercadopago();
+            $notify->response = $data->id;
+            $notify->save();
+            
             SDK::setAccessToken(config('mercadopago.AccessToken'));
             $payment = Payment::find_by_id($data->id);
             $notify = new Whmercadopago();
@@ -2013,7 +2013,7 @@ class VentaController extends Controller
                 }
             }
         }
-*/
+*
         return response()->json(["success" =>"true", "message" => "Successfully Done."], Response::HTTP_OK);
     }
 
