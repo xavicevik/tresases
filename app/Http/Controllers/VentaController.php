@@ -1731,58 +1731,50 @@ class VentaController extends Controller
 
     // Notificaciones ventas app
     public function paynotifysuccessapp(Request $request) {
+        if ($request->external_reference) {
+            $checkouts = Checkout::where('idsesionventa', $request->external_reference)->get();
+            $r = new Request();
+            $r->idsesion = $request->external_reference];
+            $r->isSale = true;
+            $idventa = $this->newSale($r);
+            $this->finishSession($r);
 
-        $checkouts = Checkout::where('preference_id', $request->preference_id)->get();
+            foreach ($checkouts as $checkout) {
+                $checkout->collection_id = $request->collection_id;
+                $checkout->collection_status = $request->collection_status;
+                $checkout->payment_id = $request->payment_id;
+                $checkout->status = $request->status;
+                $checkout->estado = self::vendido;
+                $checkout->payment_type = $request->payment_type;
+                $checkout->merchant_order_id = $request->merchant_order_id;
+                $checkout->site_id = $request->site_id;
+                $checkout->processing_mode = $request->processing_mode;
+                $checkout->merchant_account_id = $request->merchant_account_id;
+                $checkout->idventa = $idventa;
+                $checkout->save();
 
-        $r = new Request();
-        $r->idsesion = $checkouts[0]['idsesionventa'];
-        $r->isSale = true;
-        $idventa = $this->newSale($r);
-        $this->finishSession($r);
+                $cliente = Cliente::where('id', $checkout->idcliente)->first();
+                $boleta = Boleta::where('id', $checkout->idboleta)->first();
+                $to = "57".$cliente->movil;
 
-        foreach ($checkouts as $checkout) {
-            $checkout->collection_id = $request->collection_id;
-            $checkout->collection_status = $request->collection_status;
-            $checkout->payment_id = $request->payment_id;
-            $checkout->status = $request->status;
-            $checkout->estado = self::vendido;
-            $checkout->payment_type = $request->payment_type;
-            $checkout->merchant_order_id = $request->merchant_order_id;
-            $checkout->site_id = $request->site_id;
-            $checkout->processing_mode = $request->processing_mode;
-            $checkout->merchant_account_id = $request->merchant_account_id;
-            $checkout->idventa = $idventa;
-            $checkout->save();
+                $saldo = $boleta->saldo;
+                $saldotxt = '';
 
-            $cliente = Cliente::where('id', $checkout->idcliente)->first();
-            $boleta = Boleta::where('id', $checkout->idboleta)->first();
-            $to = "57".$cliente->movil;
+                if ($saldo > 0) {
+                    $saldotxt = "Tu saldo pendiente es $saldo.";
+                }
+                $message = "Shopingred agradece tu fidelidad, el gran bono millonario premio mayor $boleta->numero promocional $boleta->promocional ha sido registrado con exito. $saldotxt SUERTE";
+                $mensaje = $saldotxt;
 
-            $saldo = $boleta->saldo;
-            $saldotxt = '';
-
-            if ($saldo > 0) {
-                $saldotxt = "Tu saldo pendiente es $saldo.";
+                $this->sendSMS($to, $message);
+                if ($saldo == 0) {
+                    $mensaje = "Conserva este mensaje de paz y salvo valido para reclamar el premio mayor: Apto Robles, Camioneta mazda y Tour resolucion EDSA N 999 premio mayor $boleta->numero y promocional $boleta->promocional. Sorteo miercoles 21 de diciembre de 2022 con el premio mayor de la loteria de manizales";
+                    $this->sendSMS($to, $mensaje);
+                }
             }
-            $message = "Shopingred agradece tu fidelidad, el gran bono millonario premio mayor $boleta->numero promocional $boleta->promocional ha sido registrado con exito. $saldotxt SUERTE";
-            $mensaje = $saldotxt;
-
-            $this->sendSMS($to, $message);
-            if ($saldo == 0) {
-                $mensaje = "Conserva este mensaje de paz y salvo valido para reclamar el premio mayor: Apto Robles, Camioneta mazda y Tour resolucion EDSA N 999 premio mayor $boleta->numero y promocional $boleta->promocional. Sorteo miercoles 21 de diciembre de 2022 con el premio mayor de la loteria de manizales";
-                $this->sendSMS($to, $mensaje);
-            }
-
-            $subject = 'Shoppingred - Compra boletas';
-            $action = "$boleta->numero / $boleta->promocional";
-            $line1 = $message;
-            $line2 = $mensaje;
-
-            //$cliente->notify(new EmailcodeNotification($boleta->numero, $boleta->promocional));
-            //\Illuminate\Support\Facades\Notification::route('mail', 'javier.minotta.h@gmail.com')->notify(new EmailcodeNotification($subject, $line1, $action, $line2, $boleta->numero, $boleta->promocional));
+            $checkout = Checkout::where('preference_id', $request->preference_id)
+                ->first();
         }
-        $checkout = Checkout::where('preference_id', $request->preference_id)
-            ->first();
 
         //event(new SaleApp('Hola mundo'));
 
@@ -1964,9 +1956,6 @@ class VentaController extends Controller
 
             SDK::setAccessToken(config('mercadopago.AccessToken'));
             $payment = Payment::find_by_id($data->id);
-            $notify = new Whmercadopago();
-            $notify->response = $payment;
-            $notify->save();
 
             if ($payment->status == 'cancelled' || $payment->status == 'rejected') {
                 $checkouts = Checkout::where('idsesionventa', $request->external_reference)->get();
@@ -1987,6 +1976,9 @@ class VentaController extends Controller
                 }
             }
             if ($payment->status == 'approved') {
+                $notify = new Whmercadopago();
+                $notify->response = 'aproved';
+                $notify->save();
                 $checkouts = Checkout::where('idsesionventa', $request->external_reference)->get();
                 if ($checkouts[0]['collection_status'] != 'approved') {
                     $r = new Request();
