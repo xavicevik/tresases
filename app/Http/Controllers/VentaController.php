@@ -1731,6 +1731,7 @@ class VentaController extends Controller
 
     // Notificaciones ventas app
     public function paynotifysuccessapp(Request $request) {
+        $payment_id = null;
         if ($request->external_reference) {
             $checkouts = Checkout::where('idsesionventa', $request->external_reference)->get();
             $r = new Request();
