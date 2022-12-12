@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Events\SaleApp;
 use App\Jobs\SendEmailJob;
 use App\Jobs\SendSMSJob;
+use App\Models\Archivo;
 use App\Models\Boleta;
 use App\Models\Caja;
 use App\Models\Checkout;
@@ -18,6 +19,7 @@ use App\Models\Estado;
 use App\Models\Historialcaja;
 use App\Models\Loteria;
 use App\Models\Imagen;
+use App\Models\Militante;
 use App\Models\Pago;
 use App\Models\Promoboleta;
 use App\Models\Promocional;
@@ -827,6 +829,8 @@ class VentaController extends Controller
                     }
                     $boleta->estado = $estado;
                     $boleta->save();
+
+                    $this->genBoletaImagen($boleta);
 
                     $detalleventa = new Detalleventa();
                     $detalleventa->idventa = $venta->id;
@@ -1732,6 +1736,7 @@ class VentaController extends Controller
     // Notificaciones ventas app
     public function paynotifysuccessapp(Request $request) {
         $payment_id = null;
+        $idventa = null;
         if ($request->external_reference) {
             $checkouts = Checkout::where('idsesionventa', $request->external_reference)->get();
             $r = new Request();
@@ -2008,6 +2013,28 @@ class VentaController extends Controller
         }
 
         return response()->json(["success" =>"true", "message" => "Successfully Done."], Response::HTTP_OK);
+    }
+
+    public static function genBoletaImagen(Boleta $boleta) {
+        $url = url('storage/img/boletas/'.$boleta->idrifa.'_base.png');
+
+        $numero = $boleta->numero;
+        $promocional = $boleta->promocional;
+        $codigo = $boleta->codigo;
+
+        $data = [
+            'numero' => $numero,
+            'promocional' => $promocional,
+            'codigo' => $codigo
+        ];
+
+        $filename = 'boleta_'.$boleta->idrifa.$boleta->codigo.'.pdf';
+        $pdf = app('dompdf.wrapper');
+        $pdf->getDomPDF()->set_option("enable_php", true);
+        $pdf->loadView('pdf.boleta', $data);
+
+        $output = $pdf->output();
+        file_put_contents(public_path('storage').'/pdf/'.$filename, $output, FILE_APPEND);
     }
 
 

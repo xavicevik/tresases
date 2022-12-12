@@ -30,25 +30,25 @@ class Boleta extends Model
     {
         return $this->belongsTo(Rifa::class, 'idrifa');
     }
-
     public function scopeUseIndex($query, string $index)
     {
         $table = $this->getTable();
 
         return $query->from(DB::raw("`$table` USE INDEX(`$index`)"));
     }
-
     public function scopeForceIndex($query, string $index)
     {
         $table = $this->getTable();
 
         return $query->from(DB::raw("`$table` FORCE INDEX(`$index`)"));
     }
-
     public function cliente(){
         return $this->belongsTo(Cliente::class, 'idcliente');
     }
     public function vendedor(){
         return $this->belongsTo(Vendedor::class, 'idvendedor');
+    }
+    public function estado(){
+        return $this->belongsTo(Estado::class, 'estado');
     }
 }

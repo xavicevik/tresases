@@ -29,42 +29,41 @@ class MasterController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function rolesIndex(Request $request)
-    {
-        //if (!$request->ajax()) return redirect('/');
-        $buscar = $request->buscar;
-        if ($request->has('sortBy') && $request->sortBy <> ''){
-            $sortBy = $request->sortBy;
-        } else {
-            $sortBy = 'id';
-        }
-
-        if ($request->has('sortOrder') && $request->sortOrder <> ''){
-            $sortOrder = $request->sortOrder;
-        } else {
-            $sortOrder = 'desc';
-        }
-
-        if ($buscar == ''){
-            $roles = Role::orderBy($sortBy, $sortOrder)
-                        ->paginate(self::canPorPagina);
-        } else {
-            $roles = Role::orderBy($sortBy, $sortOrder)
-                        ->where('name', 'like', '%'. $buscar . '%')
-                        ->paginate(self::canPorPagina);
-        }
-
-        if ($request->has('ispage') && $request->ispage){
-            return ['data' => $roles];
-        } else {
-            return Inertia::render('Masters/RolesIndex', ['data' => $roles]);
-        }
+{
+    $buscar = $request->buscar;
+    if ($request->has('sortBy') && $request->sortBy <> ''){
+        $sortBy = $request->sortBy;
+    } else {
+        $sortBy = 'id';
     }
+
+    if ($request->has('sortOrder') && $request->sortOrder <> ''){
+        $sortOrder = $request->sortOrder;
+    } else {
+        $sortOrder = 'desc';
+    }
+
+    if ($buscar == ''){
+        $roles = Role::orderBy($sortBy, $sortOrder)
+            ->paginate(self::canPorPagina);
+    } else {
+        $roles = Role::orderBy($sortBy, $sortOrder)
+            ->where('name', 'like', '%'. $buscar . '%')
+            ->paginate(self::canPorPagina);
+    }
+
+    if ($request->has('ispage') && $request->ispage){
+        return ['data' => $roles];
+    } else {
+        return Inertia::render('Masters/RolesIndex', ['data' => $roles]);
+    }
+}
 
     public function rolesshow(Request $request)
     {
         $role = Role::find($request->id);
         $rolePermissions = Permission::join("role_has_permissions", "role_has_permissions.permission_id", "=", "permissions.id")
-            ->where("role_has_permissions.role_id", $request->id)->paginate(3);
+            ->where("role_has_permissions.role_id", $request->id)->paginate(10);
 
         return ['role' => $role, 'rolePermissions' => $rolePermissions];
     }
@@ -73,22 +72,34 @@ class MasterController extends Controller
     {
         $role = Role::find($request->id);
         $permission = Permission::paginate(100);
-        $rolePermissions = DB::table("role_has_permissions")->where("role_has_permissions.role_id", $request->id)
+        $rolePermissions = DB::table("role_has_permissions")
+            ->where("role_has_permissions.role_id", $request->id)
             ->pluck('role_has_permissions.permission_id', 'role_has_permissions.permission_id')
             ->all();
-
         $rolepermtemp = [];
+        $rolepermtemp2[] = [];
         if ($rolePermissions) {
             foreach ($rolePermissions as $p) {
                 $rolepermtemp[] = $p;
             }
         }
 
+        /*
+        foreach ($permission as $p => $val) {
+            if (isset($rolePermissions[$p])) {
+                $rolepermtemp2[$p] = $rolePermissions[$p]?$rolePermissions[$p]:0;
+            } else {
+                $rolepermtemp2[$p] = 0;
+            }
+        }
+        */
+
         return ['role' => $role,
-                'permission' => $permission,
-                'rolePermissions' => $rolePermissions,
-                'rolePermissionsjson'=> $rolepermtemp
-                ];
+            'permission' => $permission,
+            'rolePermissions' => $rolePermissions,
+            'rolePermissionsjson'=> $rolepermtemp,
+            '_token' => csrf_token()
+        ];
     }
 
     /**
@@ -100,17 +111,17 @@ class MasterController extends Controller
      */
     public function rolesupdate(Request $request)
     {
-        $this->validate($request, [
-            'name' => 'required',
-            'permission' => 'required',
-        ]);
+        $role = Role::where('id', $request->idrol)->first();
+        $role->revokePermissionTo(Permission::all());
 
-        $role = Role::find($request->id);
-        $role->name = $request->name;
-        $role->save();
-        $role->syncPermissions($request->permission);
+        foreach ($request->all() as $key => $value) {
+            if ($key != 'idrol') {
+                $permiso[] = Permission::where("id", $key)->get();
+            }
+        }
+        $role->syncPermissions($permiso);
 
-        return redirect()->route('roles.index')->with('success', 'Role updated successfully');
+        return redirect()->back()->with('message', 'Permisos actualizados correctamente');
     }
 
     public function paisesIndex(Request $request)

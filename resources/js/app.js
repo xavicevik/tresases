@@ -8,6 +8,7 @@ import { InertiaProgress } from '@inertiajs/progress';
 import Datepicker from '@vuepic/vue-datepicker';
 import '@vuepic/vue-datepicker/dist/main.css'
 import Submenu from '@/Components/Submenu';
+import Subreportes from '@/Components/Subreportes';
 import Permissions from "./mixins/Permissions";
 import Utilities from "./mixins/Utilities";
 import Statscards from "./Components/Statscards";
@@ -23,6 +24,7 @@ createInertiaApp({
             .mixin({ methods: { route } })
             .component('Datepicker', Datepicker)
             .component('Submenu', Submenu)
+            .component('Subreportes', Subreportes)
             .component('Statscards', Statscards)
             .component('Popper', Popper)
             .mixin(Permissions)

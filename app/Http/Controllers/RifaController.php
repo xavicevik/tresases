@@ -94,8 +94,7 @@ class RifaController extends Controller
             $boletas = Boleta::orderBy($sortBy, $sortOrder)
                 ->with('rifa')
                 ->with('vendedor')
-                ->with('cliente')
-                ->paginate(self::canPorPagina);
+                ->with('cliente');
         } else {
             $boletas = Boleta::orderBy($sortBy, $sortOrder)
                 ->with('rifa')
@@ -128,10 +127,9 @@ class RifaController extends Controller
                     ->orWhere('t1.apellido', 'like', '%'.$filtros->cliente.'%')
                     ->orWhere('t1.documento', 'like', '%'.$filtros->cliente.'%');
             }
-
-            $boletas = $boletas->select('boletas.*')->paginate(self::canPorPagina);
         }
         //$queries = DB::getQueryLog();
+        $boletas = $boletas->select(DB::raw('boletas.*, getcomisionboleta(boletas.id) as comision'))->paginate(self::canPorPagina);
 
         if ($request->has('ispage') && $request->ispage){
             return ['datos' => $boletas];

@@ -5,9 +5,19 @@
                 Lista de Roles
             </h2>
         </template>
-        <div class="py-4 lg:px-8 md:px-6 sm:px-2">
+        <div class="py-4 lg:px-4 md:px-4 sm:px-2">
             <div class="mx-auto 2xl:8">
                 <div class="bg-white overflow-hidden shadow-xl sm:rounded-lg">
+                    <!-- Mensajes Flash -->
+                    <section>
+                        <div @click="cleanMessage()" mx-auto class="bg-teal-100 border-t-4 border-teal-500 rounded-b text-teal-900 px-4 py-3 shadow-md my-3" role="alert" v-show="$page.props.flash.message">
+                            <div class="flex">
+                                <div>
+                                    <p class="text-sm">{{ $page.props.flash.message }}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
                     <!-- Fin Mensajes Flash -->
                     <!-- Encabezado y titulo -->
                     <section>
@@ -32,7 +42,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="pr-2 w-1/3 text-center">
+                            <div v-if="$can('roles-create')" class="pr-2 w-1/3 text-center">
                                 <button @click="openModal('registrar')" class="bg-blue-500 text-xs  hover:bg-blue-700 text-white font-bold py-2 px-4 rounded ">Crear Rol</button>
                             </div>
                         </div>
@@ -49,7 +59,7 @@
                             <table class="table-fixed w-full">
                                 <thead>
                                 <tr class="bg-gray-100">
-                                    <th class="px-4 py-2 w-2/12 text-sm font-bold hover:bg-blue-500 hover:text-gray-50 rounded-b">
+                                    <th class="px-4 py-2 w-1/12 text-sm font-bold hover:bg-blue-500 hover:text-gray-50 rounded-b">
                                         Id
                                     </th>
                                     <th class="px-4 py-2 w-2/12 text-sm font-bold hover:bg-blue-500 hover:text-gray-50 rounded-b">
@@ -58,7 +68,7 @@
                                     <th class="px-4 py-2 text-sm font-bold w-2/12 hover:bg-blue-500 hover:text-gray-50 rounded-b">
                                         Grupo
                                     </th>
-                                    <th class="px-4 py-2 text-sm font-bold w-1/12 hover:bg-blue-500 hover:text-gray-50 rounded-b">
+                                    <th v-if="$can('roles-list') || $can('roles-edit')" class="px-4 py-2 text-sm font-bold w-1/12 hover:bg-blue-500 hover:text-gray-50 rounded-b">
                                         Acciones
                                     </th>
                                 </tr>
@@ -68,20 +78,23 @@
                                     <td class="border px-1 py-2 text-sm truncate" v-text="dato.id"></td>
                                     <td class="border px-1 py-2 text-sm truncate" v-text="dato.name"></td>
                                     <td class="border px-2 py-2 text-sm truncate" v-text="dato.guard_name"></td>
-                                    <td class="border px-2 py-2 mx-auto text-center flex items-center">
-                                        <button @click="ver(dato.id)" class="hover:bg-green-700 text-green-400 font-bold rounded" fill="none"
-                                                viewBox="0 0 24 24" stroke="currentColor">
-                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                                <path stroke-linecap="round" stroke-linejoin="round" d="M10 21h7a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v11m0 5l4.879-4.879m0 0a3 3 0 104.243-4.242 3 3 0 00-4.243 4.242z" />
-                                            </svg>
-                                        </button>
-                                        <button @click="update(dato.id)" class="hover:bg-green-700 text-green-400 font-bold rounded" fill="none"
-                                                viewBox="0 0 24 24" stroke="currentColor">
-                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                                <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-                                            </svg>
-                                        </button>
-
+                                    <td v-if="$can('roles-list') || $can('roles-edit')" class="border px-2 py-2 flex mx-auto items-center justify-center">
+                                        <Popper v-if="$can('roles-list')" content="Ver" hover=true placement="top" arrow=true>
+                                            <button @click="ver(dato.id)" class="hover:bg-blue-700 text-blue-400 font-bold rounded" fill="none"
+                                                    viewBox="0 0 24 24" stroke="currentColor">
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" d="M10 21h7a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v11m0 5l4.879-4.879m0 0a3 3 0 104.243-4.242 3 3 0 00-4.243 4.242z" />
+                                                </svg>
+                                            </button>
+                                        </Popper>
+                                        <Popper v-if="$can('roles-edit')" content="Editar" hover=true placement="top" arrow=true>
+                                            <button @click="update(dato.id)" class="hover:bg-green-700 text-green-400 font-bold rounded" fill="none"
+                                                    viewBox="0 0 24 24" stroke="currentColor">
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                                                </svg>
+                                            </button>
+                                        </Popper>
                                     </td>
                                 </tr>
                                 <tr v-else>
@@ -98,7 +111,7 @@
                                             <button  v-else
                                                      class="mr-1 mb-1 px-4 py-3 text-sm leading-4 border rounded hover:bg-white focus:border-indigo-500 focus:text-indigo-500"
                                                      :class="{ 'bg-blue-700 text-white': link.active }"
-                                                     v-on:click="cambiarPage(link.url)"
+                                                     v-on:click="this.cambiarPage(link.url, 'master', null)"
                                                      v-html="link.label" />
                                         </template>
                                     </div>
@@ -142,9 +155,6 @@
                                                     <th class="px-4 py-2 text-sm font-bold w-2/12 hover:bg-blue-500 hover:text-gray-50 rounded-b">
                                                         Descripcion
                                                     </th>
-                                                    <th class="px-4 py-2 text-sm font-bold w-2/12 hover:bg-blue-500 hover:text-gray-50 rounded-b">
-                                                        Acciones
-                                                    </th>
                                                 </tr>
                                                 </thead>
                                                 <tbody>
@@ -152,15 +162,6 @@
                                                     <td class="border px-1 py-2 text-sm truncate" v-text="dato.id"></td>
                                                     <td class="border px-1 py-2 text-sm truncate" v-text="dato.name"></td>
                                                     <td class="border px-2 py-2 text-sm truncate" v-text="dato.guard_name"></td>
-                                                    <td class="border px-2 py-2 mx-auto text-center flex items-center">
-                                                        <button @click="ver(dato.id)" class="hover:bg-green-700 text-green-400 font-bold rounded" fill="none"
-                                                                viewBox="0 0 24 24" stroke="currentColor">
-                                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                                                <path stroke-linecap="round" stroke-linejoin="round" d="M10 21h7a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v11m0 5l4.879-4.879m0 0a3 3 0 104.243-4.242 3 3 0 00-4.243 4.242z" />
-                                                            </svg>
-                                                        </button>
-
-                                                    </td>
                                                 </tr>
                                                 <tr v-else>
                                                     <td class="border px-4 py-2 text-xs text-center" colspan="3"> La consulta no obtuvo datos</td>
@@ -168,42 +169,22 @@
                                                 </tbody>
                                             </table>
                                             <section class="mt-6">
-                                                <div v-if="this.form.rolePermissions.total > 3">
+                                                <div v-if="form.rolePermissions.total > 3">
                                                     <div class="flex flex-wrap -mb-1">
-                                                        <template v-for="(link, p) in this.form.rolePermissions.links" :key="p">
+                                                        <template v-for="(link, p) in form.rolePermissions.links" :key="p">
                                                             <div v-if="link.url === null" class="mr-1 mb-1 px-4 py-3 text-sm leading-4 text-gray-400 border rounded"
                                                                  v-html="link.label" />
                                                             <a href="#" v-else
-                                                                     class="mr-1 mb-1 px-4 py-3 text-sm leading-4 border rounded hover:bg-white focus:border-indigo-500 focus:text-indigo-500"
-                                                                     :class="{ 'bg-blue-700 text-white': link.active }"
-                                                                     v-on:click="cambiarPage(link.url)"
-                                                                     v-html="link.label" />
+                                                               class="mr-1 mb-1 px-4 py-3 text-sm leading-4 border rounded hover:bg-white focus:border-indigo-500 focus:text-indigo-500"
+                                                               :class="{ 'bg-blue-700 text-white': link.active }"
+                                                               v-on:click="cambiarPage(link.url)"
+                                                               v-html="link.label" />
                                                         </template>
                                                     </div>
                                                 </div>
                                             </section>
                                         </div>
-
-                                        <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
-                                            <span class="flex w-full rounded-md shadow-sm sm:ml-3 sm:w-auto">
-                                              <button v-show="!editMode" @click="save(form)" wire:click.prevent="store()" type="button" class="inline-flex justify-center w-full rounded-md border border-transparent px-4 py-2 bg-green-600 text-base leading-6 font-medium text-white shadow-sm hover:bg-green-500 focus:outline-none focus:border-green-700 focus:shadow-outline-green transition ease-in-out duration-150 sm:text-sm sm:leading-5" >
-                                                Guardar
-                                              </button>
-                                            </span>
-                                            <span class="flex w-full rounded-md shadow-sm sm:ml-3 sm:w-auto">
-                                              <button v-show="editMode" @click="update(form)" wire:click.prevent="store()" type="button" class="inline-flex justify-center w-full rounded-md border border-transparent px-4 py-2 bg-green-600 text-base leading-6 font-medium text-white shadow-sm hover:bg-green-500 focus:outline-none focus:border-green-700 focus:shadow-outline-green transition ease-in-out duration-150 sm:text-sm sm:leading-5" >
-                                                Actualizar
-                                              </button>
-                                            </span>
-                                            <span class="mt-3 flex w-full rounded-md shadow-sm sm:mt-0 sm:w-auto">
-
-                                          <button @click="closeModal()" type="button" class="inline-flex justify-center w-full rounded-md border border-gray-300 px-4 py-2 bg-white text-base leading-6 font-medium text-gray-700 shadow-sm hover:text-gray-500 focus:outline-none focus:border-blue-300 focus:shadow-outline-blue transition ease-in-out duration-150 sm:text-sm sm:leading-5">
-                                            Cancelar
-                                          </button>
-                                        </span>
-                                        </div>
                                     </form>
-
                                 </div>
                             </div>
                         </div>
@@ -227,10 +208,9 @@
                                     <div class="">
                                         <h2 v-text="tituloModal" class="text-sm font-bold text-gray-900 px-4 py-4"></h2>
                                     </div>
-                                    <form>
-
-
+                                    <form method="get" action="/master/rolesupdate">
                                         <div class="lg:px-4 md:px-2 sm:px-0 py-2 pb-6 overflow-y-auto h-100">
+
                                             <table class="table-fixed w-full">
                                                 <thead>
                                                 <tr class="bg-gray-100">
@@ -243,23 +223,24 @@
                                                     <th class="px-4 py-2 text-sm font-bold w-2/12 hover:bg-blue-500 hover:text-gray-50 rounded-b">
                                                         Descripcion
                                                     </th>
-                                                    <th class="px-4 py-2 text-sm font-bold w-2/12 hover:bg-blue-500 hover:text-gray-50 rounded-b">
+                                                    <th class="px-4 py-2 text-sm font-bold w-1/12 hover:bg-blue-500 hover:text-gray-50 rounded-b">
                                                         Seleccionar
                                                     </th>
                                                 </tr>
                                                 </thead>
                                                 <tbody>
-                                                <tr class="text-center" text-sm v-if="this.form.permission.data" v-for="(dato, id) in this.form.permission.data" :key="id">
+                                                <input type="hidden" id="idrol" name="idrol" :value="form.role.id">
+                                                <tr class="text-center" text-sm v-if="form.permission.data" v-for="(dato, atribute, id) in form.permission.data" :key="id">
                                                     <td class="border px-2 py-2 text-sm truncate" v-text="dato.id"></td>
                                                     <td class="border px-2 py-2 text-sm truncate" v-text="dato.name"></td>
                                                     <td class="border px-2 py-2 text-sm truncate" v-text="dato.guard_name"></td>
-                                                    <td class="border px-2 py-2 mx-auto text-center flex items-center">
+                                                    <td class="border px-2 py-2 mx-auto items-center justify-center">
                                                         <input type="checkbox"
-                                                               :name="this.permissiondat[dato.id]"
-                                                               :value="dato.name"
+                                                               :id="dato.id"
+                                                               :name="dato.id"
+                                                               :checked="form.rolePermissionsjson.includes(dato.id)"
                                                                class="form-check-input appearance-none h-4 w-4 border border-gray-300 rounded-sm bg-white checked:bg-blue-600 checked:border-blue-600 focus:outline-none transition duration-200 mt-1 align-top bg-no-repeat bg-center bg-contain float-left mr-2 cursor-pointer"
-                                                               :checked="this.form.rolePermissionsjson.includes(dato.id)"
-                                                               >
+                                                        >
                                                     </td>
                                                 </tr>
                                                 <tr v-else>
@@ -286,12 +267,7 @@
 
                                         <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
                                             <span class="flex w-full rounded-md shadow-sm sm:ml-3 sm:w-auto">
-                                              <button v-show="isOpen" @click="save(form)" wire:click.prevent="store()" type="button" class="inline-flex justify-center w-full rounded-md border border-transparent px-4 py-2 bg-green-600 text-base leading-6 font-medium text-white shadow-sm hover:bg-green-500 focus:outline-none focus:border-green-700 focus:shadow-outline-green transition ease-in-out duration-150 sm:text-sm sm:leading-5" >
-                                                Guardar
-                                              </button>
-                                            </span>
-                                            <span class="flex w-full rounded-md shadow-sm sm:ml-3 sm:w-auto">
-                                              <button v-show="isOpenUpdate" @click="edit(form)" wire:click.prevent="store()" type="button" class="inline-flex justify-center w-full rounded-md border border-transparent px-4 py-2 bg-green-600 text-base leading-6 font-medium text-white shadow-sm hover:bg-green-500 focus:outline-none focus:border-green-700 focus:shadow-outline-green transition ease-in-out duration-150 sm:text-sm sm:leading-5" >
+                                              <button v-show="isOpenUpdate || $can('roles-edit')" wire:click.prevent="submit()" type="submit" class="inline-flex justify-center w-full rounded-md border border-transparent px-4 py-2 bg-green-600 text-base leading-6 font-medium text-white shadow-sm hover:bg-green-500 focus:outline-none focus:border-green-700 focus:shadow-outline-green transition ease-in-out duration-150 sm:text-sm sm:leading-5" >
                                                 Actualizar
                                               </button>
                                             </span>
@@ -303,7 +279,6 @@
                                         </span>
                                         </div>
                                     </form>
-
                                 </div>
                             </div>
                         </div>
@@ -337,11 +312,13 @@ import { Head, Link } from '@inertiajs/inertia-vue3';
 import JetNavLink from '@/Jetstream/NavLink.vue';
 import NavLink from "../../Jetstream/NavLink";
 import Submenu from "../../Components/Submenu";
+import Input from "../../Jetstream/Input";
 
 
 export default {
 
     components: {
+        Input,
         Submenu,
         Button,
         AppLayout,
@@ -393,7 +370,8 @@ export default {
                 role: null,
                 permission: null,
                 rolePermissions: null,
-                rolePermissionsjson: []
+                rolePermissionsjson: [],
+                permisosdata: [],
             },
             permissiondat: []
         }
@@ -463,7 +441,6 @@ export default {
                     id: data,
                 }
             }).then((res) => {
-                //console.log(res.data);
                 var respuesta = res.data;
                 this.form.role = respuesta.role;
                 this.form.permission = respuesta.permission;
@@ -473,14 +450,12 @@ export default {
             })
         },
         edit: function (data) {
-            //console.log(data);
             var url= '/master/rolesupdate';
-            axios.post(url, {
+            axios.get(url, {
                 params: {
                     data: data,
                 }
             }).then((res) => {
-                //console.log(res.data);
                 var respuesta = res.data;
                 this.form.role = respuesta.role;
                 this.form.permission = respuesta.permission;
@@ -491,7 +466,6 @@ export default {
         },
 
         getData: async function (buscar = '', filtro = 'nombre', paginate = true) {
-
             var url= '/master/index';
             axios.get(url, {
                 params: {
@@ -501,7 +475,6 @@ export default {
                     ispage: true,
                 }
             }).then((res) => {
-                //console.log(res.data);
                 var respuesta = res.data;
                 this.arrayData = respuesta.data;
 
@@ -513,7 +486,6 @@ export default {
             })
         },
         openModal: function (accion, data = []) {
-
             switch (accion) {
                 case 'registrar':
                 {

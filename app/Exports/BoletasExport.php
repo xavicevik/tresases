@@ -68,6 +68,7 @@ class BoletasExport implements FromCollection, WithHeadings, ShouldAutoSize
                                 'boletas.valor as valor_boleta',
                                 'boletas.pago as valor_pagado',
                                 'boletas.saldo as valor_saldo',
+                                DB::raw('getcomisionboleta(boletas.id) as comision'),
                                 'estados.nombre as estado',
                                 'boletas.created_at as fecha_creacion',
                                 'boletas.updated_at as fecha_ultima_modificacion')
@@ -87,6 +88,7 @@ class BoletasExport implements FromCollection, WithHeadings, ShouldAutoSize
             'Valor_boleta',
             'Valor_pagado',
             'Valor_saldo',
+            'Comision', 
             'Estado',
             'Fecha_creacion',
             'Fecha_ultima_actualizacion'

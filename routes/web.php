@@ -189,7 +189,7 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'),'verified',]
         Route::get('/master/index', [MasterController::class, 'rolesIndex'])->name('master.index');
         Route::get('/master/rolesshow', [MasterController::class, 'rolesshow'])->name('master.rolesshow');
         Route::get('/master/rolesedit', [MasterController::class, 'rolesedit'])->name('master.rolesedit');
-        Route::post('/master/rolesupdate', [MasterController::class, 'rolesupdate'])->name('master.rolesupdate');
+        Route::get('/master/rolesupdate', [MasterController::class, 'rolesupdate'])->name('master.rolesupdate');
         Route::get('/master/paises', [MasterController::class, 'paisesIndex'])->name('master.paises');
         Route::get('/master/empresas', [MasterController::class, 'empresasIndex'])->name('master.empresas');
         Route::get('/master/series', [MasterController::class, 'seriesIndex'])->name('master.series');
@@ -198,10 +198,18 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'),'verified',]
         Route::get('/master/puntoventas', [PuntoventaController::class, 'index'])->name('master.puntosventa');
         Route::get('/master/tiposdoc', [MasterController::class, 'tipodocIndex'])->name('master.tiposdoc');
         Route::get('/master/tiposdocsearch', [MasterController::class, 'tipodocSearch'])->name('master.tiposdocsearch');
-
         Route::get('/enviar', [EmailController::class, 'send'])->name('enviar');
         Route::get('/detalleventa', [EmailController::class, 'send'])->name('detalleventa');
 
+        // Reportes
+        Route::get('/reportes', [ReporteController::class, 'index'])->name('reportes.index');
+        Route::get('/reportes/vendedor', [ReporteController::class, 'vendedor'])->name('reportes.vendedor');
+        Route::get('/reportes/getDetalleVendedor', [ReporteController::class, 'getDetalleVendedor'])->name('reportes.getDetalleVendedor');
+
+        Route::get('/reportes/ventavendedor', [ReporteController::class, 'ventavendedor'])->name('reportes.ventavendedor');
+        Route::get('/reportes/ventagetDetalleVendedor', [ReporteController::class, 'ventagetDetalleVendedor'])->name('reportes.ventagetDetalleVendedor');
+
+        Route::get('/reportes/resumenvendedores', [ReporteController::class, 'resumenvendedores'])->name('reportes.resumenvendedores');
 
 
     //});
