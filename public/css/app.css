@@ -1099,6 +1099,10 @@ select {
   margin-top: 0.75rem;
   margin-bottom: 0.75rem;
 }
+.mx-2 {
+  margin-left: 0.5rem;
+  margin-right: 0.5rem;
+}
 .ml-3 {
   margin-left: 0.75rem;
 }
@@ -1212,6 +1216,9 @@ select {
 }
 .-mb-px {
   margin-bottom: -1px;
+}
+.-ml-1 {
+  margin-left: -0.25rem;
 }
 .block {
   display: block;
@@ -1426,6 +1433,9 @@ select {
 }
 .w-2\/3 {
   width: 66.666667%;
+}
+.w-6\/12 {
+  width: 50%;
 }
 .min-w-0 {
   min-width: 0px;
@@ -2108,6 +2118,10 @@ select {
 .px-14 {
   padding-left: 3.5rem;
   padding-right: 3.5rem;
+}
+.py-0\.5 {
+  padding-top: 0.125rem;
+  padding-bottom: 0.125rem;
 }
 .pt-6 {
   padding-top: 1.5rem;

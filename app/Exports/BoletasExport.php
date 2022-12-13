@@ -88,7 +88,7 @@ class BoletasExport implements FromCollection, WithHeadings, ShouldAutoSize
             'Valor_boleta',
             'Valor_pagado',
             'Valor_saldo',
-            'Comision', 
+            'Comision',
             'Estado',
             'Fecha_creacion',
             'Fecha_ultima_actualizacion'

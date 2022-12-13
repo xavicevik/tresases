@@ -62,6 +62,8 @@ Route::get('/app/ventas/paynotifyfailure', [VentaController::class, 'paynotifyfa
 Route::get('/app/ventas/paynotifypending', [VentaController::class, 'paynotifypendingapp'])->name('paynotifypendingapp');
 Route::get('/app/ventas', [VentaController::class, 'createappp'])->name('ventas.createapp');
 
+Route::get('/app/genBoletaImagen', [VentaController::class, 'genBoletaImagen'])->name('ventas.genBoletaImagen');
+
 
 Route::group(['middleware'=>['guest']],function(){
 
@@ -208,7 +210,6 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'),'verified',]
 
         Route::get('/reportes/ventavendedor', [ReporteController::class, 'ventavendedor'])->name('reportes.ventavendedor');
         Route::get('/reportes/ventagetDetalleVendedor', [ReporteController::class, 'ventagetDetalleVendedor'])->name('reportes.ventagetDetalleVendedor');
-
         Route::get('/reportes/resumenvendedores', [ReporteController::class, 'resumenvendedores'])->name('reportes.resumenvendedores');
 
 

@@ -57,7 +57,9 @@ export default {
             <header class="top-0 w-full flex items-center p-4 text-semibold text-red-900 bg-white">
                 <!-- Header -->
                 <div class="flex items-center justify-start md:justify-center h-10 px-3 border-none">
-                    <img class="h-8/12 mx-auto rounded-md overflow-hidden" src="/storage/img/logo_fondo.jpg" />
+                    <a href="https://dllo.shoppingred.com.co/web/">
+                        <img class="h-8/12 mx-auto rounded-md overflow-hidden" src="/storage/img/logo_fondo.jpg" />
+                    </a>
                     <span class="text-sm md:block">
                         {{ username }}
                     </span>

@@ -33,11 +33,11 @@
                                                 </vue-countdown>
                                             </div>
                                             <div class="py-2">
-                                                <img v-show="form.idrifa.urlimagen1 != null" :src="'/storage/'+form.idrifa.urlimagen1" alt="image" class="mx-auto w-10/12 h-22"/>
+                                                <img v-show="form.idrifa.urlimagen1 != null" :src="'/storage/'+form.idrifa.urlimagen1" alt="image" class="mx-auto w-10/12 h-20"/>
                                             </div>
 
                                             <div class="py-2 text-xs">
-                                                <p>Ingrese el número deseado o presione el dado para obtener un número de manera aleatoria</p>
+                                                <p>Ingrese el número deseado o presione el boton para obtener un número de la suerte</p>
                                             </div>
 
                                             <div class="py-1">
@@ -46,28 +46,18 @@
 
 
                                                     <div class="container flex justify-center items-center">
-                                                        <div class="relative pt-1">
-                                                            <div class="absolute top-4 left-3">
-                                                                <i class="fa fa-search text-gray-400 z-20 hover:text-gray-500"></i> </div>
-                                                                 <money3 v-bind="configMoney2" v-model="form.reserva.numero" @keypress.enter="valBoletaDisponible(form.reserva.numero, form.idrifa.id, form.idvendedor.id, form.idcliente.id)" class="h-8 w-1/8 pl-2 pr-2 rounded-lg z-0 focus:shadow focus:outline-none"></money3>
-                                                                <Popper content="Seleccionar" hover=true placement="top" arrow=true>
-                                                                    <a @click="valBoletaDisponible(form.reserva.numero, form.idrifa.id, form.idvendedor.id, form.idcliente.id)">
-                                                                        <div class="absolute top-3 right-2">
-                                                                            <Icon icon="fe:import" class="h-5"  />
-                                                                        </div>
-                                                                    </a>
-                                                                </Popper>
+                                                        <div class="pt-1">
+                                                            <div class="top-4 left-3">
+                                                                 <money3 v-bind="configMoney2" v-model="form.reserva.numero" @keypress.enter="valBoletaDisponible(form.reserva.numero, form.idrifa.id, form.idvendedor.id, form.idcliente.id)" class="text-xl text-center h-8 w-1/8 pl-2 pr-2 rounded-lg z-0 focus:shadow focus:outline-none"></money3>
+                                                            </div>
                                                         </div>
-                                                        <div class="pl-2">
-                                                            <Popper content="Generar" hover=true placement="top" arrow=true>
-                                                                <button @click="generarAleatorio()" class="hover:bg-red-700 text-red-400 font-bold rounded" fill="none"
-                                                                        viewBox="0 0 24 24" stroke="currentColor">
-                                                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
-                                                                        <path stroke-linecap="round" stroke-linejoin="round" d="M21 7.5l-9-5.25L3 7.5m18 0l-9 5.25m9-5.25v9l-9 5.25M3 7.5l9 5.25M3 7.5v9l9 5.25m0-9v9" />
-                                                                    </svg>
-                                                                </button>
-                                                            </Popper>
-                                                        </div>
+                                                    </div>
+                                                    <div class="flex pt-2">
+                                                        <button type="button" @click="generarAleatorio()" class="w-1/2 mx-auto text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm p-2 py-2.5 text-center">Número de suerte</button>
+                                                        <button type="button" @click="valBoletaDisponible(form.reserva.numero, form.idrifa.id, form.idvendedor.id, form.idcliente.id)" class="w-1/2 flex mx-auto text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm p-2 mx-2 py-2.5 text-center">
+                                                            <svg aria-hidden="true" class="mr-2 -ml-1 w-4 h-4" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M3 1a1 1 0 000 2h1.22l.305 1.222a.997.997 0 00.01.042l1.358 5.43-.893.892C3.74 11.846 4.632 14 6.414 14H15a1 1 0 000-2H6.414l1-1H14a1 1 0 00.894-.553l3-6A1 1 0 0017 3H6.28l-.31-1.243A1 1 0 005 1H3zM16 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0zM6.5 18a1.5 1.5 0 100-3 1.5 1.5 0 000 3z"></path></svg>
+                                                            Comprar
+                                                        </button>
                                                     </div>
 
                                                     <div v-if="$page.props.errors.rifa" class="text-red-500">{{ $page.props.errors.rifa }}</div>
@@ -78,47 +68,37 @@
                                         <section>
                                             <div class="flex py-1 w-full max-h-fit overflow-y-scroll">
                                                 <div class="mb-4 w-full">
-                                                    <div class="flex py-1 text-xs font-bold align-middle">
-                                                        <div class="w-4/12">
+                                                    <div class="flex py-1 text-sm font-bold align-middle">
+                                                        <div class="w-6/12">
                                                             Núm/Prom
                                                         </div>
-                                                        <div class="w-3/12 px-1">
-                                                            Total
-                                                        </div>
                                                         <div class="w-4/12 px-1">
-                                                            {{ asignarMode?'Pagar':'Anular' }}
+                                                            Valor pagar
                                                         </div>
-                                                        <div class="w-1/12 px-1">
+                                                        <div class="w-2/12 px-1">
                                                         </div>
                                                     </div>
-                                                    <div v-for="(reserva, index) in form.reservas" :key="reserva.numero" class="bg-blue-200 text-xs rounded-md flex py-1 px-2">
-                                                        <div class="w-4/12">
+                                                    <div v-for="(reserva, index) in form.reservas" :key="reserva.numero" class="bg-blue-200 text-sm rounded-md flex py-1 px-2">
+                                                        <div class="w-6/12">
                                                             {{ reserva.numero }}/{{ reserva.promocional}}
                                                         </div>
-                                                        <div class="w-3/2 px-1">
-                                                            {{ formatPrice(reserva.valortotal) }}
-                                                        </div>
                                                         <div class="w-4/12 px-1">
-                                                            <money3 v-if="asignarMode" v-bind="configMoney" @focusout="pushSessionDetail(session.id, reserva, 'upd')" :max="reserva.valorsaldo" v-model="reserva.valorpagar" class="h-8 w-full text-xs pl-2 pr-2 rounded-md z-0 focus:shadow focus:outline-none"></money3>
-                                                            <money3 v-else v-bind="configMoney" :max="reserva.valoranular" v-model="reserva.valorpagado" class="h-8 w-full text-xs pl-2 pr-2 rounded-md z-0 focus:shadow focus:outline-none"></money3>
+                                                            {{ formatPrice(reserva.valorpagar) }}
                                                         </div>
-                                                        <div class="w-1/12 px-1">
+                                                        <div class="w-2/12 px-1">
                                                             <svg xmlns="http://www.w3.org/2000/svg" @click="eliminarReserva(reserva, index)" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                                                 <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                                                             </svg>
                                                         </div>
                                                     </div>
-                                                    <div class="bg-blue-400 text-xs rounded-md flex py-1 px-2 font-bold">
-                                                        <div class="w-4/12">
+                                                    <div class="bg-blue-400 text-sm rounded-md flex py-1 px-2 font-bold">
+                                                        <div class="w-6/12">
                                                             Total:
-                                                        </div>
-                                                        <div class="w-3/12 px-1">
-                                                            {{ formatPrice(totalmovimiento) }}
                                                         </div>
                                                         <div class="w-4/12 px-1">
                                                             {{ formatPrice(totalapagar) }}
                                                         </div>
-                                                        <div class="w-1/12 px-1">
+                                                        <div class="w-2/12 px-1">
                                                             {{ form.reservas.length }}
                                                         </div>
                                                     </div>
@@ -138,10 +118,9 @@
                                         Restante：{{ minutes }} min, {{ seconds }} seg.
                                     </vue-countdown>
                                 </div>
-                                <h1 class="sr-only">Resumen de la transacción</h1>
                                     <!-- Order summary -->
                                     <div class="mt-5 mb-10 lg:mt-0">
-                                        <h2 class="text-sm font-bold font-medium text-gray-900">Resumen de la transacción</h2>
+                                        <h2 class="text-lg font-bold font-medium text-gray-900">Resumen de la transacción</h2>
 
                                         <div class="mt-4 bg-white border border-gray-200 rounded-lg shadow-sm">
                                             <ul role="list" class="divide-y divide-gray-200">
@@ -212,11 +191,11 @@
                                     <div>
                                         <div class=" mt-5 mb-10 lg:mt-0">
                                             <div class="flex">
-                                                <h2 class="text-sm font-bold text-gray-900">Información del cliente</h2>
+                                                <h2 class="text-md font-bold text-gray-900">Información del cliente</h2>
                                             </div>
                                             <div v-if="$page.props.flash.message" class="text-green-500">{{ $page.props.flash.message }}</div>
                                             <div class="mt-2">
-                                                <label class="block text-xs font-medium text-gray-700">Documento</label>
+                                                <label class="block text-sm font-medium text-gray-700">Documento</label>
                                                 <div class="mt-1">
                                                     <input type="text" @change="selectClienteFull(form.cliente.documento)" @keyup.enter="selectClienteFull(form.cliente.documento)" v-model="form.cliente.documento" autocomplete="postal-code" class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 text-xs sm:text-sm">
                                                     <div v-if="$page.props.errors.documento" class="text-red-500">{{ $page.props.errors.docuemnto }}</div>
@@ -243,18 +222,16 @@
                                     </div>
 
                                     <!-- Order summary -->
-                                    <div class="mt-5 mb-10 lg:mt-0">
-                                        <h2 class="text-lg font-bold font-medium text-gray-900">Resumen de la orden</h2>
+                                    <div v-if="false" class="mt-5 mb-10 lg:mt-0">
+                                        <h2 class="text-md font-bold font-medium text-gray-900">Resumen de la orden</h2>
 
                                         <div class="mt-4 bg-white border border-gray-200 rounded-lg shadow-sm">
-                                            <h3 class="sr-only">Boletas seleccionadas</h3>
                                             <ul role="list" class="divide-y divide-gray-200">
-                                                <li class="flex py-6 px-4 sm:px-6" v-for="(dato, id) in form.reservas" :key="id">
-                                                    <div class="flex-shrink-0">
+                                                <li class="flex py-2 px-2 sm:px-6" v-for="(dato, id) in form.reservas" :key="id">
+                                                    <div class="flex-shrink-0 align-middle">
                                                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
                                                             <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 6v.75m0 3v.75m0 3v.75m0 3V18m-9-5.25h5.25M7.5 15h3M3.375 5.25c-.621 0-1.125.504-1.125 1.125v3.026a2.999 2.999 0 010 5.198v3.026c0 .621.504 1.125 1.125 1.125h17.25c.621 0 1.125-.504 1.125-1.125v-3.026a2.999 2.999 0 010-5.198V6.375c0-.621-.504-1.125-1.125-1.125H3.375z" />
                                                         </svg>
-
                                                     </div>
 
                                                     <div class="ml-6 flex-1 flex flex-col">
@@ -266,18 +243,18 @@
                                                         </div>
 
                                                         <div class="flex-1 pt-2 flex items-end justify-between">
-                                                            <p class="mt-1 text-sm font-medium text-gray-900">Valor a pagar: </p>
-                                                            <p class="mt-1 text-sm font-medium text-gray-900">${{ dato.valorpagar }}</p>
+                                                            <p class="mt-1 text-sm font-bold text-gray-900">Valor a pagar: </p>
+                                                            <p class="mt-1 text-sm font-medium text-gray-900">{{ formatPrice(dato.valorpagar) }}</p>
                                                         </div>
                                                     </div>
                                                 </li>
 
                                                 <!-- More products... -->
                                             </ul>
-                                            <dl class="border-t border-gray-200 py-6 px-4 space-y-6 sm:px-6">
-                                                <div class="flex items-center justify-between border-t border-gray-200 pt-6">
-                                                    <dt class="text-base text-bold font-medium">Total</dt>
-                                                    <dd class="text-base font-medium text-gray-900">{{ totalapagar }}</dd>
+                                            <dl class="py-2 px-2 space-y-6">
+                                                <div class="flex items-center justify-between border-t border-gray-200 pt-2">
+                                                    <dt class="text-bold text-gray-900">Total</dt>
+                                                    <dd class="text-base font-medium text-gray-900">{{ formatPrice(totalapagar) }}</dd>
                                                 </div>
                                             </dl>
 
@@ -329,7 +306,7 @@
                     </form-wizard>
                     <div v-if="isComplete" class="flex items-center justify-center p-5 bg-blue-100 min-w-screen">
                         <div class="max-w-xl p-8 text-center text-gray-800 bg-white shadow-xl lg:max-w-3xl rounded-3xl lg:p-12">
-                            <h3 class="text-2xl">Gracias por compra en TresAses!</h3>
+                            <h3 class="text-2xl">Gracias por compra en Shoppingred!</h3>
                             <div class="flex justify-center">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="w-24 h-24 text-green-400" fill="none"
                                      viewBox="0 0 24 24" stroke="currentColor">
@@ -338,7 +315,7 @@
                                 </svg>
                             </div>
 
-                            <p>A continuación recibirá un mensaje de correo electrónico al: {{ form.cliente.correo}}</p>
+                            <p>A continuación recibirá un mensaje SMS al {{ form.cliente.movil}}</p>
                             <div class="mt-4">
                                 <a :href="'/ventas/reportpdf?id=' + $page.props.flash.message" target="_blank" class="px-2 py-2 text-blue-200 bg-blue-600 rounded">Imprimir</a>
                                 <p class="mt-4 text-sm">Si tiene problemas para poder acceder al correo, puede ver el resumen de la compra en:
@@ -1110,77 +1087,79 @@ export default {
             this.form.cliente.idtipos_documento = 1;
             this.form.metacliente = null;
         },
-        saveCliente: async function(data) {
+        saveCliente: function(data) {
             if (this.form.cliente.nombre == '' || this.form.cliente.nombre === null ||
                 this.form.cliente.documento == '' || this.form.cliente.documento === null ||
                 this.form.cliente.movil == '' || this.form.cliente.movil === null) {
                 Swal.fire({
-                    icon: 'warning',
+                    icon: 'error',
                     title: 'Ingrese los datos del cliente',
                     showConfirmButton: true,
                 })
+                return false;
+            } else {
+                var formData = new FormData();
+                formData.append('nombre', this.form.cliente.nombre);
+                formData.append('apellido', '');
+                formData.append('username', this.form.cliente.documento);
+                formData.append('idrol', 2);
+                formData.append('estado', 1);
+                formData.append('idtipos_documento', 1);
+                formData.append('documento', this.form.cliente.documento);
+                formData.append('movil', this.form.cliente.movil);
+                formData.append('isnatural', 1);
+                formData.append('idempresa', 3);
+                formData.append('idsesion', this.session.id)
+
+                /*
+                params: {
+                        nombre: this.form.cliente.nombre,
+                        username: this.form.cliente.documento,
+                        documento: this.form.cliente.documento,
+                        idrol: 2,
+                        movil: this.form.cliente.movil,
+                        idsesion: this.session.id,
+                        idtipos_documento: 1
+
+                    }
+                 */
+
+                axios.post('/users/storeCliente', formData)
+                    .then((res) => {
+                        console.log('Se creo cliente');
+                        var respuesta = res.data;
+                        this.onSelectCliente(respuesta.cliente.id);
+                        this.idpreferencia = respuesta.idpreferencia;
+                        this.urlpago = respuesta.urlpago;
+                        console.log("Validar pago id " + this.idpreferencia);
+                    }).catch(function (error) {
+                        console.log(error);
+                    }).finally(() => {
+                        console.log("Finish cliente - preparepay");
+                        //this.preparePay();
+                        return true;
+                    });
+
+                /*
+                this.$inertia.post('/users/storeCliente', formData, {
+                    onBefore: (visit) => { console.log('onBefore');},
+                    onStart: (visit) => {console.log('onStart');},
+                    onProgress: (progress) => {console.log('onProgress');},
+                    onSuccess: (res) => {
+                        console.log('Se creo cliente');
+                        var respuesta = res.data;
+                        this.onSelectCliente(respuesta.cliente.id);
+                        this.idpreferencia = respuesta.idpreferencia;
+                        this.urlpago = respuesta.urlpago;
+                        console.log("Validar pago id " + this.idpreferencia);
+                    },
+                    onError: (errors) => {console.log('onError');},
+                    onCancel: () => {console.log('onCancel');},
+                    onFinish: visit => {console.log('onFinish'); return true},
+                });
+                */
             }
-            var formData = new FormData();
-            formData.append('nombre', this.form.cliente.nombre);
-            formData.append('apellido', '');
-            formData.append('username', this.form.cliente.documento);
-            formData.append('idrol', 2);
-            formData.append('estado', 1);
-            formData.append('idtipos_documento', 1);
-            formData.append('documento', this.form.cliente.documento);
-            formData.append('movil', this.form.cliente.movil);
-            formData.append('isnatural', 1);
-            formData.append('idempresa', 3);
-            formData.append('idsesion', this.session.id)
-
-            /*
-            params: {
-                    nombre: this.form.cliente.nombre,
-                    username: this.form.cliente.documento,
-                    documento: this.form.cliente.documento,
-                    idrol: 2,
-                    movil: this.form.cliente.movil,
-                    idsesion: this.session.id,
-                    idtipos_documento: 1
-
-                }
-             */
-
-            await axios.post('/users/storeCliente', formData)
-                .then((res) => {
-                    console.log('Se creo cliente');
-                    var respuesta = res.data;
-                    this.onSelectCliente(respuesta.cliente.id);
-                    this.idpreferencia = respuesta.idpreferencia;
-                    this.urlpago = respuesta.urlpago;
-                    console.log("Validar pago id " + this.idpreferencia);
-                }).catch(function (error) {
-                    console.log(error);
-                }).finally(() => {
-                    console.log("Finish cliente - preparepay");
-                    //this.preparePay();
-                    return true;
-            });
-
-            /*
-            this.$inertia.post('/users/storeCliente', formData, {
-                onBefore: (visit) => { console.log('onBefore');},
-                onStart: (visit) => {console.log('onStart');},
-                onProgress: (progress) => {console.log('onProgress');},
-                onSuccess: (res) => {
-                    console.log('Se creo cliente');
-                    var respuesta = res.data;
-                    this.onSelectCliente(respuesta.cliente.id);
-                    this.idpreferencia = respuesta.idpreferencia;
-                    this.urlpago = respuesta.urlpago;
-                    console.log("Validar pago id " + this.idpreferencia);
-                },
-                onError: (errors) => {console.log('onError');},
-                onCancel: () => {console.log('onCancel');},
-                onFinish: visit => {console.log('onFinish'); return true},
-            });
-            */
-
+            return false;
         },
         reset: function () {
             this.tituloModal = 'Crear nueva reserva';
@@ -1349,16 +1328,26 @@ export default {
         onError:function(error){
             console.log('error ?' + error)
         },
-        validateCheckout: async function() {
+        validateCheckout: function() {
             console.log('Validando checkout');
-            await this.saveCliente(this.form.cliente);
-
-            return true;
+            if (this.form.cliente.nombre == '' || this.form.cliente.nombre === null ||
+                this.form.cliente.documento == '' || this.form.cliente.documento === null ||
+                this.form.cliente.movil == '' || this.form.cliente.movil === null) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Ingrese los datos del cliente',
+                    showConfirmButton: true,
+                })
+                return false;
+            } else {
+                this.saveCliente(this.form.cliente);
+                return true;
+            }
         },
-        preparePay: async function() {
+        preparePay: function() {
             let status = false;
             var url= '/ventas/preparePay';
-            await axios.get(url, {
+            axios.get(url, {
                 params: {
                     idsesion: this.session.id
                 }

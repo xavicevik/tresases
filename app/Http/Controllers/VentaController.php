@@ -830,7 +830,7 @@ class VentaController extends Controller
                     $boleta->estado = $estado;
                     $boleta->save();
 
-                    $this->genBoletaImagen($boleta);
+                    $urlboleta = $this->genBoletaImagen($boleta);
 
                     $detalleventa = new Detalleventa();
                     $detalleventa->idventa = $venta->id;
@@ -1775,7 +1775,8 @@ class VentaController extends Controller
 
                 $this->sendSMS($to, $message);
                 if ($saldo == 0) {
-                    $mensaje = "Conserva este mensaje de paz y salvo valido para reclamar el premio mayor: Apto Robles, Camioneta mazda y Tour resolucion EDSA N 999 premio mayor $boleta->numero y promocional $boleta->promocional. Sorteo miercoles 21 de diciembre de 2022 con el premio mayor de la loteria de manizales";
+                    $urlboleta = 'boleta_'.$boleta->idrifa.$boleta->codigo.'.pdf';
+                    $mensaje = "Conserva este mensaje de paz y salvo valido para reclamar el premio mayor: Apto Robles, Camioneta mazda y Tour resolucion EDSA N 999 premio mayor $boleta->numero y promocional $boleta->promocional. Sorteo miercoles 21 de diciembre de 2022 con el premio mayor de la loteria de manizales. Boleta: $urlboleta";
                     $this->sendSMS($to, $mensaje);
                 }
             }
@@ -2016,6 +2017,7 @@ class VentaController extends Controller
     }
 
     public static function genBoletaImagen(Boleta $boleta) {
+       //$boleta = Boleta::where('id', 1111)->first();
         $url = url('storage/img/boletas/'.$boleta->idrifa.'_base.png');
 
         $numero = $boleta->numero;
@@ -2031,10 +2033,13 @@ class VentaController extends Controller
         $filename = 'boleta_'.$boleta->idrifa.$boleta->codigo.'.pdf';
         $pdf = app('dompdf.wrapper');
         $pdf->getDomPDF()->set_option("enable_php", true);
+        $pdf->setPaper('A4', 'landscape');
         $pdf->loadView('pdf.boleta', $data);
 
         $output = $pdf->output();
-        file_put_contents(public_path('storage').'/pdf/'.$filename, $output, FILE_APPEND);
+        file_put_contents(public_path('storage').'/boletas/'.$filename, $output, FILE_APPEND);
+
+        return public_path('storage').'/boletas/'.$filename;
     }
 
 
