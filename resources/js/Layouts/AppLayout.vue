@@ -129,7 +129,7 @@ export default {
                                 </Link>
                             </li>
                             <li>
-                                <Link v-if="$can('rifas-create')" :href="route('rifas.indexboletas')" href="#" class="relative flex flex-row items-center h-8 focus:outline-none hover:bg-blue-200 text-white-600 hover:text-white-800 border-l-4 border-transparent pr-6">
+                                <Link v-if="$can('boletas-list')" :href="route('rifas.indexboletas')" href="#" class="relative flex flex-row items-center h-8 focus:outline-none hover:bg-blue-200 text-white-600 hover:text-white-800 border-l-4 border-transparent pr-6">
                                 <span class="inline-flex justify-center items-center ml-4">
                                   <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                                       <path fill-rule="evenodd" d="M10 2a4 4 0 00-4 4v1H5a1 1 0 00-.994.89l-1 9A1 1 0 004 18h12a1 1 0 00.994-1.11l-1-9A1 1 0 0015 7h-1V6a4 4 0 00-4-4zm2 5V6a2 2 0 10-4 0v1h4zm-6 3a1 1 0 112 0 1 1 0 01-2 0zm7-1a1 1 0 100 2 1 1 0 000-2z" clip-rule="evenodd" />
@@ -139,7 +139,7 @@ export default {
                                 </Link>
                             </li>
                             <li>
-                                <Link v-if="$can('rifas-create')" :href="route('numerosreservados.index')" href="#" class="relative flex flex-row items-center h-8 focus:outline-none hover:bg-blue-200 text-white-600 hover:text-white-800 border-l-4 border-transparent pr-6">
+                                <Link v-if="$can('reservas-list')" :href="route('numerosreservados.index')" href="#" class="relative flex flex-row items-center h-8 focus:outline-none hover:bg-blue-200 text-white-600 hover:text-white-800 border-l-4 border-transparent pr-6">
                                 <span class="inline-flex justify-center items-center ml-4">
                                   <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z"></path></svg>
                                 </span>
@@ -189,7 +189,7 @@ export default {
                             </li>
                         </div>
                         <li>
-                            <Link v-if="$can('ventas-list')" :href="route('master.puntosventa')" :class=" (selectedRow === 'master.puntosventa' || route().current('master.puntosventa')) ? 'border-blue-500 bg-blue-200' : 'hover:border-gray-500'" class="relative flex flex-row items-center h-11 focus:outline-none hover:bg-blue-200 text-white-600 hover:text-white-800 border-l-4 border-transparent pr-6">
+                            <Link v-if="$can('ventas-create')" :href="route('master.puntosventa')" :class=" (selectedRow === 'master.puntosventa' || route().current('master.puntosventa')) ? 'border-blue-500 bg-blue-200' : 'hover:border-gray-500'" class="relative flex flex-row items-center h-11 focus:outline-none hover:bg-blue-200 text-white-600 hover:text-white-800 border-l-4 border-transparent pr-6">
                                 <span class="inline-flex justify-center items-center ml-4">
                                   <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                       <path stroke-linecap="round" stroke-linejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
@@ -199,7 +199,7 @@ export default {
                             </link>
                         </li>
                         <li>
-                            <Link v-if="$can('transacciones-list')" :href="route('transacciones.index')" :class=" (selectedRow === 'transacciones.index' || route().current('transacciones.index')) ? 'border-blue-500 bg-blue-200' : 'hover:border-gray-500'" class="relative flex flex-row items-center h-11 focus:outline-none hover:bg-blue-200 text-white-600 hover:text-white-800 border-l-4 border-transparent pr-6">
+                            <Link v-if="ñ" :href="route('transacciones.index')" :class=" (selectedRow === 'transacciones.index' || route().current('transacciones.index')) ? 'border-blue-500 bg-blue-200' : 'hover:border-gray-500'" class="relative flex flex-row items-center h-11 focus:outline-none hover:bg-blue-200 text-white-600 hover:text-white-800 border-l-4 border-transparent pr-6">
                                 <span class="inline-flex justify-center items-center ml-4 text-teal-600">
                                   <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                       <path stroke-linecap="round" stroke-linejoin="round" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
@@ -211,8 +211,8 @@ export default {
                         <li>
                             <Link v-if="$can('reportes-list')" :href="route('reportes.index')" :class=" (selectedRow === 'reportes.index' || route().current('reportes.index')) ? 'border-blue-500 bg-blue-200' : 'hover:border-gray-500'" class="relative flex flex-row items-center h-11 focus:outline-none hover:bg-blue-200 text-white-600 hover:text-white-800 border-l-4 border-transparent pr-6">
                                 <span class="inline-flex justify-center items-center ml-4 text-blue-600">
-                                  <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                      <path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 013 19.875v-6.75zM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V8.625zM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V4.125z" />
                                   </svg>
                                 </span>
                                 <span class="ml-2 text-sm tracking-wide truncate">Reportes</span>
@@ -360,8 +360,6 @@ export default {
                         </div>
 
 
-
-
                     </ul>
                 </div>
                 <footer class="text-center text-white">
@@ -426,7 +424,7 @@ export default {
 
                     <div class="text-center text-gray-800 p-2 text-sm bg-gray-200">
                         © 2022 Copyright:
-                        <a class="text-gray-800 text-sm" href="https://www.shoppingred.com.co/">shoppingRed</a>
+                        <a class="text-gray-800 text-sm" href="https://www.shoppingred.com.co/">ShoppingRed</a>
                     </div>
                 </footer>
             </div>
@@ -439,94 +437,62 @@ export default {
                     </svg>
                 </button>
 
-
                 <!-- Header -->
-                <div class="flex items-center justify-start md:justify-center pl-3 h-10 border-none">
-                    <img class="w-5 h-5 md:w-10 md:h-7 mr-2 rounded-md overflow-hidden" src="https://therminic2018.eu/wp-content/uploads/2018/07/dummy-avatar.jpg" />
-                    <span class="hidden md:block">
-                        {{ $page.props.auth.user.roles[0].name }}<br>
-                        {{ $page.props.user.username }}
-                    </span>
+                <div class="flex items-center w-1/3 justify-start md:justify-center pl-3 h-10 border-none">
+                    <img v-if="$page.props.user.profile_photo_path" class="w-5 md:w-8 mr-2 rounded-md overflow-hidden" :src="'../storage/' + $page.props.user.profile_photo_path" />
+                    <img v-else class="w-5 h-5 md:w-7 md:h-7 mr-2 rounded-md overflow-hidden" src="https://therminic2018.eu/wp-content/uploads/2018/07/dummy-avatar.jpg" />
 
+                    <span class="hidden md:block">
+                        <span class="font-bold"> {{ $page.props.auth.user.roles[0].name }}</span> -
+                        {{ $page.props.user.full_name }}
+                    </span>
                 </div>
-                <div class="flex justify-between items-center h-10 header-right">
-                    <div class="flex items-center w-full max-w-xl mr-4 p-2 shadow-sm ">
-                    </div>
-                    <ul class="flex items-center">
-                        <li>
-                            <div class="relative ">
-                                <div class="flex flex-row cursor-pointer truncate p-2 px-4  rounded" @click="isOpenCart=!isOpenCart">
-                                    <div></div>
-                                    <div class="flex flex-row-reverse ml-2 w-full">
-                                        <div slot="icon" class="relative">
-                                            <div class="absolute text-xs rounded-full -mt-1 -mr-2 px-1 font-bold top-0 right-0 bg-red-700 text-white">
-                                                {{ showCart?Object.keys(showCart).length:0 }}
-                                            </div>
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-shopping-cart w-6 h-6 mt-2">
-                                                <circle cx="9" cy="21" r="1"></circle>
-                                                <circle cx="20" cy="21" r="1"></circle>
-                                                <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+                <div class="flex w-1/3 justify-end pr-2 items-right h-10 header-right">
+                    <ul class="flex">
+                        <Popper content="Profile" hover=true placement="top" arrow=true>
+                            <a href="/user/profile">
+                                <button class="flex mr-4 hover:text-blue-100">
+                                    <li>
+                                        <div class="block w-px h-7 mx-3 px-3 text-blue-500">
+                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-7 h-7">
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="M17.982 18.725A7.488 7.488 0 0012 15.75a7.488 7.488 0 00-5.982 2.975m11.963 0a9 9 0 10-11.963 0m11.963 0A8.966 8.966 0 0112 21a8.966 8.966 0 01-5.982-2.275M15 9.75a3 3 0 11-6 0 3 3 0 016 0z" />
                                             </svg>
                                         </div>
-                                    </div>
-                                </div>
-                                <div class="absolute w-full rounded-b border-t-0 z-10" v-show="isOpenCart && Object.keys(showCart).length > 0">
-                                    <div class="shadow-xl w-64 overflow-y-auto h-80 bg-blue-100 rounded-md border-b border-gray-100">
-                                        <div v-if="showCart" v-for="(dato, id) in showCart" :key="id" class="p-2 flex bg-white hover:bg-gray-400 cursor-pointer border-b border-blue-400" style="">
-                                            <div class="p-2 w-12">
-                                                <img :src="dato.attributes?'/storage/'+dato.attributes.url:''"  height="50" width="50" alt="img product"></div>
-                                            <div class="flex-auto text-sm w-32">
-                                                <div class="font-bold text-gray-500"> {{ dato.name }}</div>
-                                                <div class="truncate text-gray-500">{{ dato.attributes?dato.attributes.numero:'' }}</div>
-                                                <div class="text-gray-400">Cant: {{ dato.quantity }}</div>
-                                            </div>
-                                            <div class="flex flex-col w-18 text-sm font-medium items-end">
-                                                <div class="w-4 h-4 mb-6 hover:bg-red-200 rounded-full cursor-pointer text-red-700">
-                                                    <svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-trash-2 ">
-                                                        <polyline points="3 6 5 6 21 6"></polyline>
-                                                        <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
-                                                        <line x1="10" y1="11" x2="10" y2="17"></line>
-                                                        <line x1="14" y1="11" x2="14" y2="17"></line>
-                                                    </svg>
-                                                </div><span class=" text-gray-500">
-                                                ${{ dato.price }}</span></div>
-                                        </div>
-                                        <div class="p-4 justify-center flex">
-                                            <button class="text-base  undefined  hover:scale-110 focus:outline-none flex justify-center px-4 py-2 rounded font-bold cursor-pointer
-                                                            hover:bg-teal-700 hover:text-teal-100
-                                                            bg-teal-100
-                                                            text-teal-700
-                                                            border duration-200 ease-in-out
-                                                            border-teal-600 transition">
-                                                Total: {{ total }}
-                                            </button>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </li>
-                        <li>
-                            <div class="block w-px h-6 mx-3 bg-gray-400 dark:bg-blue-100"></div>
-                        </li>
+                                    </li>
+                                </button>
+                            </a>
+                        </Popper>
                         <li v-if="$page.props.auth.puntoventa">
                             Punto de Venta: {{ $page.props.auth.puntoventa[0].nombre }}
                         </li>
+                        <li>
+                            <div class="block w-px h-7 mx-3 px-3 text-yellow-500">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-7 h-7">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M20.25 8.511c.884.284 1.5 1.128 1.5 2.097v4.286c0 1.136-.847 2.1-1.98 2.193-.34.027-.68.052-1.02.072v3.091l-3-3c-1.354 0-2.694-.055-4.02-.163a2.115 2.115 0 01-.825-.242m9.345-8.334a2.126 2.126 0 00-.476-.095 48.64 48.64 0 00-8.048 0c-1.131.094-1.976 1.057-1.976 2.192v4.286c0 .837.46 1.58 1.155 1.951m9.345-8.334V6.637c0-1.621-1.152-3.026-2.76-3.235A48.455 48.455 0 0011.25 3c-2.115 0-4.198.137-6.24.402-1.608.209-2.76 1.614-2.76 3.235v6.226c0 1.621 1.152 3.026 2.76 3.235.577.075 1.157.14 1.74.194V21l4.155-4.155" />
+                                </svg>
+                            </div>
+                        </li>
 
                         <li>
-                            <div class="block w-px h-6 mx-3 bg-gray-400 dark:bg-blue-100"></div>
+                            <div class="block w-px h-7 mx-3 px-4 text-black">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-7 h-7">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75v-.7V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0M3.124 7.5A8.969 8.969 0 015.292 3m13.416 0a8.969 8.969 0 012.168 4.5" />
+                                </svg>
+                            </div>
                         </li>
                         <li>
-                            <!-- Authentication -->
-
-                            <form method="POST" @submit.prevent="logout">
-                                <button class="flex items-center mr-4 hover:text-blue-100">
-                                    <span class="inline-flex mr-1">
-                                      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
-                                    </span>
-                                    Logout
-                                </button>
-                            </form>
-
+                            <div class="block w-px h-7 mx-3 px-4">
+                                <!-- Authentication -->
+                                <Popper content="Salir" hover=true placement="top" arrow=true>
+                                    <form method="POST" @submit.prevent="logout">
+                                        <button class="flex mr-4 hover:text-blue-100">
+                                        <span class="inline-flex mr-1">
+                                          <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
+                                        </span>
+                                        </button>
+                                    </form>
+                                </Popper>
+                            </div>
                         </li>
                     </ul>
                 </div>

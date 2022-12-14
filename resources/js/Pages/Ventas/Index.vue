@@ -23,7 +23,6 @@
                             </div>
                         </div>
 
-
                         <section>
                             <div class="px-4">
                                 <form>
@@ -42,11 +41,11 @@
                                         </div>
                                     </div>
                                     <div class="grid xl:grid-cols-2 xl:gap-6">
-                                        <div class="relative z-0 w-full mb-4 group">
-                                            <input type="text" v-model="form.vendedor" class="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border-blue-600 peer" placeholder=" " required />
-                                            <label class="peer-focus:font-medium absolute text-sm text-gray-500 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:left-0 peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6">
-                                                Vendedor
-                                            </label>
+                                        <div v-if="this.idvendedor == 0" class="relative z-0 w-full mb-6 group">
+                                            <select class="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer" v-model="form.vendedor">
+                                                <option value="0" >Seleccione Vendedor</option>
+                                                <option v-for="vendedor in arrayVendedores" :key="vendedor.id" :value="vendedor.id" v-text="vendedor.full_name"></option>
+                                            </select>
                                         </div>
                                         <div class="relative z-0 w-full mb-4 group">
                                             <input type="text" v-model="form.puntoventa" class="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border-blue-600 peer" placeholder=" " required />
@@ -62,11 +61,11 @@
                                                 Comprobante
                                             </label>
                                         </div>
-                                        <div class="relative z-0 w-full mb-4 group">
-                                            <input type="text" v-model="form.rifa" class="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border-blue-600 peer" placeholder=" " required />
-                                            <label class="peer-focus:font-medium absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:left-0 peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6">
-                                                Rifa
-                                            </label>
+                                        <div class="relative z-0 w-full mb-6 group">
+                                            <select class="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer" v-model="form.rifa">
+                                                <option value="0" >Seleccione Rifa</option>
+                                                <option v-for="rifa in arrayRifas.data" :key="rifa.id" :value="rifa.id" v-text="rifa.titulo"></option>
+                                            </select>
                                         </div>
                                     </div>
                                     <div class="grid xl:grid-cols-2 xl:gap-6">
@@ -110,7 +109,7 @@
                                 </tr>
                                 </thead>
                                 <tbody>
-                                <tr :class="dato.id === selectedRow ? 'bg-blue-200' : ''"  class="text-center hover:bg-blue-400" @click="rowSelect(dato.id); getDetalles(dato.id)" text-sm v-if="existedata > 0" v-for="(dato, id) in arrayData.data" :key="dato.id">
+                                <tr :class="dato.id === selectedRow ? 'bg-blue-200' : ''"  class="text-center hover:bg-blue-400" @click="rowSelect(dato.id); getDetalles(dato.id)" text-sm v-if="arrayData.data" v-for="(dato, id) in arrayData.data" :key="dato.id">
                                     <td class="border px-1 py-2 text-sm truncate" v-text="dato.id"></td>
                                     <td class="border px-1 py-2 text-sm truncate" v-text="formatPrice(dato.valorventa)"></td>
                                     <td class="border px-1 py-2 text-sm truncate" v-text="dato.vendedor.nombre"></td>
@@ -141,7 +140,7 @@
                                             <button  v-else
                                                      class="mr-1 mb-1 px-4 py-3 text-sm leading-4 border rounded hover:bg-white focus:border-indigo-500 focus:text-indigo-500"
                                                      :class="{ 'bg-blue-700 text-white': link.active }"
-                                                     v-on:click="cambiarPage(link.url)"
+                                                     v-on:click="this.cambiarPage(link.url, 'ventas2', form)"
                                                      v-html="link.label" />
                                         </template>
                                     </div>
@@ -304,6 +303,7 @@ export default {
         Link,
     },
     props:{
+        idvendedor: 0,
         data: [],
         errors: Object,
     },
@@ -341,10 +341,10 @@ export default {
             form: {
                 venta: null,
                 cliente: null,
-                vendedor: null,
+                vendedor: 0,
                 comprobante: null,
                 puntoventa: null,
-                rifa: null,
+                rifa: 0,
                 fechainicio: null,
                 fechafin: null
             },
@@ -358,33 +358,6 @@ export default {
         }
     },
     methods: {
-        cambiarPage: function (url = '') {
-            axios.get(url, {
-                params: {
-                    paginate: true,
-                    ispage: true
-                }
-            }).then((res) => {
-                var respuesta = res.data;
-                this.arrayData = respuesta.data;
-
-                if (this.arrayData.data.length > 0) {
-                    this.existedata = 1;
-                } else {
-                    this.existedata = 0;
-                }
-            })
-        },
-        formatPrice(value) {
-            let val = (value/1).toFixed(0).replace('.', ',')
-            return '$ '+ val.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".")
-        },
-        dateTime(value) {
-            return moment(value).format('DD/MM/YYYY');
-        },
-        dateTimeFull(value) {
-            return moment(value).format('YYYY-MM-DD HH:MM:SS');
-        },
         selectRifa: function () {
             this.isOpenRifa = true;
             //this.getUsers();
@@ -463,13 +436,10 @@ export default {
     },
     created: function () {
         //this.getPaises();
+        this.form.vendedor = this.idvendedor;
         this.arrayData = this.data;
-        if (this.arrayData.data.length > 0) {
-            this.existedata = 1;
-        } else {
-            this.existedata = 0;
-        }
-        //this.openModal('registrar')
+        this.arrayVendedores = this.getVendedores('', '', false);
+        this.arrayRifas = this.getRifas('');
     },
     mounted() {
         //console.log('Component mounted.');

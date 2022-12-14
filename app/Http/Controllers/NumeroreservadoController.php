@@ -35,6 +35,7 @@ class NumeroreservadoController extends Controller
     {
         $token = csrf_token();
         $filtros = json_decode($request->filtros);
+        $user = Auth::user();
 
         if ($request->has('sortBy') && $request->sortBy <> ''){
             $sortBy = $request->sortBy;
@@ -48,20 +49,26 @@ class NumeroreservadoController extends Controller
             $sortOrder = 'desc';
         }
 
-        if (is_null($filtros)){
-            $boletas = Boleta::orderBy($sortBy, $sortOrder)
-                ->with('rifa')
-                ->with('vendedor')
-                ->with('cliente')
-                ->where('boletas.estado', '2')
-                ->paginate(self::canPorPagina);
-        } else {
-            $boletas = Boleta::orderBy($sortBy, $sortOrder)
-                ->with('rifa')
-                ->with('vendedor')
-                ->with('cliente')
-                ->where('boletas.estado', '2');
+        $boletas = Boleta::orderBy($sortBy, $sortOrder)
+            ->with('rifa')
+            ->with('vendedor')
+            ->with('cliente')
+            ->where('boletas.estado', '2');
 
+        if ($user->idrol == 5) {
+            $idvendedor = $user->id;
+            if ($request->has('ispage') && $request->ispage){
+                $filtros->vendedor = $idvendedor;
+            } else {
+                $boletas = $boletas->where('idvendedor', $idvendedor);
+            }
+        } else {
+            $idvendedor = 0;
+        }
+
+        if (is_null($filtros)){
+            $boletas = $boletas->paginate(self::canPorPagina);
+        } else {
             if(!is_null($filtros->rifa) && $filtros->rifa <> '' && $filtros->rifa <> 0) {
                 $boletas = $boletas->where('boletas.idrifa', $filtros->rifa);
             }
@@ -82,18 +89,16 @@ class NumeroreservadoController extends Controller
                     ->where('t1.nombre', 'like', '%'.$filtros->cliente.'%')
                     ->orWhere('t1.apellido', 'like', '%'.$filtros->cliente.'%');
             }
-            if(!is_null($filtros->idvendedor) && $filtros->idvendedor?$filtros->idvendedor:0 <> 0) {
-                if ($filtros->idvendedor->id <> '' && $filtros->idvendedor->id <> 0) {
-                    $boletas = $boletas->where('boletas.idvendedor', $filtros->idvendedor->id);
-                }
+            if(!is_null($filtros->vendedor) && $filtros->vendedor <> '' && $filtros->vendedor <> 0) {
+                $boletas = $boletas->where('boletas.idvendedor', $filtros->vendedor);
             }
             $boletas = $boletas->select('boletas.*')->paginate(self::canPorPagina);
         }
 
         if ($request->has('ispage') && $request->ispage){
-            return ['datos' => $boletas];
+            return ['datos' => $boletas, 'idvendedor' => $idvendedor];
         } else {
-            return Inertia::render('Rifas/Numerosreservados', ['datos' => $boletas, 'estado' => $request->estado, '_token' => $token]);
+            return Inertia::render('Rifas/Numerosreservados', ['datos' => $boletas, 'estado' => $request->estado, '_token' => $token, 'idvendedor' => $idvendedor]);
         }
     }
 

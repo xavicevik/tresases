@@ -45,16 +45,17 @@ const closeModal = () => {
 <template>
     <JetActionSection>
         <template #title>
-            Browser Sessions
+            Sessions de usuario
         </template>
 
         <template #description>
-            Manage and log out your active sessions on other browsers and devices.
+            Administre y cierre las sesiones activas en otros navegadores y dispositivos.
         </template>
 
         <template #content>
             <div class="max-w-xl text-sm text-gray-600">
-                If necessary, you may log out of all of your other browser sessions across all of your devices. Some of your recent sessions are listed below; however, this list may not be exhaustive. If you feel your account has been compromised, you should also update your password.
+                Si es necesario, puede cerrar todas las sesiones de los navegadores donde se encuentre logueado en loas diferentes dispositivos. Algunas de las sesiones recientes se muestran a continuación, sin embargo esta lista no es exaustiva.
+                Si desea puede cambiar el password para tener mayor seguridad.
             </div>
 
             <!-- Other Browser Sessions -->
@@ -104,8 +105,8 @@ const closeModal = () => {
                             <div class="text-xs text-gray-500">
                                 {{ session.ip_address }},
 
-                                <span v-if="session.is_current_device" class="text-green-500 font-semibold">This device</span>
-                                <span v-else>Last active {{ session.last_active }}</span>
+                                <span v-if="session.is_current_device" class="text-green-500 font-semibold">Este dispositivo</span>
+                                <span v-else>Activo desde {{ session.last_active }}</span>
                             </div>
                         </div>
                     </div>
@@ -114,22 +115,22 @@ const closeModal = () => {
 
             <div class="flex items-center mt-5">
                 <JetButton @click="confirmLogout">
-                    Log Out Other Browser Sessions
+                    Cerrar sesión de otros navegadores
                 </JetButton>
 
                 <JetActionMessage :on="form.recentlySuccessful" class="ml-3">
-                    Done.
+                    Realizado.
                 </JetActionMessage>
             </div>
 
             <!-- Log Out Other Devices Confirmation Modal -->
             <JetDialogModal :show="confirmingLogout" @close="closeModal">
                 <template #title>
-                    Log Out Other Browser Sessions
+                    Cerrar sesión de otros navegadores
                 </template>
 
                 <template #content>
-                    Please enter your password to confirm you would like to log out of your other browser sessions across all of your devices.
+                    Por favor ingrese el password para confirmar que desea cerrar todas las sesiones de otros navegadores y dispositivos.
 
                     <div class="mt-4">
                         <JetInput
@@ -147,7 +148,7 @@ const closeModal = () => {
 
                 <template #footer>
                     <JetSecondaryButton @click="closeModal">
-                        Cancel
+                        Cancelar
                     </JetSecondaryButton>
 
                     <JetButton
@@ -156,7 +157,7 @@ const closeModal = () => {
                         :disabled="form.processing"
                         @click="logoutOtherBrowserSessions"
                     >
-                        Log Out Other Browser Sessions
+                        Cerrar sesión de otros navegadores
                     </JetButton>
                 </template>
             </JetDialogModal>

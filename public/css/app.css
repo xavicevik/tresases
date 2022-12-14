@@ -1306,6 +1306,9 @@ select {
 .h-24 {
   height: 6rem;
 }
+.h-7 {
+  height: 1.75rem;
+}
 .max-h-fit {
   max-height: -webkit-fit-content;
   max-height: -moz-fit-content;
@@ -1436,6 +1439,9 @@ select {
 }
 .w-6\/12 {
   width: 50%;
+}
+.w-7 {
+  width: 1.75rem;
 }
 .min-w-0 {
   min-width: 0px;
@@ -2118,10 +2124,6 @@ select {
 .px-14 {
   padding-left: 3.5rem;
   padding-right: 3.5rem;
-}
-.py-0\.5 {
-  padding-top: 0.125rem;
-  padding-bottom: 0.125rem;
 }
 .pt-6 {
   padding-top: 1.5rem;
@@ -3472,6 +3474,14 @@ select {
 
   .md\:w-full {
     width: 100%;
+  }
+
+  .md\:w-8 {
+    width: 2rem;
+  }
+
+  .md\:w-7 {
+    width: 1.75rem;
   }
 
   .md\:grid-cols-3 {

@@ -88,6 +88,7 @@ class VentaController extends Controller
     public function index(Request $request)
     {
         $filtros = json_decode($request->filtros);
+        $user = Auth::user();
 
         $buscar = $request->buscar;
         if ($request->has('sortBy') && $request->sortBy <> ''){
@@ -102,18 +103,25 @@ class VentaController extends Controller
             $sortOrder = 'desc';
         }
 
-        if (is_null($filtros)){
-            $ventas = Venta::orderBy($sortBy, $sortOrder)
-                            ->with('puntoventa')
-                            ->with('cliente')
-                            ->with('vendedor')
-                            ->paginate(self::canPorPagina);
-        } else {
-            $ventas = Venta::orderBy($sortBy, $sortOrder)
-                            ->with('puntoventa')
-                            ->with('cliente')
-                            ->with('vendedor');
+        $ventas = Venta::orderBy($sortBy, $sortOrder)
+            ->with('puntoventa')
+            ->with('cliente')
+            ->with('vendedor');
 
+        if ($user->idrol == 5) {
+            $idvendedor = $user->id;
+            if ($request->has('ispage') && $request->ispage){
+                $filtros->vendedor = $idvendedor;
+            } else {
+                $ventas = $ventas->where('idvendedor', $idvendedor);
+            }
+        } else {
+            $idvendedor = 0;
+        }
+
+        if (is_null($filtros)){
+            $ventas = $ventas->paginate(self::canPorPagina);
+        } else {
             if(!is_null($filtros->fechainicio) && $filtros->fechainicio <> '') {
                 $ventas = $ventas->where('ventas.created_at', '>=', $filtros->fechainicio);
             }
@@ -125,10 +133,8 @@ class VentaController extends Controller
                     ->where('t1.nombre', 'like', '%'.$filtros->cliente.'%')
                     ->orWhere('t1.apellido', 'like', '%'.$filtros->cliente.'%');
             }
-            if(!is_null($filtros->vendedor) && $filtros->vendedor <> '') {
-                $ventas = $ventas->join('users as t2', 'ventas.idvendedor', '=', 't2.id')
-                    ->where('t2.nombre', 'like', '%'.$filtros->vendedor.'%')
-                    ->orWhere('t2.apellido', 'like', '%'.$filtros->vendedor.'%');
+            if(!is_null($filtros->vendedor) && $filtros->vendedor <> '' && $filtros->vendedor <> 0) {
+                $ventas = $ventas->where('ventas.idvendedor', $filtros->vendedor);
             }
             if(!is_null($filtros->venta) && $filtros->venta <> '') {
                 $ventas = $ventas->where('ventas.id', 'like', '%'.$filtros->venta.'%');
@@ -140,7 +146,7 @@ class VentaController extends Controller
             if(!is_null($filtros->comprobante)) {
                 $ventas = $ventas->where('comprobante', 'like', '%'.$filtros->comprobante.'%');
             }
-            if(!is_null($filtros->rifa)) {
+            if(!is_null($filtros->rifa) && $filtros->rifa <> 0) {
                 $ventas = $ventas->join('rifas', 'ventas.idrifa', '=', 'rifas.id')
                     ->where('rifas.nombre_tecnico', 'like', '%'.$filtros->rifa.'%')
                     ->select('ventas.*');
@@ -152,9 +158,9 @@ class VentaController extends Controller
         //$this->authorizeResource(User::class);
 
         if ($request->has('ispage') && $request->ispage){
-            return ['data' => $ventas];
+            return ['data' => $ventas, 'idvendedor' => $idvendedor];
         } else {
-            return Inertia::render('Ventas/Index', ['data' => $ventas]);
+            return Inertia::render('Ventas/Index', ['data' => $ventas, 'idvendedor' => $idvendedor]);
         }
     }
 
@@ -2017,7 +2023,7 @@ class VentaController extends Controller
     }
 
     public static function genBoletaImagen(Boleta $boleta) {
-       //$boleta = Boleta::where('id', 1111)->first();
+       $boleta = Boleta::where('id', 1111)->first();
         $url = url('storage/img/boletas/'.$boleta->idrifa.'_base.png');
 
         $numero = $boleta->numero;
@@ -2039,7 +2045,7 @@ class VentaController extends Controller
         $output = $pdf->output();
         file_put_contents(public_path('storage').'/boletas/'.$filename, $output, FILE_APPEND);
 
-        return public_path('storage').'/boletas/'.$filename;
+        return url('storage').'/boletas/'.$filename;
     }
 
 

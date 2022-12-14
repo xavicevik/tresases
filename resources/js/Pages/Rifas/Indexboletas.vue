@@ -45,7 +45,7 @@
                                             Promocional
                                         </label>
                                     </div>
-                                    <div class="relative z-0 w-full mb-6 group">
+                                    <div v-if="this.idvendedor == 0" class="relative z-0 w-full mb-6 group">
                                         <select class="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer" v-model="form.vendedor">
                                             <option value="0" >Seleccione Vendedor</option>
                                             <option v-for="vendedor in arrayVendedores" :key="vendedor.id" :value="vendedor.id" v-text="vendedor.full_name"></option>
@@ -140,7 +140,7 @@
                                             </div>
                                         </button>
                                     </th>
-                                    <th class="px-4 py-2 text-sm font-bold hover:bg-blue-500 hover:text-gray-50 rounded-b">
+                                    <th v-if="this.idvendedor == 0" class="px-4 py-2 text-sm font-bold hover:bg-blue-500 hover:text-gray-50 rounded-b">
                                         <button @click="getCajas(buscar, 'id')" class="font-bold">
                                             Vendedor
                                             <div v-show="sortBy == 'ciudad.precio'">
@@ -249,7 +249,7 @@
                                     <td class="border px-1 py-2 text-sm truncate" v-text="dato.rifa.titulo"></td>
                                     <td class="border px-1 py-2 text-sm truncate" v-text="dato.numero"></td>
                                     <td class="border px-1 py-2 text-sm truncate" v-text="dato.promocional"></td>
-                                    <td class="border px-1 py-2 text-sm truncate" v-text="dato.vendedor?dato.vendedor.full_name:''"></td>
+                                    <td v-if="this.idvendedor == 0" class="border px-1 py-2 text-sm truncate" v-text="dato.vendedor?dato.vendedor.full_name:''"></td>
                                     <td class="border px-1 py-2 text-sm truncate" v-text="dato.cliente?dato.cliente.full_name:''"></td>
                                     <td class="border px-2 py-2 text-sm truncate" v-if="dato.estado==1">
                                         <span class="inline-flex px-2 text-sm font-semibold leading-5 text-green-800 bg-green-100 rounded-full">
@@ -417,6 +417,7 @@ export default {
 
     },
     props:{
+        idvendedor: 0,
         datos : [],
         errors: Object,
     },
@@ -498,6 +499,7 @@ export default {
         },
     },
     created: function () {
+        this.form.vendedor = this.idvendedor;
         this.arrayData = this.datos;
         this.arrayVendedores = this.getVendedores('', '', false);
         this.arrayRifas = this.getRifas('');

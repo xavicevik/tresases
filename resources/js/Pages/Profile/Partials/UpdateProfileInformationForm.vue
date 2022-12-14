@@ -16,8 +16,10 @@ const props = defineProps({
 
 const form = useForm({
     _method: 'PUT',
-    name: props.user.name,
-    email: props.user.email,
+    nombre: props.user.nombre,
+    apellido: props.user.apellido,
+    correo: props.user.correo,
+    movil: props.user.movil,
     photo: null,
 });
 
@@ -74,11 +76,11 @@ const clearPhotoFileInput = () => {
 <template>
     <JetFormSection @submitted="updateProfileInformation">
         <template #title>
-            Profile Information
+            Información de Perfil
         </template>
 
         <template #description>
-            Update your account's profile information and email address.
+            Actualice la información del usuario.
         </template>
 
         <template #form>
@@ -108,7 +110,7 @@ const clearPhotoFileInput = () => {
                 </div>
 
                 <JetSecondaryButton class="mt-2 mr-2" type="button" @click.prevent="selectNewPhoto">
-                    Select A New Photo
+                    Seleccione foto
                 </JetSecondaryButton>
 
                 <JetSecondaryButton
@@ -117,45 +119,70 @@ const clearPhotoFileInput = () => {
                     class="mt-2"
                     @click.prevent="deletePhoto"
                 >
-                    Remove Photo
+                    Eliminar foto
                 </JetSecondaryButton>
 
                 <JetInputError :message="form.errors.photo" class="mt-2" />
             </div>
 
-            <!-- Name -->
+            <!-- Nombre -->
             <div class="col-span-6 sm:col-span-4">
-                <JetLabel for="name" value="Name" />
+                <JetLabel for="nombre" value="Nombre" />
                 <JetInput
-                    id="name"
-                    v-model="form.name"
+                    id="nombre"
+                    v-model="form.nombre"
                     type="text"
                     class="mt-1 block w-full"
-                    autocomplete="name"
+                    autocomplete="nombre"
                 />
-                <JetInputError :message="form.errors.name" class="mt-2" />
+                <JetInputError :message="form.errors.nombre" class="mt-2" />
+            </div>
+
+            <!-- Apellido -->
+            <div class="col-span-6 sm:col-span-4">
+                <JetLabel for="apellido" value="Apellido" />
+                <JetInput
+                    id="apellido"
+                    v-model="form.apellido"
+                    type="text"
+                    class="mt-1 block w-full"
+                    autocomplete="apellido"
+                />
+                <JetInputError :message="form.errors.apellido" class="mt-2" />
             </div>
 
             <!-- Email -->
             <div class="col-span-6 sm:col-span-4">
-                <JetLabel for="email" value="Email" />
+                <JetLabel for="correo" value="Email" />
                 <JetInput
-                    id="email"
-                    v-model="form.email"
+                    id="correo"
+                    v-model="form.correo"
                     type="email"
                     class="mt-1 block w-full"
                 />
-                <JetInputError :message="form.errors.email" class="mt-2" />
+                <JetInputError :message="form.errors.correo" class="mt-2" />
+            </div>
+
+            <!-- Celular -->
+            <div class="col-span-6 sm:col-span-4">
+                <JetLabel for="movil" value="Movil" />
+                <JetInput
+                    id="movil"
+                    v-model="form.movil"
+                    type="text"
+                    class="mt-1 block w-full"
+                />
+                <JetInputError :message="form.errors.movil" class="mt-2" />
             </div>
         </template>
 
         <template #actions>
             <JetActionMessage :on="form.recentlySuccessful" class="mr-3">
-                Saved.
+                Guardado.
             </JetActionMessage>
 
             <JetButton :class="{ 'opacity-25': form.processing }" :disabled="form.processing">
-                Save
+                Guardar
             </JetButton>
         </template>
     </JetFormSection>

@@ -77,6 +77,7 @@ class RifaController extends Controller
     {
         //DB::connection()->enableQueryLog();
         $filtros = json_decode($request->filtros);
+        $user = Auth::user();
 
         if ($request->has('sortBy') && $request->sortBy <> ''){
             $sortBy = $request->sortBy;
@@ -90,17 +91,23 @@ class RifaController extends Controller
             $sortOrder = 'desc';
         }
 
-        if (is_null($filtros)){
-            $boletas = Boleta::orderBy($sortBy, $sortOrder)
-                ->with('rifa')
-                ->with('vendedor')
-                ->with('cliente');
-        } else {
-            $boletas = Boleta::orderBy($sortBy, $sortOrder)
-                ->with('rifa')
-                ->with('vendedor')
-                ->with('cliente');
+        $boletas = Boleta::orderBy($sortBy, $sortOrder)
+            ->with('rifa')
+            ->with('vendedor')
+            ->with('cliente');
 
+        if ($user->idrol == 5) {
+            $idvendedor = $user->id;
+            if ($request->has('ispage') && $request->ispage){
+                $filtros->vendedor = $idvendedor;
+            } else {
+                $boletas = $boletas->where('idvendedor', $idvendedor);
+            }
+        } else {
+            $idvendedor = 0;
+        }
+
+        if (!is_null($filtros)){
             if(!is_null($filtros->rifa) && $filtros->rifa <> '' && $filtros->rifa <> 0) {
                 $boletas = $boletas->where('boletas.idrifa', $filtros->rifa);
             }
@@ -132,9 +139,9 @@ class RifaController extends Controller
         $boletas = $boletas->select(DB::raw('boletas.*, getcomisionboleta(boletas.id) as comision'))->paginate(self::canPorPagina);
 
         if ($request->has('ispage') && $request->ispage){
-            return ['datos' => $boletas];
+            return ['datos' => $boletas, 'idvendedor' => $idvendedor];
         } else {
-            return Inertia::render('Rifas/Indexboletas', ['datos' => $boletas, 'estado' => $request->estado]);
+            return Inertia::render('Rifas/Indexboletas', ['datos' => $boletas, 'estado' => $request->estado, 'idvendedor' => $idvendedor]);
         }
     }
 

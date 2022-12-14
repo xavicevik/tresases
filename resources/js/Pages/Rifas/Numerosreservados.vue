@@ -29,19 +29,17 @@
                                 </h1>
                             </div>
 
-
-                            <div class="flex w-1/2">
-                                <div class="w-1/6 text-center">
+                            <div v-if="$can('reservas-list')" class="flex w-1/2">
+                                <div v-if="$can('reservas-create')" class="w-1/6 text-center">
                                     <button @click="openModal('registrar')" class="bg-blue-500 text-xs  hover:bg-blue-700 text-white font-bold py-2 px-4 rounded ">Asignar</button>
                                 </div>
-                                <div class="w-1/6 text-center">
+                                <div v-if="$can('reservas-delete')" class="w-1/6 text-center">
                                     <button @click="openModal('eliminar')" class="bg-red-500 text-xs  hover:bg-red-700 text-white font-bold py-2 px-4 rounded ">Desasignar</button>
                                 </div>
-                                <div class="w-1/6 text-center">
+                                <div v-if="$can('reservas-create')" class="w-1/6 text-center">
                                     <button @click="openModal('importar')" class="bg-orange-500 text-xs  hover:bg-orange-700 text-white font-bold py-2 px-4 rounded ">Importar</button>
                                 </div>
                             </div>
-
 
                         </div>
                     </section>
@@ -72,7 +70,7 @@
                                             Promocional
                                         </label>
                                     </div>
-                                    <div class="relative z-0 w-full mb-6 group">
+                                    <div v-if="this.idvendedor == 0" class="relative z-0 w-full mb-6 group">
                                         <select class="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer" v-model="form.vendedor">
                                             <option value="0" >Seleccione Vendedor</option>
                                             <option v-for="vendedor in arrayVendedoresMenu" :key="vendedor.id" :value="vendedor.id" v-text="vendedor.full_name"></option>
@@ -142,7 +140,7 @@
                                             </div>
                                         </button>
                                     </th>
-                                    <th class="px-4 w-2/5 py-2 text-sm font-bold hover:bg-blue-500 hover:text-gray-50 rounded-b">
+                                    <th v-if="this.idvendedor == 0" class="px-4 w-2/5 py-2 text-sm font-bold hover:bg-blue-500 hover:text-gray-50 rounded-b">
                                         <button @click="getCajas(buscar, 'id')" class="font-bold">
                                             Vendedor
                                             <div v-show="sortBy == 'ciudad.precio'">
@@ -183,7 +181,7 @@
                                     <td class="border px-4 py-2 text-sm truncate" v-text="dato.rifa.titulo"></td>
                                     <td class="border px-4 py-2 text-sm truncate" v-text="dato.numero"></td>
                                     <td class="border px-4 py-2 text-sm truncate" v-text="dato.promocional"></td>
-                                    <td class="border px-4 py-2 text-sm truncate"><a :href="dato.vendedor?verVendedor(dato.vendedor.id):''"> {{ dato.vendedor?(dato.vendedor.documento + ' - '+dato.vendedor.full_name):''}} </a></td>
+                                    <td v-if="this.idvendedor == 0" class="border px-4 py-2 text-sm truncate"><a :href="dato.vendedor?verVendedor(dato.vendedor.id):''"> {{ dato.vendedor?(dato.vendedor.documento + ' - '+dato.vendedor.full_name):''}} </a></td>
                                     <td class="border px-4 py-2 text-sm truncate" v-text="dateTimeFull(dato.updated_at)"></td>
                                 </tr>
                                 <tr v-else>
@@ -673,6 +671,7 @@ export default {
         money3: Money3Component,
     },
     props:{
+        idvendedor: 0,
         datos : [],
         numerosreservados : [],
         rifas: [],
@@ -1196,6 +1195,7 @@ export default {
 
     },
     created: function () {
+        this.form.vendedor = this.idvendedor;
         this.arrayData = this.datos;
         this.getVendedoresSelect('');
         this.getVendedores('','nombre', true);

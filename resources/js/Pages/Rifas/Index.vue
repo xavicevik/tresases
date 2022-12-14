@@ -45,25 +45,12 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="pr-2 w-1/3 text-center">
+                            <div v-if="$can('rifas-create')" class="pr-2 w-1/3 text-center">
                                 <button @click="openModal('registrar')" class="bg-blue-500 text-xs  hover:bg-blue-700 text-white font-bold py-2 px-4 rounded ">CREAR RIFA</button>
                             </div>
 
                         </div>
 
-                        <div class="flex justify-left mx-auto ml-4 p-2 space-x-4">
-                            <div class="flex pr-1 w-1/12 text-center">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                                </svg>
-                                <Link :href="route('numerosreservados.index')" class="text-xs hover:text-blue-700 text-blue-400 font-bold py-1 px-1 rounded ">
-                                    Reservas
-                                </Link>
-
-
-                            </div>
-
-                        </div>
                     </section>
                     <!-- Fin Encabezado y titulo -->
                     <!-- Tabla de contenido -->
@@ -225,7 +212,7 @@
                                             </div>
                                         </button>
                                     </th>
-                                    <th class="lg:px-4 md:px-1 mx-auto py-2 text-sm font-bold lg:w-1/12 md:w-1/11 hover:bg-blue-500 hover:text-gray-50 rounded-b">
+                                    <th v-if="$can('rifas-list') || $can('rifas-create') || $can('rifas-edit') || $can('rifas-delete') || $can('rifas-copy')" class="lg:px-4 md:px-1 mx-auto py-2 text-sm font-bold lg:w-1/12 md:w-1/11 hover:bg-blue-500 hover:text-gray-50 rounded-b">
                                         Acciones
                                     </th>
                                 </tr>
@@ -250,8 +237,8 @@
                                             Inactivo
                                         </span>
                                     </td>
-                                    <td class="border px-1 py-1 mx-auto text-center flex items-center">
-                                        <button @click="ver(rifa)" class="hover:bg-green-700 text-green-400 font-bold rounded" fill="none"
+                                    <td v-if="$can('rifas-list') || $can('rifas-create') || $can('rifas-edit') || $can('rifas-delete') || $can('rifas-copy')" class="border px-1 py-1 mx-auto text-center flex items-center">
+                                        <button v-if="$can('rifas-list')" @click="ver(rifa)" class="hover:bg-green-700 text-green-400 font-bold rounded" fill="none"
                                                 viewBox="0 0 24 24" stroke="currentColor">
                                             <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                                 <path stroke-linecap="round" stroke-linejoin="round" d="M10 21h7a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v11m0 5l4.879-4.879m0 0a3 3 0 104.243-4.242 3 3 0 00-4.243 4.242z" />
@@ -264,14 +251,14 @@
                                             </svg>
                                         </button>
 
-                                        <button @click="edit(rifa)" class="hover:bg-blue-700 text-white font-bold rounded">
+                                        <button v-if="$can('rifas-edit')" @click="edit(rifa)" class="hover:bg-blue-700 text-white font-bold rounded">
                                             <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 text-blue-400" fill="none"
                                                  viewBox="0 0 24 24" stroke="currentColor">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                       d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                                             </svg>
                                         </button>
-                                        <button @click="deleteRow(rifa)" class="hover:bg-red-700 text-white font-bold rounded">
+                                        <button v-if="$can('rifas-delete')" @click="deleteRow(rifa)" class="hover:bg-red-700 text-white font-bold rounded">
                                             <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 text-red-400" fill="none"
                                                  viewBox="0 0 24 24" stroke="currentColor">
                                                 <path v-if="rifa.estado" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"

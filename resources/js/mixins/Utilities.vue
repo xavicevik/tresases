@@ -85,6 +85,8 @@ export default {
                     this.arrayCajas = respuesta.cajas;
                 } else if (entidad == 'ventas') {
                     this.arrayVentas = respuesta.data;
+                } else if (entidad == 'ventas2') {
+                    this.arrayData = respuesta.data;
                 } else if (entidad == 'detalles') {
                     this.arrayDetalles = respuesta.data;
                 } else if (entidad == 'users') {
