@@ -1172,16 +1172,7 @@ export default {
             */
             let res;   
             try {
-                res = await axios.get('/users/storeCliente', {params: {
-                        nombre: this.form.cliente.nombre,
-                        username: this.form.cliente.documento,
-                        documento: this.form.cliente.documento,
-                        idrol: 2,
-                        movil: this.form.cliente.movil,
-                        idsesion: this.session.id,
-                        idtipos_documento: 1
-
-                    }});
+                res = await axios.get('/users/storeCliente', formData);
             } catch (error) {
                 console.log(error);
                 return false;

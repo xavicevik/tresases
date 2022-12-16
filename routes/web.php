@@ -63,8 +63,6 @@ Route::group(['middleware'=>['guest']],function(){
     Route::get('/app/genBoletaImagen', [VentaController::class, 'genBoletaImagen'])->name('ventas.genBoletaImagen');
 
 
-
-
     Route::get('/', [LoginController::class, 'index'])->name('login.index');
     Route::post('/', [LoginController::class, 'authenticate'])->name('login.authenticate');
 

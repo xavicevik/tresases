@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\RealTimeMessage;
 use App\Events\SaleApp;
 use App\Jobs\SendEmailJob;
 use App\Jobs\SendSMSJob;
@@ -2056,6 +2057,10 @@ class VentaController extends Controller
     }
 
     public static function genBoletaImagen(Boleta $boleta) {
+
+        event(new \App\Events\RealTimeMessage('Hello World'));
+
+        dd('ok');
        //$boleta = Boleta::where('id', 1111)->first();
         $url = url('storage/img/boletas/'.$boleta->idrifa.'_base.png');
 

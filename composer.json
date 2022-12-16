@@ -24,6 +24,7 @@
         "maatwebsite/excel": "^3.1",
         "mercadopago/dx-php": "^2.5",
         "owen-it/laravel-auditing": "^13.0",
+        "pusher/pusher-php-server": "^7.2",
         "spatie/laravel-csp": "^2.8",
         "spatie/laravel-permission": "^5.5",
         "tightenco/ziggy": "^1.0"
