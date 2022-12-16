@@ -53,7 +53,7 @@
                                                 <div class="container flex justify-center items-center">
                                                     <div class="pt-1">
                                                         <div class="top-4 left-3">
-                                                            <money3 v-bind="configMoney2" v-model="form.reserva.numero" @keypress.enter="valBoletaDisponible(form.reserva.numero, form.idrifa.id, form.idvendedor.id, form.idcliente.id)" class="text-3xl border-0 text-center h-8 w-1/8 pl-2 pr-2 rounded-lg z-0 focus:shadow focus:outline-none"></money3>
+                                                            <money3 v-bind="configMoney2" v-model="form.reserva.numero" class="text-3xl border-0 text-center h-8 w-1/8 pl-2 pr-2 rounded-lg z-0 focus:shadow focus:outline-none"></money3>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -155,7 +155,7 @@
                                             <div class="mt-2">
                                                 <label class="block text-sm font-medium text-gray-700">Documento</label>
                                                 <div class="mt-1">
-                                                    <input type="text" @change="selectClienteFull(form.cliente.documento)" @keyup.enter="selectClienteFull(form.cliente.documento)" v-model="form.cliente.documento" autocomplete="postal-code" class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 text-xs sm:text-sm">
+                                                    <input type="number" @change="selectClienteFull(form.cliente.documento)" @keyup.enter="selectClienteFull(form.cliente.documento)" v-model="form.cliente.documento" autocomplete="postal-code" class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 text-xs sm:text-sm">
                                                     <div v-if="$page.props.errors.documento" class="text-red-500">{{ $page.props.errors.docuemnto }}</div>
                                                 </div>
                                             </div>
@@ -1172,7 +1172,7 @@ export default {
             */
             let res;   
             try {
-                res = await axios.get('/users/storeCliente', formData);
+                res = await axios.post('/users/storeCliente', formData);
             } catch (error) {
                 console.log(error);
                 return false;
