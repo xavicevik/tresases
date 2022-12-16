@@ -406,17 +406,17 @@ export default {
                 console.log(res.data);
             })
         },
-        pushSessionDetailClient: function (id, cliente, type) {
+        pushSessionDetailClient: async function (id, cliente, type) {
             var url= '/ventas/updDetailSessionClient';
-            axios.get(url, {
+            let res = await axios.get(url, {
                 params: {
                     idsesion: id,
                     idcliente: cliente,
                     type: type
                 }
-            }).then((res) => {
-                console.log(res.data);
-            })
+            });
+            console.log(res.data);
+            return true;
         },
         registrarSessionVenta: function (idpuntoventa = null, idrifa = null, idvendedor = null, tipoventa = null) {
             var url= '/ventas/initSession';

@@ -25,7 +25,7 @@
                             </div>
 
                             <p>Comprobante de pago {{ payment_id }} </p>
-                            <p>A continuación recibirá un mensaje de correo electrónico </p>
+                            <p>A continuación recibirá un mensaje SMS </p>
                             <div class="mt-4" v-if="estado == 'aprobado'">
                                 <a :href="'/ventas/reportpdf?id=' + idventa" target="_blank" class="px-2 py-2 text-blue-200 bg-blue-600 rounded">Imprimir</a>
                                 <p class="mt-4 text-sm">Si tiene problemas para poder acceder al correo, puede ver el resumen de la compra en:

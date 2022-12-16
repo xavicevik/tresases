@@ -479,7 +479,7 @@ class UserController extends Controller
             if ($user) {
                 $user->nombre = $request->nombre;
                 $user->movil = $request->movil;
-                $user->observaciones = $user->observaciones.' Cliente actualizado';
+                $user->observaciones = 'Cliente actualizado';
             } else {
                 $user = Cliente::create($request->all());
                 $user->changedpassword = null;
@@ -506,6 +506,7 @@ class UserController extends Controller
             DB::commit();
         } catch (Throwable $e){
             DB::rollBack();
+            return $e;
         }
 
         return ['cliente' => $user, 'idpreferencia' => $resultadoprepare['idpreferencia'], 'urlpago' => $resultadoprepare['urlpago']];

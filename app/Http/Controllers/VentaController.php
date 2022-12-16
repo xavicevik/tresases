@@ -1640,6 +1640,8 @@ class VentaController extends Controller
         $r = new Request();
         $r->idsesion = $checkouts[0]['idsesionventa'];
         $r->isSale = true;
+        $sesion = Sesionventa::where('id', $r->idsesion)->first();
+        $idrifa = $sesion->idrifa;
         $idventa = $this->newSale($r);
         $this->finishSession($r);
 
@@ -1657,13 +1659,18 @@ class VentaController extends Controller
             $checkout->idventa = $idventa;
             $checkout->save();
         }
+
         $checkout = Checkout::where('preference_id', $request->preference_id)
                               ->first();
+
+        $urlbase = config('mercadopago.urlretorno');
+        $url = $urlbase.'app/authenticatelink/'.$checkouts[0]['idvendedor'].'?idrifa='.$idrifa;
 
         return Inertia::render('Ventas/Finishsale', [
                         'payment_id' => $checkout->payment_id,
                         'idventa' => $checkout->idventa,
                         'estado' => 'aprobado',
+                        'url' => $url,
                         'mensajePago' => 'Gracias por comprar en Shoppingred.com!'
         ]);
     }
@@ -1674,6 +1681,8 @@ class VentaController extends Controller
         $r = new Request();
         $r->idsesion = $checkouts[0]['idsesionventa'];
         $r->isSale = false;
+        $sesion = Sesionventa::where('id', $r->idsesion)->first();
+        $idrifa = $sesion->idrifa;
         $this->finishSession($r);
 
         foreach ($checkouts as $checkout) {
@@ -1693,9 +1702,13 @@ class VentaController extends Controller
         $checkout = Checkout::where('preference_id', $request->preference_id)
             ->first();
 
+        $urlbase = config('mercadopago.urlretorno');
+        $url = $urlbase.'app/authenticatelink/'.$checkouts[0]['idvendedor'].'?idrifa='.$idrifa;
+
         return Inertia::render('Ventas/Finishsale', [
             'payment_id' => $checkout->payment_id,
             'idventa' => null,
+            'url' => $url,
             'estado' => 'rechazado',
             'mensajePago' => 'El pago fue rechazado!'
         ]);
@@ -1713,6 +1726,7 @@ class VentaController extends Controller
         $sesionventa = Sesionventa::where('id', $checkouts[0]['idsesionventa'])->first();
         $sesionventa->estado = self::enproceso;
         $sesionventa->save();
+        $idrifa = $sesionventa->idrifa;
 
         foreach ($checkouts as $checkout) {
             $checkout->collection_id = $request->collection_id;
@@ -1731,10 +1745,14 @@ class VentaController extends Controller
         $checkout = Checkout::where('preference_id', $request->preference_id)
             ->first();
 
+        $urlbase = config('mercadopago.urlretorno');
+        $url = $urlbase.'app/authenticatelink/'.$checkouts[0]['idvendedor'].'?idrifa='.$idrifa;
+
         return Inertia::render('Ventas/Finishsale', [
             'payment_id' => $checkout->payment_id,
             'idventa' => null,
             'estado' => 'pendiente',
+            'url' => $url,
             'mensajePago' => 'El pago se encuentra pendiente'
         ]);
     }
@@ -1748,6 +1766,8 @@ class VentaController extends Controller
             $r = new Request();
             $r->idsesion = $request->external_reference;
             $r->isSale = true;
+            $sesion = Sesionventa::where('id', $r->idsesion)->first();
+            $idrifa = $sesion->idrifa;
             $idventa = $this->newSale($r);
             $this->finishSession($r);
 
@@ -1781,12 +1801,15 @@ class VentaController extends Controller
 
                 $this->sendSMS($to, $message);
                 if ($saldo == 0) {
-                    $urlboleta = 'boleta_'.$boleta->idrifa.$boleta->codigo.'.pdf';
+                    $urlboleta = url('storage').'/boletas/boleta_'.$boleta->idrifa.$boleta->codigo.'.pdf';
                     $mensaje = "Conserva este mensaje de paz y salvo valido para reclamar el premio mayor: Apto Robles, Camioneta mazda y Tour resolucion EDSA N 999 premio mayor $boleta->numero y promocional $boleta->promocional. Sorteo miercoles 21 de diciembre de 2022 con el premio mayor de la loteria de manizales. Boleta: $urlboleta";
                     $this->sendSMS($to, $mensaje);
                 }
             }
-            $checkout = Checkout::where('preference_id', $request->preference_id)->first();
+
+            $urlbase = config('mercadopago.urlretorno');
+            $url = $urlbase.'app/authenticatelink/'.$checkouts[0]['idvendedor'].'?idrifa='.$idrifa;
+            //$checkout = Checkout::where('preference_id', $request->preference_id)->first();
         }
 
         //event(new SaleApp('Hola mundo'));
@@ -1795,15 +1818,17 @@ class VentaController extends Controller
             'payment_id' => $payment_id?$payment_id:null,
             'idventa' => $idventa?$idventa:null,
             'estado' => $payment_id?'aprobado':'Esperando',
+            'url' => $url?$url:'',
             'mensajePago' => $payment_id?'Gracias por comprar en Shoppingred.com!':'En espera del pago'
         ]);
     }
 
     public function paynotifyfailureapp(Request $request) {
         $checkouts = Checkout::where('preference_id', $request->preference_id)->get();
-
         $r = new Request();
         $r->idsesion = $checkouts[0]['idsesionventa'];
+        $sesion = Sesionventa::where('id', $r->idsesion)->first();
+        $idrifa = $sesion->idrifa;
         $r->isSale = false;
         $this->finishSession($r);
 
@@ -1837,6 +1862,9 @@ class VentaController extends Controller
             //$cliente->notify(new EmailcodeNotification($boleta->numero, $boleta->promocional));
             //\Illuminate\Support\Facades\Notification::route('mail', 'javier.minotta.h@gmail.com')->notify(new EmailcodeNotification($subject, $line1, $action, $line2, $boleta->numero, $boleta->promocional));
         }
+
+        $urlbase = config('mercadopago.urlretorno');
+        $url = $urlbase.'app/authenticatelink/'.$checkouts[0]['idvendedor'].'?idrifa='.$idrifa;
         $checkout = Checkout::where('preference_id', $request->preference_id)
             ->first();
 
@@ -1844,16 +1872,17 @@ class VentaController extends Controller
             'payment_id' => $checkout->payment_id,
             'idventa' => null,
             'estado' => 'rechazado',
+            'url' => $url?$url:'',
             'mensajePago' => 'El pago fue rechazado!'
         ]);
     }
 
     public function paynotifypendingapp(Request $request) {
         $checkouts = Checkout::where('preference_id', $request->preference_id)->get();
-
         $sesionventa = Sesionventa::where('id', $checkouts[0]['idsesionventa'])->first();
         $sesionventa->estado = self::enproceso;
         $sesionventa->save();
+        $idrifa = $sesionventa->idrifa;
 
         foreach ($checkouts as $checkout) {
             $checkout->collection_id = $request->collection_id;
@@ -1885,6 +1914,9 @@ class VentaController extends Controller
             //$cliente->notify(new EmailcodeNotification($boleta->numero, $boleta->promocional));
             //\Illuminate\Support\Facades\Notification::route('mail', 'javier.minotta.h@gmail.com')->notify(new EmailcodeNotification($subject, $line1, $action, $line2, $boleta->numero, $boleta->promocional));
         }
+
+        $urlbase = config('mercadopago.urlretorno');
+        $url = $urlbase.'app/authenticatelink/'.$checkouts[0]['idvendedor'].'?idrifa='.$idrifa;
         $checkout = Checkout::where('preference_id', $request->preference_id)
             ->first();
 
@@ -1892,6 +1924,7 @@ class VentaController extends Controller
             'payment_id' => $checkout->payment_id,
             'idventa' => null,
             'estado' => 'pendiente',
+            'url' => $url?$url:'',
             'mensajePago' => 'El pago se encuentra pendiente'
         ]);
     }
@@ -2023,7 +2056,7 @@ class VentaController extends Controller
     }
 
     public static function genBoletaImagen(Boleta $boleta) {
-       $boleta = Boleta::where('id', 1111)->first();
+       //$boleta = Boleta::where('id', 1111)->first();
         $url = url('storage/img/boletas/'.$boleta->idrifa.'_base.png');
 
         $numero = $boleta->numero;
@@ -2047,6 +2080,4 @@ class VentaController extends Controller
 
         return url('storage').'/boletas/'.$filename;
     }
-
-
 }

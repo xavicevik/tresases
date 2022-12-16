@@ -6,9 +6,13 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
+use OwenIt\Auditing\Contracts\Auditable;
+use OwenIt\Auditing\Auditable as AuditableTrait;
 
-class Boleta extends Model
+class Boleta extends Model implements Auditable
 {
+    use AuditableTrait;
+    
     protected $table = 'boletas';
     protected $fillable =[
         'idrifa',

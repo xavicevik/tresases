@@ -24,10 +24,15 @@
 
                             </div>
 
-                            <p>Comprobante de pago {{ payment_id }} </p>
-                            <p>A continuación recibirá un mensaje de correo electrónico y un mensaje de texto con el detalle de la compra</p>
+                            <p v-if="payment_id">Comprobante de pago {{ payment_id }} </p>
+                            <p>A continuación recibirá un mensaje de texto con el detalle de la compra</p>
 
                         </div>
+                    </div>
+                    <div class="mx-auto">
+                        <a :href="url">
+                            <button type="button" class="w-1/2 mx-auto text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm p-2 py-2.5 text-center">Volver a compar</button>
+                        </a>
                     </div>
 
                 </div>
@@ -93,6 +98,7 @@ export default {
         estado: null,
         mensajePago:'',
         errors: Object,
+        url: null
     },
     computed: {
     },
@@ -181,12 +187,6 @@ export default {
                 inputLabel: 'Número boleta',
                 inputValue: this.numerotmp,
                 showCancelButton: true,
-                /*
-                inputValidator: (value) => {
-                    if (!value) {
-                        return 'Por favor ingrese un número!'
-                    }
-                */
             }).then((result) => {
                 if (result.isConfirmed) {
                     this.form.boleta.numero = this.form.numero;

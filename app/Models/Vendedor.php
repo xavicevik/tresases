@@ -13,9 +13,11 @@ use Spatie\Permission\Traits\HasRoles;
 use Spatie\Permission\Models\Permission;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Database\Eloquent\Casts\Attribute;
+use OwenIt\Auditing\Contracts\Auditable;
+use OwenIt\Auditing\Auditable as AuditableTrait;
 
 
-class Vendedor extends Authenticatable
+class Vendedor extends Authenticatable implements Auditable
 {
     use HasApiTokens;
     use HasFactory;
@@ -24,6 +26,7 @@ class Vendedor extends Authenticatable
     use Notifiable;
     use TwoFactorAuthenticatable;
     use HasRoles;
+    use AuditableTrait;
 
     protected $guard = 'vendedor';
 

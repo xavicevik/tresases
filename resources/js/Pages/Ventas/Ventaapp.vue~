@@ -1,0 +1,1545 @@
+<template>
+    <AppLayout title="Ventas" :username="username">
+        <template #header>
+            <h2 class="font-semibold text-xl text-gray-800 leading-tight">
+                Nueva venta
+            </h2>
+        </template>
+        <div class="pt-2 w-full mx-auto lg:px-8 md:px-4 sm:px-1">
+            <div class="mx-auto 2xl:8">
+                <div class="bg-white border-2 border-blue-200 m-2 p-2 rounded-lg overflow-hidden shadow-xl sm:rounded-lg">
+                    <!-- Fin Mensajes Flash -->
+                        <section v-if="saleState == 'detalle'">
+                            <!-- validateRifa <form> -->
+                            <div class="bg-white pb-1">
+                                <div class="">
+                                    <!-- Mensajes Flash -->
+
+                                    <!-- Fin Mensajes Flash -->
+                                    <!-- Formulario -->
+                                    <section>
+                                        <div id="countd" class="mx-auto text-center w-full border-0">
+                                            <vue-countdown ref="countdown" class="pb-4 text-sm mx-auto text-blue-700" :time="time" v-slot="{ minutes, seconds }" @end="onCountdownEnd('userapp')">
+                                                Restan：{{ minutes }} min, {{ seconds }} seg.
+                                            </vue-countdown>
+                                        </div>
+                                        <div class="py-2">
+                                            <img v-show="form.idrifa.urlimagen1 != null" :src="'/storage/'+form.idrifa.urlimagen1" alt="image" class="mx-auto w-10/12 h-20"/>
+                                        </div>
+
+                                        <div class="py-2 text-xs">
+                                            <p>Ingrese el número deseado o presione el boton para obtener un número de la suerte</p>
+                                        </div>
+
+                                        <div class="py-1">
+                                            <div class="mb-4 w-full pr-2 text-center">
+                                                <label class="block text-gray-700 text-sm text-center mx-auto font-bold mb-2">Premio Mayor</label>
+
+                                                <div class="container flex justify-center items-center">
+                                                    <div class="pt-1">
+                                                        <div class="top-4 left-3">
+                                                            <money3 v-bind="configMoney2" v-model="form.reserva.numero" @keypress.enter="valBoletaDisponible(form.reserva.numero, form.idrifa.id, form.idvendedor.id, form.idcliente.id)" class="text-xl text-center h-8 w-1/8 pl-2 pr-2 rounded-lg z-0 focus:shadow focus:outline-none"></money3>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="flex pt-2">
+                                                    <button type="button" @click="generarAleatorio()" class="w-1/2 mx-auto text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm p-2 py-2.5 text-center">Número de suerte</button>
+                                                    <button type="button" @click="valBoletaDisponible(form.reserva.numero, form.idrifa.id, form.idvendedor.id, form.idcliente.id)" class="w-1/2 flex mx-auto text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm p-2 mx-2 py-2.5 text-center">
+                                                        <svg aria-hidden="true" class="mr-2 -ml-1 w-4 h-4" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M3 1a1 1 0 000 2h1.22l.305 1.222a.997.997 0 00.01.042l1.358 5.43-.893.892C3.74 11.846 4.632 14 6.414 14H15a1 1 0 000-2H6.414l1-1H14a1 1 0 00.894-.553l3-6A1 1 0 0017 3H6.28l-.31-1.243A1 1 0 005 1H3zM16 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0zM6.5 18a1.5 1.5 0 100-3 1.5 1.5 0 000 3z"></path></svg>
+                                                        Comprar
+                                                    </button>
+                                                </div>
+
+                                                <div v-if="$page.props.errors.rifa" class="text-red-500">{{ $page.props.errors.rifa }}</div>
+                                            </div>
+                                        </div>
+
+                                    </section>
+                                    <section>
+                                        <div class="flex px-2 w-full max-h-fit overflow-y-scroll">
+                                            <div class="mb-2 w-full">
+                                                <div class="flex py-2 text-sm font-bold align-middle border-b-2 border-black">
+                                                    <div class="w-4/12">
+                                                        Número
+                                                    </div>
+                                                    <div class="w-3/12">
+                                                        Promocional
+                                                    </div>
+                                                    <div class="w-4/12 px-1">
+                                                        Valor
+                                                    </div>
+                                                    <div class="w-1/12 px-1">
+                                                    </div>
+                                                </div>
+                                                <div v-for="(reserva, index) in form.reservas" :key="reserva.numero" class="text-sm rounded-md flex py-1 px-2">
+                                                    <div class="w-4/12">
+                                                        {{ reserva.numero }}
+                                                    </div>
+                                                    <div class="w-3/12">
+                                                        {{ reserva.promocional}}
+                                                    </div>
+                                                    <div class="w-4/12">
+                                                        {{ formatPrice(reserva.valorpagar) }}
+                                                    </div>
+                                                    <div class="w-1/12 px-1">
+                                                        <svg xmlns="http://www.w3.org/2000/svg" @click="eliminarReserva(reserva, index)" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                                        </svg>
+                                                    </div>
+                                                </div>
+                                                <div class="bg-blue-400 text-sm rounded-md flex py-2 px-2 font-bold">
+                                                    <div class="w-3/12">
+                                                        Total:
+                                                    </div>
+                                                    <div class="w-4/12 px-1">
+                                                        {{ formatPrice(totalapagar) }}
+                                                    </div>
+                                                    <div class="w-3/12">
+                                                        Cantidad:
+                                                    </div>
+                                                    <div class="w-2/12 px-1">
+                                                        {{ form.reservas.length }}
+                                                    </div>
+                                                </div>
+
+                                            </div>
+                                        </div>
+                                    </section>
+                                    <!-- Fin formulario -->
+                                </div>
+                            </div>
+                            <div class="w-full">
+                                <div class="mr-auto">
+                                    <button type="button" class="text-white bg-red-600 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-2 py-2 text-center inline-flex items-center">
+                                        Siguiente
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
+                                        </svg>
+                                    </button>
+                                </div>
+
+                            </div>
+                            <!-- </form> -->
+                        </section>
+                        <section v-if="saleState == 'pago'">
+                            <div class="w-full mx-auto pb-5">
+                                <div class="mx-auto text-center w-full border-0">
+                                    <vue-countdown ref="countdown" class="p-2 pb-4 text-sm mx-auto text-blue-700" :time="time" v-slot="{ minutes, seconds }" @end="onCountdownEnd">
+                                        Restante：{{ minutes }} min, {{ seconds }} seg.
+                                    </vue-countdown>
+                                </div>
+                                <!-- Order summary -->
+                                <div class="mt-5 mb-10 lg:mt-0">
+                                    <h2 class="text-lg font-bold font-medium text-gray-900">Resumen de la transacción</h2>
+
+                                    <div class="mt-4 bg-white border border-gray-200 rounded-lg shadow-sm">
+                                        <ul role="list" class="divide-y divide-gray-200">
+                                            <li class="flex py-3 px-4 sm:px-6 font-bold">
+                                                <div class="min-w-0 flex-1">
+                                                    <h4 class="text-xs">
+                                                        Número
+                                                    </h4>
+                                                </div>
+                                                <div class="min-w-0 flex-1">
+                                                    <h4 class="text-xs">
+                                                        Saldo
+                                                    </h4>
+                                                </div>
+                                                <div class="min-w-0 flex-1">
+                                                    <h4 class="text-xs">
+                                                        Pagar
+                                                    </h4>
+                                                </div>
+                                            </li>
+                                            <li class="flex py-4 px-4 sm:px-6" v-for="(dato, id) in form.reservas" :key="id">
+                                                <div class="min-w-0 flex-1">
+                                                    <h4 class="text-xs">
+                                                        <a href="#" class="text-gray-700 hover:text-gray-800"> {{ dato.numero }}/{{ dato.promocional }} </a>
+                                                    </h4>
+                                                </div>
+                                                <div class="min-w-0 flex-1">
+                                                    <h4 class="text-xs">
+                                                        <p class="mt-1 text-xs text-gray-900">{{ formatPrice(dato.valorsaldo) }}</p>
+                                                    </h4>
+                                                </div>
+                                                <div class="min-w-0 flex-1">
+                                                    <h4 class="text-xs">
+                                                        <p class="mt-1 text-xs text-gray-900">{{ formatPrice(dato.valorpagar) }}</p>
+                                                    </h4>
+                                                </div>
+                                            </li>
+                                            <!-- More products... -->
+                                        </ul>
+                                        <div class="flex border-t border-gray-200 py-4 px-2 sm:px-6">
+                                            <div class="w-1/3 text-base font-medium font-bold">Total</div>
+                                            <div class="w-1/3 text-base font-medium font-bold"></div>
+                                            <div class="w-1/3 text-base font-medium text-gray-900 font-bold">{{ formatPrice(totalapagar) }}</div>
+                                        </div>
+                                        <div v-if="form.paymentmethod == 2" class="flex border-t border-gray-200 py-2 px-2 sm:px-6">
+                                            <div class="text-base font-medium w-1/3">Comprobante</div>
+                                            <div class="text-base font-medium w-1/3"></div>
+                                            <div class="text-base font-medium text-gray-900 w-1/3"><input type="text" v-model="form.comprobante" autocomplete="family-name" class="block h-10/12 w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"></div>
+                                        </div>
+                                        <div class="flex w-10/12 mx-auto justify-items-center pb-4">
+                                            <div class="cho-container">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
+                        <section v-if="saleState == 'checkout'">
+                        <!-- validateCheckout -->
+                            <div class="mx-auto text-center w-full border-0">
+                                <vue-countdown ref="countdown" class="p-2 pb-4 mx-auto text-blue-700" :time="time" v-slot="{ minutes, seconds }" @end="onCountdownEnd">
+                                    Restan：{{ minutes }} min, {{ seconds }} seg.
+                                </vue-countdown>
+                            </div>
+                            <div class="max-w-2xl mx-auto lg:max-w-none pb-4">
+                                <h1 class="sr-only">Checkout</h1>
+
+                                <form class="lg:grid lg:grid-cols-2 lg:gap-x-12 xl:gap-x-16">
+                                    <div>
+                                        <div class=" mt-5 mb-10 lg:mt-0">
+                                            <div class="flex">
+                                                <h2 class="text-md font-bold text-gray-900">Información del cliente</h2>
+                                            </div>
+                                            <div v-if="$page.props.flash.message" class="text-green-500">{{ $page.props.flash.message }}</div>
+                                            <div class="mt-2">
+                                                <label class="block text-sm font-medium text-gray-700">Documento</label>
+                                                <div class="mt-1">
+                                                    <input type="text" @change="selectClienteFull(form.cliente.documento)" @keyup.enter="selectClienteFull(form.cliente.documento)" v-model="form.cliente.documento" autocomplete="postal-code" class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 text-xs sm:text-sm">
+                                                    <div v-if="$page.props.errors.documento" class="text-red-500">{{ $page.props.errors.docuemnto }}</div>
+                                                </div>
+                                            </div>
+                                            <div v-show="form.cliente.id || isNewCliente" class="mt-2 grid grid-cols-1 gap-y-6 sm:grid-cols-2 sm:gap-x-4">
+                                                <div>
+                                                    <label class="block text-xs font-medium text-gray-700">Nombre</label>
+                                                    <div class="mt-1">
+                                                        <input type="text" :disabled="!isNewCliente" :class="{'bg-blue-100' : !isNewCliente}" v-model="form.cliente.nombre" v-text="form.cliente.nombre + ' ' + form.cliente.apellido" autocomplete="given-name" class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 text-xs sm:text-sm">
+                                                        <div v-if="$page.props.errors.nombre" class="text-red-500">{{ $page.props.errors.nombre }}</div>
+                                                    </div>
+                                                </div>
+                                                <div>
+                                                    <label class="block text-xs font-medium text-gray-700">Celular</label>
+                                                    <div class="mt-1">
+                                                        <input type="text" :disabled="!isNewCliente" :class="{'bg-blue-100' : !isNewCliente}" v-model="form.cliente.movil" autocomplete="family-name" class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 text-xs sm:text-sm">
+                                                        <div v-if="$page.props.errors.movil" class="text-red-500">{{ $page.props.errors.movil }}</div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                    </div>
+
+                                    <!-- Order summary -->
+                                    <div v-if="false" class="mt-5 mb-10 lg:mt-0">
+                                        <h2 class="text-md font-bold font-medium text-gray-900">Resumen de la orden</h2>
+
+                                        <div class="mt-4 bg-white border border-gray-200 rounded-lg shadow-sm">
+                                            <ul role="list" class="divide-y divide-gray-200">
+                                                <li class="flex py-2 px-2 sm:px-6" v-for="(dato, id) in form.reservas" :key="id">
+                                                    <div class="flex-shrink-0 align-middle">
+                                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 6v.75m0 3v.75m0 3v.75m0 3V18m-9-5.25h5.25M7.5 15h3M3.375 5.25c-.621 0-1.125.504-1.125 1.125v3.026a2.999 2.999 0 010 5.198v3.026c0 .621.504 1.125 1.125 1.125h17.25c.621 0 1.125-.504 1.125-1.125v-3.026a2.999 2.999 0 010-5.198V6.375c0-.621-.504-1.125-1.125-1.125H3.375z" />
+                                                        </svg>
+                                                    </div>
+
+                                                    <div class="ml-6 flex-1 flex flex-col">
+                                                        <div class="flex">
+                                                            <div class="flex-1 pt-2 flex items-end justify-between">
+                                                                <p class="mt-1 text-sm font-medium text-gray-900">Número: </p>
+                                                                <p class="mt-1 text-sm text-gray-500">{{ dato.numero }}</p>
+                                                            </div>
+                                                        </div>
+
+                                                        <div class="flex-1 pt-2 flex items-end justify-between">
+                                                            <p class="mt-1 text-sm font-bold text-gray-900">Valor a pagar: </p>
+                                                            <p class="mt-1 text-sm font-medium text-gray-900">{{ formatPrice(dato.valorpagar) }}</p>
+                                                        </div>
+                                                    </div>
+                                                </li>
+
+                                                <!-- More products... -->
+                                            </ul>
+                                            <dl class="py-2 px-2 space-y-6">
+                                                <div class="flex items-center justify-between border-t border-gray-200 pt-2">
+                                                    <dt class="text-bold text-gray-900">Total</dt>
+                                                    <dd class="text-base font-medium text-gray-900">{{ formatPrice(totalapagar) }}</dd>
+                                                </div>
+                                            </dl>
+
+                                            <!-- Payment -->
+                                            <div v-show="false" class="mt-2 border-t border-gray-200 pt-2">
+                                                <h2 class="text-lg font-bold border-b-2 font-medium text-gray-900">Método de pago</h2>
+
+                                                <fieldset class="mt-2">
+                                                    <legend class="sr-only">Payment type</legend>
+                                                    <div class="p-2 space-y-4 sm:flex sm:items-center sm:space-y-0 sm:space-x-10">
+                                                        <div class="flex items-center">
+                                                            <input v-model="form.paymentmethod" value="1" type="radio" checked class="px-2 focus:ring-indigo-500 h-4 w-4 text-indigo-600 border-gray-300">
+                                                            <svg class="px-2 w-10" style="enable-background:new 0 0 48 48;" version="1.1" viewBox="0 0 48 48" xml:space="preserve" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"><g id="Icons"><g><path d="M16.3872,34.6633l-6.71-10.09c-0.86-1.42-0.41-3.26,1.01-4.13l14.15-8.6    c1.42-0.86,3.26-0.41,4.13,1l3.68,6.06l1.18,2.11" style="fill:#F43735;"/><path d="M35.7572,36.5934h-16.569c-1.6568,0-3-1.3432-3-3V24.01c0-1.6568,1.3432-3,3-3h16.569    c1.6569,0,3,1.3432,3,3v9.5834C38.7572,35.2502,37.4141,36.5934,35.7572,36.5934z" style="fill:#F9F9F9;"/><rect height="3.1331" style="fill:#383838;" width="22.5712" x="16.1879" y="24.4404"/><g><line style="fill:none;stroke:#303030;stroke-width:0.5;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;" x1="36.6873" x2="34.0623" y1="31.6485" y2="31.6485"/><line style="fill:none;stroke:#303030;stroke-width:0.5;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;" x1="36.6873" x2="34.0623" y1="32.7735" y2="32.7735"/><line style="fill:none;stroke:#303030;stroke-width:0.5;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;" x1="36.6873" x2="34.0623" y1="33.9402" y2="33.9402"/></g><path d="M25.6898,29.138c-1.0925,0-2.0289,0.659-2.44,1.6c-0.4111-0.941-1.3475-1.6-2.44-1.6    c-1.4715,0-2.6642,1.1928-2.6642,2.6641c0,1.4714,1.1927,2.6642,2.6642,2.6642c1.0925,0,2.0289-0.6591,2.44-1.6001    c0.4111,0.941,1.3475,1.6001,2.44,1.6001c1.4714,0,2.6641-1.1928,2.6641-2.6642C28.3539,30.3308,27.1612,29.138,25.6898,29.138z" style="fill:#FFC601;"/><path d="    M35.7572,36.5934h-16.569c-1.6568,0-3-1.3432-3-3V24.01c0-1.6568,1.3432-3,3-3h16.569c1.6569,0,3,1.3432,3,3v9.5834    C38.7572,35.2502,37.4141,36.5934,35.7572,36.5934z" style="fill:none;stroke:#303030;stroke-width:0.5;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;"/><line style="fill:none;stroke:#303030;stroke-width:0.5;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;" x1="38.7591" x2="16.1879" y1="24.4404" y2="24.4404"/><line style="fill:none;stroke:#303030;stroke-width:0.5;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;" x1="38.7591" x2="16.1879" y1="27.5735" y2="27.5735"/><line style="fill:none;stroke:#303030;stroke-width:0.5;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;" x1="17.1372" x2="17.1272" y1="35.7833" y2="35.7733"/><path d="    M16.3872,34.6633l-6.71-10.09c-0.86-1.42-0.41-3.26,1.01-4.13l14.15-8.6c1.42-0.86,3.26-0.41,4.13,1l3.68,6.06l1.18,2.11" style="fill:none;stroke:#303030;stroke-width:0.5;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;"/><g><path d="     M11.5128,25.096c0,0-1.9506-2.1279-0.14779-3.5182l5.77659-3.5273" style="fill:none;stroke:#303030;stroke-width:0.5;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;"/><line style="fill:none;stroke:#303030;stroke-width:0.5;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;" x1="18.4377" x2="19.0404" y1="17.309" y2="16.8798"/><line style="fill:none;stroke:#303030;stroke-width:0.5;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;" x1="32.2411" x2="30.6115" y1="21.01" y2="18.3804"/></g><circle cx="20.79519" cy="31.80215" r="2.64959" style="fill:#F43735;"/></g></g></svg>
+                                                            <label class="ml-3 block text-sm font-medium text-gray-700"> TC /TD </label>
+                                                        </div>
+
+                                                        <div class="flex items-center">
+                                                            <input v-model="form.paymentmethod" value="2" type="radio" class="px-2 focus:ring-indigo-500 h-4 w-4 text-indigo-600 border-gray-300">
+
+                                                            <label class="ml-3 block text-sm font-medium text-gray-700"> Transferencia </label>
+                                                        </div>
+
+                                                        <div class="flex items-center">
+                                                            <input v-model="form.paymentmethod" value="3" type="radio" class="px-2 focus:ring-indigo-500 h-4 w-4 text-indigo-600 border-gray-300">
+                                                            <svg class="px-2 w-10" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="48px" height="48px" viewBox="0 0 48 48"><g >
+                                                                <path fill="#307730" d="M40,22H8c-0.55228,0-1-0.44772-1-1V6c0-0.55228,0.44772-1,1-1h32c0.55228,0,1,0.44772,1,1v15
+C41,21.55228,40.55228,22,40,22z"/>
+                                                                <path fill="#3F8E3F" d="M43,22H5c-0.55228,0-1-0.44772-1-1V10c0-0.55229,0.44772-1,1-1h38c0.55228,0,1,0.44771,1,1v11
+C44,21.55228,43.55228,22,43,22z"/>
+                                                                <path fill="#4DA34D" d="M46,43H2c-0.55225,0-1-0.44775-1-1V14c0-0.55225,0.44775-1,1-1h44c0.55225,0,1,0.44775,1,1v28
+C47,42.55225,46.55225,43,46,43z"/>
+                                                                <path fill="#9EDB9E" d="M38,16H10c0,3.31372-2.68628,6-6,6v12c3.31372,0,6,2.68628,6,6h28c0-3.31372,2.68628-6,6-6V22
+C40.68628,22,38,19.31372,38,16z"/>
+                                                                <circle fill="#4DA34D" cx="24" cy="28" r="7"/>
+                                                            </g></svg>
+                                                            <label class="ml-3 block text-sm font-medium text-gray-700"> Efectivo </label>
+                                                        </div>
+                                                    </div>
+                                                </fieldset>
+
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                            <!-- Fin Checkout -->
+                        </section>
+
+                    <div v-if="isComplete" class="flex items-center justify-center p-5 bg-blue-100 min-w-screen">
+                        <div class="max-w-xl p-8 text-center text-gray-800 bg-white shadow-xl lg:max-w-3xl rounded-3xl lg:p-12">
+                            <h3 class="text-2xl">Gracias por compra en Shoppingred!</h3>
+                            <div class="flex justify-center">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="w-24 h-24 text-green-400" fill="none"
+                                     viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1"
+                                          d="M3 19v-8.93a2 2 0 01.89-1.664l7-4.666a2 2 0 012.22 0l7 4.666A2 2 0 0121 10.07V19M3 19a2 2 0 002 2h14a2 2 0 002-2M3 19l6.75-4.5M21 19l-6.75-4.5M3 10l6.75 4.5M21 10l-6.75 4.5m0 0l-1.14.76a2 2 0 01-2.22 0l-1.14-.76" />
+                                </svg>
+                            </div>
+
+                            <p>A continuación recibirá un mensaje SMS al {{ form.cliente.movil}}</p>
+                            <div class="mt-4">
+                                <a :href="'/ventas/reportpdf?id=' + $page.props.flash.message" target="_blank" class="px-2 py-2 text-blue-200 bg-blue-600 rounded">Imprimir</a>
+                                <p class="mt-4 text-sm">Si tiene problemas para poder acceder al correo, puede ver el resumen de la compra en:
+                                    <a :href="'/ventas/sumary?id=' + $page.props.flash.message" target="_blank" class="text-blue-600 underline">Resumen</a>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <!-- Ventana modal Rifas-->
+                    <section>
+                        <div class="fixed z-10 inset-0 overflow-y-auto ease-out duration-400" v-if="isOpenRifa">
+                            <div class="flex items-end justify-center pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+
+                                <div class="fixed inset-0 transition-opacity" @click="closeMoodalRifa()">
+                                    <div class="absolute inset-0 bg-gray-500 opacity-75"></div>
+                                </div>
+                                <!-- This element is to trick the browser into centering the modal contents. -->
+                                <span class="hidden sm:inline-block sm:align-middle sm:h-screen"></span>
+
+                                <!-- Contenido modal -->
+                                <div class="inline-block lg:w-7/12 align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:w-full" role="dialog" aria-modal="true" aria-labelledby="modal-headline">
+                                    <button type="button" @click="closeModal()" class="absolute top-3 right-2.5 text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center dark:hover:bg-gray-800 dark:hover:text-white" data-modal-toggle="authentication-modal">
+                                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg>
+                                    </button>
+                                    <section>
+                                        <div class="mx-auto p-4">
+                                            <div class="w-1/4 pr-2">
+                                                <div class="container flex items-center">
+                                                    <div class="relative">
+                                                        <div class="absolute top-4 left-3">
+                                                            <i class="fa fa-search text-gray-400 z-20 hover:text-gray-500"></i>
+                                                        </div>
+                                                        <input type="text" v-model="buscar" @keyup="getRifas(buscar,'nombre_tecnico', true)" class="h-8 w-26 pl-4 pr-4 rounded-lg z-0 focus:shadow focus:outline-none" placeholder="Buscar (nombre_tecnico)">
+                                                        <button @click="getRifas(buscar,'nombre_tecnico', true)">
+                                                            <div class="absolute top-2 right-2">
+                                                                <Icon icon="fe:search" class="h-4"  />
+                                                            </div>
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                        </div>
+                                    </section>
+                                    <!-- Fin Encabezado y titulo -->
+                                    <!-- Tabla de contenido -->
+                                    <section>
+                                        <div class="lg:px-4 px-2 md:px-2 sm:px-0 py-2 pb-6">
+                                            <table class="table-fixed w-full">
+                                                <thead>
+                                                <tr class="bg-gray-100">
+                                                    <th class="px-4 py-2 w-2/12 text-sm font-bold hover:bg-blue-500 hover:text-gray-50 rounded-b">
+                                                        <button @click="getRifas('', 'titulo')" class="font-bold">
+                                                            Nombre
+                                                            <div v-show="sortBy == 'titulo'">
+                                                            <span v-show="!sortOrder">
+                                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                                                                    <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+                                                                </svg>
+                                                            </span>
+                                                                <span v-show="sortOrder">
+                                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                                                                  <path fill-rule="evenodd" d="M14.707 12.707a1 1 0 01-1.414 0L10 9.414l-3.293 3.293a1 1 0 01-1.414-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 010 1.414z" clip-rule="evenodd" />
+                                                                </svg>
+                                                            </span>
+                                                            </div>
+                                                        </button>
+                                                    </th>
+
+                                                    <th class="px-4 py-2 text-sm font-bold w-2/12 hover:bg-blue-500 hover:text-gray-50 rounded-b">
+                                                        <button @click="getRifas(buscar, 'rifas.fechafin')" class="font-bold">
+                                                            Fin
+                                                            <div v-show="sortBy == 'rifas.fechafin'">
+                                                            <span v-show="!sortOrder">
+                                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                                                                    <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+                                                                </svg>
+                                                            </span>
+                                                                <span v-show="sortOrder">
+                                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                                                                  <path fill-rule="evenodd" d="M14.707 12.707a1 1 0 01-1.414 0L10 9.414l-3.293 3.293a1 1 0 01-1.414-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 010 1.414z" clip-rule="evenodd" />
+                                                                </svg>
+                                                            </span>
+                                                            </div>
+                                                        </button>
+                                                    </th>
+                                                </tr>
+                                                </thead>
+                                                <tbody>
+                                                <tr @click="onSelectRifa(rifa)" class="hover:bg-blue-50 text-center" text-sm v-if="existerifa > 0" v-for="(rifa, id) in arrayRifas.data" :key="id">
+                                                    <td class="border px-1 py-2 text-sm truncate" v-text="rifa.titulo"></td>
+                                                    <td class="border px-1 py-2 text-sm truncate" v-text="dateTime(rifa.fechafin)"></td>
+                                                </tr>
+                                                <tr v-else>
+                                                    <td class="border px-4 py-2 text-xs text-center" colspan="2"> La consulta no obtuvo datos</td>
+                                                </tr>
+                                                </tbody>
+                                            </table>
+                                            <section class="mt-6">
+                                                <div v-if="arrayRifas.links.length > 3">
+                                                    <div class="flex flex-wrap -mb-1">
+                                                        <template v-for="(link, p) in arrayRifas.links" :key="p">
+                                                            <div v-if="link.url === null" class="mr-1 mb-1 px-4 py-3 text-sm leading-4 text-gray-400 border rounded"
+                                                                 v-html="link.label" />
+                                                            <button  v-else
+                                                                     class="mr-1 mb-1 px-4 py-3 text-sm leading-4 border rounded hover:bg-white focus:border-indigo-500 focus:text-indigo-500"
+                                                                     :class="{ 'bg-blue-700 text-white': link.active }"
+                                                                     v-on:click="cambiarPage(link.url)"
+                                                                     v-html="link.label" />
+                                                        </template>
+                                                    </div>
+                                                </div>
+                                            </section>
+
+                                        </div>
+                                    </section>
+                                    <!-- Fin form -->
+                                </div>
+                                <!-- Fin Contenido modal -->
+                            </div>
+                        </div>
+                    </section>
+                    <!-- Fin Ventana modal  Rifas -->
+
+                    <!-- Ventana modal buscar cliente-->
+                    <section>
+                        <div class="fixed z-10 inset-0 overflow-y-auto ease-out duration-400" v-if="isOpenCliente">
+                            <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+                                <div class="fixed inset-0 transition-opacity" @click="closeModalCliente()">
+                                    <div class="absolute inset-0 bg-gray-500 opacity-75"></div>
+                                </div>
+
+                                <!-- This element is to trick the browser into centering the modal contents. -->
+                                <span class="hidden sm:inline-block sm:align-middle sm:h-screen"></span>
+
+                                <!-- Contenido modal -->
+                                <div class="inline-block lg:w-6/12 align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:w-full" role="dialog" aria-modal="true" aria-labelledby="modal-headline">
+                                    <button type="button" @click="closeModalCliente()" class="absolute top-3 right-2.5 text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center dark:hover:bg-gray-800 dark:hover:text-white" data-modal-toggle="authentication-modal">
+                                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg>
+                                    </button>
+                                    <section>
+                                        <div class="flex mx-auto p-4">
+                                            <div class="w-1/2">
+                                                <a href="#" @click="crearCliente()">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-blue-500" viewBox="0 0 20 20" fill="currentColor">
+                                                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v2H7a1 1 0 100 2h2v2a1 1 0 102 0v-2h2a1 1 0 100-2h-2V7z" clip-rule="evenodd" />
+                                                    </svg>
+                                                </a>
+                                            </div>
+
+                                            <div class="w-1/4 pr-2">
+                                                <div class="container flex items-center">
+                                                    <div class="relative">
+                                                        <div class="absolute top-4 left-3">
+                                                            <i class="fa fa-search text-gray-400 z-20 hover:text-gray-500"></i> </div>
+                                                        <input type="text" v-model="buscarcliente" @keyup.enter="getClientes(buscarcliente,'documento, nombre', true)" class="h-8 w-26 pl-4 pr-4 rounded-lg z-0 focus:shadow focus:outline-none" placeholder="Buscar (documento, nombre)">
+                                                        <button @click="getClientes(buscarcliente,'documento, nombre', true)">
+                                                            <div class="absolute top-2 right-2">
+                                                                <Icon icon="fe:search" class="h-4"  />
+                                                            </div>
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                        </div>
+                                    </section>
+                                    <!-- Fin Encabezado y titulo -->
+                                    <!-- Tabla de contenido -->
+                                    <section>
+                                        <div class="lg:px-4 md:px-2 sm:px-0 py-2 pb-6">
+                                            <table class="table-fixed w-full text-xs">
+                                                <thead>
+                                                <tr class="bg-gray-100 hover:bg-blue-500 hover:text-gray-50">
+                                                    <th class="px-4 py-2 w-2/12 font-bold rounded-b">
+                                                        <button @click="getRifas('', 'idloteria')" class="font-bold">
+                                                            Nombre
+                                                            <div v-show="sortBy == 'idloteria'">
+                                                            <span v-show="!sortOrder">
+                                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                                                                    <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+                                                                </svg>
+                                                            </span>
+                                                                <span v-show="sortOrder">
+                                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                                                                  <path fill-rule="evenodd" d="M14.707 12.707a1 1 0 01-1.414 0L10 9.414l-3.293 3.293a1 1 0 01-1.414-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 010 1.414z" clip-rule="evenodd" />
+                                                                </svg>
+                                                            </span>
+                                                            </div>
+                                                        </button>
+                                                    </th>
+                                                    <th class="px-4 py-2 w-1/12 font-bold rounded-b">
+                                                        <button @click="getRifas(buscar, 'loteria.nombre')" class="font-bold">
+                                                            Documento
+                                                            <div v-show="sortBy == 'loteria.nombre'">
+                                                            <span v-show="!sortOrder">
+                                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                                                                    <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+                                                                </svg>
+                                                            </span>
+                                                                <span v-show="sortOrder">
+                                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                                                                  <path fill-rule="evenodd" d="M14.707 12.707a1 1 0 01-1.414 0L10 9.414l-3.293 3.293a1 1 0 01-1.414-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 010 1.414z" clip-rule="evenodd" />
+                                                                </svg>
+                                                            </span>
+                                                            </div>
+                                                        </button>
+                                                    </th>
+                                                </tr>
+                                                </thead>
+                                                <tbody>
+                                                <tr @click="onSelectCliente(cliente)" class="hover:bg-blue-100 text-center" text-sm v-if="arrayClientes.data" v-for="(cliente, id) in arrayClientes.data" :key="id">
+                                                    <td class="border px-1 py-2 text-sm truncate" v-text="cliente.nombre + ' ' + cliente.apellido"></td>
+                                                    <td class="border px-1 py-2 text-sm truncate" v-text="cliente.documento"></td>
+                                                </tr>
+                                                <tr v-else>
+                                                    <td class="border px-4 py-2 text-xs text-center" colspan="2"> La consulta no obtuvo datos</td>
+                                                </tr>
+                                                </tbody>
+                                            </table>
+
+                                            <!-- Paginacion -->
+                                            <section class="mt-6">
+                                                <div v-if="arrayClientes.links.length > 3">
+                                                    <div class="flex flex-wrap -mb-1">
+                                                        <template v-for="(link, p) in arrayClientes.links" :key="p">
+                                                            <div v-if="link.url === null" class="mr-1 mb-1 px-4 py-3 text-sm leading-4 text-gray-400 border rounded"
+                                                                 v-html="link.label" />
+                                                            <button  v-else
+                                                                     class="mr-1 mb-1 px-4 py-3 text-sm leading-4 border rounded hover:bg-white focus:border-indigo-500 focus:text-indigo-500"
+                                                                     :class="{ 'bg-blue-700 text-white': link.active }"
+                                                                     v-on:click="this.cambiarPage(link.url, 'clientes', form, idVenta)"
+                                                                     v-html="link.label" />
+                                                        </template>
+                                                    </div>
+                                                </div>
+                                            </section>
+                                            <!-- Paginacion -->
+
+
+                                        </div>
+                                    </section>
+                                    <!-- Fin form -->
+                                </div>
+                                <!-- Fin Contenido modal -->
+                            </div>
+                        </div>
+                    </section>
+                    <!-- Fin Ventana modal buscar cliente -->
+
+
+                </div>
+            </div>
+        </div>
+    </AppLayout>
+</template>
+
+
+<script>
+
+import AppLayout from '@/Layouts/AppLayoutapp.vue';
+import Swal from "sweetalert2";
+import { Icon } from '@iconify/vue';
+import Pagination from '@/Components/Pagination';
+
+import Toggle from '@vueform/toggle';
+import '@vueform/toggle/themes/default.css';
+import Button from "../../Jetstream/Button";
+
+import moment from 'moment'
+import { QuillEditor } from '@vueup/vue-quill';
+import '@vueup/vue-quill/dist/vue-quill.snow.css';
+import { ref, onMounted } from 'vue';
+import { Money3Component } from 'v-money3'
+
+import { Inertia } from '@inertiajs/inertia';
+import { Head, Link } from '@inertiajs/inertia-vue3';
+import JetNavLink from '@/Jetstream/NavLink.vue';
+import NavLink from "../../Jetstream/NavLink";
+import Submenu from "../../Components/Submenu";
+
+
+//import {FormWizard, TabContent} from 'vue3-form-wizard';
+//import 'vue3-form-wizard/dist/style.css';
+import ThemifyIcon from "vue-themify-icons";
+
+import VueQrcode from '@chenfengyuan/vue-qrcode';
+import VueCountdown from '@chenfengyuan/vue-countdown';
+
+export default {
+    name: 'App',
+
+    components: {
+        Submenu,
+        Button,
+        AppLayout,
+        Icon,
+        Pagination,
+        Toggle,
+        QuillEditor,
+        money3: Money3Component,
+        Link,
+        //FormWizard,
+        //TabContent,
+        VueQrcode,
+        ThemifyIcon,
+        VueCountdown
+    },
+    props:{
+        username: null,
+        tipoventa: null,
+        datos : [],
+        caja:[],
+        numerosreservados : [],
+        rifas: [],
+        vendedores: [],
+        errors: Object,
+        totaltransaccionprop: 0,
+        totalcomisionesprop: 0,
+        totalboletas: 0,
+        vendedor: [],
+        rifa: []
+    },
+    computed: {
+        calcularSubtotal(){
+            var total = 0.0;
+
+            for (var i = 0; i < this.form.reservas.length; i++) {
+                console.log(this.form.reservas);
+                total += this.form.reservas[i]['valorapagar'];
+            }
+            this.total = this.formatPrice(total)
+            this.totalnoparseado = total;
+            this.form.valorpagar = total;
+            return (total);
+        },
+        totalmovimiento: function () {
+            const sumWithInitial = this.form.reservas.reduce(
+                (accumulator, currentValue) => parseFloat(accumulator) + parseFloat(currentValue.valortotal),
+                0
+            );
+            return sumWithInitial;
+        },
+        totalapagar: function () {
+            if (this.asignarMode) {
+                const sumWithInitial = this.form.reservas.reduce(
+                    (accumulator, currentValue) => parseFloat(accumulator) + parseFloat(currentValue.valorpagar),
+                    0
+                );
+                return sumWithInitial;
+            } else if (this.eliminarMode) {
+                const sumWithInitial = this.form.reservas.reduce(
+                    (accumulator, currentValue) => parseFloat(accumulator) + parseFloat(currentValue.valorpagado),
+                    0
+                );
+                return sumWithInitial;
+            }
+        },
+
+    },
+    data() {
+        return {
+            saleState: 'detalle',
+            time: 2 * 60 * 1000,
+            idpreferencia: 0,
+            urlpago: null,
+            session: [],
+            loadingWizard: false,
+            inputValue: null,
+            configMoney: {
+                masked: false,
+                prefix: '$ ',
+                suffix: '',
+                thousands: ',',
+                decimal: '.',
+                precision: 0,
+                disableNegative: false,
+                disabled: false,
+                min: null,
+                max: null,
+                allowBlank: false,
+                minimumNumberOfCharacters: 0,
+            },
+            ispage: true,
+            tituloModal: '',
+            arrayData: {
+                data: [],
+                links: []
+            },
+            form: {
+                id: null,
+                idrifa: {
+                   ciudad: [],
+                   departamento: [],
+                   loteria: [],
+                   promocionales: [],
+                   tiposerie: [],
+                   cifras: 0
+                },
+                cliente: {
+                    id: 0,
+                    nombre: null,
+                    apellido: null,
+                    correo: null,
+                    movil: null,
+                    telefono: null,
+                    idtipos_documento: 1,
+                    username: null,
+                    idrol: 0,
+                    idpais: 1,
+                    idciudad: 0,
+                    iddepartamento: 0,
+                },
+                numero: null,
+                estado: false,
+                rangoinicial: 0,
+                rangofinal: 0,
+                idvendedor: 0,
+                idcliente: 0,
+                fecha: null,
+                boleta: {
+                    id: null,
+                    numero: null,
+                    idrifa: null,
+                    promocionales: [],
+                    valor: null,
+                    cantidad: null,
+                    url: null,
+                    attributes: []
+                },
+                promocionales: [],
+                comprobante: null,
+                paymentmethod: 0,
+                valorpagar: 0,
+                reservas:[],
+                reserva: {
+                    numero: null,
+                    promocional: null,
+                    valortotal:null,
+                    valorpagar:null,
+                    valorsaldo: null,
+                    idcliente:null,
+                    cliente:null
+                },
+            },
+            configMoney2: {
+                masked: true,
+                prefix: '',
+                suffix: '',
+                thousands: '',
+                decimal: '',
+                precision: 0,
+                disableNegative: true,
+                disabled: false,
+                min: 0,
+                max: 9999,
+                allowBlank: false,
+                minimumNumberOfCharacters: 4,
+            },
+            editMode: false,
+            verMode: false,
+            isOpen: false,
+            buscar: '',
+            sortOrder: 1,
+            sortBy: '',
+            errornumerosreservados: 0,
+            existedata: 0,
+            existecliente: 0,
+            arrayRifas: {
+                data: [],
+                links: []
+            },
+            arrayClientes: {
+                data: [],
+                links: []
+            },
+            isOpenRifa: false,
+            isOpenCliente: false,
+            valboleta: [],
+            promoboleta: [],
+            isRandom: 0,
+            isCliente: false,
+            arrayPaises: [],
+            arrayDepartamentos: [],
+            arrayCiudades: [],
+            arrayTiposdocumento: [],
+            cart: [],
+            numerotmp: null,
+            boleta: [],
+            total: 0.0,
+            totalnoparseado: 0.0,
+            subtotal: 0.0,
+            isComplete: false,
+            isBussyCart: 0,
+            isNewCliente: false,
+            asignarMode: true
+        }
+    },
+    methods: {
+        selectNumero: async function(tipo) {
+            this.numerotmp = this.form.numero;
+            const { value: ipAddress } = await Swal.fire({
+                title: 'Ingrese el número deseado',
+                input: 'text',
+                inputLabel: 'Número boleta',
+                inputValue: this.numerotmp,
+                showCancelButton: true,
+                /*
+                inputValidator: (value) => {
+                    if (!value) {
+                        return 'Por favor ingrese un número!'
+                    }
+                */
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    this.form.boleta.numero = this.form.numero;
+                    this.form.boleta.idrifa = this.form.idrifa.id;
+                }
+            })
+        },
+        generarAleatorio: function () {
+            if(!this.form.idrifa.id || this.form.idrifa.id == 0 || this.form.idrifa.id == '') {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Primero debe seleccionar una rifa',
+                    showConfirmButton: true,
+                })
+            } else {
+                var tiporifa = 'Boleta';
+                /*
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Se buscará un número libre de manera aleatoria',
+                    showConfirmButton: true,
+                    timer: 1500
+                })
+                */
+                var url = '/ventas/getRandBoletaLibre';
+                axios.get(url, {
+                    params: {
+                        rifa: this.form.idrifa.id,
+                        tiporifa: tiporifa
+                    }
+                }).then((res) => {
+                    var respuesta = res.data;
+                    this.boleta = respuesta.boleta;
+                    this.form.reserva.numero = this.boleta.numero;
+                })
+            }
+        },
+        valBoletaLibre: function (buscar, rifa, cifras, tiporifa = 'boletas'){
+
+            if(!this.form.idrifa.id) {
+                Swal.fire({
+                    //position: 'top-end',
+                    icon: 'warning',
+                    title: 'Primero debe seleccionar una rifa',
+                    showConfirmButton: true,
+                    //timer: 1500
+                })
+            } else if(this.form.numero == '' && this.isRandom == 0) {
+                Swal.fire({
+                    //position: 'top-end',
+                    icon: 'warning',
+                    title: 'Ingrese un número válido',
+                    showConfirmButton: true,
+                    //timer: 1500
+                })
+            } else {
+                if (this.isRandom == 1){
+                    var tiporifa = 'Boleta';
+                    Swal.fire({
+                        //position: 'top-end',
+                        icon: 'warning',
+                        title: 'Se buscará un número libre de manera aleatoria',
+                        showConfirmButton: true,
+                        timer: 1500
+                    })
+                    var url = '/ventas/getRandBoletaLibre';
+                    axios.get(url, {
+                        params: {
+                            buscar: buscar,
+                            rifa: rifa,
+                            cifras: cifras,
+                            tiporifa: tiporifa
+                        }
+                    }).then((res) => {
+                        console.log(res.data);
+                        var respuesta = res.data;
+                        this.boleta = respuesta.boleta;
+                        this.promoboleta = respuesta.promoboleta;
+
+                        Swal.fire({
+                            //position: 'top-end',
+                            icon: 'success',
+                            title: 'Se obtuvo el número ' + this.boleta.numero,
+                            showConfirmButton: true,
+                            //timer: 1500
+                        })
+                        this.form.numero =  this.boleta.numero;
+
+/*
+                        this.promoboleta.forEach(function(rifa, indice) {
+                            Swal.fire({
+                                //position: 'top-end',
+                                icon: 'warning',
+                                title: 'El número se encuentra ocupado para un premio promocional',
+                                showConfirmButton: true,
+                                //timer: 1500
+                            })
+                        })
+*/
+                    })
+                } else {
+                    var url = '/ventas/valBoletaLibre';
+                    axios.get(url, {
+                        params: {
+                            buscar: buscar,
+                            rifa: rifa,
+                            cifras: cifras
+                        }
+                    }).then((res) => {
+                        console.log(res.data);
+                        var respuesta = res.data;
+                        this.boleta = respuesta.boleta;
+                        this.promoboleta = respuesta.promoboleta;
+                        var isocupado = respuesta.isocupado;
+
+                        if (isocupado) {
+                            Swal.fire({
+                                //position: 'top-end',
+                                icon: 'warning',
+                                title: 'El número se encuentra ocupado para el premio mayor de la rifa ' + this.boleta.idrifa,
+                                showConfirmButton: true,
+                                //timer: 1500
+                            })
+                        } else {
+                            Swal.fire({
+                                //position: 'top-end',
+                                icon: 'success',
+                                title: 'El número se encuentra disponible para el premio mayor',
+                                showConfirmButton: true,
+                                //timer: 1500
+                            })
+                        }
+
+                        this.promoboleta.forEach(function(rifa, indice) {
+                            Swal.fire({
+                                //position: 'top-end',
+                                icon: 'warning',
+                                title: 'El número se encuentra ocupado para un premio promocional',
+                                showConfirmButton: true,
+                                //timer: 1500
+                            })
+                        })
+                    })
+                }
+            }
+        },
+        selectRifa: function () {
+            this.isOpenRifa = true;
+            this.getRifas('','nombre_tecnico','true');
+        },
+        getRifas: async function (buscar = '', filtro = 'nombre_tecnico', paginate = false) {
+
+            var url= '/rifas/getRifasActivas';
+            axios.get(url, {
+                params: {
+                    buscar: buscar,
+                    filtro: filtro,
+                    paginate: paginate
+                }
+            }).then((res) => {
+                console.log(res.data);
+                var respuesta = res.data;
+                this.arrayRifas = respuesta.rifas;
+
+                if (this.arrayRifas.data.length > 0) {
+                    this.existerifa = 1;
+                } else {
+                    this.existerifa = 0;
+                }
+            })
+        },
+        closeMoodalRifa: function(){
+            this.isOpenRifa = false;
+            //this.reset();
+            this.editMode = false;
+            this.verMode  = false;
+            this.$page.props.errors = [];
+        },
+        onSelectRifa: function(data){
+            this.form.idrifa = data;
+            this.closeMoodalRifa();
+            this.actualizarRangos();
+            this.updateSession(this.session.id, this.form.idrifa.id, this.form.idvendedor.id);
+        },
+        selectClienteFull: function (documento) {
+            var url= '/users/showClientDoc';
+            axios.get(url, {
+                params: {
+                    documento: documento
+                }
+            }).then((res) => {
+                var respuesta = res.data;
+                if (respuesta.cliente) {
+                    this.form.cliente = respuesta.cliente;
+                    this.isNewCliente = false;
+                    this.pushSessionDetailClient(this.session.id, this.form.cliente.id, 'upd');
+                } else {
+                    /*
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'El cliente no existe',
+                        showConfirmButton: false,
+                        timer: 1500
+                    })
+                     */
+                    this.isNewCliente = true;
+                }
+
+            })
+        },
+        selectCliente: function () {
+            this.isOpenCliente = true;
+            this.getClientes('','documento','true');
+        },
+        getClientes: async function (buscar = '', filtro = 'documento', paginate = false) {
+
+            var url= '/users/getClientesActivos';
+            axios.get(url, {
+                params: {
+                    buscar: buscar,
+                    filtro: filtro,
+                    paginate: paginate
+                }
+            }).then((res) => {
+                console.log(res.data);
+                var respuesta = res.data;
+                this.arrayClientes = respuesta.clientes;
+
+                if (this.arrayClientes.data.length > 0) {
+                    this.existecliente = 1;
+                } else {
+                    this.existecliente = 0;
+                }
+            })
+        },
+        closeMoodalCliente: function(){
+            this.isOpenCliente = false;
+            //this.reset();
+            this.editMode = false;
+            this.verMode  = false;
+            this.$page.props.errors = [];
+        },
+        onSelectCliente: function(data){
+            this.form.cliente.id = data;
+            this.isNewCliente = false;
+            this.pushSessionDetailClient(this.session.id, this.form.cliente.id, 'upd');
+        },
+        crearCliente: function (){
+            this.isCliente = true;
+            this.isNewCliente = true;
+            this.form.cliente = []
+            this.form.cliente.idpais = 1;
+            this.form.cliente.iddepartamento = 0;
+            this.form.cliente.idciudad = 0;
+            this.form.cliente.idtipos_documento = 1;
+            this.form.metacliente = null;
+        },
+        saveCliente: function(data) {
+            var formData = new FormData();
+            formData.append('nombre', this.form.cliente.nombre);
+            formData.append('apellido', '');
+            formData.append('username', this.form.cliente.documento);
+            formData.append('idrol', 2);
+            formData.append('estado', 1);
+            formData.append('idtipos_documento', 1);
+            formData.append('documento', this.form.cliente.documento);
+            formData.append('movil', this.form.cliente.movil);
+            formData.append('isnatural', 1);
+            formData.append('idempresa', 3);
+            formData.append('idsesion', this.session.id)
+
+            /*
+            params: {
+                    nombre: this.form.cliente.nombre,
+                    username: this.form.cliente.documento,
+                    documento: this.form.cliente.documento,
+                    idrol: 2,
+                    movil: this.form.cliente.movil,
+                    idsesion: this.session.id,
+                    idtipos_documento: 1
+
+                }
+             */
+
+            axios.post('/users/storeCliente', formData)
+                .then((res) => {
+                    console.log('Se creo cliente');
+                    var respuesta = res.data;
+                    this.onSelectCliente(respuesta.cliente.id);
+                    this.idpreferencia = respuesta.idpreferencia;
+                    this.urlpago = respuesta.urlpago;
+                    console.log("Validar pago id " + this.idpreferencia);
+                    console.log("Finish cliente - preparepay");
+                    return true;
+                }).catch(function (error) {
+                    console.log(error);
+                }).finally(() => {
+                    console.log("Finish cliente - preparepay");
+                    //this.preparePay();
+                    return true;
+                });
+
+            /*
+            this.$inertia.post('/users/storeCliente', formData, {
+                onBefore: (visit) => { console.log('onBefore');},
+                onStart: (visit) => {console.log('onStart');},
+                onProgress: (progress) => {console.log('onProgress');},
+                onSuccess: (res) => {
+                    console.log('Se creo cliente');
+                    var respuesta = res.data;
+                    this.onSelectCliente(respuesta.cliente.id);
+                    this.idpreferencia = respuesta.idpreferencia;
+                    this.urlpago = respuesta.urlpago;
+                    console.log("Validar pago id " + this.idpreferencia);
+                },
+                onError: (errors) => {console.log('onError');},
+                onCancel: () => {console.log('onCancel');},
+                onFinish: visit => {console.log('onFinish'); return true},
+            });
+            */
+        },
+        reset: function () {
+            this.tituloModal = 'Crear nueva reserva';
+            this.form.id = null;
+            this.form.idrifa = 0;
+            this.form.numero = null;
+            this.form.estado = false;
+            this.form.rangoinicial = null;
+            this.form.rangofinal = null;
+            this.form.idvendedor = 0;
+            this.form.idcliente = 0;
+            this.form.fecha = null;
+        },
+        ver: function (data) {
+            this.verMode = true;
+            this.openModal('ver', data);
+        },
+        getData: async function (buscar = '', filtro = 'nombre', paginate = true) {
+
+            var url= '/ventas';
+            axios.get(url, {
+                params: {
+                    buscar: buscar,
+                    filtro: filtro,
+                    paginate: paginate,
+                    ispage: true,
+                }
+            }).then((res) => {
+                console.log(res.data);
+                var respuesta = res.data;
+                this.arrayData = respuesta.data;
+
+                if (this.arrayData.data.length > 0) {
+                    this.existedata = 1;
+                } else {
+                    this.existedata = 0;
+                }
+            })
+        },
+
+        onValidateRifa: function(isValid, tabIndex){
+            /*
+            console.log('Termino validar rifa, se registrar cart '+ tabIndex);
+            switch (tabIndex) {
+                case 0:
+                    this.isBussyCart = 0;
+                    axios.get('/cart/validarId', {
+                        params: {
+                            iditem: this.boleta.id
+                        }
+                    }).then((res) => {
+                        console.log('bol id' + this.boleta.id);
+                        console.log('cart ' + res.data.cart);
+                        console.log('object ' + Object.keys(res.data).length);
+                        this.isBussyCart = res.data.cart;
+
+                        console.log('isbussy' + this.isBussyCart);
+                        if (this.form.boleta.idrifa && this.form.boleta.numero && this.isBussyCart == 0)
+                        {
+                            this.form.boleta.idrifa = this.form.idrifa.id;
+                            this.form.boleta.id     = this.boleta.id;
+                            this.form.boleta.valor  = this.form.idrifa.precio;
+                            this.form.boleta.rifa   = this.form.idrifa.nombre_tecnico;
+                            this.form.boleta.cantidad = 1;
+                            this.form.boleta.url    = this.form.idrifa.urlimagen1;
+                            const data              = {};
+                            data.id = this.form.boleta.id;
+                            data.name = this.form.boleta.rifa;
+                            data.price = this.form.boleta.valor;
+                            data.quantity = this.form.boleta.cantidad;
+                            data.url = this.form.boleta.url;
+                            data.serie = this.form.idrifa.serie;
+                            data.descripcion = this.form.idrifa.titulo;
+                            data.idrifa = this.form.idrifa.id;
+                            data.numero = this.form.boleta.numero;
+                            data.codigo = this.boleta.codigo;
+                            console.log(data);
+
+                            this.$inertia.post('/cart', data, {
+                                onBefore: (visit) => { console.log('onBefore');},
+                                onStart: (visit) => {console.log('onStart');},
+                                onProgress: (progress) => {console.log('onProgress');},
+                                onSuccess: (page) => {
+                                    Swal.fire({
+                                        icon: 'success',
+                                        title: 'La boleta se ha agregado al carrito de compras',
+                                        showConfirmButton: true,
+                                        timer: 1500
+                                    })
+                                    this.getCart();
+                                },
+                                onError: (errors) => {console.log('onError');},
+                                onCancel: () => {console.log('onCancel');},
+                                onFinish: visit => {console.log('onFinish');},
+                            });
+                        } else {
+                            console.log('error de validacion');
+                        }
+                    })
+                    break;
+                case 1:
+                    console.log('Se valida cliente');
+                    break;
+                case 2:
+                    console.log('Se valida pago');
+                    break;
+            }
+            */
+        },
+        validateRifa:function() {
+            console.log('Validando Rifa');
+            /*
+            if (Object.keys(this.cart).length > 0) {
+                return true;
+            }
+             */
+            if (!this.form.idrifa.id || this.form.idrifa.id == 0) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Primero debe seleccionar una rifa',
+                    showConfirmButton: true,
+                })
+                return false;
+            }
+            if (this.form.reservas.length == 0) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Seleccione un número de boleta',
+                    showConfirmButton: true,
+                })
+                return false;
+            }
+
+            return true;
+        },
+        delCartItem: async function(data) {
+            data._method = 'DELETE';
+            var url = '/cart';
+            axios.delete(url, { data: { id: data.id }}
+            ).then((res) => {
+                console.log(res.data);
+                var respuesta = res.data;
+                this.cart = respuesta.cart;
+            })
+
+            data._method = 'DELETE';
+            this.$inertia.post('/cart/'  + data.id, data, {
+                onBefore: (visit) => { console.log('onBefore');},
+                onStart: (visit) => {console.log('onStart');},
+                onProgress: (progress) => {console.log('onProgress');},
+                onSuccess: (page) => {
+                    Swal.fire({
+                        position: 'top-end',
+                        icon: 'success',
+                        title: 'Se ha eliminado el artículo del carrito',
+                        showConfirmButton: false,
+                        timer: 1500
+                    })
+                    this.getCart();
+                },
+                onError: (errors) => {console.log('onError');},
+                onCancel: () => {console.log('onCancel');},
+                onFinish: visit => {console.log('onFinish');},
+            });
+        },
+        onError:function(error){
+            console.log('error ?' + error)
+        },
+        validateCheckout: function() {
+            console.log('Validando checkout');
+            if (this.form.cliente.nombre == '' || this.form.cliente.nombre === null ||
+                this.form.cliente.documento == '' || this.form.cliente.documento === null ||
+                this.form.cliente.movil == '' || this.form.cliente.movil === null) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Ingrese los datos del cliente',
+                    showConfirmButton: true,
+                })
+                return false;
+            } else {
+                this.saveCliente(this.form.cliente);
+                return true;
+            }
+        },
+        preparePay: function() {
+            let status = false;
+            var url= '/ventas/preparePay';
+            axios.get(url, {
+                params: {
+                    idsesion: this.session.id
+                }
+            }).then((res) => {
+                var respuesta = res.data;
+                this.idpreferencia = respuesta.idpreferencia;
+                this.urlpago = respuesta.urlpago;
+                console.log("Validar pago id " + this.idpreferencia);
+            }).finally(() => {
+                console.log("Finish cliente");
+                status = true;
+            })
+
+            return status;
+        },
+        validatePago:function() {
+            if (this.urlpago) {
+                window.location.href = this.urlpago;
+            }
+        },
+        onValidateCliente: function(isValid, tabIndex){
+            console.log('registrar cart');
+            //if (!this.cart) {
+                if (isValid) {
+                    this.form.boleta.idrifa = this.form.idrifa.id;
+                    this.form.boleta.id = this.boleta.id;
+                    this.form.boleta.valor = this.form.idrifa.precio;
+                    this.form.boleta.rifa = this.form.idrifa.nombre_tecnico;
+                    this.form.boleta.cantidad = 1;
+                    this.form.boleta.url = this.form.idrifa.urlimagen1;
+                    const data = {};
+                    data.id = this.form.boleta.id;
+                    data.name = this.form.boleta.rifa;
+                    data.price = this.form.boleta.valor;
+                    data.quantity = this.form.boleta.cantidad;
+                    data.url = this.form.boleta.url;
+                    data.serie = this.form.idrifa.serie;
+                    data.descripcion = this.form.idrifa.titulo;
+                    data.idrifa = this.form.idrifa.id;
+                    data.numero = this.form.boleta.numero;
+                    console.log(data);
+
+                    this.$inertia.post('/cart', data, {
+                        onBefore: (visit) => { console.log('onBefore');},
+                        onStart: (visit) => {console.log('onStart');},
+                        onProgress: (progress) => {console.log('onProgress');},
+                        onSuccess: (page) => {
+                            Swal.fire({
+                                //position: 'top-end',
+                                icon: 'success',
+                                title: 'La boleta se ha agregado al carrito de compras',
+                                showConfirmButton: true,
+                                timer: 1500
+                            })
+                            this.getCart();
+                        },
+                        onError: (errors) => {console.log('onError');},
+                        onCancel: () => {console.log('onCancel');},
+                        onFinish: visit => {console.log('onFinish');},
+                    });
+                } else {
+                    console.log('error de validacion');
+                }
+            //}
+        },
+        validateCliente:function() {
+            console.log('Validando info');
+
+            if (this.cart) {
+                 return true;
+            }
+
+            if (!this.form.boleta.idrifa) {
+                Swal.fire({
+                    //position: 'top-end',
+                    icon: 'error',
+                    title: 'Primero debe seleccionar una rifa',
+                    showConfirmButton: true,
+                    //timer: 1500
+                })
+                return false;
+            }
+            if (!this.form.boleta.numero) {
+                Swal.fire({
+                    //position: 'top-end',
+                    icon: 'error',
+                    title: 'Seleccione un número de boleta',
+                    showConfirmButton: true,
+                    //timer: 1500
+                })
+                return false;
+            }
+
+            console.log('validate ok');
+            return true;
+        },
+        valBoletaDisponible: function (numero, rifa, idvendedor, idcliente){
+            if(!this.form.idrifa.id) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Primero debe seleccionar una rifa',
+                    showConfirmButton: true,
+                    //timer: 1500
+                })
+            } else if(this.form.reserva.numero == '') {
+                Swal.fire({
+                    //position: 'top-end',
+                    icon: 'warning',
+                    title: 'Ingrese un número válido',
+                    showConfirmButton: true,
+                    //timer: 1500
+                })
+            } else {
+                if (this.asignarMode) {
+                    var url = '/numerosreservados/getBoletaOcupadaVenta';
+                } else if (this.eliminarMode) {
+                    var url = '/numerosreservados/getBoletaVendida';
+                }
+                axios.get(url, {
+                    params: {
+                        numero: numero,
+                        rifa: rifa,
+                        idvendedor: idvendedor,
+                        idcliente: idcliente
+                    }
+                }).then((res) => {
+                    //console.log(res.data);
+                    var respuesta = res.data;
+                    let isocupado = respuesta.isocupado;
+                    if (isocupado) {
+                        this.form.reservas.push({
+                            numero: respuesta.boleta.numero,
+                            promocional: respuesta.boleta.promocional,
+                            valortotal: respuesta.boleta.valor,
+                            valorpagar: respuesta.boleta.saldo,
+                            valorsaldo: respuesta.boleta.saldo,
+                            valoranular: respuesta.boleta.pago,
+                            valorpagado: respuesta.boleta.pago,
+                            idcliente: respuesta.boleta.idcliente,
+                            cliente: respuesta.boleta.cliente?respuesta.boleta.cliente.full_name:'',
+                        });
+                        this.form.reserva.numero = null;
+                        this.form.reserva.promocional = null;
+                        this.pushSessionDetail(this.session.id, respuesta.boleta, 'add');
+                    } else {
+                        Swal.fire({
+                            //position: 'top-end',
+                            icon: 'warning',
+                            title: 'El número no se puede utilizar',
+                            showConfirmButton: true,
+                            //timer: 1500
+                        })
+                    }
+                })
+            }
+        },
+        eliminarReserva: function(boleta, index){
+            this.form.reservas.splice(index, 1);
+            this.pushSessionDetail(this.session.id, boleta, 'del');
+        },
+
+    },
+    created: function () {
+    },
+    mounted() {
+        this.form.idvendedor = this.vendedor;
+        this.registrarSessionVenta(this.caja.puntoventa.id, this.rifa.id, this.form.idvendedor.id, this.tipoventa);
+        this.form.idrifa = this.rifa;
+    },
+}
+</script>
+
+
+<style>
+* {
+    margin: 0;
+    padding: 0;
+}
+fieldset label span {
+    min-width: 125px;
+}
+fieldset .select::after {
+    content: '';
+    position: absolute;
+    width: 9px;
+    height: 5px;
+    right: 20px;
+    top: 50%;
+    margin-top: -2px;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='9' height='5' viewBox='0 0 9 5'><title>Arrow</title><path d='M.552 0H8.45c.58 0 .723.359.324.795L5.228 4.672a.97.97 0 0 1-1.454 0L.228.795C-.174.355-.031 0 .552 0z' fill='%23CFD7DF' fill-rule='evenodd'/></svg>");
+    pointer-events: none;
+}
+</style>
