@@ -53,7 +53,7 @@
                                                 <div class="container flex justify-center items-center">
                                                     <div class="pt-1">
                                                         <div class="top-4 left-3">
-                                                            <money3 v-bind="configMoney2" v-model="form.reserva.numero" class="text-3xl border-0 text-center h-8 w-1/8 pl-2 pr-2 rounded-lg z-0 focus:shadow focus:outline-none"></money3>
+                                                            <money3 v-bind="configMoney2" v-model="form.reserva.numero" class="text-3xl border-0 text-center w-1/8 pl-2 pr-2 rounded-lg z-0 focus:shadow focus:outline-none"></money3>
                                                         </div>
                                                         <span class="text-xs">
                                                             Digite el número de la boleta
