@@ -1144,12 +1144,13 @@ class VentaController extends Controller
 
     public function sendSmsSales(Request $request) {
         $id = $request->id;
-
         $detalle = Detalleventa::where('id', $id)
                               ->with('cliente')
                               ->with('boleta')
                               ->first();
         $to = "57".$detalle->cliente->movil;//"573155665528";
+
+        $rifa = Rifa::where('id', $detalle->idrifa)->first();
 
         $saldo = $detalle->boleta->saldo;
         $saldotxt = '';
@@ -1163,7 +1164,10 @@ class VentaController extends Controller
         SendSMSJob::dispatch($to, $message);
         if ($saldo == 0) {
             //$message = "Conserva este mensaje de paz y salvo valido para reclamar el premio mayor: Apto Plaza Robles, Camioneta mazda y Tour resolucion EDSA N 999 premio mayor ".$detalle->boleta->numero." y promocional ".$detalle->boleta->promocional.". Sorteo miercoles 21 de diciembre de 2022 con el premio mayor de la loteria de manizales";
-            $message = "Conserva este mensaje de paz y salvo valido para reclamar el premio mayor: Apto Icaru, Camioneta mazda CX5 y Viaje resolucion EDSA N 999 premio mayor ".$detalle->boleta->numero." y promocional ".$detalle->boleta->promocional.". Sorteo miercoles 5 de julio de 2023 con el premio mayor de la loteria de manizales";
+            //$message = "Conserva este mensaje de paz y salvo valido para reclamar el premio mayor: Apto Icaru, Camioneta mazda CX5 y Viaje resolucion EDSA N 999 premio mayor ".$detalle->boleta->numero." y promocional ".$detalle->boleta->promocional.". Sorteo miercoles 5 de julio de 2023 con el premio mayor de la loteria de manizales";
+
+            $message = str_replace('%mayor%', $detalle->boleta->numero, $rifa->resumen);
+            $message = str_replace('%promocional%', $detalle->boleta->promocional, $message);
 
             //$this->sendSMS($to, $message);
             SendSMSJob::dispatch($to, $message);
@@ -1807,7 +1811,11 @@ class VentaController extends Controller
                 if ($saldo == 0) {
                     $urlboleta = url('storage').'/boletas/boleta_'.$boleta->idrifa.$boleta->codigo.'.pdf';
                     //$mensaje = "Conserva este mensaje de paz y salvo valido para reclamar el premio mayor: Apto Robles, Camioneta mazda y Tour resolucion EDSA N 999 premio mayor $boleta->numero y promocional $boleta->promocional. Sorteo miercoles 21 de diciembre de 2022 con el premio mayor de la loteria de manizales. Boleta: $urlboleta";
-                    $message = "Conserva este mensaje de paz y salvo valido para reclamar el premio mayor: Apto Icaru, Camioneta mazda CX5 y Viaje resolucion EDSA N 999 premio mayor $boleta->numero y promocional $boleta->promocional. Sorteo miercoles 5 de julio de 2023 con el premio mayor de la loteria de manizales. Boleta: $urlboleta";
+                    //$message = "Conserva este mensaje de paz y salvo valido para reclamar el premio mayor: Apto Icaru, Camioneta mazda CX5 y Viaje resolucion EDSA N 999 premio mayor $boleta->numero y promocional $boleta->promocional. Sorteo miercoles 5 de julio de 2023 con el premio mayor de la loteria de manizales. Boleta: $urlboleta";
+
+                    $rifa = Rifa::where('id', $boleta->idrifa)->first();
+                    $message = str_replace('%mayor%', $boleta->numero, $rifa->resumen);
+                    $message = str_replace('%promocional%', $boleta->promocional, $message);
                     $this->sendSMS($to, $mensaje);
                 }
             }
@@ -1964,7 +1972,10 @@ class VentaController extends Controller
             $this->sendSMS($to, $message);
             if ($saldo == 0) {
                 //$mensaje = "Conserva este mensaje de paz y salvo valido para reclamar el premio mayor: Apto Robles, Camioneta mazda y Tour resolucion EDSA N 999 premio mayor $boleta->numero y promocional $boleta->promocional. Sorteo miercoles 21 de diciembre de 2022 con el premio mayor de la loteria de manizales";
-                $message = "Conserva este mensaje de paz y salvo valido para reclamar el premio mayor: Apto Icaru, Camioneta mazda CX5 y Viaje resolucion EDSA N 999 premio mayor $boleta->numero y promocional $boleta->promocional. Sorteo miercoles 5 de julio de 2023 con el premio mayor de la loteria de manizales";
+                //$message = "Conserva este mensaje de paz y salvo valido para reclamar el premio mayor: Apto Icaru, Camioneta mazda CX5 y Viaje resolucion EDSA N 999 premio mayor $boleta->numero y promocional $boleta->promocional. Sorteo miercoles 5 de julio de 2023 con el premio mayor de la loteria de manizales";
+                $rifa = Rifa::where('id', $boleta->idrifa)->first();
+                $message = str_replace('%mayor%', $boleta->numero, $rifa->resumen);
+                $message = str_replace('%promocional%', $boleta->promocional, $message);
                 $this->sendSMS($to, $mensaje);
             }
         }

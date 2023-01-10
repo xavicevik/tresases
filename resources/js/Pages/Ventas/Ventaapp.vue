@@ -12,7 +12,7 @@
                         <section v-if="loading">
                             <!-- validateRifa <form> -->
                             <div class="bg-white pb-1 mx-auto items-center w-full">
-                                <div class=""> 
+                                <div class="">
                                     <!-- Formulario -->
                                     <section>
                                         <div class="absolute mt-10 w-full" id="app">
@@ -27,7 +27,7 @@
                         <section v-if="saleState == 'detalle'">
                             <!-- validateRifa <form> -->
                             <div class="bg-white pb-1">
-                                <div class=""> 
+                                <div class="">
                                     <!-- Mensajes Flash -->
 
                                     <!-- Fin Mensajes Flash -->
@@ -39,7 +39,7 @@
                                             </vue-countdown>
                                         </div>
                                         <div class="py-2">
-                                            <img v-show="form.idrifa.urlimagen1 != null" :src="'/storage/'+form.idrifa.urlimagen1" alt="image" class="mx-auto w-10/12 h-20"/>
+                                            <img v-show="form.idrifa.urlimagen1 != null" :src="'/storage/'+form.idrifa.urlimagen1" alt="image" class="mx-auto w-10/12"/>
                                         </div>
 
                                         <div class="py-2 text-xs">
@@ -48,13 +48,16 @@
 
                                         <div class="py-1">
                                             <div class="mb-4 w-full pr-2 text-center">
-                                                <label class="block text-gray-700 text-sm text-center mx-auto font-bold mb-2">Premio Mayor</label>
+                                                <label class="block text-gray-700 text-xl text-center mx-auto font-bold mb-2">Premio Mayor</label>
 
                                                 <div class="container flex justify-center items-center">
                                                     <div class="pt-1">
                                                         <div class="top-4 left-3">
                                                             <money3 v-bind="configMoney2" v-model="form.reserva.numero" class="text-3xl border-0 text-center h-8 w-1/8 pl-2 pr-2 rounded-lg z-0 focus:shadow focus:outline-none"></money3>
                                                         </div>
+                                                        <span class="text-xs">
+                                                            Digite el número de la boleta
+                                                        </span>
                                                     </div>
                                                 </div>
                                                 <div class="inline-flex pt-3">
@@ -78,7 +81,7 @@
                                                         Número
                                                     </div>
                                                     <div class="w-3/12">
-                                                        Promocional
+                                                        Promo
                                                     </div>
                                                     <div class="w-4/12 px-1">
                                                         Valor
@@ -364,7 +367,7 @@ C40.68628,22,38,19.31372,38,16z"/>
                                 </div>
                             </div>
                         </section>
-                        
+
                     <div v-if="isComplete" class="flex items-center justify-center p-5 bg-blue-100 min-w-screen">
                         <div class="max-w-xl p-8 text-center text-gray-800 bg-white shadow-xl lg:max-w-3xl rounded-3xl lg:p-12">
                             <h3 class="text-2xl">Gracias por compra en Shoppingred!</h3>
@@ -628,6 +631,62 @@ C40.68628,22,38,19.31372,38,16z"/>
                     </section>
                     <!-- Fin Ventana modal buscar cliente -->
 
+                    <!-- Ventana modal Inicio-->
+                    <section>
+                        <div class="fixed z-10 inset-0 overflow-y-auto ease-out duration-400" v-if="isStart">
+                            <div class="h-full border-2 border-black items-end justify-center py-2 px-2 text-center sm:block sm:p-0">
+
+                                <!-- This element is to trick the browser into centering the modal contents. -->
+                                <span class="hidden sm:inline-block sm:align-middle sm:h-screen"></span>
+
+                                <!-- Contenido modal -->
+                                <div class="inline-block w-full h-full align-bottom bg-gray-200 rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:w-full" role="dialog" aria-modal="true" aria-labelledby="modal-headline">
+                                    <section>
+                                        <div class="mx-auto p-2">
+                                            <div class="items-center justify-start md:justify-center pt-5 px-3 border-none">
+                                                <a href="https://dllo.shoppingred.com.co/web/">
+                                                    <img class="h-8/12 mx-auto rounded-md overflow-hidden" src="/storage/img/logo_fondo.jpg" />
+                                                </a>
+                                            </div>
+                                            <div class=" items-center justify-center px-3 pt-10 border-none">
+                                                    <img v-show="form.idrifa.urlimagen1 != null" :src="'/storage/'+form.idrifa.urlimagen1" alt="image" class="mx-auto w-1/2"/>
+                                            </div>
+                                            <div class="inline-flex items-center justify-center h-10 px-3 pt-10 border-none">
+                                                <input type="checkbox" v-model="acceptTermns" value="1" class="px-2 w-6 h-6 text-red-600 rounded border-red-600 focus:ring-red-500 focus:ring-2">
+                                                <span class="mx-2">
+                                                    <a href="/terms-of-service" target="_blank">
+                                                        <span class="ml-2 text-blue-600 hover:underline">
+                                                            Acepta términos y condiciones
+                                                        </span>
+                                                    </a>
+                                                </span>
+                                            </div>
+                                            <div class="inline-flex items-center justify-center h-10 px-3 pt-10 border-none">
+                                                <input type="checkbox" v-model="acceptPrivacy" value="1" class="px-2 w-6 h-6 text-red-600 rounded border-red-600 focus:ring-red-500 focus:ring-2">
+                                                <span class="mx-2">
+                                                    <a href="/privacy-policy" target="_blank">
+                                                        <span class="ml-2 text-blue-600 hover:underline">
+                                                            Acepta política de tratamiento de datos personales
+                                                        </span>
+                                                    </a>
+                                                </span>
+                                            </div>
+                                            <div class="text-center p-2 mx-auto">
+                                                <button type="button" @click="iniciar()" :disabled="(!acceptTermns || !acceptPrivacy)" :class="{'bg-red-600 hover:bg-red-800':(acceptTermns && acceptPrivacy), 'bg-gray-300':(!acceptTermns || !acceptPrivacy)}" class="text-white font-medium rounded-lg text-sm px-2 py-2 text-center inline-flex items-center">
+                                                    Iniciar
+                                                </button>
+                                            </div>
+
+                                        </div>
+                                    </section>
+                                    <!-- Fin Encabezado y titulo -->
+                                </div>
+                                <!-- Fin Contenido modal -->
+                            </div>
+                        </div>
+                    </section>
+                    <!-- Fin Ventana modal Inicio -->
+
                 </div>
             </div>
         </div>
@@ -667,12 +726,14 @@ import VueQrcode from '@chenfengyuan/vue-qrcode';
 import VueCountdown from '@chenfengyuan/vue-countdown';
 
 import { SemipolarSpinner } from 'epic-spinners'
+import Input from "../../Jetstream/Input";
 
 
 export default {
     name: 'App',
 
     components: {
+        Input,
         Submenu,
         Button,
         AppLayout,
@@ -687,7 +748,7 @@ export default {
         VueQrcode,
         ThemifyIcon,
         VueCountdown,
-        SemipolarSpinner 
+        SemipolarSpinner
     },
     props:{
         username: null,
@@ -744,6 +805,9 @@ export default {
     data() {
         return {
             loading: false,
+            isStart: true,
+            acceptTermns: false,
+            acceptPrivacy: false,
             saleState: 'detalle',
             time: 2 * 60 * 1000,
             idpreferencia: 0,
@@ -1170,7 +1234,7 @@ export default {
 
                     }
             */
-            let res;   
+            let res;
             try {
                 res = await axios.post('/users/storeCliente', formData);
             } catch (error) {
@@ -1307,7 +1371,7 @@ export default {
                         this.saleState = 'detalle';
                     }
                     this.loading = false;
-                    break;                
+                    break;
                 case 'checkout':
                     result = await this.validateCheckout();
                     if (result) {
@@ -1329,7 +1393,7 @@ export default {
         volver: function (state) {
             this.loading = true;
             let result = false;
-            switch (state) {               
+            switch (state) {
                 case 'checkout':
                     this.saleState = 'detalle';
                     this.loading = false;
@@ -1386,7 +1450,7 @@ export default {
                     return true;
                 } else {
                     return false;
-                }        
+                }
             }
         },
         preparePay: function() {
@@ -1554,6 +1618,12 @@ export default {
             this.pushSessionDetail(this.session.id, boleta, 'del');
         },
 
+        iniciar: async function () {
+            if (this.acceptTermns && this.acceptPrivacy) {
+                this.isStart = false;
+            }
+        }
+
     },
     // created para acceder a datos del API Rest
     created: function () {
@@ -1563,8 +1633,8 @@ export default {
         this.form.idrifa = this.rifa;
     },
     // Mounted cuando ya ha cargado todo los componentes
-    mounted() {  
-        //this.loading = false;      
+    mounted() {
+        //this.loading = false;
     },
     beforeCreate() {
         console.log('No se ha ejecutado nada todavía')

@@ -652,9 +652,6 @@ export default {
                 }
                 case 'ver': {
                     this.tituloModal = 'Ver Usuario ' + data['username'];
-                    this.form.idpais = data['idpais'];
-                    this.form.iddepartamento = data['iddepartamento'];
-                    this.form.idciudad = data['idciudad'];
                     this.form.idtipos_documento = data['idtipos_documento'];
                     this.form.idrol = data['idrol'];
                     this.form.idempresa = data['idempresa'];
@@ -668,8 +665,11 @@ export default {
                     this.form.telefono = data['telefono'];
                     this.getRoles();
                     this.getPaises();
-                    this.getCiudades();
+                    this.form.idpais = data['idpais'];
                     this.getDepartamentos();
+                    this.form.iddepartamento = data['iddepartamento'];
+                    this.getCiudades();
+                    this.form.idciudad = data['idciudad'];
                     this.getTiposdocumento();
                     this.getEmpresas();
                     this.newMode = false;
@@ -681,9 +681,6 @@ export default {
                 case 'actualizar': {
                     this.form.id = data['id'];
                     this.tituloModal = 'Actualizar Usuario ' + data['username'];
-                    this.form.idpais = data['idpais'];
-                    this.form.iddepartamento = data['iddepartamento'];
-                    this.form.idciudad = data['idciudad'];
                     this.form.idtipos_documento = data['idtipos_documento'];
                     this.form.idrol = data['idrol'];
                     this.form.idempresa = data['idempresa'];
@@ -697,14 +694,16 @@ export default {
                     this.form.telefono = data['telefono'];
                     this.getRoles();
                     this.getPaises();
-                    this.getCiudades();
+                    this.form.idpais = data['idpais'];
                     this.getDepartamentos();
+                    this.form.iddepartamento = data['iddepartamento'];
+                    this.getCiudades();
+                    this.form.idciudad = data['idciudad'];
                     this.getTiposdocumento();
                     this.getEmpresas();
                     this.newMode = false;
                     this.verMode = false;
                     this.editMode = true;
-                    break;
                     break;
                 }
 

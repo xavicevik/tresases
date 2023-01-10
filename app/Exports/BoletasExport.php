@@ -31,10 +31,9 @@ class BoletasExport implements FromCollection, WithHeadings, ShouldAutoSize
                         ->leftJoin('vendedors as t1', 'boletas.idvendedor', '=', 't1.id')
                         ->leftJoin('clientes as t2', 'boletas.idcliente', '=', 't2.id')
                         ->leftJoin('estados', 'boletas.estado', '=', 'estados.id');
-
         if (!is_null($filtros)) {
             if(!is_null($filtros->rifa) && $filtros->rifa <> '' && $filtros->rifa <> 0) {
-                $boletas = $boletas->where('rifas.titulo', 'like', '%'.$filtros->rifa.'%');
+                $boletas = $boletas->where('rifas.id', $filtros->rifa);
             }
 
             if(!is_null($filtros->numero) && $filtros->numero <> '' && $filtros->numero <> 0) {
@@ -58,6 +57,7 @@ class BoletasExport implements FromCollection, WithHeadings, ShouldAutoSize
             }
             //$queries = DB::getQueryLog();
         }
+
         return $boletas->select('rifas.titulo as rifa',
                                 'boletas.numero as numero',
                                 'boletas.promocional as promocional',

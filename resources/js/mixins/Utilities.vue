@@ -115,48 +115,47 @@ export default {
         dateTimeFull(value) {
             return moment(value).format('YYYY-MM-DD HH:MM:SS');
         },
-        getLoterias: function () {
-            axios.get('/loterias',).then((res) => {
-                this.arrayLoterias = res.data.loterias;
-            })
+        getLoterias: async function () {
+            let res = await axios.get('/loterias');
+            this.arrayLoterias = res.data.loterias;
         },
-        getTerminos: function () {
-            axios.get('/terminos',).then((res) => {
-                this.arrayTerminos = res.data.terminos;
-            })
+        getTerminos: async function () {
+            let res = await axios.get('/terminos');
+            this.arrayTerminos = res.data.terminos;
         },
-        getPaises: function () {
-            axios.get('/paises',).then((res) => {
-                this.arrayPaises = res.data.paises;
-            })
+        getPaises: async function () {
+            console.log('consulta paises');
+            try {
+                let res = await axios.get('/paises');
+                this.arrayPaises = await res.data.paises;
+            } catch (error) {
+                console.log('error');
+            }
         },
-        getDepartamentos: function () {
-            axios.get('/paises/departamentos', {
+        getDepartamentos: async function () {
+            let res = await axios.get('/paises/departamentos', {
                 params: {
                     idpais: this.form.idpais
                 }
-            }).then((res) => {
-                this.arrayDepartamentos = res.data.departamentos;
             })
+            this.arrayDepartamentos = res.data.departamentos;
         },
-        getEmpresas: function () {
-            axios.get('/master/getEmpresas', {
+        getEmpresas: async function () {
+            let res = await axios.get('/master/getEmpresas', {
                 params: {
                     idrol: this.form.idrol
                 }
-            }).then((res) => {
-                this.arrayEmpresas = res.data.data;
             })
+            this.arrayEmpresas = res.data.data;
         },
-        getCiudades: function () {
-            axios.get('/paises/ciudades', {
+        getCiudades: async function () {
+            let res = await axios.get('/paises/ciudades', {
                 params: {
                     idpais: this.form.idpais,
                     iddepartamento: this.form.iddepartamento
                 }
-            }).then((res) => {
-                this.arrayCiudades = res.data.ciudades;
             })
+            this.arrayCiudades = res.data.ciudades;
         },
         getTiposdocumento: function () {
             axios.get('/master/tiposdocsearch',).then((res) => {
@@ -165,12 +164,11 @@ export default {
         },
         getRoles: async function () {
             var url= '/master/getRoles';
-            axios.get(url).then((res) => {
-                var respuesta = res.data;
-                this.arrayRoles = respuesta.data;
-            })
+            let res = await axios.get(url);
+            var respuesta = res.data;
+            this.arrayRoles = respuesta.data;
         },
-        getClientes: async function (buscar = '', filtro = 'documento', paginate = false) {
+        getClientes: function (buscar = '', filtro = 'documento', paginate = false) {
             var url= '/users/getClientesActivos';
             axios.get(url, {
                 params: {
@@ -183,7 +181,7 @@ export default {
                 this.arrayClientes = respuesta.clientes;
             })
         },
-        showClient: async function (id) {
+        showClient: function (id) {
             var url= '/users/cliente/' + id;
             axios.get(url).then((res) => {
                 var respuesta = res.data;

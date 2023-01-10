@@ -665,7 +665,7 @@ class UserController extends Controller
         $rol = Role::where('id', $user->idrol)->first();
         $user->syncRoles($rol);
 
-        return redirect()->back()->with('message', 'Usuario modificado satisfactoriamente');
+        return redirect()->back()->with('message', 'Vendedor modificado satisfactoriamente');
     }
 
     public function updateCliente(Request $request, Cliente $cliente)

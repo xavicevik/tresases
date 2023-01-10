@@ -12,13 +12,15 @@ import { usePage } from '@inertiajs/inertia-vue3'
 defineProps({
     canResetPassword: Boolean,
     status: String,
+    username: String,
+    password: String,
     puntoventas: [],
     _token: String
 });
 
 const form = useForm({
-    username: '',
-    password: '',
+    username: usePage().props.value.username,
+    password: usePage().props.value.password,
     remember: false,
     puntodeventa: 0,
     _token: usePage().props.value._token,

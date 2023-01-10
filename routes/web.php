@@ -198,6 +198,9 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'),'verified',]
         Route::get('/master/tiposdocsearch', [MasterController::class, 'tipodocSearch'])->name('master.tiposdocsearch');
         Route::get('/enviar', [EmailController::class, 'send'])->name('enviar');
         Route::get('/detalleventa', [EmailController::class, 'send'])->name('detalleventa');
+        Route::resource('paises', PaisController::class);
+        Route::get('/paises/departamentos', [PaisController::class, 'departamentos']);
+        Route::get('/paises/ciudades', [PaisController::class, 'ciudades']);
 
         // Reportes
         Route::get('/reportes', [ReporteController::class, 'index'])->name('reportes.index');

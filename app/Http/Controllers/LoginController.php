@@ -121,7 +121,7 @@ class LoginController extends Controller
             $request->session()->regenerate();
             $request->session()->push('puntodeventa', $request['puntodeventa']);
 
-            return redirect()->intended('dashboard');
+            return redirect()->intended('/ventas');
         }
 
         return back()->withErrors([
