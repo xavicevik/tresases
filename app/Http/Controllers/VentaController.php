@@ -1476,12 +1476,16 @@ class VentaController extends Controller
         }
 
         if ($request->type == 'del') {
+            $boleta = Boleta::join('detallesesion', 'boletas.id', '=', 'detallesesion.idboleta')
+                              ->where('detallesesion.idsesionventa', $idsesion)
+                              ->where('boletas.numero', $boletaupd->numero)
+                              ->first();
+
             $detalle = Detallesesion::join('boletas', 'boletas.id', '=', 'detallesesion.idboleta')
                                      ->where('detallesesion.idsesionventa', $idsesion)
                                      ->where('boletas.numero', $boletaupd->numero)
                                      ->delete();
 
-            $boleta = Boleta::where('numero', $boletaupd->numero)->first();
             $boleta->estado = $boleta->estado_ant;
             $boleta->save();
         }
