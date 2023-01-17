@@ -1438,67 +1438,57 @@ class VentaController extends Controller
     }
 
     public function updDetailSession(Request $request) {
+        try {
+            DB::beginTransaction();
 
-        $boletaupd = json_decode($request->boleta);
-        $idsesion  = $request->idsesion;
+            $boletaupd = json_decode($request->boleta);
+            $idsesion  = $request->idsesion;
 
-        if ($request->type == 'add') {
-            $detalle = new Detallesesion();
-            $detalle->idsesionventa = $idsesion;
-            $detalle->idboleta = $boletaupd->id;
-            $detalle->valor = $boletaupd->saldo;
-            $detalle->idcliente = $boletaupd->idcliente;
-            $detalle->save();
+            if ($request->type == 'add') {
+                $detalle = new Detallesesion();
+                $detalle->idsesionventa = $idsesion;
+                $detalle->idboleta = $boletaupd->id;
+                $detalle->valor = $boletaupd->saldo;
+                $detalle->idcliente = $boletaupd->idcliente;
+                $detalle->save();
 
-            $boleta = Boleta::where('id', $boletaupd->id)->first();
-            $boleta->estado_ant = $boleta->estado;
-            $boleta->estado = self::enproceso;
-            $boleta->save();
+                $boleta = Boleta::where('id', $boletaupd->id)->first();
+                $boleta->estado_ant = $boleta->estado;
+                $boleta->estado = self::enproceso;
+                $boleta->save();
+            }
 
-            /*
-            \Cart::session(Auth::user()->id);
-            \Cart::add(array(
-                'id' => $idsesion, // inique row ID
-                'name' => $boleta->numero,
-                'price' => $boleta->valor,
-                'quantity' => 1,
-                'attributes' => array(
-                    'url' => $request->url,
-                    'serie' => '',
-                    'descripcion' => '',
-                    'idrifa' => $boleta->idrifa,
-                    'numero' => $boleta->numero,
-                    'codigo' => $boleta->id
-                ),
-                'associatedModel' => Boleta::class
-            ));
-            */
-        }
+            if ($request->type == 'del') {
+                $boleta = Boleta::join('detallesesion', 'boletas.id', '=', 'detallesesion.idboleta')
+                                  ->where('detallesesion.idsesionventa', $idsesion)
+                                  ->where('boletas.numero', $boletaupd->numero)
+                                  ->select('boletas.id')
+                                  ->first();
+                $idboleta = $boleta->id;
 
-        if ($request->type == 'del') {
-            $boleta = Boleta::join('detallesesion', 'boletas.id', '=', 'detallesesion.idboleta')
-                              ->where('detallesesion.idsesionventa', $idsesion)
-                              ->where('boletas.numero', $boletaupd->numero)
-                              ->first();
+                DB::statement("UPDATE boletas SET estado = estado_ant WHERE numero = $boletaupd->numero and id = $idboleta");
 
-            $detalle = Detallesesion::join('boletas', 'boletas.id', '=', 'detallesesion.idboleta')
-                                     ->where('detallesesion.idsesionventa', $idsesion)
-                                     ->where('boletas.numero', $boletaupd->numero)
-                                     ->delete();
-
-            $boleta->estado = $boleta->estado_ant;
-            $boleta->save();
-        }
-
-        if ($request->type == 'upd') {
-            $detalle = Detallesesion::join('boletas', 'boletas.id', '=', 'detallesesion.idboleta')
+                                $detalle = Detallesesion::join('boletas', 'boletas.id', '=', 'detallesesion.idboleta')
                                     ->where('detallesesion.idsesionventa', $idsesion)
                                     ->where('boletas.numero', $boletaupd->numero)
                                     ->select('detallesesion.*')
-                                    ->first();
-            $detalle->valor = $boletaupd->valorpagar;
-            $detalle->idcliente = $boletaupd->idcliente;
-            $detalle->save();
+                                    ->delete();
+            }
+
+            if ($request->type == 'upd') {
+                $detalle = Detallesesion::join('boletas', 'boletas.id', '=', 'detallesesion.idboleta')
+                                        ->where('detallesesion.idsesionventa', $idsesion)
+                                        ->where('boletas.numero', $boletaupd->numero)
+                                        ->select('detallesesion.*')
+                                        ->first();
+                $detalle->valor = $boletaupd->valorpagar;
+                $detalle->idcliente = $boletaupd->idcliente;
+                $detalle->save();
+            }
+            DB::commit();
+        } catch (Throwable $e){
+            dd($e);
+            DB::rollBack();
         }
         return 1;
     }

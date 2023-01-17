@@ -12,8 +12,9 @@ use OwenIt\Auditing\Auditable as AuditableTrait;
 class Boleta extends Model implements Auditable
 {
     use AuditableTrait;
-    
+
     protected $table = 'boletas';
+    protected $primaryKey = 'id';
     protected $fillable =[
         'idrifa',
         'numero',
@@ -34,6 +35,8 @@ class Boleta extends Model implements Auditable
     {
         return $this->belongsTo(Rifa::class, 'idrifa');
     }
+
+    /*
     public function scopeUseIndex($query, string $index)
     {
         $table = $this->getTable();
@@ -46,13 +49,16 @@ class Boleta extends Model implements Auditable
 
         return $query->from(DB::raw("`$table` FORCE INDEX(`$index`)"));
     }
+    */
     public function cliente(){
         return $this->belongsTo(Cliente::class, 'idcliente');
     }
     public function vendedor(){
         return $this->belongsTo(Vendedor::class, 'idvendedor');
     }
+    /*
     public function estado(){
         return $this->belongsTo(Estado::class, 'estado');
     }
+    */
 }
