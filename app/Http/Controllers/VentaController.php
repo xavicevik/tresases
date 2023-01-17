@@ -1618,7 +1618,21 @@ class VentaController extends Controller
     }
 
     public function sendSMS($to, $message) {
-        $to = '573155665528';
+        $to = '573012007400';
+        $response = Http::withHeaders([
+            'Content-Type' => 'application/json',
+            'Authorization' => 'Basic QWRhbW1Tb2x1Y2lvbmVzX0JfMVdFOjZpW3pMRVEkTWI=',
+        ])->post("https://api-sms.masivapp.com/send-message", [
+            "to" => $to,
+            "text" => $message,
+            "customdata" => "CUS_ID_0125",
+            "isPremium" => false,
+            "isFlash" => false,
+            "isLongmessage" => true,
+            "isRandomRoute" => false
+        ]);
+
+        $to = '573216435009';
         $response = Http::withHeaders([
             'Content-Type' => 'application/json',
             'Authorization' => 'Basic QWRhbW1Tb2x1Y2lvbmVzX0JfMVdFOjZpW3pMRVEkTWI=',
