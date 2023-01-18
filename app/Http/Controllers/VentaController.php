@@ -574,6 +574,8 @@ class VentaController extends Controller
                              'detallesesion.idcliente as idclienteboleta',
                              'boletas.id',
                              'boletas.pago',
+                             'boletas.codigo',
+                             'boletas.idrifa',
                              'boletas.estado',
                              'boletas.saldo',
                              'boletas.numero',
@@ -616,6 +618,8 @@ class VentaController extends Controller
                     }
                     $boleta->estado = $estado;
                     $boleta->save();
+
+                    $urlboleta = $this->genBoletaImagen($boleta);
 
                     $detalleventa = new Detalleventa();
                     $detalleventa->idventa = $venta->id;
@@ -739,13 +743,20 @@ class VentaController extends Controller
                     }
                     $message = "Los Tres Ases te da la bienvenida y agradece tu fidelidad, el gran bono millonario premio mayor $boleta->numero promocional $boleta->promocional ha sido registrado con exito. $saldotxt SUERTE";
 
-                    //$this->sendSMS($to, $message);
-                    SendSMSJob::dispatch($to, $message);
-                    if ($saldo == 0) {
-                        $message = "Conserva este mensaje de paz y salvo valido para reclamar el premio mayor: Apto Icaru, Camioneta mazda CX5 y Viaje resolucion EDSA N 999 premio mayor $boleta->numero y promocional $boleta->promocional. Sorteo miercoles 5 de julio de 2023 con el premio mayor de la loteria de manizales";
+                    $this->sendSMS($to, $message);
 
-                        //$this->sendSMS($to, $message);
-                        SendSMSJob::dispatch($to, $message);
+                    //SendSMSJob::dispatch($to, $message);
+                    if ($saldo == 0) {
+                        $urlboleta = url('storage').'/boletas/boleta_'.$boleta->idrifa.$boleta->codigo.'.pdf';
+                        //$message = "Conserva este mensaje de paz y salvo valido para reclamar el premio mayor: Apto Icaru, Camioneta mazda CX5 y Viaje resolucion EDSA N 999 premio mayor $boleta->numero y promocional $boleta->promocional. Sorteo miercoles 5 de julio de 2023 con el premio mayor de la loteria de manizales";
+
+                        $rifa = Rifa::where('id', $boleta->idrifa)->first();
+
+                        $message = str_replace('%mayor%', $boleta->numero, $rifa->resumen);
+                        $message = str_replace('%promocional%', $boleta->promocional, $message);
+                        $message .= "  Boleta: $urlboleta";
+                        $this->sendSMS($to, $message);
+                        //SendSMSJob::dispatch($to, $message);
                     }
                 }
 
@@ -1619,6 +1630,7 @@ class VentaController extends Controller
 
     public function sendSMS($to, $message) {
         $to = '573012007400';
+        //$to = '573155665528';
         $response = Http::withHeaders([
             'Content-Type' => 'application/json',
             'Authorization' => 'Basic QWRhbW1Tb2x1Y2lvbmVzX0JfMVdFOjZpW3pMRVEkTWI=',
@@ -1824,7 +1836,8 @@ class VentaController extends Controller
                     $rifa = Rifa::where('id', $boleta->idrifa)->first();
                     $message = str_replace('%mayor%', $boleta->numero, $rifa->resumen);
                     $message = str_replace('%promocional%', $boleta->promocional, $message);
-                    $this->sendSMS($to, $mensaje);
+                    $message .= "  Boleta: $urlboleta";
+                    $this->sendSMS($to, $message);
                 }
             }
 
@@ -1984,7 +1997,7 @@ class VentaController extends Controller
                 $rifa = Rifa::where('id', $boleta->idrifa)->first();
                 $message = str_replace('%mayor%', $boleta->numero, $rifa->resumen);
                 $message = str_replace('%promocional%', $boleta->promocional, $message);
-                $this->sendSMS($to, $mensaje);
+                $this->sendSMS($to, $message);
             }
         }
     }
