@@ -2006,7 +2006,7 @@ class VentaController extends Controller
         $checkouts = Checkout::whereIn('status', array('in_process','pending'))->get();
 
         foreach ($checkouts as $checkout) {
-            SDK::setAccessToken("TEST-527760229179050-091011-a9b62330235cb5d7a47b2b59968ac474-1195821039");
+            SDK::setAccessToken(config('mercadopago.AccessToken'));
             $response = Payment::get($checkout->payment_id);
 
             if ($response->status == 'cancelled') {
