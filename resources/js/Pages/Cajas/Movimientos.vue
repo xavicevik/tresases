@@ -1227,6 +1227,30 @@
 
                 </div>
             </div>
+
+            <!-- Ventana modal dirección de loading -->
+            <!-- Main modal -->
+            <section> <!-- Ventana modal -->
+                <div class="fixed z-10 inset-0 overflow-y-auto ease-out duration-400" v-if="loading">
+                    <div class="items-end justify-center min-h-screen pt-10 px-2 pb-20 text-center sm:block sm:p-0">
+
+                        <div class="fixed inset-0 transition-opacity">
+                            <div class="absolute inset-0 bg-gray-400 opacity-75"></div>
+                        </div>
+
+                        <!-- This element is to trick the browser into centering the modal contents. -->
+                        <span class="hidden inline-block align-middle h-screen"></span>
+                        <section>
+                            <div class=" mt-10 w-full" id="app">
+                                <semipolar-spinner class="mt-10 mx-auto" :animation-duration="2000" :size="85" color="#ff1d5e" />
+                            </div>
+                        </section>
+
+
+                    </div>
+                </div>
+            </section>
+            <!-- Fin Ventana modal dirección de loading -->
         </div>
     </AppLayout>
 </template>
@@ -1301,6 +1325,7 @@ export default {
     },
     data() {
         return {
+            loading: false,
             time: 1 * 60 * 1000,
             session: [],
             configMoney2: {
@@ -1401,8 +1426,9 @@ export default {
             this.closeModalClienteNew();
             this.pushSessionDetail(this.session.id, this.boletatmp, 'upd');
         },
-        generarReciboEliminar: function () {
+        generarReciboEliminar: async function () {
             let isOk = true;
+            this.loading = true;
             if (this.form.reservas.length > 0){
                 this.form.reservas.forEach(element => {
                     if (element['idcliente'] == '' || element['idcliente'] === null) {
@@ -1412,7 +1438,7 @@ export default {
 
                 if (isOk) {
                     var url = '/ventas/reportpdfAnulaMov';
-                    axios.get(url, {
+                    let res = await axios.get(url, {
                         params: {
                             rifa: this.form.idrifa.nombre_tecnico,
                             idvendedor: this.form.idvendedor.id,
@@ -1424,16 +1450,16 @@ export default {
                             idcaja: this.caja.id,
                             idpuntoventa: this.caja.idpuntoventa
                         }
-                    }).then((res) => {
-                        Swal.fire({
-                            icon: 'success',
-                            title: 'Se ha generado el recibo correspondiente',
-                            showConfirmButton: true,
-                        })
-                        window.open(res.data.url, '_blank');
-                        this.form.reservas = [];
-                        this.getMovimientos();
+                    });
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Se ha generado el recibo correspondiente',
+                        showConfirmButton: true,
                     })
+                    //this.$refs.countdown.end();
+                    window.open(res.data.url, '_blank');
+                    this.form.reservas = [];
+                    this.getMovimientos();
                 } else {
                     Swal.fire({
                         icon: 'warning',
@@ -1448,10 +1474,11 @@ export default {
                     showConfirmButton: true,
                 })
             }
-
+            this.loading = false;
         },
-        generarReciboAsignar: function () {
+        generarReciboAsignar: async function () {
             let isOk = true;
+            this.loading = true;
             if (this.form.reservas.length > 0){
                 this.form.reservas.forEach(element => {
                     if (element['idcliente'] == '' || element['idcliente'] === null) {
@@ -1461,23 +1488,23 @@ export default {
 
                 if (isOk) {
                     var url = '/ventas/reportpdfRegistroMov';
-                    axios.get(url, {
+                    let res = await axios.get(url, {
                         params: {
                             idsesion: this.session.id,
                             idcaja: this.caja.id,
                             idpuntoventa: this.caja.idpuntoventa
                         }
-                    }).then((res) => {
-                        Swal.fire({
-                            icon: 'success',
-                            title: 'Se ha generado el recibo correspondiente',
-                            showConfirmButton: true,
-                        })
-                        this.$refs.countdown.end();
-                        window.open(res.data.url, '_blank');
-                        this.form.reservas = [];
-                        this.getMovimientos();
+                    });
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Se ha generado el recibo correspondiente',
+                        showConfirmButton: true,
                     })
+                    this.$refs.countdown.end();
+                    window.open(res.data.url, '_blank');
+                    this.form.reservas = [];
+                    this.getMovimientos();
+
                 } else {
                     Swal.fire({
                         icon: 'warning',
@@ -1492,6 +1519,7 @@ export default {
                     showConfirmButton: true,
                 })
             }
+            this.loading = false;
 
         },
         eliminarReserva: function(boleta, index){
@@ -1508,6 +1536,7 @@ export default {
         },
         openModal: function (accion, data = []) {
             this.isOpen = true;
+            this.loading = true;
 
             switch (accion) {
                 case 'registrar':
@@ -1541,9 +1570,11 @@ export default {
                     this.form.fecha = null;
                     this.asignarMode = false;
                     this.eliminarMode = true;
+                    this.registrarSessionVenta(this.caja.puntoventa.id)
                     break;
                 }
             }
+            this.loading = false;
         },
         selectRifa: function () {
             this.isOpenRifa = true;

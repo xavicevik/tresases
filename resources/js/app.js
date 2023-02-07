@@ -12,6 +12,7 @@ import Subreportes from '@/Components/Subreportes';
 import Permissions from "./mixins/Permissions";
 import Utilities from "./mixins/Utilities";
 import Statscards from "./Components/Statscards";
+import { SemipolarSpinner } from 'epic-spinners';
 
 const appName = window.document.getElementsByTagName('title')[0]?.innerText || 'Laravel';
 
@@ -27,6 +28,7 @@ createInertiaApp({
             .component('Subreportes', Subreportes)
             .component('Statscards', Statscards)
             .component('Popper', Popper)
+            .component('SemipolarSpinner', SemipolarSpinner)
             .mixin(Permissions)
             .mixin(Utilities)
             .mount(el);

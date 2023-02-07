@@ -408,26 +408,26 @@ class UserController extends Controller
         Validator::make($request->all(), [
             'nombre' => ['required', 'string', 'max:255'],
             'apellido' => ['required', 'string', 'max:255'],
-            'correo' => ['required', 'string', 'email', 'max:255'],
-            'telefono' => ['required', 'string', 'max:255'],
+            //'correo' => ['required', 'string', 'email', 'max:255'],
+            'movil' => ['required', 'string', 'max:255'],
             'documento' => ['required', 'string', 'max:255'],
             'idtipos_documento' => 'required|numeric|gt:0',
-            'idpais' => 'required|numeric|gt:0',
-            'iddepartamento' => 'required|numeric|gt:0',
-            'idciudad' => 'required|numeric|gt:0',
+            //'idpais' => 'required|numeric|gt:0',
+            //'iddepartamento' => 'required|numeric|gt:0',
+            //'idciudad' => 'required|numeric|gt:0',
             'idrol' => 'required|numeric|gt:0',
         ],
         [
             'nombre.required' => 'Ingrese el nombre',
             'apellido.required' => 'Ingrese el apellido',
-            'correo.required' => 'Ingrese el correo',
-            'telefono.required' => 'Ingrese el teléfono celular',
+            //'correo.required' => 'Ingrese el correo',
+            'movil.required' => 'Ingrese el teléfono celular',
             'documento.required' => 'Ingrese el número de identificacion',
             'idtipos_documento.gt' => 'Seleccione una tipo de documento',
-            'idpais.gt' => 'Seleccione un País',
-            'iddepartamento.gt' => 'Seleccione un Departamento',
+            //'idpais.gt' => 'Seleccione un País',
+            //'iddepartamento.gt' => 'Seleccione un Departamento',
             'idrol.gt' => 'Seleccione un Rol',
-            'idciudad.gt' => 'Seleccione una ciudad',
+            //'idciudad.gt' => 'Seleccione una ciudad',
         ])->validate();
 
         $mytime= Carbon::now('America/Bogota');
@@ -451,12 +451,12 @@ class UserController extends Controller
         $user->saveOrFail();
 
         $rol = Rol::where('id', $user->idrol)->first();
-        //$user->assignRole($rol->nombre);
+        $user->assignRole($rol->nombre);
 
         if ($user->observaciones == 'Creado por movimiento de caja') {
             return ['user' => $user];
         } else {
-            return redirect()->back()->with('message', 'Cliente creado satisfactoriamente');
+            return redirect()->back()->with('message', 'Usuario creado satisfactoriamente');
         }
     }
 
@@ -662,8 +662,8 @@ class UserController extends Controller
                       );
         $user->saveOrFail();
 
-        $rol = Role::where('id', $user->idrol)->first();
-        $user->syncRoles($rol);
+        //$rol = Role::where('id', $user->idrol)->first();
+        //$user->syncRoles($rol);
 
         return redirect()->back()->with('message', 'Vendedor modificado satisfactoriamente');
     }
@@ -672,28 +672,27 @@ class UserController extends Controller
     {
         Validator::make($request->all(), [
             'nombre' => ['required', 'string', 'max:255'],
-            'apellido' => ['required', 'string', 'max:255'],
-            'correo' => ['required', 'string', 'email', 'max:255'],
-            'telefono' => ['required', 'string', 'max:255'],
+            //'apellido' => ['required', 'string', 'max:255'],
+            //'correo' => ['required', 'string', 'email', 'max:255'],
+            'movil' => ['required', 'string', 'max:255'],
             'documento' => ['required', 'string', 'max:255'],
-            'documento' => ['required', 'string', 'max:255'],
-            'idtipos_documento' => 'required|numeric|gt:0',
-            'idpais' => 'required|numeric|gt:0',
-            'iddepartamento' => 'required|numeric|gt:0',
-            'idciudad' => 'required|numeric|gt:0',
-            'idrol' => 'required|numeric|gt:0',
+            //'idtipos_documento' => 'required|numeric|gt:0',
+            //'idpais' => 'required|numeric|gt:0',
+            //'iddepartamento' => 'required|numeric|gt:0',
+            //'idciudad' => 'required|numeric|gt:0',
+            //'idrol' => 'required|numeric|gt:0',
         ],
             [
                 'nombre.required' => 'Ingrese el nombre',
-                'apellido.required' => 'Ingrese el apellido',
-                'correo.required' => 'Ingrese el correo',
-                'telefono.required' => 'Ingrese el teléfono celular',
+                //'apellido.required' => 'Ingrese el apellido',
+                //'correo.required' => 'Ingrese el correo',
+                'movil.required' => 'Ingrese el teléfono celular',
                 'documento.required' => 'Ingrese el número de identificacion',
-                'idtipos_documento.gt' => 'Seleccione una tipo de documento',
-                'idpais.gt' => 'Seleccione un País',
-                'iddepartamento.gt' => 'Seleccione un Departamento',
-                'idrol.gt' => 'Seleccione una Ciudad',
-                'idciudad.gt' => 'Seleccione un Rol',
+                //'idtipos_documento.gt' => 'Seleccione una tipo de documento',
+                //'idpais.gt' => 'Seleccione un País',
+                //'iddepartamento.gt' => 'Seleccione un Departamento',
+                //'idrol.gt' => 'Seleccione una Ciudad',
+                //'idciudad.gt' => 'Seleccione un Rol',
             ])->validate();
 
         $mytime= Carbon::now('America/Bogota');
@@ -720,10 +719,10 @@ class UserController extends Controller
         );
         $user->saveOrFail();
 
-        $rol = Role::where('id', $user->idrol)->first();
-        $user->syncRoles($rol);
+        //$rol = Role::where('id', $user->idrol)->first();
+        //$user->syncRoles($rol);
 
-        return redirect()->back()->with('message', 'Usuario modificado satisfactoriamente');
+        return redirect()->back()->with('message', 'Cliente modificado satisfactoriamente');
     }
 
     /**

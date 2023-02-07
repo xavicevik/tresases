@@ -15,39 +15,29 @@ use \App\Models\Rol;
 use \App\Models\Terminosycondiciones;
 use App\Exports\ProductsExport;
 use Maatwebsite\Excel\Facades\Excel;
-/*
-|--------------------------------------------------------------------------
-| Web Routes
-|--------------------------------------------------------------------------
-|
-| Here is where you can register web routes for your application. These
-| routes are loaded by the RouteServiceProvider within a group which
-| contains the "web" middleware group. Now create something great!
-|
-*/
 
 //Route::group(['middleware'=>['guest']],function(){
-    Route::get('/', [LoginController::class, 'index'])->name('login.index');
-    Route::post('/', [LoginController::class, 'authenticate'])->name('login.authenticate');
+Route::get('/', [LoginController::class, 'index'])->name('login.index');
+Route::post('/', [LoginController::class, 'authenticate'])->name('login.authenticate');
 
-    Route::get('/loginvendedor', [LoginController::class, 'indexVendedor'])->name('loginvendedor.index');
-    Route::post('/loginvendedor', [LoginController::class, 'authenticatevendedor'])->name('loginvendedor.authenticate');
+Route::get('/loginvendedor', [LoginController::class, 'indexVendedor'])->name('loginvendedor.index');
+Route::post('/loginvendedor', [LoginController::class, 'authenticatevendedor'])->name('loginvendedor.authenticate');
 
-    Route::get('/changepass', [LoginController::class, 'changePassword'])->name('changepass.index');
-    Route::post('/changepass', [LoginController::class, 'updatePassword'])->name('changepass.update');
+Route::get('/changepass', [LoginController::class, 'changePassword'])->name('changepass.index');
+Route::post('/changepass', [LoginController::class, 'updatePassword'])->name('changepass.update');
 
-    Route::get('/ventas/sumary', [VentaController::class, 'sumary'])->name('sumary');
+Route::get('/ventas/sumary', [VentaController::class, 'sumary'])->name('sumary');
 
-    Route::get('/ventas/paynotifysuccess', [VentaController::class, 'paynotifysuccess'])->name('paynotifysuccess');
-    Route::get('/ventas/paynotifyfailure', [VentaController::class, 'paynotifyfailure'])->name('paynotifyfailure');
-    Route::get('/ventas/paynotifypending', [VentaController::class, 'paynotifypending'])->name('paynotifypending');
+Route::get('/ventas/paynotifysuccess', [VentaController::class, 'paynotifysuccess'])->name('paynotifysuccess');
+Route::get('/ventas/paynotifyfailure', [VentaController::class, 'paynotifyfailure'])->name('paynotifyfailure');
+Route::get('/ventas/paynotifypending', [VentaController::class, 'paynotifypending'])->name('paynotifypending');
 
-    //app
-    Route::get('/app/authenticatelink/{vendedor}', [VentaController::class, 'createappp'])->name('ventas.authenticatelink');
+//app
+Route::get('/app/authenticatelink/{vendedor}', [VentaController::class, 'createappp'])->name('ventas.authenticatelink');
 
-    Route::get('/ventas/sumary', [VentaController::class, 'sumary'])->name('sumary');
-    Route::post('/app/ventas/paynotify', [VentaController::class, 'paynotify'])->name('paynotify');
-    Route::get('/app/ventas/paynotify', [VentaController::class, 'paynotify'])->name('paynotify');
+Route::get('/ventas/sumary', [VentaController::class, 'sumary'])->name('sumary');
+Route::post('/app/ventas/paynotify', [VentaController::class, 'paynotify'])->name('paynotify');
+Route::get('/app/ventas/paynotify', [VentaController::class, 'paynotify'])->name('paynotify');
 
 Route::get('/ventas/initSession', [VentaController::class, 'initSession'])->name('ventas.initSession');
 Route::get('/ventas/getRandBoletaLibre', [VentaController::class, 'getRandBoletaLibre'])->name('ventas.getRandBoletaLibre');

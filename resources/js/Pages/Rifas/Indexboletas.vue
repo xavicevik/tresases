@@ -89,7 +89,7 @@
                             <table class="table-fixed w-full">
                                 <thead>
                                 <tr class="bg-gray-100">
-                                    <th class="px-4 py-2 text-sm font-bold hover:bg-blue-500 hover:text-gray-50 rounded-b">
+                                    <th class="px-4 py-2 text-sm font-bold hover:bg-blue-500 hover:text-gray-50 rounded-b w-2/12">
                                         <button @click="getCajas(buscar, 'id')" class="font-bold">
                                             Rifa
                                             <div v-show="sortBy == 'nombre'">
@@ -106,7 +106,7 @@
                                             </div>
                                         </button>
                                     </th>
-                                    <th class="px-4 py-2 text-sm font-bold hover:bg-blue-500 hover:text-gray-50 rounded-b">
+                                    <th class="px-4 py-2 text-sm font-bold hover:bg-blue-500 hover:text-gray-50 rounded-b w-1/12">
                                         <button @click="getCajas(buscar, 'id')" class="font-bold">
                                             Número
                                             <div v-show="sortBy == 'nombre'">
@@ -123,7 +123,7 @@
                                             </div>
                                         </button>
                                     </th>
-                                    <th class="px-4 py-2 text-sm font-bold hover:bg-blue-500 hover:text-gray-50 rounded-b">
+                                    <th class="px-4 py-2 text-sm font-bold hover:bg-blue-500 hover:text-gray-50 rounded-b w-1/12">
                                         <button @click="getCajas(buscar, 'id')" class="font-bold">
                                             Promocional
                                             <div v-show="sortBy == 'nombre'">
@@ -140,7 +140,7 @@
                                             </div>
                                         </button>
                                     </th>
-                                    <th v-if="this.idvendedor == 0" class="px-4 py-2 text-sm font-bold hover:bg-blue-500 hover:text-gray-50 rounded-b">
+                                    <th v-if="this.idvendedor == 0" class="px-4 py-2 text-sm font-bold hover:bg-blue-500 hover:text-gray-50 rounded-b w-2/12">
                                         <button @click="getCajas(buscar, 'id')" class="font-bold">
                                             Vendedor
                                             <div v-show="sortBy == 'ciudad.precio'">
@@ -157,7 +157,7 @@
                                             </div>
                                         </button>
                                     </th>
-                                    <th class="px-4 py-2 text-sm font-bold hover:bg-blue-500 hover:text-gray-50 rounded-b">
+                                    <th class="px-4 py-2 text-sm font-bold hover:bg-blue-500 hover:text-gray-50 rounded-b w-3/12">
                                         <button @click="getCajas(buscar, 'id')" class="font-bold">
                                             Cliente
                                             <div v-show="sortBy == 'fechafin'">
@@ -174,7 +174,7 @@
                                             </div>
                                         </button>
                                     </th>
-                                    <th class="px-4 py-2 text-sm font-bold hover:bg-blue-500 hover:text-gray-50 rounded-b">
+                                    <th class="px-4 py-2 text-sm font-bold hover:bg-blue-500 hover:text-gray-50 rounded-b w-1/12">
                                         <button @click="getCajas(buscar, 'id')" class="font-bold">
                                             Estado
                                             <div v-show="sortBy == 'fechafin'">
@@ -191,7 +191,7 @@
                                             </div>
                                         </button>
                                     </th>
-                                    <th class="px-4 py-2 text-sm font-bold hover:bg-blue-500 hover:text-gray-50 rounded-b">
+                                    <th class="px-4 py-2 text-sm font-bold hover:bg-blue-500 hover:text-gray-50 rounded-b w-1/12">
                                         <button @click="getCajas(buscar, 'id')" class="font-bold">
                                             Valor
                                             <div v-show="sortBy == 'fechafin'">
@@ -208,7 +208,7 @@
                                             </div>
                                         </button>
                                     </th>
-                                    <th class="px-4 py-2 text-sm font-bold hover:bg-blue-500 hover:text-gray-50 rounded-b">
+                                    <th class="px-4 py-2 text-sm font-bold hover:bg-blue-500 hover:text-gray-50 rounded-b w-1/12">
                                         <button @click="getCajas(buscar, 'id')" class="font-bold">
                                             Saldo
                                             <div v-show="sortBy == 'fechafin'">
@@ -225,7 +225,7 @@
                                             </div>
                                         </button>
                                     </th>
-                                    <th class="px-4 py-2 text-sm font-bold hover:bg-blue-500 hover:text-gray-50 rounded-b">
+                                    <th class="px-4 py-2 text-sm font-bold hover:bg-blue-500 hover:text-gray-50 rounded-b w-1/12">
                                         <button @click="getCajas(buscar, 'id')" class="font-bold">
                                             Comisión pagada
                                             <div v-show="sortBy == 'fechafin'">
@@ -246,44 +246,44 @@
                                 </thead>
                                 <tbody>
                                 <tr :class="dato.id === selectedRow ? 'bg-blue-200' : ''"  class="text-center hover:bg-blue-400" @click="rowSelect(dato.id); getHistorialBoleta(dato.id)" text-sm v-if="arrayData.data" v-for="(dato, id) in arrayData.data" :key="dato.id">
-                                    <td class="border px-1 py-2 text-sm truncate" v-text="dato.rifa.titulo"></td>
-                                    <td class="border px-1 py-2 text-sm truncate" v-text="dato.numero"></td>
-                                    <td class="border px-1 py-2 text-sm truncate" v-text="dato.promocional"></td>
-                                    <td v-if="this.idvendedor == 0" class="border px-1 py-2 text-sm truncate" v-text="dato.vendedor?dato.vendedor.full_name:''"></td>
-                                    <td class="border px-1 py-2 text-sm truncate" v-text="dato.cliente?dato.cliente.full_name:''"></td>
-                                    <td class="border px-2 py-2 text-sm truncate" v-if="dato.estado==1">
+                                    <td class="border px-1 py-2 text-sm truncate w-2/12" v-text="dato.rifa.titulo"></td>
+                                    <td class="border px-1 py-2 text-sm truncate w-1/12" v-text="dato.numero"></td>
+                                    <td class="border px-1 py-2 text-sm truncate w-1/12" v-text="dato.promocional"></td>
+                                    <td v-if="this.idvendedor == 0" class="border px-1 py-2 text-sm truncate w-2/12" v-text="dato.vendedor?dato.vendedor.full_name:''"></td>
+                                    <td class="border px-1 py-2 text-sm truncate w-3/12" v-text="dato.cliente?(dato.cliente.documento+'-'+dato.cliente.full_name):''"></td>
+                                    <td class="border px-2 py-2 text-sm truncate w-1/12" v-if="dato.estado==1">
                                         <span class="inline-flex px-2 text-sm font-semibold leading-5 text-green-800 bg-green-100 rounded-full">
                                             Activo
                                         </span>
                                     </td>
-                                    <td class="border px-2 py-2 text-sm truncate" v-if="dato.estado==2">
+                                    <td class="border px-2 py-2 text-sm truncate w-1/12" v-if="dato.estado==2">
                                         <span class="inline-flex px-2 text-sm font-semibold leading-5 text-yellow-800 bg-yellow-100 rounded-full">
                                             Reservado
                                         </span>
                                     </td>
-                                    <td class="border px-2 py-2 text-sm truncate" v-if="dato.estado==3">
+                                    <td class="border px-2 py-2 text-sm truncate w-1/12" v-if="dato.estado==3">
                                         <span class="inline-flex px-2 text-sm font-semibold leading-5 text-blue-800 bg-blue-100 rounded-full">
                                             Vendido
                                         </span>
                                     </td>
-                                    <td class="border px-2 py-2 text-sm truncate" v-if="dato.estado==4">
+                                    <td class="border px-2 py-2 text-sm truncate w-1/12" v-if="dato.estado==4">
                                         <span class="inline-flex px-2 text-sm font-semibold leading-5 text-blue-800 bg-blue-100 rounded-full">
                                             Pendiente
                                         </span>
                                     </td>
-                                    <td class="border px-2 py-2 text-sm truncate" v-if="dato.estado==5">
+                                    <td class="border px-2 py-2 text-sm truncate w-1/12" v-if="dato.estado==5">
                                         <span class="inline-flex px-2 text-sm font-semibold leading-5 text-blue-800 bg-blue-100 rounded-full">
                                             En proceso
                                         </span>
                                     </td>
-                                    <td class="border px-2 py-2 text-sm" v-if="dato.estado==0">
+                                    <td class="border px-2 py-2 text-sm w-1/12" v-if="dato.estado==0">
                                         <span class="inline-flex px-2 text-xs font-semibold leading-5 text-red-800 bg-red-100 rounded-full">
                                             Inactivo
                                         </span>
                                     </td>
-                                    <td class="border px-1 py-2 text-sm truncate" v-text="formatPrice(dato.valor)"></td>
-                                    <td class="border px-1 py-2 text-sm truncate" v-text="formatPrice(dato.saldo)"></td>
-                                    <td class="border px-1 py-2 text-sm truncate" v-text="formatPrice(dato.comision)"></td>
+                                    <td class="border px-1 py-2 text-sm truncate w-1/12" v-text="formatPrice(dato.valor)"></td>
+                                    <td class="border px-1 py-2 text-sm truncate w-1/12" v-text="formatPrice(dato.saldo)"></td>
+                                    <td class="border px-1 py-2 text-sm truncate w-1/12" v-text="formatPrice(dato.comision)"></td>
                                 </tr>
                                 <tr v-else>
                                     <td class="border px-4 py-2 text-xs text-center" colspan="12"> La consulta no obtuvo datos</td>

@@ -423,7 +423,7 @@ export default {
                     </div>
 
                     <div class="text-center text-gray-800 p-2 text-sm bg-gray-200">
-                        © 2022 Copyright:
+                        © 2023 Copyright:
                         <a class="text-gray-800 text-sm" href="https://www.shoppingred.com.co/">ShoppingRed</a>
                     </div>
                 </footer>

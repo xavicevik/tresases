@@ -125,19 +125,16 @@ export default {
         },
         getPaises: async function () {
             console.log('consulta paises');
-            try {
-                let res = await axios.get('/paises');
-                this.arrayPaises = await res.data.paises;
-            } catch (error) {
-                console.log('error');
-            }
+            let res = await axios.get('/paises');
+            this.arrayPaises = res.data.paises;
+
         },
         getDepartamentos: async function () {
             let res = await axios.get('/paises/departamentos', {
                 params: {
                     idpais: this.form.idpais
                 }
-            })
+            });
             this.arrayDepartamentos = res.data.departamentos;
         },
         getEmpresas: async function () {
@@ -157,10 +154,9 @@ export default {
             })
             this.arrayCiudades = res.data.ciudades;
         },
-        getTiposdocumento: function () {
-            axios.get('/master/tiposdocsearch',).then((res) => {
-                this.arrayTiposdocumento = res.data.data;
-            })
+        getTiposdocumento: async function () {
+            let res = await axios.get('/master/tiposdocsearch',);
+            this.arrayTiposdocumento = res.data.data;
         },
         getRoles: async function () {
             var url= '/master/getRoles';
@@ -168,25 +164,23 @@ export default {
             var respuesta = res.data;
             this.arrayRoles = respuesta.data;
         },
-        getClientes: function (buscar = '', filtro = 'documento', paginate = false) {
+        getClientes: async function (buscar = '', filtro = 'documento', paginate = false) {
             var url= '/users/getClientesActivos';
-            axios.get(url, {
+            let res = await axios.get(url, {
                 params: {
                     buscar: buscar,
                     filtro: filtro,
                     paginate: paginate
                 }
-            }).then((res) => {
-                var respuesta = res.data;
-                this.arrayClientes = respuesta.clientes;
-            })
+            });
+            var respuesta = res.data;
+            this.arrayClientes = respuesta.clientes;
         },
-        showClient: function (id) {
+        showClient: async function (id) {
             var url= '/users/cliente/' + id;
-            axios.get(url).then((res) => {
-                var respuesta = res.data;
-                this.form.cliente = respuesta.cliente;
-            })
+            let res = await axios.get(url);
+            var respuesta = res.data;
+            this.form.cliente = respuesta.cliente;
         },
         getBoletasreservas: function (filtros = [], sortBy = 'boletas.id') {
             if (sortBy == this.sortBy){
@@ -214,7 +208,8 @@ export default {
                 this.arrayData = respuesta.datos;
             })
         },
-        getBoletas: function (filtros = [], sortBy = 'boletas.id') {
+        getBoletas: async function (filtros = [], sortBy = 'boletas.id') {
+            this.loading = true;
             if (sortBy == this.sortBy){
                 this.sortOrder = !this.sortOrder;
             }
@@ -228,17 +223,17 @@ export default {
             this.ispage = true;
 
             var url= '/rifas/indexboletas';
-            axios.get(url, {
+            let res = await axios.get(url, {
                 params: {
                     filtros: filtros,
                     sortBy: this.sortBy,
                     sortOrder: sortOrderdesc,
                     ispage: this.ispage
                 }
-            }).then((res) => {
-                var respuesta = res.data;
-                this.arrayData = respuesta.datos;
-            })
+            });
+            var respuesta = res.data;
+            this.arrayData = respuesta.datos;
+            this.loading = false;
         },
         getRifas: async function (buscar = '', filtro = 'titulo', paginate = false) {
             var url= '/rifas/getRifasActivas';
@@ -381,28 +376,28 @@ export default {
         selTipoSerie: function (data){
             this.isIndividual = data;
         },
-        updateSession: function (idsesion, idrifa = null, idvendedor = null) {
+        updateSession: async function (idsesion, idrifa = null, idvendedor = null) {
             var url= '/ventas/updateSession';
-            axios.get(url, {
+            let res = await axios.get(url, {
                 params: {
                     idsesion: idsesion,
                     idrifa: idrifa,
                     idvendedor: idvendedor,
                 }
-            }).then((res) => {
-            })
+            });
+
+            return 1;
         },
-        pushSessionDetail: function (id, boleta, type) {
+        pushSessionDetail: async function (id, boleta, type) {
             var url= '/ventas/updDetailSession';
-            axios.get(url, {
+            let res = await axios.get(url, {
                 params: {
                     idsesion: id,
                     boleta: boleta,
                     type: type
                 }
-            }).then((res) => {
-                console.log(res.data);
-            })
+            });
+            return 1;
         },
         pushSessionDetailClient: async function (id, cliente, type) {
             var url= '/ventas/updDetailSessionClient';
@@ -416,89 +411,86 @@ export default {
             console.log(res.data);
             return true;
         },
-        registrarSessionVenta: function (idpuntoventa = null, idrifa = null, idvendedor = null, tipoventa = null) {
+        registrarSessionVenta: async function (idpuntoventa = null, idrifa = null, idvendedor = null, tipoventa = null) {
             var url= '/ventas/initSession';
-            axios.get(url, {
+            let res = await axios.get(url, {
                 params: {
                     idpuntoventa: idpuntoventa,
                     idrifa: idrifa,
                     idvendedor: idvendedor,
                     tipoventa: tipoventa
                 }
-            }).then((res) => {
-                var respuesta = res.data;
-                this.session = respuesta.session;
-                this.detallesession = respuesta.detallesession;
+            });
+            var respuesta = res.data;
+            this.session = respuesta.session;
+            this.detallesession = respuesta.detallesession;
 
-                if (respuesta.cliente) {
-                    this.form.cliente = respuesta.cliente;
-                    this.getDepartamentos();
-                    this.getCiudades();
-                    this.form.metacliente = respuesta.cliente.documento + ' - ' + respuesta.cliente.nombre + ' ' + respuesta.cliente.apellido;
-                }
+            if (respuesta.cliente) {
+                this.form.cliente = respuesta.cliente;
+                this.getDepartamentos();
+                this.getCiudades();
+                this.form.metacliente = respuesta.cliente.documento + ' - ' + respuesta.cliente.nombre + ' ' + respuesta.cliente.apellido;
+            }
 
-                if(this.session.rifa) this.form.idrifa = this.session.rifa;
-                if(this.session.vendedor) this.form.idvendedor = this.session.vendedor;
-                this.time = respuesta.time * 1000;
-                for (const property in this.detallesession) {
-                    this.form.reservas.push({
-                        numero: this.detallesession[property]['numero'],
-                        promocional: this.detallesession[property]['promocional'],
-                        valortotal: this.detallesession[property]['valortotal'],
-                        valorpagar: this.detallesession[property]['valor'],
-                        valorsaldo: this.detallesession[property]['saldo'],
-                        valoranular: this.detallesession[property]['pago'],
-                        valorpagado: this.detallesession[property]['pago'],
-                        idcliente: this.detallesession[property]['idcliente'],
-                        cliente: this.detallesession[property]['idcliente']?this.detallesession[property]['full_name']:'',
-                    });
-                }
-            })
+            if(this.session.rifa) this.form.idrifa = this.session.rifa;
+            if(this.session.vendedor) this.form.idvendedor = this.session.vendedor;
+            this.time = respuesta.time * 1000;
+            for (const property in this.detallesession) {
+                this.form.reservas.push({
+                    numero: this.detallesession[property]['numero'],
+                    promocional: this.detallesession[property]['promocional'],
+                    valortotal: this.detallesession[property]['valortotal'],
+                    valorpagar: this.detallesession[property]['valor'],
+                    valorsaldo: this.detallesession[property]['saldo'],
+                    valoranular: this.detallesession[property]['pago'],
+                    valorpagado: this.detallesession[property]['pago'],
+                    idcliente: this.detallesession[property]['idcliente'],
+                    cliente: this.detallesession[property]['idcliente']?this.detallesession[property]['full_name']:'',
+                });
+            }
         },
-        updateTimeSession: function (tipoventa = null) {
+        updateTimeSession: async function (tipoventa = null) {
             var url= '/ventas/updateTimeSession';
-            axios.get(url, {
+            let res = await axios.get(url, {
                 params: {
                     idsesion: this.session.id,
                 }
-            }).then((res) => {
-                Swal.fire({
-                    position: 'top-end',
-                    icon: 'success',
-                    title: 'Se ha reiniciado el contador para la venta',
-                    showConfirmButton: true,
-                    timer: 1000
-                })
-                const {
-                    host, hostname, href, origin, pathname, port, protocol, search
-                } = window.location;
+            });
+            Swal.fire({
+                position: 'top-end',
+                icon: 'success',
+                title: 'Se ha reiniciado el contador para la venta',
+                showConfirmButton: true,
+                timer: 1000
+            })
+            const {
+                host, hostname, href, origin, pathname, port, protocol, search
+            } = window.location;
 
-                console.log(pathname + search);
-                this.$inertia.visit(pathname + search);
-            })
+            console.log(pathname + search);
+            this.$inertia.visit(pathname + search);
         },
-        finishSession: function () {
+        finishSession: async function () {
             var url= '/ventas/finishSession';
-            axios.get(url, {
+            let res = await axios.get(url, {
                 params: {
                     idsesion: this.session.id,
                 }
-            }).then((res) => {
-                Swal.fire({
-                    position: 'top-end',
-                    icon: 'success',
-                    title: 'Se ha superado el tiempo máximo para realizar la venta',
-                    showConfirmButton: true,
-                    timer: 1000
-                })
-                //this.registrarSessionVenta(this.caja.puntoventa.id)
-                this.form.reservas = [];
-                this.form.idrifa = [];
-                this.form.idvendedor = [];
-                this.getMovimientos();
-                this.closeModal();
-                //this.$refs.countdown.start();
+            });
+            Swal.fire({
+                position: 'top-end',
+                icon: 'success',
+                title: 'Se ha superado el tiempo máximo para realizar la venta',
+                showConfirmButton: true,
+                timer: 1000
             })
+            //this.registrarSessionVenta(this.caja.puntoventa.id)
+            this.form.reservas = [];
+            this.form.idrifa = [];
+            this.form.idvendedor = [];
+            this.getMovimientos();
+            this.closeModal();
+            //this.$refs.countdown.start();
         },
         anularVenta: function (id) {
             axios.get('/ventas/anularVenta?id='+id+'&idcaja='+this.caja.id+'&idpuntoventa='+this.caja.puntoventa.id,)
@@ -520,8 +512,8 @@ export default {
                     }
                 })
         },
-        onCountdownEnd: function (tipoventa = null) {
-            Swal.fire({
+        onCountdownEnd: async function (tipoventa = null) {
+            await Swal.fire({
                 icon: 'warning',
                 title: 'Se ha agotado el tiempo para realizar la compra, desea continuar?',
                 showConfirmButton: true,

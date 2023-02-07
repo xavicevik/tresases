@@ -189,9 +189,9 @@
                                 <tbody>
                                 <tr class="text-center" text-sm v-if="arrayData.data" v-for="(user, id) in arrayData.data" :key="id">
                                     <td class="border px-1 py-2 text-sm truncate" v-text="user.documento"></td>
-                                    <td class="border px-1 py-2 text-sm truncate" v-text="user.nombre + ' ' + user.apellido"></td>
-                                    <td class="border px-1 py-2 text-sm truncate" v-text="user.movil"></td>
-                                    <td class="border px-1 py-2 text-sm truncate" v-text="user.correo"></td>
+                                    <td class="border px-1 py-2 text-sm truncate" v-text="user.nombre?user.nombre:'' + ' ' + user.apellido?user.apellido:''"></td>
+                                    <td class="border px-1 py-2 text-sm truncate" v-text="user.movil?user.movil:''"></td>
+                                    <td class="border px-1 py-2 text-sm truncate" v-text="user.correo?user.correo:''"></td>
                                     <td class="border px-2 py-2 text-sm truncate" v-if="user.estado">
                                         <span class="inline-flex px-2 text-sm font-semibold leading-5 text-green-800 bg-green-100 rounded-full">
                                             Activo
@@ -494,6 +494,31 @@
 
                 </div>
             </div>
+
+            <!-- Ventana modal dirección de loading -->
+            <!-- Main modal -->
+            <section> <!-- Ventana modal -->
+                <div class="fixed z-10 inset-0 overflow-y-auto ease-out duration-400" v-if="loading">
+                    <div class="items-end justify-center min-h-screen pt-10 px-2 pb-20 text-center sm:block sm:p-0">
+
+                        <div class="fixed inset-0 transition-opacity">
+                            <div class="absolute inset-0 bg-gray-400 opacity-75"></div>
+                        </div>
+
+                        <!-- This element is to trick the browser into centering the modal contents. -->
+                        <span class="hidden inline-block align-middle h-screen"></span>
+                        <section>
+                            <div class=" mt-10 w-full" id="app">
+                                <semipolar-spinner class="mt-10 mx-auto" :animation-duration="2000" :size="85" color="#ff1d5e" />
+                            </div>
+                        </section>
+
+
+                    </div>
+                </div>
+            </section>
+            <!-- Fin Ventana modal dirección de loading -->
+
         </div>
     </AppLayout>
 </template>
@@ -527,8 +552,8 @@ export default {
         JetNavLink,
         Link,
         money3: Money3Component,
-
     },
+
     props:{
         clientes : [],
         errors: Object
@@ -538,6 +563,7 @@ export default {
     },
     data() {
         return {
+            loading: false,
             tituloModal: '',
             formpasswd: {
                 _token: usePage().props.value._token,
@@ -595,8 +621,9 @@ export default {
                 },
             });
         },
-        openModal: function (accion, data = []) {
+        openModal: async function (accion, data = []) {
             this.isOpen = true;
+            this.loading = true;
 
             switch (accion) {
                 case 'registrar':
@@ -607,11 +634,6 @@ export default {
                     this.form.idciudad = 0;
                     this.form.idtipos_documento = 0;
                     this.form.idrol = 2;
-                    this.getRoles();
-                    this.getPaises();
-                    this.getCiudades();
-                    this.getDepartamentos();
-                    this.getTiposdocumento();
                     this.newMode = true;
                     this.verMode = false;
                     this.editMode = false;
@@ -633,19 +655,13 @@ export default {
                     this.form.username = data['username'];
                     this.form.direccion = data['direccion'];
                     this.form.telefono = data['telefono'];
-                    this.getRoles();
-                    this.getPaises();
-                    this.getCiudades();
-                    this.getDepartamentos();
-                    this.getTiposdocumento();
-                    this.getEmpresas();
                     this.newMode = false;
                     this.verMode = true;
                     this.editMode = false;
                     break;
-                    break;
                 }
                 case 'actualizar': {
+                    console.log('inicia loading');
                     this.form.id = data['id'];
                     this.tituloModal = 'Actualizar Usuario ' + data['username'];
                     this.form.idpais = data['idpais'];
@@ -662,20 +678,15 @@ export default {
                     this.form.username = data['username'];
                     this.form.direccion = data['direccion'];
                     this.form.telefono = data['telefono'];
-                    this.getRoles();
-                    this.getPaises();
-                    this.getCiudades();
-                    this.getDepartamentos();
-                    this.getTiposdocumento();
-                    this.getEmpresas();
+
                     this.newMode = false;
                     this.verMode = false;
                     this.editMode = true;
-                    break;
+                    console.log('termina loading');
                     break;
                 }
-
             }
+            this.loading = false;
         },
         closeModal: function () {
             this.isOpen = false;
@@ -737,6 +748,7 @@ export default {
             this.openModal('ver', data);
         },
         update: function (data) {
+            this.loading = true;
             data._method = 'PUT';
             this.$inertia.post('/users/cliente/' + data.id, data, {
                 onSuccess: (page) => {
@@ -755,6 +767,7 @@ export default {
                     this.newMode = false;
                 },
             });
+            this.loading = false;
         },
         getUsers: function (buscar, sortBy, filtros = []) {
             this.buscar = buscar;
@@ -808,6 +821,12 @@ export default {
     },
     created: function () {
         this.arrayData = this.clientes;
+        this.getRoles();
+        this.getPaises();
+        this.getCiudades();
+        this.getDepartamentos();
+        this.getTiposdocumento();
+        this.getEmpresas();
     },
     mounted() {
     },

@@ -282,6 +282,30 @@
 
                 </div>
             </div>
+
+            <!-- Ventana modal dirección de loading -->
+            <!-- Main modal -->
+            <section> <!-- Ventana modal -->
+                <div class="fixed z-10 inset-0 overflow-y-auto ease-out duration-400" v-if="loading">
+                    <div class="items-end justify-center min-h-screen pt-10 px-2 pb-20 text-center sm:block sm:p-0">
+
+                        <div class="fixed inset-0 transition-opacity">
+                            <div class="absolute inset-0 bg-gray-400 opacity-75"></div>
+                        </div>
+
+                        <!-- This element is to trick the browser into centering the modal contents. -->
+                        <span class="hidden inline-block align-middle h-screen"></span>
+                        <section>
+                            <div class=" mt-10 w-full" id="app">
+                                <semipolar-spinner class="mt-10 mx-auto" :animation-duration="2000" :size="85" color="#ff1d5e" />
+                            </div>
+                        </section>
+
+
+                    </div>
+                </div>
+            </section>
+            <!-- Fin Ventana modal dirección de loading -->
         </div>
     </AppLayout>
 </template>
@@ -337,6 +361,7 @@ export default {
     },
     data() {
         return {
+            loading: false,
             datoant: 0,
             datoact:0,
             configMoney: {
@@ -390,7 +415,8 @@ export default {
         }
     },
     methods: {
-        getReport: function (filtros = [], sortBy = 'boletas.idvendedor') {
+        getReport: async function (filtros = [], sortBy = 'boletas.idvendedor') {
+            this.loading = true;
             if (sortBy == this.sortBy){
                 this.sortOrder = !this.sortOrder;
             }
@@ -404,17 +430,17 @@ export default {
             this.ispage = true;
 
             var url= '/reportes/vendedor';
-            axios.get(url, {
+            let res = await axios.get(url, {
                 params: {
                     filtros: filtros,
                     sortBy: this.sortBy,
                     sortOrder: sortOrderdesc,
                     ispage: this.ispage
                 }
-            }).then((res) => {
-                var respuesta = res.data;
-                this.arrayData = respuesta.datos;
-            })
+            });
+            var respuesta = res.data;
+            this.arrayData = respuesta.datos;
+            this.loading = false;
         },
         BoletasExport: function (filtros = []) {
             let fecha = moment(new Date()).format('DDMMYYYY');
@@ -435,17 +461,16 @@ export default {
                 fileLink.click();
             })
         },
-        getDetalleVendedor: function (idvendedor, filtros = []) {
+        getDetalleVendedor: async function (idvendedor, filtros = []) {
             var url= '/reportes/getDetalleVendedor';
-            axios.get(url, {
+            let res = await axios.get(url, {
                 params: {
                     filtros: filtros,
                     idvendedor: idvendedor,
                 }
-            }).then((res) => {
-                var respuesta = res.data;
-                this.arrayDetalles = respuesta.data;
-            })
+            });
+            var respuesta = res.data;
+            this.arrayDetalles = respuesta.data;
         },
     },
     created: function () {
