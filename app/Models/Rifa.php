@@ -35,7 +35,9 @@ class Rifa extends Model
         'idcreador',
         'serieoculta',
         'serie',
-        'idserie'
+        'idserie',
+        'mensaje1',
+        'mensaje2'
     ];
 
     public function scopeActive($query) {

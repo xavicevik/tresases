@@ -741,22 +741,18 @@ class VentaController extends Controller
                     if ($saldo > 0) {
                         $saldotxt = "Tu saldo pendiente es $saldo.";
                     }
-                    $message = "Los Tres Ases te da la bienvenida y agradece tu fidelidad, el gran bono millonario premio mayor $boleta->numero promocional $boleta->promocional ha sido registrado con exito. $saldotxt SUERTE";
+                    $rifa = Rifa::where('id', $boleta->idrifa)->first();
+                    $message1 = str_replace('%mayor%', $boleta->numero, $rifa->mensaje1);
+                    $message1 = str_replace('%promocional%', $boleta->promocional, $message1);
+                    $message1 = str_replace('%saldotxt%', $saldotxt, $message1);
 
-                    $this->sendSMS($to, $message);
-
-                    //SendSMSJob::dispatch($to, $message);
+                    $this->sendSMS($to, $message1);
                     if ($saldo == 0) {
-                        $urlboleta = url('storage').'/boletas/boleta_'.$boleta->idrifa.$boleta->codigo.'.pdf';
-                        //$message = "Conserva este mensaje de paz y salvo valido para reclamar el premio mayor: Apto Icaru, Camioneta mazda CX5 y Viaje resolucion EDSA N 999 premio mayor $boleta->numero y promocional $boleta->promocional. Sorteo miercoles 5 de julio de 2023 con el premio mayor de la loteria de manizales";
-
-                        $rifa = Rifa::where('id', $boleta->idrifa)->first();
-
-                        $message = str_replace('%mayor%', $boleta->numero, $rifa->resumen);
-                        $message = str_replace('%promocional%', $boleta->promocional, $message);
-                        $message .= "  Boleta: $urlboleta";
-                        $this->sendSMS($to, $message);
-                        //SendSMSJob::dispatch($to, $message);
+                        $urlboleta = url('storage') . '/boletas/boleta' . $boleta->idrifa . $boleta->codigo . '.pdf';
+                        $message2 = str_replace('%mayor%', $boleta->numero, $rifa->mensaje2);
+                        $message2 = str_replace('%promocional%', $boleta->promocional, $message2);
+                        $message2 .= "  Boleta: $urlboleta";
+                        $this->sendSMS($to, $message2);
                     }
                 }
 
@@ -1169,19 +1165,17 @@ class VentaController extends Controller
         if ($saldo > 0) {
             $saldotxt = "Tu saldo pendiente es $saldo.";
         }
-        $message = "Los Tres Ases te da la bienvenida y agradece tu fidelidad, el gran bono millonario premio mayor ".$detalle->boleta->numero." promocional ".$detalle->boleta->promocional." ha sido registrado con exito. $saldotxt SUERTE";
+        $message1 = str_replace('%mayor%', $detalle->boleta->numero, $rifa->mensaje1);
+        $message1 = str_replace('%promocional%', $detalle->boleta->promocional, $message1);
+        $message1 = str_replace('%saldotxt%', $saldotxt, $message1);
 
-        //$this->sendSMS($to, $message);
-        SendSMSJob::dispatch($to, $message);
+        $this->sendSMS($to, $message1);
         if ($saldo == 0) {
-            //$message = "Conserva este mensaje de paz y salvo valido para reclamar el premio mayor: Apto Plaza Robles, Camioneta mazda y Tour resolucion EDSA N 999 premio mayor ".$detalle->boleta->numero." y promocional ".$detalle->boleta->promocional.". Sorteo miercoles 21 de diciembre de 2022 con el premio mayor de la loteria de manizales";
-            //$message = "Conserva este mensaje de paz y salvo valido para reclamar el premio mayor: Apto Icaru, Camioneta mazda CX5 y Viaje resolucion EDSA N 999 premio mayor ".$detalle->boleta->numero." y promocional ".$detalle->boleta->promocional.". Sorteo miercoles 5 de julio de 2023 con el premio mayor de la loteria de manizales";
-
-            $message = str_replace('%mayor%', $detalle->boleta->numero, $rifa->resumen);
-            $message = str_replace('%promocional%', $detalle->boleta->promocional, $message);
-
-            //$this->sendSMS($to, $message);
-            SendSMSJob::dispatch($to, $message);
+            $urlboleta = url('storage') . '/boletas/boleta' . $detalle->boleta->idrifa . $detalle->boleta->codigo . '.pdf';
+            $message2 = str_replace('%mayor%', $detalle->boleta->numero, $rifa->mensaje1);
+            $message2 = str_replace('%promocional%', $detalle->boleta->promocional, $message2);
+            $message2 .= "  Boleta: $urlboleta";
+            $this->sendSMS($to, $message2);
         }
     }
 
@@ -1594,12 +1588,8 @@ class VentaController extends Controller
         $preference->expiration_date_to = $mytime->addHours(config('mercadopago.expirationpay'))->toIso8601String();
         $preference->date_of_expiration = $preference->expiration_date_to;
         $preference->notification_url = $url.'app/ventas/paynotify';
-        $preference->external_reference = $request->idsesion;
-        //$payer = new \MercadoPago\Payer();
-        //$payer->email = "recibos@hola.com";
-        //$payer->name
-        //$payer->first_name
-        //$preference->payer = $payer;
+	$preference->external_reference = $request->idsesion;
+	$preference->statement_descriptor = 'SHOPPINGRED';
 
         foreach ($detallesesion as $product) {
             $item = new \MercadoPago\Item();
@@ -1629,8 +1619,6 @@ class VentaController extends Controller
     }
 
     public function sendSMS($to, $message) {
-        $to = '573012007400';
-        //$to = '573155665528';
         $response = Http::withHeaders([
             'Content-Type' => 'application/json',
             'Authorization' => 'Basic QWRhbW1Tb2x1Y2lvbmVzX0JfMVdFOjZpW3pMRVEkTWI=',
@@ -1644,6 +1632,7 @@ class VentaController extends Controller
             "isRandomRoute" => false
         ]);
 
+	/*
         $to = '573216435009';
         $response = Http::withHeaders([
             'Content-Type' => 'application/json',
@@ -1656,7 +1645,8 @@ class VentaController extends Controller
             "isFlash" => false,
             "isLongmessage" => true,
             "isRandomRoute" => false
-        ]);
+	]);
+	 */
 
         return $response;
     }
@@ -1664,6 +1654,11 @@ class VentaController extends Controller
     public function paynotifysuccess(Request $request) {
 
         $checkouts = Checkout::where('preference_id', $request->preference_id)->get();
+
+        $boleta = Boleta::where('id', $checkouts[0]['idboleta'])->first();
+        $idrifa = $boleta->idrifa;
+
+        /*
 
         $r = new Request();
         $r->idsesion = $checkouts[0]['idsesionventa'];
@@ -1691,12 +1686,14 @@ class VentaController extends Controller
         $checkout = Checkout::where('preference_id', $request->preference_id)
                               ->first();
 
+        */
+
         $urlbase = config('mercadopago.urlretorno');
         $url = $urlbase.'app/authenticatelink/'.$checkouts[0]['idvendedor'].'?idrifa='.$idrifa;
 
         return Inertia::render('Ventas/Finishsale', [
-                        'payment_id' => $checkout->payment_id,
-                        'idventa' => $checkout->idventa,
+                        'payment_id' => $checkouts[0]['payment_id'],
+                        'idventa' => $checkouts[0]['idventa'],
                         'estado' => 'aprobado',
                         'url' => $url,
                         'mensajePago' => 'Gracias por comprar en Shoppingred.com!'
@@ -1705,6 +1702,11 @@ class VentaController extends Controller
 
     public function paynotifyfailure(Request $request) {
         $checkouts = Checkout::where('preference_id', $request->preference_id)->get();
+
+        $boleta = Boleta::where('id', $checkouts[0]['idboleta'])->first();
+        $idrifa = $boleta->idrifa;
+
+        /*
 
         $r = new Request();
         $r->idsesion = $checkouts[0]['idsesionventa'];
@@ -1730,11 +1732,13 @@ class VentaController extends Controller
         $checkout = Checkout::where('preference_id', $request->preference_id)
             ->first();
 
+        */
+
         $urlbase = config('mercadopago.urlretorno');
         $url = $urlbase.'app/authenticatelink/'.$checkouts[0]['idvendedor'].'?idrifa='.$idrifa;
 
         return Inertia::render('Ventas/Finishsale', [
-            'payment_id' => $checkout->payment_id,
+            'payment_id' => $checkouts[0]['payment_id'],
             'idventa' => null,
             'url' => $url,
             'estado' => 'rechazado',
@@ -1745,12 +1749,10 @@ class VentaController extends Controller
     public function paynotifypending(Request $request) {
         $checkouts = Checkout::where('preference_id', $request->preference_id)->get();
 
-        //$r = new Request();
-        //$r->idsesion = $checkouts[0]['idsesionventa'];
-        //$r->isSale = true;
-        //$idventa = $this->newSale($r);
-        //$this->finishSession($r);
+        $boleta = Boleta::where('id', $checkouts[0]['idboleta'])->first();
+        $idrifa = $boleta->idrifa;
 
+        /*
         $sesionventa = Sesionventa::where('id', $checkouts[0]['idsesionventa'])->first();
         $sesionventa->estado = self::enproceso;
         $sesionventa->save();
@@ -1772,12 +1774,12 @@ class VentaController extends Controller
         }
         $checkout = Checkout::where('preference_id', $request->preference_id)
             ->first();
-
+        */
         $urlbase = config('mercadopago.urlretorno');
         $url = $urlbase.'app/authenticatelink/'.$checkouts[0]['idvendedor'].'?idrifa='.$idrifa;
 
         return Inertia::render('Ventas/Finishsale', [
-            'payment_id' => $checkout->payment_id,
+            'payment_id' => $checkouts[0]['payment_id'],
             'idventa' => null,
             'estado' => 'pendiente',
             'url' => $url,
@@ -1788,9 +1790,14 @@ class VentaController extends Controller
     // Notificaciones ventas app
     public function paynotifysuccessapp(Request $request) {
         $payment_id = null;
-        $idventa = null;
+	$idventa = null;
+	$url = null;
         if ($request->external_reference) {
             $checkouts = Checkout::where('idsesionventa', $request->external_reference)->get();
+            $boleta = Boleta::where('id', $checkouts[0]['idboleta'])->first();
+            $idrifa = $boleta->idrifa;
+
+            /*
             $r = new Request();
             $r->idsesion = $request->external_reference;
             $r->isSale = true;
@@ -1829,9 +1836,7 @@ class VentaController extends Controller
 
                 $this->sendSMS($to, $message);
                 if ($saldo == 0) {
-                    $urlboleta = url('storage').'/boletas/boleta_'.$boleta->idrifa.$boleta->codigo.'.pdf';
-                    //$mensaje = "Conserva este mensaje de paz y salvo valido para reclamar el premio mayor: Apto Robles, Camioneta mazda y Tour resolucion EDSA N 999 premio mayor $boleta->numero y promocional $boleta->promocional. Sorteo miercoles 21 de diciembre de 2022 con el premio mayor de la loteria de manizales. Boleta: $urlboleta";
-                    //$message = "Conserva este mensaje de paz y salvo valido para reclamar el premio mayor: Apto Icaru, Camioneta mazda CX5 y Viaje resolucion EDSA N 999 premio mayor $boleta->numero y promocional $boleta->promocional. Sorteo miercoles 5 de julio de 2023 con el premio mayor de la loteria de manizales. Boleta: $urlboleta";
+                    $urlboleta = url('storage').'/boletas/boleta'.$boleta->idrifa.$boleta->codigo.'.pdf';
 
                     $rifa = Rifa::where('id', $boleta->idrifa)->first();
                     $message = str_replace('%mayor%', $boleta->numero, $rifa->resumen);
@@ -1840,13 +1845,13 @@ class VentaController extends Controller
                     $this->sendSMS($to, $message);
                 }
             }
+            */
 
             $urlbase = config('mercadopago.urlretorno');
             $url = $urlbase.'app/authenticatelink/'.$checkouts[0]['idvendedor'].'?idrifa='.$idrifa;
-            //$checkout = Checkout::where('preference_id', $request->preference_id)->first();
+            $payment_id = $checkouts[0]['payment_id'];
+            $idventa = $checkouts[0]['idventa'];
         }
-
-        //event(new SaleApp('Hola mundo'));
 
         return Inertia::render('Ventas/Finishsaleapp', [
             'payment_id' => $payment_id?$payment_id:null,
@@ -1859,6 +1864,9 @@ class VentaController extends Controller
 
     public function paynotifyfailureapp(Request $request) {
         $checkouts = Checkout::where('preference_id', $request->preference_id)->get();
+        $boleta = Boleta::where('id', $checkouts[0]['idboleta'])->first();
+        $idrifa = $boleta->idrifa;
+        /*
         $r = new Request();
         $r->idsesion = $checkouts[0]['idsesionventa'];
         $sesion = Sesionventa::where('id', $r->idsesion)->first();
@@ -1897,13 +1905,12 @@ class VentaController extends Controller
             //\Illuminate\Support\Facades\Notification::route('mail', 'javier.minotta.h@gmail.com')->notify(new EmailcodeNotification($subject, $line1, $action, $line2, $boleta->numero, $boleta->promocional));
         }
 
+        */
         $urlbase = config('mercadopago.urlretorno');
         $url = $urlbase.'app/authenticatelink/'.$checkouts[0]['idvendedor'].'?idrifa='.$idrifa;
-        $checkout = Checkout::where('preference_id', $request->preference_id)
-            ->first();
 
         return Inertia::render('Ventas/Finishsaleapp', [
-            'payment_id' => $checkout->payment_id,
+            'payment_id' => $checkouts[0]['payment_id'],
             'idventa' => null,
             'estado' => 'rechazado',
             'url' => $url?$url:'',
@@ -1913,6 +1920,9 @@ class VentaController extends Controller
 
     public function paynotifypendingapp(Request $request) {
         $checkouts = Checkout::where('preference_id', $request->preference_id)->get();
+        $boleta = Boleta::where('id', $checkouts[0]['idboleta'])->first();
+        $idrifa = $boleta->idrifa;
+        /*
         $sesionventa = Sesionventa::where('id', $checkouts[0]['idsesionventa'])->first();
         $sesionventa->estado = self::enproceso;
         $sesionventa->save();
@@ -1949,13 +1959,14 @@ class VentaController extends Controller
             //\Illuminate\Support\Facades\Notification::route('mail', 'javier.minotta.h@gmail.com')->notify(new EmailcodeNotification($subject, $line1, $action, $line2, $boleta->numero, $boleta->promocional));
         }
 
-        $urlbase = config('mercadopago.urlretorno');
-        $url = $urlbase.'app/authenticatelink/'.$checkouts[0]['idvendedor'].'?idrifa='.$idrifa;
         $checkout = Checkout::where('preference_id', $request->preference_id)
             ->first();
+        */
+        $urlbase = config('mercadopago.urlretorno');
+        $url = $urlbase.'app/authenticatelink/'.$checkouts[0]['idvendedor'].'?idrifa='.$idrifa;
 
         return Inertia::render('Ventas/Finishsaleapp', [
-            'payment_id' => $checkout->payment_id,
+            'payment_id' => $checkouts[0]['payment_id'],
             'idventa' => null,
             'estado' => 'pendiente',
             'url' => $url?$url:'',
@@ -1987,17 +1998,19 @@ class VentaController extends Controller
             if ($saldo > 0) {
                 $saldotxt = "Tu saldo pendiente es $saldo.";
             }
-            $message = "Shopingred agradece tu fidelidad, el gran bono millonario premio mayor $boleta->numero promocional $boleta->promocional ha sido registrado con exito. $saldotxt SUERTE";
-            $mensaje = $saldotxt;
 
-            $this->sendSMS($to, $message);
+            $rifa = Rifa::where('id', $boleta->idrifa)->first();
+            $message1 = str_replace('%mayor%', $boleta->numero, $rifa->mensaje1);
+            $message1 = str_replace('%promocional%', $boleta->promocional, $message1);
+            $message1 = str_replace('%saldotxt%', $saldotxt, $message1);
+
+            $this->sendSMS($to, $message1);
             if ($saldo == 0) {
-                //$mensaje = "Conserva este mensaje de paz y salvo valido para reclamar el premio mayor: Apto Robles, Camioneta mazda y Tour resolucion EDSA N 999 premio mayor $boleta->numero y promocional $boleta->promocional. Sorteo miercoles 21 de diciembre de 2022 con el premio mayor de la loteria de manizales";
-                //$message = "Conserva este mensaje de paz y salvo valido para reclamar el premio mayor: Apto Icaru, Camioneta mazda CX5 y Viaje resolucion EDSA N 999 premio mayor $boleta->numero y promocional $boleta->promocional. Sorteo miercoles 5 de julio de 2023 con el premio mayor de la loteria de manizales";
-                $rifa = Rifa::where('id', $boleta->idrifa)->first();
-                $message = str_replace('%mayor%', $boleta->numero, $rifa->resumen);
-                $message = str_replace('%promocional%', $boleta->promocional, $message);
-                $this->sendSMS($to, $message);
+                $urlboleta = url('storage') . '/boletas/boleta' . $boleta->idrifa . $boleta->codigo . '.pdf';
+                $message2 = str_replace('%mayor%', $boleta->numero, $rifa->mensaje2);
+                $message2 = str_replace('%promocional%', $boleta->promocional, $message2);
+                $message2 .= "  Boleta: $urlboleta";
+                $this->sendSMS($to, $message2);
             }
         }
     }
@@ -2006,7 +2019,7 @@ class VentaController extends Controller
         $checkouts = Checkout::whereIn('status', array('in_process','pending'))->get();
 
         foreach ($checkouts as $checkout) {
-            SDK::setAccessToken("TEST-527760229179050-091011-a9b62330235cb5d7a47b2b59968ac474-1195821039");
+            SDK::setAccessToken(config('mercadopago.AccessToken'));
             $response = Payment::get($checkout->payment_id);
 
             if ($response->status == 'cancelled') {
@@ -2019,78 +2032,253 @@ class VentaController extends Controller
             } elseif ($response->status == 'approved') {
                 $checkout->estado = self::vendido;
                 $checkout->status = 'approved';
-                $this->paynotifysuccessappjob($checkout->preference_id);
+
+                $r = new Request();
+                $r->idsesion = $checkout->idsesionventa;
+                $r->isSale = true;
+                $idventa = $this->newSale($r);
+                VentaController::finishSession($r);
+
+                $checkout->status = $response->status;
+                $checkout->estado = self::vendido;
+                $checkout->save();
+
+                $cliente = Cliente::where('id', $checkout->idcliente)->first();
+                $boleta = Boleta::where('id', $checkout->idboleta)->first();
+                $to = "57".$cliente->movil;
+
+                $saldo = $boleta->saldo;
+                $saldotxt = '';
+
+                if ($saldo > 0) {
+                    $saldotxt = "Tu saldo pendiente es $saldo.";
+                }
+                $rifa = Rifa::where('id', $boleta->idrifa)->first();
+                $message1 = str_replace('%mayor%', $boleta->numero, $rifa->mensaje1);
+                $message1 = str_replace('%promocional%', $boleta->promocional, $message1);
+                $message1 = str_replace('%saldotxt%', $saldotxt, $message1);
+
+                $this->sendSMS($to, $message1);
+                if ($saldo == 0) {
+                    $urlboleta = url('storage') . '/boletas/boleta' . $boleta->idrifa . $boleta->codigo . '.pdf';
+                    $message2 = str_replace('%mayor%', $boleta->numero, $rifa->mensaje2);
+                    $message2 = str_replace('%promocional%', $boleta->promocional, $message2);
+                    $message2 .= "  Boleta: $urlboleta";
+                    $this->sendSMS($to, $message2);
+                }
+
             }
             $checkout->save();
         }
     }
 
     public function paynotify(Request $request) {
-        $notify = new Whmercadopago();
-        $notify->response = $request;
-        $notify->save();
+        try {
+            DB::beginTransaction();
+            $notify = new Whmercadopago();
+            $notify->response = 'Get - ' . $request;
+	    $notify->save();
 
-        if ($request->type == 'payment') {
-            $params =  json_decode(json_encode($request->post()));
-            $data = json_decode(json_encode($params->data));
+            $params = json_decode(json_encode($request->post()));
+	    $data = json_decode(json_encode($params->data));
 
             $notify = new Whmercadopago();
-            $notify->response = $data->id;
-            $notify->save();
+            $notify->response = '$request->type - ' . $request->type;
+	    $notify->save();
+	    
+            if ($request->type == 'payment') {
+                //$params = json_decode(json_encode($request->post()));
+                //$data = json_decode(json_encode($params->data));
 
-            SDK::setAccessToken(config('mercadopago.AccessToken'));
-            $payment = Payment::find_by_id($data->id);
-
-            if ($payment->status == 'cancelled' || $payment->status == 'rejected') {
-                $checkouts = Checkout::where('idsesionventa', $request->external_reference)->get();
-                foreach ($checkouts as $checkout) {
-                    $checkout->estado = self::cancelado;
-                    $checkout->save();
-                    $r = new Request();
-                    $r->idsesion = $checkout->idsesionventa;
-                    $r->isSale = false;
-                    $this->finishSession($r);
-                }
-            }
-            if ($payment->status == 'in_process' || $payment->status == 'pending'){
-                $checkouts = Checkout::where('idsesionventa', $request->external_reference)->get();
-                foreach ($checkouts as $checkout) {
-                    $checkout->estado = self::enproceso;
-                    $checkout->save();
-                }
-            }
-            if ($payment->status == 'approved') {
                 $notify = new Whmercadopago();
-                $notify->response = 'aproved';
+                $notify->response = 'data.id - ' . $data->id;
                 $notify->save();
-                $checkouts = Checkout::where('idsesionventa', $request->external_reference)->get();
-                if ($checkouts[0]['collection_status'] != 'approved') {
-                    $r = new Request();
-                    $r->idsesion = $request->external_reference;
-                    $r->isSale = true;
-                    $idventa = $this->newSale($r);
-                    $this->finishSession($r);
 
+                SDK::setAccessToken(config('mercadopago.AccessToken'));
+                $payment = Payment::find_by_id($data->id);
+
+                $notify = new Whmercadopago();
+                $notify->response = 'payment.external_reference - ' . $payment->external_reference;
+                $notify->save();
+
+                $notify = new Whmercadopago();
+                $notify->response = 'payment.status - ' . $payment->status;
+                $notify->save();
+
+
+		if ($payment->status == 'cancelled') {
+                    $checkouts = Checkout::where('idsesionventa', $payment->external_reference)->get();
                     foreach ($checkouts as $checkout) {
-                        $checkout->collection_id = $request->collection_id;
-                        $checkout->collection_status = $request->collection_status;
-                        $checkout->payment_id = $request->payment_id;
-                        $checkout->status = $request->status;
-                        $checkout->estado = self::vendido;
-                        $checkout->payment_type = $request->payment_type;
-                        $checkout->merchant_order_id = $request->merchant_order_id;
-                        $checkout->site_id = $request->site_id;
-                        $checkout->processing_mode = $request->processing_mode;
-                        $checkout->merchant_account_id = $request->merchant_account_id;
-                        $checkout->idventa = $idventa;
+                        $checkout->estado = self::cancelado;
+                        $checkout->collection_status = $payment->status;
+                        $checkout->payment_id = $data->id;
+                        $checkout->status = $payment->status;
+                        $checkout->payment_type = $payment->payment_type_id;
+                        $checkout->processing_mode = $payment->processing_mode;
+                        $checkout->merchant_account_id = $payment->merchant_account_id;
                         $checkout->save();
-                        $this->paynotifysuccessappjob($checkout->preference_id);
+                        $r = new Request();
+                        $r->idsesion = $checkout->idsesionventa;
+                        $r->isSale = false;
+                        $this->finishSession($r);
+
+                        //
+                        $notify = new Whmercadopago();
+                        $notify->response = 'cancelled';
+                        $notify->save();
+
+                        $cliente = Cliente::where('id', $checkout->idcliente)->first();
+                        $boleta = Boleta::where('id', $checkout->idboleta)->first();
+                        $to = "57" . $cliente->movil;
+
+                        $message1 = "Shopingred le informa que el pago [$data->id] del proceso de venta de la boleta $boleta->numero ha sido cancelado por la plataforma de pago";
+
+                        $this->sendSMS($to, $message1);
+                        //
+                    }
+                }
+
+                if ($payment->status == 'rejected') {
+                    $checkouts = Checkout::where('idsesionventa', $payment->external_reference)->get();
+                    foreach ($checkouts as $checkout) {
+                        $checkout->estado = self::cancelado;
+                        $checkout->collection_status = $payment->status;
+                        $checkout->payment_id = $data->id;
+                        $checkout->status = $payment->status;
+                        $checkout->payment_type = $payment->payment_type_id;
+                        $checkout->processing_mode = $payment->processing_mode;
+                        $checkout->merchant_account_id = $payment->merchant_account_id;
+                        $checkout->save();
+                        //$r = new Request();
+                        //$r->idsesion = $checkout->idsesionventa;
+                        //$r->isSale = false;
+                        //$this->finishSession($r);
+
+                        //
+                        $notify = new Whmercadopago();
+                        $notify->response = 'rejected';
+                        $notify->save();
+
+                        $cliente = Cliente::where('id', $checkout->idcliente)->first();
+                        $boleta = Boleta::where('id', $checkout->idboleta)->first();
+                        $to = "57" . $cliente->movil;
+
+                        $message1 = "Shopingred le informa que el pago [$data->id] del proceso de venta de la boleta $boleta->numero ha sido rechazado por la plataforma de pago";
+
+                        $this->sendSMS($to, $message1);
+                        //
+                    }
+                }
+                if ($payment->status == 'in_process' || $payment->status == 'pending') {
+                    $checkouts = Checkout::where('idsesionventa', $payment->external_reference)->get();
+                    foreach ($checkouts as $checkout) {
+                        $checkout->estado = self::enproceso;
+                        $checkout->collection_status = $payment->status;
+                        $checkout->payment_id = $data->id;
+                        $checkout->status = $payment->status;
+                        $checkout->payment_type = $payment->payment_type_id;
+                        $checkout->processing_mode = $payment->processing_mode;
+                        $checkout->merchant_account_id = $payment->merchant_account_id;
+                        $checkout->save();
+
+                        //
+                        $notify = new Whmercadopago();
+                        $notify->response = 'pendiente - en proceso';
+                        $notify->save();
+
+                        $cliente = Cliente::where('id', $checkout->idcliente)->first();
+                        $boleta = Boleta::where('id', $checkout->idboleta)->first();
+                        $to = "57" . $cliente->movil;
+
+                        $message1 = "Shopingred le informa que se ha registrado el pago [$data->id] del proceso de venta de la boleta $boleta->numero y se encuentra en estado pendiente de pago";
+
+                        $this->sendSMS($to, $message1);
+                        //
+
+                    }
+                }
+                if ($payment->status == 'approved') {
+                    $notify = new Whmercadopago();
+                    $notify->response = 'aproved';
+                    $notify->save();
+
+                    $checkouts = Checkout::where('idsesionventa', $payment->external_reference)->get();
+
+                    $notify = new Whmercadopago();
+                    $notify->response = 'checkout.collection_status -' . $checkouts[0]['collection_status'];
+                    $notify->save();
+
+                    if ($checkouts[0]['collection_status'] != 'approved') {
+                        $notify = new Whmercadopago();
+                        $notify->response = 'venta aprobada';
+                        $notify->save();
+
+                        $r = new Request();
+                        $r->idsesion = $payment->external_reference;
+                        $r->isSale = true;
+                        $idventa = $this->newSale($r);
+                        //$this->finishSession($r);
+                        VentaController::finishSession($r);
+
+                        $notify = new Whmercadopago();
+                        $notify->response = 'venta - ' . $idventa;
+                        $notify->save();
+
+                        foreach ($checkouts as $checkout) {
+                            $notify = new Whmercadopago();
+                            $notify->response = 'checkout - ' . $checkout->preference_id;
+                            $notify->save();
+
+                            //$checkout->collection_id = $request->collection_id;
+                            $checkout->collection_status = $payment->status;
+                            $checkout->payment_id = $data->id;
+                            $checkout->status = $payment->status;
+                            $checkout->estado = self::vendido;
+                            $checkout->payment_type = $payment->payment_type_id;
+                            //$checkout->merchant_order_id = $request->merchant_order_id;
+                            //$checkout->site_id = $request->site_id;
+                            $checkout->processing_mode = $payment->processing_mode;
+                            $checkout->merchant_account_id = $payment->merchant_account_id;
+                            $checkout->idventa = $idventa;
+                            $checkout->save();
+                            //$this->paynotifysuccessappjob($checkout->preference_id);
+
+                            $cliente = Cliente::where('id', $checkout->idcliente)->first();
+                            $boleta = Boleta::where('id', $checkout->idboleta)->first();
+                            $to = "57" . $cliente->movil;
+
+                            $saldo = $boleta->saldo;
+                            $saldotxt = '';
+
+                            if ($saldo > 0) {
+                                $saldotxt = "Tu saldo pendiente es $saldo.";
+                            }
+                            $rifa = Rifa::where('id', $boleta->idrifa)->first();
+
+                            $message1 = str_replace('%mayor%', $boleta->numero, $rifa->mensaje1);
+                            $message1 = str_replace('%promocional%', $boleta->promocional, $message1);
+                            $message1 = str_replace('%saldotxt%', $saldotxt, $message1);
+
+                            $this->sendSMS($to, $message1);
+                            if ($saldo == 0) {
+                                $urlboleta = url('storage') . '/boletas/boleta' . $boleta->idrifa . $boleta->codigo . '.pdf';
+                                $message2 = str_replace('%mayor%', $boleta->numero, $rifa->mensaje2);
+                                $message2 = str_replace('%promocional%', $boleta->promocional, $message2);
+                                $message2 .= "  Boleta: $urlboleta";
+                                $this->sendSMS($to, $message2);
+                            }
+                        }
                     }
                 }
             }
-        }
+            DB::commit();
 
-        return response()->json(["success" =>"true", "message" => "Successfully Done."], Response::HTTP_OK);
+            return response()->json(["success" =>"true", "message" => "Successfully Done."], Response::HTTP_OK);
+        } catch (Throwable $e){
+            DB::rollBack();
+
+            return response()->json(["success" =>"false", "message" => "Error."], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
     }
 
     public static function genBoletaImagen(Boleta $boleta) {
@@ -2108,7 +2296,7 @@ class VentaController extends Controller
             'codigo' => $codigo
         ];
 
-        $filename = 'boleta_'.$boleta->idrifa.$boleta->codigo.'.pdf';
+        $filename = 'boleta'.$boleta->idrifa.$boleta->codigo.'.pdf';
         $pdf = app('dompdf.wrapper');
         $pdf->getDomPDF()->set_option("enable_php", true);
         $pdf->setPaper('A4', 'landscape');
