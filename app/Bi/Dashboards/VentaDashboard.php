@@ -20,7 +20,7 @@ use LaravelBi\LaravelBi\Widgets\Table;
 use LaravelBi\LaravelBi\Widgets\Traits\SingleMetric;
 
 
-class VentasDashboard extends Dashboard
+class VentaDashboard extends Dashboard
 {
 
     public $model  = Venta::class;
@@ -31,41 +31,38 @@ class VentasDashboard extends Dashboard
     {
         return [
             DateIntervalFilter::create('created_at', 'Fecha'),
-            BelongsToFilter::create('genero', 'Género')
-                ->relation('genero')
+            BelongsToFilter::create('vendedor', 'Vendedor')
+                ->relation('vendedor')
                 ->otherColumn('nombre'),
-            BelongsToFilter::create('etnia', 'Etnia')
-                ->relation('grupoEtnico')
-                ->otherColumn('nombre'),
+            BelongsToFilter::create('rifa', 'Rifa')
+                ->relation('rifa')
+                ->otherColumn('nombre_tecnico'),
             BelongsToFilter::create('estado', 'Estado')
                 ->relation('estados')
-                ->otherColumn('nombre'),
-            BelongsToFilter::create('inscripcion', 'Tipo inscripción')
-                ->relation('inscripcion')
                 ->otherColumn('nombre'),
             BelongsToFilter::create('ciudad', 'Ciudad')
                 ->relation('ciudad')
                 ->otherColumn('nombre'),
-            StringFilter::create('avalado', 'Avalado'),
-            StringFilter::create('electo', 'Electo'),
-            StringFilter::create('lider', 'Lider'),
+            //StringFilter::create('avalado', 'Avalado'),
+            //StringFilter::create('electo', 'Electo'),
+            //StringFilter::create('lider', 'Lider'),
         ];
     }
 
     public function widgets()
     {
         return [
-            BigNumber::create('militantes', 'Cantidad de militantes')
+            BigNumber::create('ventas', 'Cantidad de ventas')
                 ->metric(
                     CountMetric::create('count', 'Cantidad')
                         ->color('#ff5555')
                 )
                 ->width('1/3'),
 
-            PartitionPie::create('miliantes-generos', 'Militantes por géneros')
+            PartitionPie::create('boletas', 'Boletas por estado')
                 ->dimensions([
-                    BelongsToDimension::create('idgenero', 'Género')
-                        ->relation('genero')
+                    BelongsToDimension::create('estado', 'Estado')
+                        ->relation('estados')
                         ->otherColumn('nombre')
                 ])
                 ->metrics([

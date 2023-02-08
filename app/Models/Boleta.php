@@ -56,9 +56,9 @@ class Boleta extends Model implements Auditable
     public function vendedor(){
         return $this->belongsTo(Vendedor::class, 'idvendedor');
     }
-    /*
-    public function estado(){
+
+    public function estados(){
         return $this->belongsTo(Estado::class, 'estado');
     }
-    */
+
 }

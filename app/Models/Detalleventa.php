@@ -38,6 +38,10 @@ class Detalleventa extends Model
         return $this->belongsTo(Boleta::class, 'idboleta');
     }
 
+    public function estados(){
+        return $this->belongsTo(Estado::class, 'estado');
+    }
+
     public function rifa(){
         return $this->belongsTo(Rifa::class, 'idrifa');
     }
