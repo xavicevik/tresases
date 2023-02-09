@@ -5,7 +5,7 @@
                 Nueva venta
             </h2>
         </template>
-        <div class="pt-2 w-full mx-auto lg:px-8 md:px-4 sm:px-1">
+        <div class="pt-2 w-full sm:w-3/4 mx-auto lg:px-8 md:px-4 sm:px-1">
             <div class="mx-auto 2xl:8">
                 <div class="relative bg-white border-2 border-blue-200 m-2 p-2 rounded-lg overflow-hidden shadow-xl sm:rounded-lg">
                     <!-- Fin Mensajes Flash -->
@@ -39,10 +39,10 @@
                                             </vue-countdown>
                                         </div>
                                         <div class="py-2">
-                                            <img v-show="form.idrifa.urlimagen1 != null" :src="'/storage/'+form.idrifa.urlimagen1" alt="image" class="mx-auto w-10/12"/>
+                                            <img v-show="form.idrifa.urlimagen1 != null" :src="'/storage/'+form.idrifa.urlimagen1" alt="image" class="mx-auto w-10/12 sm:w-4/12"/>
                                         </div>
 
-                                        <div class="py-2 text-xs">
+                                        <div class="py-2 text-xs sm:text-sm sm:text-center">
                                             <p>Ingrese el número deseado o presione el boton para obtener un número de la suerte</p>
                                         </div>
 
@@ -50,7 +50,7 @@
                                             <div class="mb-4 w-full pr-2 text-center">
                                                 <label class="block text-gray-700 text-xl text-center mx-auto font-bold mb-2">Premio Mayor</label>
 
-                                                <div class="container flex justify-center items-center">
+                                                <div class="flex justify-center items-center">
                                                     <div class="pt-1">
                                                         <div class="top-4 left-3">
                                                             <money3 v-bind="configMoney2" v-model="form.reserva.numero" class="text-3xl border-0 text-center w-1/8 pl-2 pr-2 rounded-lg z-0 focus:shadow focus:outline-none"></money3>
@@ -74,7 +74,7 @@
 
                                     </section>
                                     <section>
-                                        <div class="flex px-2 w-full max-h-fit overflow-y-scroll">
+                                        <div class="justify-center items-center mx-auto flex px-2 w-full sm:w-1/2 max-h-fit overflow-y-scroll">
                                             <div class="mb-2 w-full">
                                                 <div class="flex py-2 text-sm font-bold align-middle border-b-2 border-black">
                                                     <div class="w-4/12">
@@ -140,7 +140,7 @@
                         </section>
                         <section v-if="saleState == 'checkout'">
                         <!-- validateCheckout -->
-                            <div class="mx-auto text-center w-full border-0">
+                            <div class="mx-auto text-center w-full sm:w-1/2 border-0">
                                 <vue-countdown ref="countdown" class="p-2 pb-4 mx-auto text-blue-700" :time="time" v-slot="{ minutes, seconds }" @end="onCountdownEnd">
                                     Restan：{{ minutes }} min, {{ seconds }} seg.
                                 </vue-countdown>
@@ -148,7 +148,7 @@
                             <div class="max-w-2xl mx-auto lg:max-w-none pb-4">
                                 <h1 class="sr-only">Checkout</h1>
 
-                                <form class="lg:grid lg:grid-cols-2 lg:gap-x-12 xl:gap-x-16">
+                                <form class="lg:grid lg:gap-x-12 xl:gap-x-16 sm:w-1/2 sm:mx-auto">
                                     <div>
                                         <div class=" mt-5 mb-10 lg:mt-0">
                                             <div class="flex">
@@ -290,7 +290,7 @@ C40.68628,22,38,19.31372,38,16z"/>
                                     </vue-countdown>
                                 </div>
                                 <!-- Order summary -->
-                                <div class="mt-5 mb-10 lg:mt-0">
+                                <div class="mt-5 mb-10 lg:mt-0 sm:w-1/2 sm:mx-auto">
                                     <h2 class="text-lg font-bold font-medium text-gray-900">Resumen de la transacción</h2>
 
                                     <div class="mt-4 bg-white border border-gray-200 rounded-lg shadow-sm">
@@ -642,16 +642,16 @@ C40.68628,22,38,19.31372,38,16z"/>
                                 <!-- Contenido modal -->
                                 <div class="inline-block w-full h-full align-bottom bg-gray-200 rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:w-full" role="dialog" aria-modal="true" aria-labelledby="modal-headline">
                                     <section>
-                                        <div class="mx-auto p-2">
+                                        <div class="mx-auto p-2 sm:text-center">
                                             <div class="items-center justify-start md:justify-center pt-5 px-3 border-none">
-                                                <a href="https://dllo.shoppingred.com.co/web/">
+                                                <a href="https://dllo.shoppingred.com.co/">
                                                     <img class="h-8/12 mx-auto rounded-md overflow-hidden" src="/storage/img/logo_fondo.jpg" />
                                                 </a>
                                             </div>
-                                            <div class=" items-center justify-center px-3 pt-10 border-none">
+                                            <div class="items-center justify-center px-3 pt-10 border-none">
                                                     <img v-show="form.idrifa.urlimagen1 != null" :src="'/storage/'+form.idrifa.urlimagen1" alt="image" class="mx-auto w-1/2"/>
                                             </div>
-                                            <div class="inline-flex items-center justify-center h-10 px-3 pt-10 border-none">
+                                            <div class="pb-3 sm:inline-flex items-center justify-center h-10 px-3 pt-10 border-none">
                                                 <input type="checkbox" v-model="acceptTermns" value="1" class="px-2 w-6 h-6 text-red-600 rounded border-red-600 focus:ring-red-500 focus:ring-2">
                                                 <span class="mx-2">
                                                     <a href="/terms-of-service" target="_blank">
