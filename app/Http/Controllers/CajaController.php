@@ -317,14 +317,17 @@ class CajaController extends Controller
             ->where('fechaventa', '>=', Carbon::create($caja->fechaapertura)->toDateTimeString())
             ->paginate(self::canPorPagina);
 
-        $totaltransaccion = 0;
-        $totalcomisiones = 0;
-        $totalboletas = 0;
-        foreach($ventas as $venta) {
-            $totaltransaccion += $venta->valorventa;
-            $totalcomisiones += $venta->comision;
-            $totalboletas += $venta->cantidad;
-        }
+        $ventastotal = Venta::orderBy($sortBy, $sortOrder)
+                ->where('idpuntoventa', $caja->idpuntoventa)
+                ->where('transaccion', $caja->id)
+                ->where('fechaventa', '>=', Carbon::create($caja->fechaapertura)->toDateTimeString())
+                ->select(DB::raw('sum(valorventa) venta, sum(comision) comision, sum(cantidad) cantidad'))
+                ->groupBy('idpuntoventa', 'transaccion')
+                ->get();
+
+        $totaltransaccion = $ventastotal[0]['venta'];
+        $totalcomisiones = $ventastotal[0]['comision'];
+        $totalboletas = $ventastotal[0]['cantidad'];
 
         if ($request->has('ispage') && $request->ispage){
             return [
