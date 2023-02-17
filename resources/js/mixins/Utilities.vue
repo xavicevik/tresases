@@ -235,13 +235,14 @@ export default {
             this.arrayData = respuesta.datos;
             this.loading = false;
         },
-        getRifas: async function (buscar = '', filtro = 'titulo', paginate = false) {
+        getRifas: async function (buscar = '', filtro = 'titulo', paginate = false, estado = 1) {
             var url= '/rifas/getRifasActivas';
             axios.get(url, {
                 params: {
                     buscar: buscar,
                     filtro: filtro,
-                    paginate: paginate
+                    paginate: paginate,
+                    estado: estado
                 }
             }).then((res) => {
                 var respuesta = res.data;

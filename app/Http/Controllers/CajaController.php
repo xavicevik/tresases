@@ -325,9 +325,9 @@ class CajaController extends Controller
                 ->groupBy('idpuntoventa', 'transaccion')
                 ->get();
 
-        $totaltransaccion = $ventastotal[0]['venta'];
-        $totalcomisiones = $ventastotal[0]['comision'];
-        $totalboletas = $ventastotal[0]['cantidad'];
+        $totaltransaccion = sizeof($ventastotal)!=0?$ventastotal[0]['venta']:0;
+        $totalcomisiones = sizeof($ventastotal)!=0?$ventastotal[0]['comision']:0;
+        $totalboletas = sizeof($ventastotal)!=0?$ventastotal[0]['cantidad']:0;
 
         if ($request->has('ispage') && $request->ispage){
             return [

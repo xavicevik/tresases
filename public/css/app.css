@@ -1388,6 +1388,9 @@ select {
 .w-7 {
   width: 1.75rem;
 }
+.w-8\/12 {
+  width: 66.666667%;
+}
 .w-40 {
   width: 10rem;
 }
@@ -1431,9 +1434,6 @@ select {
   width: 6rem;
 }
 .w-2\/3 {
-  width: 66.666667%;
-}
-.w-8\/12 {
   width: 66.666667%;
 }
 .min-w-0 {
@@ -3207,24 +3207,20 @@ select {
     width: 100%;
   }
 
+  .sm\:w-2\/4 {
+    width: 50%;
+  }
+
   .sm\:w-auto {
     width: auto;
-  }
-
-  .sm\:w-1\/3 {
-    width: 33.333333%;
-  }
-
-  .sm\:w-4\/12 {
-    width: 33.333333%;
   }
 
   .sm\:w-3\/4 {
     width: 75%;
   }
 
-  .sm\:w-2\/4 {
-    width: 50%;
+  .sm\:w-4\/12 {
+    width: 33.333333%;
   }
 
   .sm\:w-1\/2 {

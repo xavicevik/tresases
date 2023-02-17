@@ -184,6 +184,23 @@
                                             </div>
                                         </button>
                                     </th>
+                                    <th class="px-4 py-2 text-sm font-bold hover:bg-blue-500 hover:text-gray-50 rounded-b">
+                                        <button @click="getCajas(buscar, 'id')" class="font-bold">
+                                            Valor Entregado
+                                            <div v-show="sortBy == 'fechafin'">
+                                                <span v-show="!sortOrder">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                                                        <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+                                                    </svg>
+                                                </span>
+                                                <span v-show="sortOrder">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                                                      <path fill-rule="evenodd" d="M14.707 12.707a1 1 0 01-1.414 0L10 9.414l-3.293 3.293a1 1 0 01-1.414-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 010 1.414z" clip-rule="evenodd" />
+                                                    </svg>
+                                                </span>
+                                            </div>
+                                        </button>
+                                    </th>
                                 </tr>
                                 </thead>
                                 <tbody>
@@ -194,6 +211,7 @@
                                     <td class="border px-1 py-2 text-sm truncate" v-text="formatPrice(dato.pagado)"></td>
                                     <td class="border px-1 py-2 text-sm truncate" v-text="formatPrice(dato.saldo)"></td>
                                     <td class="border px-1 py-2 text-sm truncate" v-text="formatPrice(dato.comision)"></td>
+                                    <td class="border px-1 py-2 text-sm truncate" v-text="formatPrice(dato.entregado)"></td>
                                 </tr>
                                 <tr v-else>
                                     <td class="border px-4 py-2 text-xs text-center" colspan="12"> La consulta no obtuvo datos</td>
@@ -245,6 +263,9 @@
                                     <th class="px-4 py-2 text-sm font-bold w-2/12 hover:bg-blue-500 hover:text-gray-50 rounded-b">
                                         Comisión
                                     </th>
+                                    <th class="px-4 py-2 text-sm font-bold w-2/12 hover:bg-blue-500 hover:text-gray-50 rounded-b">
+                                        Entregado
+                                    </th>
                                 </tr>
                                 </thead>
                                 <tbody>
@@ -254,6 +275,7 @@
                                     <td class="border px-1 py-2 text-sm truncate" v-text="formatPrice(dato.pagado)"></td>
                                     <td class="border px-1 py-2 text-sm truncate" v-text="formatPrice(dato.saldo)"></td>
                                     <td class="border px-1 py-2 text-sm truncate" v-text="formatPrice(dato.comision)"></td>
+                                    <td class="border px-1 py-2 text-sm truncate" v-text="formatPrice(dato.entregado)"></td>
                                 </tr>
                                 <tr v-else>
                                     <td class="border px-4 py-2 text-xs text-center" colspan="7"> La consulta no obtuvo datos</td>
@@ -475,7 +497,7 @@ export default {
     },
     created: function () {
         this.arrayVendedores = this.getVendedores('', '', false);
-        this.arrayRifas = this.getRifas('');
+        this.arrayRifas = this.getRifas('', 'titulo', false, 99);
     },
     mounted() {
     },

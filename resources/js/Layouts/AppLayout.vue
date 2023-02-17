@@ -60,7 +60,7 @@ export default {
     <div x-data="{ sidebarOpen: true }" class="flex overflow-x-hidden h-screen">
         <aside class="h-screen bg-white text-red-900 overflow-auto sticky top-0 flex-shrink-0 w-64 flex flex-col border-r transition-all duration-300" :class="{ '-ml-64': !sidebarOpen }">
 
-            <div class="h-screen">
+            <div class="flex flex-col h-screen">
                 <div class="flex-grow">
                     <ul class="flex flex-col py-2 space-y-1">
                         <span>
@@ -418,10 +418,8 @@ export default {
                                     ></path>
                                 </svg>
                             </a>
-
                         </div>
                     </div>
-
                     <div class="text-center text-gray-800 p-2 text-sm bg-gray-200">
                         © 2023 Copyright:
                         <a class="text-gray-800 text-sm" href="https://www.shoppingred.com.co/">ShoppingRed</a>

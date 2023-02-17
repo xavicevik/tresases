@@ -118,7 +118,7 @@ class ReporteController extends Controller
                 $boletas = $boletas->where('boletas.estado', $filtros->estado);
             }
         }
-        $boletas = $boletas->select(DB::raw('vendedors.id, vendedors.nombre, vendedors.apellido, count(1) as cantidad, sum(pago) as pagado, sum(saldo) as saldo, getcomision(vendedors.id, -1) comision'))
+        $boletas = $boletas->select(DB::raw('vendedors.id, vendedors.nombre, vendedors.apellido, count(1) as cantidad, sum(pago) as pagado, sum(saldo) as saldo, getcomision(vendedors.id, -1) comision, (sum(pago) - getcomision(vendedors.id, -1)) entregado'))
                             //->groupBy('boletas.idvendedor');
                             ->groupBy('vendedors.id', 'vendedors.nombre', 'vendedors.apellido');
 
@@ -175,14 +175,12 @@ class ReporteController extends Controller
                 $boletas = $boletas->where('boletas.estado', $filtros->estado);
             }
         }
-        $boletas = $boletas->select(DB::raw('vendedors.id, vendedors.nombre, vendedors.apellido, count(1) as cantidad, sum(pago) as pagado, sum(saldo) as saldo, estados.nombre as estado, getcomision(vendedors.id, boletas.estado) comision'))
+        $boletas = $boletas->select(DB::raw('vendedors.id, vendedors.nombre, vendedors.apellido, count(1) as cantidad, sum(pago) as pagado, sum(saldo) as saldo, estados.nombre as estado, getcomision(vendedors.id, boletas.estado) comision, (sum(pago) - getcomision(vendedors.id, boletas.estado)) entregado'))
                             //->groupBy('boletas.idvendedor', 'boletas.estado');
                             ->groupBy('vendedors.id', 'vendedors.nombre', 'vendedors.apellido', 'boletas.estado', 'estados.nombre');
 
         $queries = DB::getQueryLog();
-
         $resultado = DB::query()->from($boletas, 'a')->paginate(self::canPorPagina);
-
 
         return ['data' => $resultado];
     }

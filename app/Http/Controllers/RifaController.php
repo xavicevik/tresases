@@ -183,10 +183,7 @@ class RifaController extends Controller
                     ->with('ciudad')
                     ->with('loteria')
                     ->with('tiposerie')
-                    ->with('promocionales')
-                    ->where('estado', '=', '1')
-                    ->where('fechafin', '>', $mytime->toDateString())
-                    ->paginate(self::canPorPagina);
+                    ->with('promocionales');
             } else {
                 $rifas = Rifa::orderBy($sortBy, $sortOrder)
                         ->with('pais')
@@ -195,11 +192,12 @@ class RifaController extends Controller
                         ->with('loteria')
                         ->with('tiposerie')
                         ->with('promocionales')
-                        ->where('estado', '=', '1')
-                        ->where('fechafin', '>', $mytime->toDateString())
-                        ->where($filtro, 'like', '%'. $buscar . '%')
-                        ->paginate(self::canPorPagina);
+                        ->where($filtro, 'like', '%'. $buscar . '%');
             }
+            if ($request->estado != 99) {
+                $rifas = $rifas->where('estado', $request->estado)->where('fechafin', '>', $mytime->toDateString());
+            }
+            $rifas = $rifas->paginate(self::canPorPagina);
         } else {
             if ($buscar == ''){
                 $rifas = Rifa::orderBy($sortBy, $sortOrder)
@@ -208,10 +206,7 @@ class RifaController extends Controller
                     ->with('ciudad')
                     ->with('loteria')
                     ->with('tiposerie')
-                    ->with('promocionales')
-                    ->where('estado', '=', '1')
-                    ->where('fechafin', '>', $mytime->toDateString())
-                    ->get();
+                    ->with('promocionales');
             } else {
                 $rifas = Rifa::orderBy($sortBy, $sortOrder)
                         ->with('pais')
@@ -220,11 +215,12 @@ class RifaController extends Controller
                         ->with('loteria')
                         ->with('tiposerie')
                         ->with('promocionales')
-                        ->where('estado', '=', '1')
-                        ->where('fechafin', '>', $mytime->toDateString())
-                        ->where($filtro, 'like', '%'. $buscar . '%')
-                    >get();
+                        ->where($filtro, 'like', '%'. $buscar . '%');
             }
+            if ($request->estado != 99) {
+                $rifas = $rifas->where('estado', $request->estado)->where('fechafin', '>', $mytime->toDateString());
+            }
+            $rifas = $rifas->get();
         }
 
         return ['rifas' => $rifas];
