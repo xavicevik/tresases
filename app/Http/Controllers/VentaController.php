@@ -634,7 +634,9 @@ class VentaController extends Controller
                     $detalleventa->cantidad = 1;
                     $detalleventa->estado = self::vendido;
                     $detalleventa->save();
-                    $boleta['comision'] = $boleta->valor * ($concomision->comisionvendedor/100);
+                    $boleta['comision'] = number_format($boleta->valor * ($concomision->comisionvendedor/100), 0, ".", ",");
+                    $boleta->valor = number_format($boleta->valor, 0, ".", ",");                     
+
                     $salida[] = $boleta;
                 }
 

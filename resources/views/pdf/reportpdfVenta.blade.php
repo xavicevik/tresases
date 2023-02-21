@@ -5,7 +5,7 @@
 </head>
 <style>
     @page {
-        margin-left: 1cm;
+        margin-left: 0.5cm;
         margin-right: 0;
         margin-top: 0cm;
         margin-bottom: 0.5cm;
@@ -67,9 +67,12 @@
 </html>
 
 <style>
+    body {
+        font-family: ArialMT, Helvetica, sans-serif;
+    }
     * {
         font-size: 15px;
-        font-family: 'Arial Rounded MT Bold';
+        font-family: 'ArialMT';
     }
 
     td,
@@ -77,22 +80,27 @@
     tr,
     table {
         padding-left: 0px;
+        font-family: 'ArialMT';
     }
 
     th.numero {
         font-size: 15px;
-
+        font-family: 'ArialMT';
     }
 
     th.promo {
-        font-size: 13px;
+        font-size: 12px;
+        font-family: 'ArialMT';
+    }
 
+    .left {
+        font-family: 'ArialMT';
     }
 
     .centrado {
         text-align: center;
         align-content: center;
+        font-family: 'ArialMT';
     }
-
 
 </style>
