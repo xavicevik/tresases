@@ -142,6 +142,8 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'),'verified',]
     Route::put('/users/cliente/{cliente}', [UserController::class, 'updateCliente'])->name('users.updateCliente');
     Route::get('/users/cliente/{cliente}', [UserController::class, 'showClient'])->name('users.showClient');
 
+
+    Route::post('/users/storeClienteMov', [UserController::class, 'storeClienteMov'])->name('users.storeClienteMov');
     Route::resource('users', UserController::class);
 
    // Route::resource('/puntoventas', PuntoventaController::class);

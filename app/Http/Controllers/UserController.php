@@ -408,7 +408,7 @@ class UserController extends Controller
         Validator::make($request->all(), [
             'nombre' => ['required', 'string', 'max:255'],
             'apellido' => ['required', 'string', 'max:255'],
-            //'correo' => ['required', 'string', 'email', 'max:255'],
+            'correo' => ['required', 'string', 'email', 'max:255'],
             'movil' => ['required', 'string', 'max:255'],
             'documento' => ['required', 'string', 'max:255'],
             'idtipos_documento' => 'required|numeric|gt:0',
@@ -420,7 +420,7 @@ class UserController extends Controller
         [
             'nombre.required' => 'Ingrese el nombre',
             'apellido.required' => 'Ingrese el apellido',
-            //'correo.required' => 'Ingrese el correo',
+            'correo.required' => 'Ingrese el correo',
             'movil.required' => 'Ingrese el teléfono celular',
             'documento.required' => 'Ingrese el número de identificacion',
             'idtipos_documento.gt' => 'Seleccione una tipo de documento',
@@ -452,6 +452,41 @@ class UserController extends Controller
 
         $rol = Rol::where('id', $user->idrol)->first();
         $user->assignRole($rol->nombre);
+
+        if ($user->observaciones == 'Creado por movimiento de caja') {
+            return ['user' => $user];
+        } else {
+            return redirect()->back()->with('message', 'Usuario creado satisfactoriamente');
+        }
+    }
+
+    /**
+     * Store a newly created resource in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function storeClienteMov(Request $request)
+    {
+        Validator::make($request->all(), [
+            'nombre' => ['required', 'string', 'max:255'],
+            'apellido' => ['required', 'string', 'max:255'],
+            'movil' => ['required', 'string', 'max:255'],
+            'documento' => ['required', 'string', 'max:255'],
+        ],
+            [
+                'nombre.required' => 'Ingrese el nombre',
+                'apellido.required' => 'Ingrese el apellido',
+                'movil.required' => 'Ingrese el teléfono celular',
+                'documento.required' => 'Ingrese el número de identificacion',
+            ])->validate();
+
+        $mytime= Carbon::now('America/Bogota');
+        $user = Cliente::create($request->all());
+        $user->changedpassword = $mytime->toDateString();
+        $user->password = Hash::make($user->password);
+        $user->estado = true;
+        $user->saveOrFail();
 
         if ($user->observaciones == 'Creado por movimiento de caja') {
             return ['user' => $user];

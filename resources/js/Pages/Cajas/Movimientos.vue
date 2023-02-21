@@ -1595,7 +1595,7 @@ export default {
             var formData = new FormData();
             formData.append('nombre', this.form.cliente.nombre);
             formData.append('apellido', this.form.cliente.apellido);
-            formData.append('correo', this.form.cliente.correo);
+            formData.append('correo', this.form.cliente.correo?this.form.cliente.correo:'notiene@shoppingred.com.co');
             formData.append('password', this.form.cliente.documento);
             formData.append('username', this.form.cliente.documento);
             formData.append('idrol', 2);
@@ -1611,7 +1611,7 @@ export default {
             formData.append('observaciones', 'Creado por movimiento de caja');
 
             //console.log(formData);
-            var url= '/users';
+            var url= '/users/storeClienteMov';
             axios.post(url, formData
             ).then((res) => {
                 Swal.fire({

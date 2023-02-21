@@ -68,8 +68,8 @@
 
 <style>
     * {
-        font-size: 14px;
-        font-family: 'Verdana';
+        font-size: 15px;
+        font-family: 'Arial Rounded MT Bold';
     }
 
     td,
@@ -80,12 +80,12 @@
     }
 
     th.numero {
-        font-size: 14px;
+        font-size: 15px;
 
     }
 
     th.promo {
-        font-size: 12px;
+        font-size: 13px;
 
     }
 
