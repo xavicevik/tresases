@@ -1500,10 +1500,11 @@ export default {
                         title: 'Se ha generado el recibo correspondiente',
                         showConfirmButton: true,
                     })
-                    this.$refs.countdown.end();
+                    //this.$refs.countdown.end();
                     window.open(res.data.url, '_blank');
                     this.form.reservas = [];
                     this.getMovimientos();
+                    this.closeModal();
 
                 } else {
                     Swal.fire({

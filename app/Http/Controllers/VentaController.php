@@ -635,7 +635,7 @@ class VentaController extends Controller
                     $detalleventa->estado = self::vendido;
                     $detalleventa->save();
                     $boleta['comision'] = number_format($boleta->valor * ($concomision->comisionvendedor/100), 0, ".", ",");
-                    $boleta->valor = number_format($boleta->valor, 0, ".", ",");                     
+                    $boleta->valor = number_format($boleta->valor, 0, ".", ",");
 
                     $salida[] = $boleta;
                 }
@@ -729,6 +729,11 @@ class VentaController extends Controller
                 file_put_contents(public_path('storage').'/pdf/'.$filename, $output, FILE_APPEND);
                 $venta->urlrecibo = url('/storage/pdf/').'/'.$filename;
                 $venta->save();
+
+                $r = new Request();
+                $r->idsesion = $session->id;
+                $r->isSale = true;
+                $this->finishSession($r);
                 DB::commit();
 
                 // Envío de mensajes de texto
@@ -757,11 +762,6 @@ class VentaController extends Controller
                         $this->sendSMS($to, $message2);
                     }
                 }
-
-                $r = new Request();
-                $r->idsesion = $session->id;
-                $r->isSale = true;
-                $this->finishSession($r);
 
                 return ['url' => url('/storage/pdf/').'/'.$filename];
             }
@@ -1536,9 +1536,6 @@ class VentaController extends Controller
                     $dato->save();
                 }
             }
-
-            //\Cart::session(Auth::user()->id);
-            //\Cart::remove($idsesion);
             session()->forget('session');
 
            DB::commit();

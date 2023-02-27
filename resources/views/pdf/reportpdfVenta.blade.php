@@ -68,7 +68,7 @@
 
 <style>
     body {
-        font-family: ArialMT, Helvetica, sans-serif;
+        font-family: ArialMT;
     }
     * {
         font-size: 15px;
@@ -94,6 +94,10 @@
     }
 
     .left {
+        font-family: 'ArialMT';
+    }
+
+    .ticket {
         font-family: 'ArialMT';
     }
 
