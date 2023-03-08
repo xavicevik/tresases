@@ -402,17 +402,15 @@ class RifaController extends Controller
             $boleta->save();
         }
 
-        if ($isFisica) {
-            $boletas = Boleta::where('estado', 1)
-                             ->where('idrifa', $idrifa)
-                             ->inRandomOrder()
-                             ->get();
-            $i = 0;
-            foreach($boletas as $boleta) {
-                $boleta->promocional = str_pad(strval($i), $cifras, "0", STR_PAD_LEFT);
-                $boleta->save();
-                $i++;
-            }
+        $boletas = Boleta::where('estado', 1)
+                         ->where('idrifa', $idrifa)
+                         ->inRandomOrder()
+                         ->get();
+        $i = 0;
+        foreach($boletas as $boleta) {
+            $boleta->promocional = str_pad(strval($i), $cifras, "0", STR_PAD_LEFT);
+            $boleta->save();
+            $i++;
         }
 
         return ['status' => 'Terminado'];
