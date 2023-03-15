@@ -20,6 +20,7 @@ class Kernel extends ConsoleKernel
         $schedule->command('sessions:finish')->everyMinute();
         $schedule->command('cajas:openclose')->daily();
         $schedule->command('sessions:clearcheckout')->sundays();
+        $schedule->command('sessions:rollback')->everyFifteenMinutes();
         //$schedule->command('ventas:processpayments')->everyTwoMinutes();
         //$schedule->job(new ValidarVentasJob())->everyTwoMinutes();
     }

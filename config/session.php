@@ -207,4 +207,15 @@ return [
     */
     'max_time_sales' => env('MAX_TIME_SALES', 120),
 
+    /*
+    |--------------------------------------------------------------------------
+    | MAX_TIME_INPROCESS
+    |--------------------------------------------------------------------------
+    |
+    | This is the max time available to doing each transaction
+    |
+    */
+    'max_time_inprocess' => env('MAX_TIME_INPROCESS', 240),
+
+
 ];
