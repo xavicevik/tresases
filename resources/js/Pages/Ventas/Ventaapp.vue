@@ -1225,18 +1225,37 @@ export default {
             /*
                 params: {
                         nombre: this.form.cliente.nombre,
+                        apellido: '',
                         username: this.form.cliente.documento,
                         documento: this.form.cliente.documento,
                         idrol: 2,
+                        estado: 1,
                         movil: this.form.cliente.movil,
                         idsesion: this.session.id,
-                        idtipos_documento: 1
-
+                        idtipos_documento: 1,
+                        isnatural: 1,
+                        idempresa: 3
                     }
             */
             let res;
             try {
-                res = await axios.post('/users/storeCliente', formData);
+                //res = await axios.post('/users/storeCliente', formData);
+                res = await axios.get('/users/storeCliente', {
+                        params: {
+                            nombre: this.form.cliente.nombre,
+                            apellido: '',
+                            username: this.form.cliente.documento,
+                            documento: this.form.cliente.documento,
+                            idrol: 2,
+                            estado: 1,
+                            movil: this.form.cliente.movil,
+                            idsesion: this.session.id,
+                            idtipos_documento: 1,
+                            isnatural: 1,
+                            idempresa: 3
+                        }
+                    }
+                );
             } catch (error) {
                 console.log(error);
                 return false;
