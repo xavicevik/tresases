@@ -52,6 +52,12 @@ class FinisInProcess extends Command
                                     $query->select(DB::raw(1))
                                         ->from('detallesesion')
                                         ->whereRaw('detallesesion.id = boletas.id');
+                                })
+                                ->whereNotExists(function($query)
+                                {
+                                    $query->select(DB::raw(1))
+                                        ->from('checkout')
+                                        ->whereRaw("checkout.idboleta = boletas.id and status = 'pending'");
                                 })->get();
             foreach ($boletas as $boleta) {
                 if ($boleta->estado_ant == 5) {
@@ -71,7 +77,9 @@ class FinisInProcess extends Command
                         $boleta->estado = 4;
                     }
                 } else {
+                    $estadoact = $boleta->estado;
                     $boleta->estado = $boleta->estado_ant;
+                    $boleta->estado_ant = $estadoact;
                 }
                 $boleta->save();
             }
