@@ -1165,8 +1165,8 @@ class VentaController extends Controller
                               ->with('cliente')
                               ->with('boleta')
                               ->first();
-        //$to = "57".$detalle->cliente->movil;
-        $to = "573155665528";
+        $to = "57".$detalle->cliente->movil;
+        //$to = "573155665528";
 
         $rifa = Rifa::where('id', $detalle->idrifa)->first();
 
