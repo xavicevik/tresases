@@ -1165,7 +1165,8 @@ class VentaController extends Controller
                               ->with('cliente')
                               ->with('boleta')
                               ->first();
-        $to = "57".$detalle->cliente->movil;//"573155665528";
+        //$to = "57".$detalle->cliente->movil;
+        $to = "573155665528";
 
         $rifa = Rifa::where('id', $detalle->idrifa)->first();
 
@@ -1182,8 +1183,9 @@ class VentaController extends Controller
         $this->sendSMS($to, $message1);
         if ($saldo == 0) {
             $urlboleta = url('storage') . '/boletas/boleta' . $detalle->boleta->idrifa . $detalle->boleta->codigo . '.pdf';
-            $message2 = str_replace('%mayor%', $detalle->boleta->numero, $rifa->mensaje1);
+            $message2 = str_replace('%mayor%', $detalle->boleta->numero, $rifa->mensaje2);
             $message2 = str_replace('%promocional%', $detalle->boleta->promocional, $message2);
+            $message2 .= "  Boleta: $urlboleta";
             if (!$rifa->fisica) {
                 $message2 .= "  Boleta: $urlboleta";
             }
