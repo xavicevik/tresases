@@ -5,6 +5,7 @@ namespace App\Exports;
 use App\Models\Boleta;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\WithHeadings;
@@ -56,6 +57,10 @@ class VentasExport implements FromCollection, WithHeadings, ShouldAutoSize
                     ->orWhere('t2.documento', 'like', '%'.$filtros->cliente.'%');
             }
         }
+        if (Auth::user()->idrol == 7) {
+            $boletas = $boletas->where('rifas.resumen', Auth::user()->idempresa);
+        }
+
         return $boletas->select('rifas.titulo as rifa',
             'boletas.numero as numero',
             'boletas.promocional as promocional',

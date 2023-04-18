@@ -45,8 +45,7 @@ class Pagocontroller extends Controller
             $pagos = Pago::orderBy($sortBy, $sortOrder)
                 ->with('vendedor')
                 ->with('cliente')
-                ->with('puntoventa')
-                ->paginate(self::canPorPagina);
+                ->with('puntoventa');
         } else {
 
             $pagos = Pago::orderBy($sortBy, $sortOrder)
@@ -86,9 +85,14 @@ class Pagocontroller extends Controller
                 $pagos = $pagos->where('soporte', 'like', '%'.$filtros->soporte.'%');
             }
 
-            $pagos = $pagos->select('pagos.*')->paginate(self::canPorPagina);
+            $pagos = $pagos->select('pagos.*');
+        }
+        if (Auth::user()->idrol == 7) {
+            $pagos = $pagos->join('vendedors', 'pagos.idvendedor', '=', 'vendedors.id')
+                ->where('vendedors.idempresa', '=', Auth::user()->idempresa);
         }
 
+        $pagos = $pagos->paginate(self::canPorPagina);
         if ($request->has('ispage') && $request->ispage){
             return ['datos' => $pagos];
         } else {
