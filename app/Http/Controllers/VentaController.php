@@ -116,13 +116,16 @@ class VentaController extends Controller
             } else {
                 $ventas = $ventas->where('idvendedor', $idvendedor);
             }
+        } elseif ($user->idrol == 7) {
+            $idvendedor = 0;
+            $ventas = $ventas->join('vendedors', 'ventas.idvendedor', '=', 'vendedors.id')
+                ->where('vendedors.idempresa', '=', Auth::user()->idempresa)
+                ->select('ventas.*');
         } else {
             $idvendedor = 0;
         }
 
-        if (is_null($filtros)){
-            $ventas = $ventas->paginate(self::canPorPagina);
-        } else {
+        if (!is_null($filtros)){
             if(!is_null($filtros->fechainicio) && $filtros->fechainicio <> '') {
                 $ventas = $ventas->where('ventas.created_at', '>=', $filtros->fechainicio);
             }
@@ -153,10 +156,16 @@ class VentaController extends Controller
                     ->select('ventas.*');
             }
 
-            $ventas = $ventas->select('ventas.*')->paginate(self::canPorPagina);
+            $ventas = $ventas->select('ventas.*');
         }
-
+/*
+        if (Auth::user()->idrol == 7) {
+            $ventas = $ventas->join('vendedors', 'ventas.idvendedor', '=', 'vendedors.id')
+                ->where('vendedors.idempresa', '=', Auth::user()->idempresa);
+        }
+*/
         //$this->authorizeResource(User::class);
+        $ventas = $ventas->paginate(self::canPorPagina);
 
         if ($request->has('ispage') && $request->ispage){
             return ['data' => $ventas, 'idvendedor' => $idvendedor];

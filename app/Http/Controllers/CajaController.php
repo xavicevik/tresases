@@ -124,6 +124,10 @@ class CajaController extends Controller
             }
         }
 
+        if (Auth::user()->idrol == 7) {
+            $cajas = $cajas->where('idvendedor', '=', Auth::user()->id);
+        }
+
         $cajas = $cajas->paginate(self::canPorPagina);
 
         if ($request->has('ispage') && $request->ispage){
@@ -173,6 +177,10 @@ class CajaController extends Controller
                 $cajas = $cajas->join('puntos_ventas', 'historialcajas.idpuntoventa', '=', 'puntos_ventas.id')
                                ->where('puntos_ventas.nombre', 'like', '%'.$filtros->puntoventa.'%');
             }
+        }
+
+        if (Auth::user()->idrol == 7) {
+            $cajas = $cajas->where('idvendedor', '=', Auth::user()->id);
         }
 
         $cajas = $cajas->paginate(self::canPorPagina);

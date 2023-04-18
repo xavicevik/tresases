@@ -136,6 +136,11 @@ class RifaController extends Controller
             }
         }
         //$queries = DB::getQueryLog();
+        if (Auth::user()->idrol == 7) {
+            $boletas = $boletas->join('rifas', 'boletas.idrifa', '=', 'rifas.id')
+                ->where('rifas.resumen', '=', Auth::user()->idempresa);
+                //->select('boletas.*');
+        }
         $boletas = $boletas->select(DB::raw('boletas.*, getcomisionboleta(boletas.id) as comision'))->paginate(self::canPorPagina);
 
         if ($request->has('ispage') && $request->ispage){
@@ -197,6 +202,9 @@ class RifaController extends Controller
             if ($request->estado != 99) {
                 $rifas = $rifas->where('estado', $request->estado)->where('fechafin', '>', $mytime->toDateString());
             }
+            if (Auth::user()->idrol == 7) {
+                $rifas = $rifas->where('resumen', '=', Auth::user()->idempresa);
+            }
             $rifas = $rifas->paginate(self::canPorPagina);
         } else {
             if ($buscar == ''){
@@ -219,6 +227,9 @@ class RifaController extends Controller
             }
             if ($request->estado != 99) {
                 $rifas = $rifas->where('estado', $request->estado)->where('fechafin', '>', $mytime->toDateString());
+            }
+            if (Auth::user()->idrol == 7) {
+                $rifas = $rifas->where('resumen', '=', Auth::user()->idempresa);
             }
             $rifas = $rifas->get();
         }

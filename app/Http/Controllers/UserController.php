@@ -11,6 +11,7 @@ use App\Models\Rifa;
 use App\Models\Rol;
 use App\Models\User;
 use App\Models\Vendedor;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Redirect;
@@ -287,6 +288,10 @@ class UserController extends Controller
                             ->orWhere('apellido', 'like', '%'. $buscar . '%')
                             ->orWhere('documento', 'like', '%'. $buscar . '%');
                     });
+        }
+
+        if (Auth::user()->idrol == 7) {
+            $users = $users->where('idempresa', '=', Auth::user()->idempresa);
         }
 
         if ($paginate == "true") {

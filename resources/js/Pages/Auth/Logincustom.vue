@@ -82,12 +82,24 @@ const submit = () => {
                 </label>
             </div>
 
+            <div v-if="$page.props.jetstream.hasTermsAndPrivacyPolicyFeature" class="mt-4">
+                <JetLabel for="terms">
+                    <div class="flex items-center">
+                        <JetCheckbox id="terms" v-model:checked="form.terms" name="terms" />
+
+                        <div class="ml-2">
+                            Estoy de acuerdo con <a target="_blank" :href="route('terms.show')" class="underline text-sm text-gray-600 hover:text-gray-900">Términos de servicio</a> y <a target="_blank" :href="route('policy.show')" class="underline text-sm text-gray-600 hover:text-gray-900">Política de privacidad</a>
+                        </div>
+                    </div>
+                </JetLabel>
+            </div>
+
             <div class="flex items-center justify-end mt-4">
                 <Link v-if="canResetPassword" :href="route('password.request')" class="underline text-sm text-gray-600 hover:text-gray-900 mx-4">
                     Olvido el passsword?
                 </Link>
 
-                <JetButton class="ml-4" :class="{ 'opacity-25': form.processing }" :disabled="form.processing">
+                <JetButton class="ml-4" :class="{ 'opacity-25': form.processing }" :disabled="form.processing || !form.terms">
                     Ingresar
                 </JetButton>
             </div>

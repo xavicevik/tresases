@@ -100,10 +100,16 @@ class LoginController extends Controller
         } else {
             $guard = Auth::guard('web');
         }
+
         if ($guard->attempt($credentials, ($request->remember == 'on') ? true : false)) {
             $request->session()->regenerate();
+            if (! is_null($rol) && $rol->idrol == 7) {
+                return redirect()->intended('ventas');
+            }
             return redirect()->intended('dashboard');
         }
+
+
 
         return back()->withErrors([
             'username' => 'Las credenciales ingresadas no corresponden con un usuario registrado',

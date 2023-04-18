@@ -110,14 +110,14 @@ export default {
                             </li>
                         </div>
                         <li>
-                            <a v-show="$can('rifas-list')" href="#" @click="isMenuRifas = !isMenuRifas" :class=" (selectedRow === 'rifas' || route().current('rifas.index') || route().current('rifas.indexboletas') || route().current('numerosreservados.index')) ? 'border-blue-500 bg-blue-200' : 'hover:border-gray-500'" class="relative flex flex-row items-center h-11 focus:outline-none hover:bg-blue-200 text-white-600 hover:text-white-800 border-l-4 border-transparent pr-6">
+                            <a v-show="$can('rifas-list') || $can('boletas-list')" href="#" @click="isMenuRifas = !isMenuRifas" :class=" (selectedRow === 'rifas' || route().current('rifas.index') || route().current('rifas.indexboletas') || route().current('numerosreservados.index')) ? 'border-blue-500 bg-blue-200' : 'hover:border-gray-500'" class="relative flex flex-row items-center h-11 focus:outline-none hover:bg-blue-200 text-white-600 hover:text-white-800 border-l-4 border-transparent pr-6">
                                 <span class="inline-flex justify-center items-center ml-4 text-yellow-500">
                                   <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"></path></svg>
                                 </span>
                                 <span class="ml-2 text-sm tracking-wide truncate">Rifas</span>
                             </a>
                         </li>
-                        <div v-show="isMenuRifas && $can('rifas-list')" class="pl-8 bg-blue-100 text-white-600 hover:text-white-600">
+                        <div v-show="isMenuRifas && ($can('rifas-list') || $can('boletas-list'))" class="pl-8 bg-blue-100 text-white-600 hover:text-white-600">
                             <li>
                                 <Link v-if="$can('rifas-list')" :href="route('rifas.index')" class="relative flex flex-row items-center h-8 focus:outline-none hover:bg-blue-200 text-white-600 hover:text-white-800 border-l-4 border-transparent pr-6">
                                 <span class="inline-flex justify-center items-center ml-4">
@@ -168,7 +168,7 @@ export default {
                                 </Link>
                             </li>
                             <li>
-                                <Link v-if="$can('cajas-list')" :href="route('cajas.movimientos')" class="relative flex flex-row items-center h-8 focus:outline-none hover:bg-blue-200 text-white-600 hover:text-white-800 border-l-4 border-transparent pr-6">
+                                <Link v-if="$can('transacciones-list')" :href="route('cajas.movimientos')" class="relative flex flex-row items-center h-8 focus:outline-none hover:bg-blue-200 text-white-600 hover:text-white-800 border-l-4 border-transparent pr-6">
                                 <span class="inline-flex justify-center items-center ml-4">
                                   <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                                       <path d="M8 5a1 1 0 100 2h5.586l-1.293 1.293a1 1 0 001.414 1.414l3-3a1 1 0 000-1.414l-3-3a1 1 0 10-1.414 1.414L13.586 5H8zM12 15a1 1 0 100-2H6.414l1.293-1.293a1 1 0 10-1.414-1.414l-3 3a1 1 0 000 1.414l3 3a1 1 0 001.414-1.414L6.414 15H12z" />
@@ -189,7 +189,7 @@ export default {
                             </li>
                         </div>
                         <li>
-                            <Link v-if="$can('ventas-create')" :href="route('master.puntosventa')" :class=" (selectedRow === 'master.puntosventa' || route().current('master.puntosventa')) ? 'border-blue-500 bg-blue-200' : 'hover:border-gray-500'" class="relative flex flex-row items-center h-11 focus:outline-none hover:bg-blue-200 text-white-600 hover:text-white-800 border-l-4 border-transparent pr-6">
+                            <Link v-if="$can('puntosventa-list')" :href="route('master.puntosventa')" :class=" (selectedRow === 'master.puntosventa' || route().current('master.puntosventa')) ? 'border-blue-500 bg-blue-200' : 'hover:border-gray-500'" class="relative flex flex-row items-center h-11 focus:outline-none hover:bg-blue-200 text-white-600 hover:text-white-800 border-l-4 border-transparent pr-6">
                                 <span class="inline-flex justify-center items-center ml-4">
                                   <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                       <path stroke-linecap="round" stroke-linejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
@@ -199,7 +199,7 @@ export default {
                             </link>
                         </li>
                         <li>
-                            <Link v-if="ñ" :href="route('transacciones.index')" :class=" (selectedRow === 'transacciones.index' || route().current('transacciones.index')) ? 'border-blue-500 bg-blue-200' : 'hover:border-gray-500'" class="relative flex flex-row items-center h-11 focus:outline-none hover:bg-blue-200 text-white-600 hover:text-white-800 border-l-4 border-transparent pr-6">
+                            <Link v-if="$can('transacciones-list')" :href="route('transacciones.index')" :class=" (selectedRow === 'transacciones.index' || route().current('transacciones.index')) ? 'border-blue-500 bg-blue-200' : 'hover:border-gray-500'" class="relative flex flex-row items-center h-11 focus:outline-none hover:bg-blue-200 text-white-600 hover:text-white-800 border-l-4 border-transparent pr-6">
                                 <span class="inline-flex justify-center items-center ml-4 text-teal-600">
                                   <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                       <path stroke-linecap="round" stroke-linejoin="round" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
