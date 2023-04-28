@@ -50,8 +50,7 @@ class RifaController extends Controller
                 ->with('loteria')
                 ->with('terminosycondiciones')
                 ->with('tiposerie')
-                ->with('promocionales')
-                ->paginate(self::canPorPagina);
+                ->with('promocionales');
         } else {
             $rifas = Rifa::orderBy($sortBy, $sortOrder)
                 ->with('pais')
@@ -62,9 +61,14 @@ class RifaController extends Controller
                 ->with('tiposerie')
                 ->with('promocionales')
                 ->where('nombre', 'like', '%'. $buscar . '%')
-                ->orWhere('nombre_tecnico', 'like', '%'. $buscar . '%')
-                ->paginate(self::canPorPagina);
+                ->orWhere('nombre_tecnico', 'like', '%'. $buscar . '%');
         }
+
+        if (Auth::user()->idrol == 7 || Auth::user()->idrol == 5) {
+            $rifas = $rifas->where('resumen', '=', Auth::user()->idempresa);
+        }
+        $rifas = $rifas->paginate(self::canPorPagina);
+
 
         if ($request->has('ispage') && $request->ispage){
             return ['rifas' => $rifas];
@@ -136,7 +140,7 @@ class RifaController extends Controller
             }
         }
         //$queries = DB::getQueryLog();
-        if (Auth::user()->idrol == 7) {
+        if (Auth::user()->idrol == 7 || Auth::user()->idrol == 5) {
             $boletas = $boletas->join('rifas', 'boletas.idrifa', '=', 'rifas.id')
                 ->where('rifas.resumen', '=', Auth::user()->idempresa);
                 //->select('boletas.*');
@@ -202,7 +206,7 @@ class RifaController extends Controller
             if ($request->estado != 99) {
                 $rifas = $rifas->where('estado', $request->estado)->where('fechafin', '>', $mytime->toDateString());
             }
-            if (Auth::user()->idrol == 7) {
+            if (Auth::user()->idrol == 7 || Auth::user()->idrol == 5) {
                 $rifas = $rifas->where('resumen', '=', Auth::user()->idempresa);
             }
             $rifas = $rifas->paginate(self::canPorPagina);
@@ -228,7 +232,7 @@ class RifaController extends Controller
             if ($request->estado != 99) {
                 $rifas = $rifas->where('estado', $request->estado)->where('fechafin', '>', $mytime->toDateString());
             }
-            if (Auth::user()->idrol == 7) {
+            if (Auth::user()->idrol == 7 || Auth::user()->idrol == 5) {
                 $rifas = $rifas->where('resumen', '=', Auth::user()->idempresa);
             }
             $rifas = $rifas->get();

@@ -106,7 +106,7 @@ class LoginController extends Controller
             if (! is_null($rol) && $rol->idrol == 7) {
                 return redirect()->intended('ventas');
             }
-            return redirect()->intended('dashboard');
+            return redirect()->intended('ventas');
         }
 
 

@@ -194,7 +194,7 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'),'verified',]
 
     Route::get('/ventas/reportpdf', [VentaController::class, 'reportpdf'])->name('reportpdf');
 
-
+    Route::get('/app/ventas/createvendedor', [VentaController::class, 'createapppvendedor'])->name('ventas.create.vendedor');
     Route::resource('ventas', VentaController::class);
 
     Route::get('/cart/validarId', [CartController::class, 'validarId'])->name('validarId');

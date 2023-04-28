@@ -16,7 +16,8 @@ class Caja extends Model
         'montocierre',
         'fechaapertura',
         'fechacierre',
-        'estado'
+        'estado',
+        'tipo'
     ];
 
     public function vendedor()

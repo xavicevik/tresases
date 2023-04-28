@@ -19,6 +19,7 @@ const form = useForm({
     username: '',
     password: '',
     remember: false,
+    terms: true,
     _token: usePage().props.value._token,
 });
 

@@ -150,10 +150,8 @@ class VentaController extends Controller
             if(!is_null($filtros->comprobante)) {
                 $ventas = $ventas->where('comprobante', 'like', '%'.$filtros->comprobante.'%');
             }
-            if(!is_null($filtros->rifa) && $filtros->rifa <> 0) {
-                $ventas = $ventas->join('rifas', 'ventas.idrifa', '=', 'rifas.id')
-                    ->where('rifas.nombre_tecnico', 'like', '%'.$filtros->rifa.'%')
-                    ->select('ventas.*');
+            if(!is_null($filtros->rifa) && $filtros->rifa <> 0 && $filtros->rifa <> '') {
+                $ventas = $ventas->where('idrifa', $filtros->rifa);
             }
 
             $ventas = $ventas->select('ventas.*');
@@ -167,6 +165,11 @@ class VentaController extends Controller
         //$this->authorizeResource(User::class);
         $ventas = $ventas->paginate(self::canPorPagina);
 
+        /*
+        $boleta = Boleta::where('numero', 1234)->where('idrifa', 6)->first();
+        $url = $this->genBoletaImagen($boleta);
+        dd($url);
+        */
         if ($request->has('ispage') && $request->ispage){
             return ['data' => $ventas, 'idvendedor' => $idvendedor];
         } else {
@@ -241,9 +244,40 @@ class VentaController extends Controller
         ]);
     }
 
+
+    public function createapppvendedor(Request $request)
+    {
+        $caja = Caja::where('tipo', 2)
+                    ->join('puntos_ventas as t1', 'cajas.idpuntoventa', '=', 't1.id')
+                        ->where('t1.codigo', 2)
+                        ->where('t1.idempresa', Auth::guard('vendedor')->user()->idempresa)
+                        ->with('puntoventa')
+                        ->select('cajas.*')
+                        ->first();
+
+        $rifa = Rifa::where('resumen', Auth::guard('vendedor')->user()->idempresa)->where('estado', 1)->first();
+
+        return Inertia::render('Ventas/Ventaappvendedor', [
+            'caja' => $caja,
+            'rifa' => $rifa,
+            'estado' => 0,
+            'username' => 'ID '.Auth::guard('vendedor')->id(),
+            'idvendedor' => 'ID '.Auth::guard('vendedor')->id(),
+            'vendedor' => Auth::guard('vendedor')->user(),
+            'tipoventa' => 'userapp'
+        ]);
+    }
+
     public function createappp(Request $request, Vendedor $vendedor)
     {
-        $caja = Caja::where('id', 5)->with('puntoventa')->first();
+        //$caja = Caja::where('id', 5)->with('puntoventa')->first();
+        $caja = Caja::where('tipo', 2)
+            ->join('puntos_ventas as t1', 'cajas.idpuntoventa', '=', 't1.id')
+            ->where('t1.codigo', 2)
+            ->where('t1.idempresa', Auth::guard('vendedor')->user()->idempresa)
+            ->with('puntoventa')
+            ->select('cajas.*')
+            ->first();
         /*
         $caja = Caja::where('idvendedor', Auth::user()->id)
             ->with('puntoventa')
@@ -2081,14 +2115,25 @@ class VentaController extends Controller
         $data = [
             'numero' => $numero,
             'promocional' => $promocional,
-            'codigo' => $codigo
+            'codigo' => $codigo,
+            'url' => $url
         ];
 
         $filename = 'boleta'.$boleta->idrifa.$boleta->codigo.'.pdf';
         $pdf = app('dompdf.wrapper');
         $pdf->getDomPDF()->set_option("enable_php", true);
         $pdf->setPaper('A4', 'landscape');
-        $pdf->loadView('pdf.boleta', $data);
+        switch ($boleta->idrifa) {
+            case config('app.idrifas.movilgo'):
+                $pdf->loadView('pdf.boleta', $data);
+                break;
+            case config('app.idrifas.cardoso'):
+                $pdf->loadView('pdf.boletacardoso', $data);
+                break;
+            case config('app.idrifas.taxia'):
+                $pdf->loadView('pdf.boletataxia', $data);
+                break;
+        }
 
         $output = $pdf->output();
         file_put_contents(public_path('storage').'/boletas/'.$filename, $output, FILE_APPEND);

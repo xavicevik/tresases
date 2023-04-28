@@ -203,4 +203,17 @@ return [
         //'Cart' => Darryldecode\Cart\Facades\CartFacade::class,
     ])->toArray(),
 
+
+    'idrifas' => [
+        'movilgo' => env('RIFAS_ID_MOVILGO', 4),
+        'cardoso' => env('RIFAS_ID_CARDOSO', 7),
+        'taxia' => env('RIFAS_ID_TAXIA', 6),
+    ],
+
+    'cajaventa' => [
+        'movilgo' => env('CAJAVENTA_ID_MOVILGO', 14),
+        'cardoso' => env('CAJAVENTA_ID_CARDOSO', 13),
+        'taxia' => env('CAJAVENTA_ID_TAXIA', 6),
+    ],
+
 ];

@@ -6,7 +6,7 @@
     <title>Document</title>
 <style>
     body {
-        background-image: url("storage/img/boletas/4_base.png");
+        background-image: url("storage/img/boletas/7_base.png");
         background-size: cover;
     }
 
@@ -16,24 +16,16 @@
         font-size: 40px;
         width: 80%;
         text-align: justify;
-        margin-left: 9%;
-        margin-top: 45%;
+        margin-left: 6%;
+        margin-top: 51%;
     }
 
-    #p2{
-        font-family: Verdana;
-        font-size: 40px;
-        width: 80%;
-        text-align: justify;
-        margin-left: 20%;
-        padding-top: 45%;
-    }
 
     #p3{
         font-family: Verdana;
         font-size: 25px;
         margin-left: 80%;
-        padding-top: -1.0%;
+        padding-top: 7%;
     }
 </style>
 </head>
@@ -41,9 +33,7 @@
 
 <div id="contenedor" name="contenedor">
     <p id="p1">
-        {{ $numero }}
-    </p>
-    <p id="p2">
+        {{ $numero }} &nbsp; &nbsp; &nbsp;
         {{ $promocional }}
     </p>
     <p id="p3">

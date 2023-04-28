@@ -40,42 +40,42 @@ const updatePassword = () => {
 <template>
     <JetFormSection @submitted="updatePassword">
         <template #title>
-            Actualizar Password
+            Actualizar Contraseña
         </template>
 
         <template #description>
-            Puede realizar el cambio de password, asegurese que este sea seguro.
+            Puede realizar el cambio de Contraseña, asegurese que este sea seguro.
         </template>
 
         <template #form>
             <div class="col-span-6 sm:col-span-4">
-                <JetLabel for="current_password" value="Password actual" />
+                <JetLabel for="current_password" value="Contraseña actual" />
                 <JetInput
                     id="current_password"
                     ref="currentPasswordInput"
                     v-model="form.current_password"
                     type="password"
                     class="mt-1 block w-full"
-                    autocomplete="current-password"
+                    autocomplete="actual-Contraseña"
                 />
                 <JetInputError :message="form.errors.current_password" class="mt-2" />
             </div>
 
             <div class="col-span-6 sm:col-span-4">
-                <JetLabel for="password" value="Nuevo Password" />
+                <JetLabel for="password" value="Nueva Contraseña" />
                 <JetInput
                     id="password"
                     ref="passwordInput"
                     v-model="form.password"
                     type="password"
                     class="mt-1 block w-full"
-                    autocomplete="new-password"
+                    autocomplete="nueva-Contraseña"
                 />
                 <JetInputError :message="form.errors.password" class="mt-2" />
             </div>
 
             <div class="col-span-6 sm:col-span-4">
-                <JetLabel for="password_confirmation" value="Confirmar Password" />
+                <JetLabel for="password_confirmation" value="Confirmar Contraseña" />
                 <JetInput
                     id="password_confirmation"
                     v-model="form.password_confirmation"
@@ -89,7 +89,7 @@ const updatePassword = () => {
 
         <template #actions>
             <JetActionMessage :on="form.recentlySuccessful" class="mr-3">
-                Guardado.
+                Guardado
             </JetActionMessage>
 
             <JetButton :class="{ 'opacity-25': form.processing }" :disabled="form.processing">
