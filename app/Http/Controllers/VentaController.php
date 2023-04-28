@@ -378,7 +378,7 @@ class VentaController extends Controller
             $venta->idcliente = $request->idcliente;
             $venta->idpuntoventa = $request->idpuntoventa;
             $venta->fechaventa = $mytime->toDateString();//$request->fechaventa;
-            $venta->comprobante = $request->comprobante;
+            $venta->comprobante = $request->paymentmethod;//$request->comprobante;
             $venta->estado = 1;
             $venta->transaccion = 1;
             $venta->saveOrFail();
@@ -411,15 +411,15 @@ class VentaController extends Controller
             //return redirect()->route('enviar', ['notificacion' => $venta->id]);
 
             switch ($request->paymentmethod) {
-                case 1:
+                case 2:
                     $concepto = 4;
                     $descripcion = 'Pago con tarjeta crédito/debito';
                     break;
-                case 2:
+                case 3:
                     $concepto = 6;
                     $descripcion = 'Pago con transferencia';
                     break;
-                case 3:
+                case 1:
                     $concepto = 2;
                     $descripcion = 'Pago en efectivo';
                     break;
@@ -938,20 +938,21 @@ class VentaController extends Controller
                 $venta->valorventa = $totalpagado;
                 $venta->valortotal = $totalventa;
                 $venta->cantidad = sizeof($boletas);
+                $venta->comprobante = $request->paymentmethod;
                 $venta->save();
 
                 // pendiente el método de pago
-                $request->paymentmethod = 1;
+                $request->paymentmethod = 2;
                 switch ($request->paymentmethod) {
-                    case 1:
+                    case 2:
                         $concepto = 4;
                         $descripcion = 'Pago con tarjeta crédito/debito';
                         break;
-                    case 2:
+                    case 3:
                         $concepto = 6;
                         $descripcion = 'Pago con transferencia';
                         break;
-                    case 3:
+                    case 1:
                         $concepto = 2;
                         $descripcion = 'Pago en efectivo';
                         break;
