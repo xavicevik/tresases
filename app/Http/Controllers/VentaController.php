@@ -274,7 +274,7 @@ class VentaController extends Controller
         $caja = Caja::where('tipo', 2)
             ->join('puntos_ventas as t1', 'cajas.idpuntoventa', '=', 't1.id')
             ->where('t1.codigo', 2)
-            ->where('t1.idempresa', Auth::guard('vendedor')->user()->idempresa)
+            ->where('t1.idempresa', $vendedor->idempresa)
             ->with('puntoventa')
             ->select('cajas.*')
             ->first();
