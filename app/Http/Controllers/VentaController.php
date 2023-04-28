@@ -165,11 +165,11 @@ class VentaController extends Controller
         //$this->authorizeResource(User::class);
         $ventas = $ventas->paginate(self::canPorPagina);
 
-
+/*
         $boleta = Boleta::where('numero', 1234)->where('idrifa', 7)->first();
         $url = $this->genBoletaImagen($boleta);
         dd($url);
-
+*/
         if ($request->has('ispage') && $request->ispage){
             return ['data' => $ventas, 'idvendedor' => $idvendedor];
         } else {
