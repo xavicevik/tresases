@@ -6,7 +6,7 @@
     <title>Document</title>
 <style>
     body {
-        background-image: url("storage/img/boletas/7_base.png");
+        background-image: url({{ $url }});
         background-size: cover;
     }
 
@@ -16,8 +16,8 @@
         font-size: 40px;
         width: 80%;
         text-align: justify;
-        margin-left: 6%;
-        margin-top: 51%;
+        margin-left: 7%;
+        margin-top: 52%;
     }
 
 
@@ -25,7 +25,7 @@
         font-family: Verdana;
         font-size: 25px;
         margin-left: 80%;
-        padding-top: 7%;
+        padding-top: 10%;
     }
 </style>
 </head>
@@ -33,7 +33,7 @@
 
 <div id="contenedor" name="contenedor">
     <p id="p1">
-        {{ $numero }} &nbsp; &nbsp; &nbsp;
+        {{ $numero }} &nbsp; &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
         {{ $promocional }}
     </p>
     <p id="p3">

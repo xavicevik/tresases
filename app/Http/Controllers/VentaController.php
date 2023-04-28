@@ -165,11 +165,11 @@ class VentaController extends Controller
         //$this->authorizeResource(User::class);
         $ventas = $ventas->paginate(self::canPorPagina);
 
-        /*
-        $boleta = Boleta::where('numero', 1234)->where('idrifa', 6)->first();
+
+        $boleta = Boleta::where('numero', 1234)->where('idrifa', 7)->first();
         $url = $this->genBoletaImagen($boleta);
         dd($url);
-        */
+
         if ($request->has('ispage') && $request->ispage){
             return ['data' => $ventas, 'idvendedor' => $idvendedor];
         } else {
@@ -1296,6 +1296,7 @@ class VentaController extends Controller
             $comisionnew->comisionvendedor = $ventanew->valorventa * ($concomision->comisionvendedor/100);
             $comisionnew->estado = self::anulado;
             $comisionnew->save();
+            config('');
 
             $concepto = 5;
             $descripcion = 'Anulación Pago en efectivo';
@@ -2106,7 +2107,7 @@ class VentaController extends Controller
     public static function genBoletaImagen(Boleta $boleta) {
         //event(new \App\Events\RealTimeMessage('Hello World'));
        //$boleta = Boleta::where('id', 1111)->first();
-        $url = url('storage/img/boletas/'.$boleta->idrifa.'_base.png');
+        $url = 'storage/img/boletas/'.$boleta->idrifa.'_base.png';
 
         $numero = $boleta->numero;
         $promocional = $boleta->promocional;
@@ -2122,7 +2123,10 @@ class VentaController extends Controller
         $filename = 'boleta'.$boleta->idrifa.$boleta->codigo.'.pdf';
         $pdf = app('dompdf.wrapper');
         $pdf->getDomPDF()->set_option("enable_php", true);
-        $pdf->setPaper('A4', 'landscape');
+        //$pdf->setPaper('A4', 'landscape');
+        $paper_size = array(0,0,1079,800);
+        $pdf->setPaper($paper_size);
+        /*
         switch ($boleta->idrifa) {
             case config('app.idrifas.movilgo'):
                 $pdf->loadView('pdf.boleta', $data);
@@ -2131,6 +2135,19 @@ class VentaController extends Controller
                 $pdf->loadView('pdf.boletacardoso', $data);
                 break;
             case config('app.idrifas.taxia'):
+                $pdf->loadView('pdf.boletataxia', $data);
+                break;
+        }
+        */
+
+        switch ($boleta->idrifa) {
+            case env('RIFAS_ID_MOVILGO', 4):
+                $pdf->loadView('pdf.boleta', $data);
+                break;
+            case env('RIFAS_ID_CARDOSO', 7):
+                $pdf->loadView('pdf.boletacardoso', $data);
+                break;
+            case env('RIFAS_ID_TAXIA', 6):
                 $pdf->loadView('pdf.boletataxia', $data);
                 break;
         }

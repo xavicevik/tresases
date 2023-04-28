@@ -210,10 +210,5 @@ return [
         'taxia' => env('RIFAS_ID_TAXIA', 6),
     ],
 
-    'cajaventa' => [
-        'movilgo' => env('CAJAVENTA_ID_MOVILGO', 14),
-        'cardoso' => env('CAJAVENTA_ID_CARDOSO', 13),
-        'taxia' => env('CAJAVENTA_ID_TAXIA', 6),
-    ],
 
 ];
