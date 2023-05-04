@@ -66,9 +66,17 @@ class BoletasExport implements FromCollection, WithHeadings, ShouldAutoSize
                                 'boletas.numero as numero',
                                 'boletas.promocional as promocional',
                                 DB::raw('CONCAT(t1.nombre, " ", t1.apellido) AS vendedor'),
+                                't2.documento as documento_cliente',
                                 DB::raw('CONCAT(t2.nombre, " ", t2.apellido) AS cliente'),
                                 'boletas.serie as serie',
                                 'boletas.codigo as codigo',
+                                 DB::raw('CASE
+                                                    WHEN boletas.metodopago = 1 THEN "Efectivo"
+                                                    WHEN boletas.metodopago = 2 THEN "Tarjeta C/D"
+                                                    WHEN boletas.metodopago = 4 THEN "Bolsa"
+                                                    ELSE " "
+                                                END
+                                  AS metodo_pago'),
                                 'boletas.valor as valor_boleta',
                                 'boletas.pago as valor_pagado',
                                 'boletas.saldo as valor_saldo',
@@ -86,9 +94,11 @@ class BoletasExport implements FromCollection, WithHeadings, ShouldAutoSize
             'número',
             'Promocional',
             'Vendedor',
+            'Documento_Cliente',
             'Cliente',
             'Serie',
             'Código',
+            'Metodo_pago',
             'Valor_boleta',
             'Valor_pagado',
             'Valor_saldo',

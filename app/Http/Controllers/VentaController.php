@@ -81,6 +81,12 @@ class VentaController extends Controller
     const enproceso = 5;
     const cancelado = 6;
     const anulado = 9;
+
+    //metodos de pago
+    const efectivo = 1;
+    const tarjeta = 2;
+    const transferencia = 3;
+    const bolsa = 4;
     /**
      * Display a listing of the resource.
      *
@@ -405,10 +411,8 @@ class VentaController extends Controller
                     $detalleventa->saveOrFail();
                 }
             }
-            \Cart::clear();
-            \Cart::session(Auth::user()->id)->clear();
-
-            //return redirect()->route('enviar', ['notificacion' => $venta->id]);
+            //\Cart::clear();
+            //\Cart::session(Auth::user()->id)->clear();
 
             switch ($request->paymentmethod) {
                 case 2:
@@ -418,6 +422,10 @@ class VentaController extends Controller
                 case 3:
                     $concepto = 6;
                     $descripcion = 'Pago con transferencia';
+                    break;
+                case 4:
+                    $concepto = 2;
+                    $descripcion = 'Pago con bolsa';
                     break;
                 case 1:
                     $concepto = 2;
@@ -641,7 +649,7 @@ class VentaController extends Controller
                 $venta->idcliente = null;
                 $venta->idpuntoventa = $session->idpuntoventa;
                 $venta->fechaventa = $mytime->toDateTimeString();
-                $venta->comprobante = $request->comprobante;
+                $venta->comprobante = $request->paymentmethod;
                 $venta->estado = self::vendido;
                 $venta->transaccion = $request->idcaja;
                 $venta->save();
@@ -654,6 +662,8 @@ class VentaController extends Controller
                     $boleta->idcliente = $boleta->idclienteboleta;
                     $boleta->pago = $boleta->pago + $boleta->valor;
                     $boleta->saldo = $boleta->valortotal - $boleta->pago;
+                    $boleta->metodopago = $request->paymentmethod;
+                    $boleta->conciliado = $request->conciliado;
                     if ($boleta->saldo == 0) {
                         $estado = self::vendido;
                     } else {
@@ -712,6 +722,12 @@ class VentaController extends Controller
                 $venta->valortotal = $totalventa;
                 $venta->cantidad = sizeof($boletas);
                 $venta->save();
+
+                if ($request->paymentmethod == 4) {
+                    $vendedor = Vendedor::where('id', $session->idvendedor)->first();
+                    $vendedor->saldo -= ($venta->valorventa - $venta->comision);
+                    $vendedor->save();
+                }
 
                 $concepto = 2;
                 $descripcion = 'Pago en efectivo';
@@ -884,6 +900,8 @@ class VentaController extends Controller
                     $boleta->idcliente = $boleta->idclienteboleta;
                     $boleta->pago = $boleta->pago + $boleta->valor;
                     $boleta->saldo = $boleta->valortotal - $boleta->pago;
+                    $boleta->metodopago = self::tarjeta;
+                    $boleta->conciliado = true;
                     if ($boleta->saldo == 0) {
                         $estado = self::vendido;
                     } else {
@@ -942,7 +960,7 @@ class VentaController extends Controller
                 $venta->save();
 
                 // pendiente el método de pago
-                $request->paymentmethod = 2;
+                $request->paymentmethod = self::tarjeta;
                 switch ($request->paymentmethod) {
                     case 2:
                         $concepto = 4;
@@ -951,6 +969,10 @@ class VentaController extends Controller
                     case 3:
                         $concepto = 6;
                         $descripcion = 'Pago con transferencia';
+                        break;
+                    case 4:
+                        $concepto = 2;
+                        $descripcion = 'Pago con bolsa';
                         break;
                     case 1:
                         $concepto = 2;
@@ -1066,10 +1088,14 @@ class VentaController extends Controller
                     if ($boleta->estado_ant == self::reservado) {
                         $boleta->estado_ant = $boleta->estado;
                         $boleta->estado = self::reservado;
+                        $boleta->metodopago = null;
+                        $boleta->conciliado = true;
                         $boleta->idvendedor = $request->idvendedor;
                     } else {
                         $boleta->estado_ant = $boleta->estado;
                         $boleta->estado = self::activo;
+                        $boleta->conciliado = true;
+                        $boleta->metodopago = null;
                         $boleta->idvendedor = null;
                     }
                     $boleta->idcliente = null;
@@ -1643,8 +1669,8 @@ class VentaController extends Controller
         $preference->expiration_date_to = $mytime->addHours(config('mercadopago.expirationpay'))->toIso8601String();
         $preference->date_of_expiration = $preference->expiration_date_to;
         $preference->notification_url = $url.'app/ventas/paynotify';
-	$preference->external_reference = $request->idsesion;
-	$preference->statement_descriptor = 'SHOPPINGRED';
+	    $preference->external_reference = $request->idsesion;
+	    $preference->statement_descriptor = 'SHOPPINGRED';
 
         foreach ($detallesesion as $product) {
             $item = new \MercadoPago\Item();
@@ -1671,6 +1697,21 @@ class VentaController extends Controller
             $checkout->save();
         }
         return ['idpreferencia' => $preference->id, 'urlpago' => $preference->init_point];
+    }
+
+    public function preparePayEfecty(Request $request) {
+        require base_path('vendor/autoload.php');
+
+        $detallesesion = Detallesesion::where('idsesionventa', $request->idsesion)
+            ->with('boleta')
+            ->get();
+
+        // Se bloquea la sesión para que no se borre
+        $session = Sesionventa::where('id', $request->idsesion)->first();
+        $session->estado = self::enproceso; // En proceso
+        $session->save();
+
+        return ['idpreferencia' => null, 'urlpago' => ''];
     }
 
     public function sendSMS($to, $message) {

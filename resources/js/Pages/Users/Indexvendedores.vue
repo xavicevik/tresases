@@ -9,6 +9,21 @@
         <div class="py-4 lg:px-4 md:px-2 sm:px-2">
             <div class="mx-auto 2xl:8">
                 <div class="bg-white overflow-hidden shadow-xl sm:rounded-lg">
+                    <section v-if="loading">
+                        <!-- validateRifa <form> -->
+                        <div class="bg-white pb-1 mx-auto items-center w-full">
+                            <div class="">
+                                <!-- Formulario -->
+                                <section>
+                                    <div class="absolute mt-10 w-full" id="app">
+                                        <semipolar-spinner class="mt-10 mx-auto" :animation-duration="2000" :size="85" color="#ff1d5e" />
+                                    </div>
+                                </section>
+                                <!-- Fin formulario -->
+                            </div>
+                        </div>
+                        <!-- </form> -->
+                    </section>
                     <!-- Mensajes Flash -->
                     <section>
                         <div @click="cleanMessage()" mx-auto class="bg-teal-100 border-t-4 border-teal-500 rounded-b text-teal-900 px-4 py-3 shadow-md my-3" role="alert" v-show="$page.props.flash.message">
@@ -101,6 +116,23 @@
                                 <tr class="bg-gray-100">
                                     <th class="px-4 py-2 w-1/12 text-sm font-bold hover:bg-blue-500 hover:text-gray-50 rounded-b">
                                         <button @click="getUsers(buscar, 'documento')" class="font-bold">
+                                            ID
+                                            <div v-show="sortBy == 'nombre'">
+                                                <span v-show="!sortOrder">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                                                        <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+                                                    </svg>
+                                                </span>
+                                                <span v-show="sortOrder">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                                                      <path fill-rule="evenodd" d="M14.707 12.707a1 1 0 01-1.414 0L10 9.414l-3.293 3.293a1 1 0 01-1.414-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 010 1.414z" clip-rule="evenodd" />
+                                                    </svg>
+                                                </span>
+                                            </div>
+                                        </button>
+                                    </th>
+                                    <th class="px-4 py-2 w-1/12 text-sm font-bold hover:bg-blue-500 hover:text-gray-50 rounded-b">
+                                        <button @click="getUsers(buscar, 'documento')" class="font-bold">
                                             Documento
                                             <div v-show="sortBy == 'nombre'">
                                                 <span v-show="!sortOrder">
@@ -189,6 +221,7 @@
                                 </thead>
                                 <tbody>
                                 <tr class="text-center" text-sm v-if="arrayData.data" v-for="(user, id) in arrayData.data" :key="id">
+                                    <td class="border px-1 py-2 text-sm truncate" v-text="user.id"></td>
                                     <td class="border px-1 py-2 text-sm truncate" v-text="user.documento"></td>
                                     <td class="border px-1 py-2 text-sm truncate" v-text="user.nombre + ' ' + user.apellido"></td>
                                     <td class="border px-1 py-2 text-sm truncate" v-text="user.movil"></td>
@@ -263,183 +296,392 @@
                                 <!-- This element is to trick the browser into centering the modal contents. -->
                                 <span class="hidden sm:inline-block sm:align-middle sm:h-screen"></span>
                                 <div class="inline-block lg:w-8/12 align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:w-full" role="dialog" aria-modal="true" aria-labelledby="modal-headline">
-                                    <button type="button" @click="closeModal()" class="absolute top-3 right-2.5 text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center dark:hover:bg-gray-800 dark:hover:text-white" data-modal-toggle="authentication-modal">
-                                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg>
-                                    </button>
-                                    <div class="">
-                                        <h2 v-text="tituloModal" class="text-sm font-bold text-gray-900 px-4 py-4"></h2>
-                                    </div>
-                                    <form>
-                                        <div class="bg-white px-4 pt-2 pb-4 sm:p-6 sm:pb-4">
-                                            <div class="">
-                                                <section>
-                                                    <div class="mt-2 grid grid-cols-1 gap-y-6 sm:grid-cols-3 sm:gap-x-4">
-                                                        <div>
-                                                            <label class="block text-sm font-medium text-gray-700">Nombre</label>
-                                                            <div class="mt-1">
-                                                                <input type="text" :disabled="verMode" :class="{'bg-blue-100' : verMode}" v-model="form.nombre" autocomplete="given-name" class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
-                                                                <div v-if="$page.props.errors.nombre" class="text-red-500">{{ $page.props.errors.nombre }}</div>
-                                                            </div>
-                                                        </div>
 
-                                                        <div>
-                                                            <label class="block text-sm font-medium text-gray-700">Apellido</label>
-                                                            <div class="mt-1">
-                                                                <input type="text" :disabled="verMode" :class="{'bg-blue-100' : verMode}" v-model="form.apellido" autocomplete="family-name" class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
-                                                                <div v-if="$page.props.errors.apellido" class="text-red-500">{{ $page.props.errors.apellido }}</div>
-                                                            </div>
-                                                        </div>
 
-                                                        <div>
-                                                            <label class="block text-sm font-medium text-gray-700">Correo</label>
-                                                            <div class="mt-1">
-                                                                <input type="text" :disabled="verMode" :class="{'bg-blue-100' : verMode}" v-model="form.correo" autocomplete="street-address" class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
-                                                                <div v-if="$page.props.errors.correo" class="text-red-500">{{ $page.props.errors.correo }}</div>
-                                                            </div>
-                                                        </div>
-                                                        <div>
-                                                            <label class="block text-sm font-medium text-gray-700">Movil</label>
-                                                            <div class="mt-1">
-                                                                <input type="text" :disabled="verMode" :class="{'bg-blue-100' : verMode}" v-model="form.movil" autocomplete="street-address" class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
-                                                                <div v-if="$page.props.errors.movil" class="text-red-500">{{ $page.props.errors.movil }}</div>
-                                                            </div>
-                                                        </div>
+                                    <!-- Menu Tabs -->
+                                    <section>
+                                        <div class="border-b border-gray-200">
+                                            <ul class="flex flex-wrap -mb-px text-sm font-medium text-center text-gray-500">
+                                                <li class="mr-2">
+                                                    <a href="#" v-on:click="activetab='1'; tituloModalDetalle = 'Información'" v-bind:class="[ activetab === '1' ? ' text-gray-600 border-gray-600 active ' : ' text-gray-400 border-transparent hover:text-gray-900 hover:border-gray-900 ' ]" class="inline-flex p-4 rounded-t-lg border-b-2 group">
+                                                        <svg v-bind:class="[ activetab === '1' ? 'group-active:text-gray-600 text-gray-600 ' : ' group-active:text-gray-600 text-gray-400 group-hover:text-gray-500 ']" class="mr-2 w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                                                            <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-6-3a2 2 0 11-4 0 2 2 0 014 0zm-2 4a5 5 0 00-4.546 2.916A5.986 5.986 0 0010 16a5.986 5.986 0 004.546-2.084A5 5 0 0010 11z" clip-rule="evenodd"></path>
+                                                        </svg>Información
+                                                    </a>
+                                                </li>
+                                                <li class="mr-2">
+                                                    <a href="#" v-on:click="activetab='2'; tituloModalDetalle = 'Recargas'" v-bind:class="[ activetab === '2' ? ' text-gray-600 border-gray-600 active ' : ' text-gray-400 border-transparent hover:text-gray-900 hover:border-gray-900 ' ]" class="inline-flex p-4 rounded-t-lg border-b-2 group">
+                                                        <svg v-bind:class="[ activetab === '2' ? 'group-active:text-gray-600 text-gray-600 ' : ' group-active:text-gray-600 text-gray-400 group-hover:text-gray-500 ']" class="mr-2 w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                                                            <path d="M5 3a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2V5a2 2 0 00-2-2H5zM5 11a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2v-2a2 2 0 00-2-2H5zM11 5a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V5zM11 13a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path>
+                                                        </svg>Recargas
+                                                    </a>
+                                                </li>
+                                                <li class="mr-2">
+                                                    <a href="#" v-on:click="activetab='3'; tituloModalDetalle = 'Ventas'" v-bind:class="[ activetab === '3' ? ' text-gray-600 border-gray-600 active ' : ' text-gray-400 border-transparent hover:text-gray-900 hover:border-gray-900 ' ]" class="inline-flex p-4 rounded-t-lg border-b-2 group">
+                                                        <svg v-bind:class="[ activetab === '3' ? 'group-active:text-gray-600 text-gray-600 ' : ' group-active:text-gray-600 text-gray-400 group-hover:text-gray-500 ']" class="mr-2 w-5 h-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 18.75h-9m9 0a3 3 0 013 3h-15a3 3 0 013-3m9 0v-3.375c0-.621-.503-1.125-1.125-1.125h-.871M7.5 18.75v-3.375c0-.621.504-1.125 1.125-1.125h.872m5.007 0H9.497m5.007 0a7.454 7.454 0 01-.982-3.172M9.497 14.25a7.454 7.454 0 00.981-3.172M5.25 4.236c-.982.143-1.954.317-2.916.52A6.003 6.003 0 007.73 9.728M5.25 4.236V4.5c0 2.108.966 3.99 2.48 5.228M5.25 4.236V2.721C7.456 2.41 9.71 2.25 12 2.25c2.291 0 4.545.16 6.75.47v1.516M7.73 9.728a6.726 6.726 0 002.748 1.35m8.272-6.842V4.5c0 2.108-.966 3.99-2.48 5.228m2.48-5.492a46.32 46.32 0 012.916.52 6.003 6.003 0 01-5.395 4.972m0 0a6.726 6.726 0 01-2.749 1.35m0 0a6.772 6.772 0 01-3.044 0" />
+                                                        </svg>
+                                                        Ventas
+                                                    </a>
+                                                </li>
+                                                <li class="mr-2">
+                                                    <a href="#" v-on:click="activetab='4'; tituloModalDetalle = 'Conciliaciones'" v-bind:class="[ activetab === '4' ? ' text-gray-600 border-gray-600 active ' : ' text-gray-400 border-transparent hover:text-gray-900 hover:border-gray-900 ' ]" class="inline-flex p-4 rounded-t-lg border-b-2 group">
+                                                        <svg v-bind:class="[ activetab === '4' ? 'group-active:text-gray-600 text-gray-600 ' : ' group-active:text-gray-600 text-gray-400 group-hover:text-gray-500 ']" class="mr-2 w-5 h-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 18.75h-9m9 0a3 3 0 013 3h-15a3 3 0 013-3m9 0v-3.375c0-.621-.503-1.125-1.125-1.125h-.871M7.5 18.75v-3.375c0-.621.504-1.125 1.125-1.125h.872m5.007 0H9.497m5.007 0a7.454 7.454 0 01-.982-3.172M9.497 14.25a7.454 7.454 0 00.981-3.172M5.25 4.236c-.982.143-1.954.317-2.916.52A6.003 6.003 0 007.73 9.728M5.25 4.236V4.5c0 2.108.966 3.99 2.48 5.228M5.25 4.236V2.721C7.456 2.41 9.71 2.25 12 2.25c2.291 0 4.545.16 6.75.47v1.516M7.73 9.728a6.726 6.726 0 002.748 1.35m8.272-6.842V4.5c0 2.108-.966 3.99-2.48 5.228m2.48-5.492a46.32 46.32 0 012.916.52 6.003 6.003 0 01-5.395 4.972m0 0a6.726 6.726 0 01-2.749 1.35m0 0a6.772 6.772 0 01-3.044 0" />
+                                                        </svg>
+                                                        Conciliaciones
+                                                    </a>
+                                                </li>
+                                                <li class="mr-2" v-if="verMode||editMode">
+                                                    <a href="#" v-on:click="activetab='5'; tituloModalDetalle = 'Historial'" v-bind:class="[ activetab === '5' ? ' text-gray-600 border-gray-600 active ' : ' text-gray-400 border-transparent hover:text-gray-900 hover:border-gray-900 ' ]" class="inline-flex p-4 rounded-t-lg border-b-2 group">
+                                                        <svg v-bind:class="[ activetab === '5' ? 'group-active:text-gray-600 text-gray-600 ' : ' group-active:text-gray-600 text-gray-400 group-hover:text-gray-500 ']" class="mr-2 w-5 h-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 17.25v3.375c0 .621-.504 1.125-1.125 1.125h-9.75a1.125 1.125 0 01-1.125-1.125V7.875c0-.621.504-1.125 1.125-1.125H6.75a9.06 9.06 0 011.5.124m7.5 10.376h3.375c.621 0 1.125-.504 1.125-1.125V11.25c0-4.46-3.243-8.161-7.5-8.876a9.06 9.06 0 00-1.5-.124H9.375c-.621 0-1.125.504-1.125 1.125v3.5m7.5 10.375H9.375a1.125 1.125 0 01-1.125-1.125v-9.25m12 6.625v-1.875a3.375 3.375 0 00-3.375-3.375h-1.5a1.125 1.125 0 01-1.125-1.125v-1.5a3.375 3.375 0 00-3.375-3.375H9.75" />
+                                                        </svg>
+                                                        Historial
+                                                    </a>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </section>
 
-                                                        <div>
-                                                            <label class="block text-sm font-medium text-gray-700">Tipo documento</label>
-                                                            <div class="mt-1">
-                                                                <select :disabled="verMode" :class="{'bg-blue-100' : verMode}" class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" v-model="form.idtipos_documento">
-                                                                    <option value="0" >Seleccione</option>
-                                                                    <option v-for="tipodoc in arrayTiposdocumento" :key="tipodoc.id" :value="tipodoc.id" v-text="tipodoc.nombre_corto"></option>
-                                                                </select>
-                                                                <div v-if="$page.props.errors.idtipos_documento" class="text-red-500">{{ $page.props.errors.idtipos_documento }}</div>
+                                    <!-- Opciones -->
+
+                                    <!-- Seccion menu 1 -->
+                                    <section v-if="activetab ==='1'">
+                                        <button type="button" @click="closeModal()" class="absolute top-3 right-2.5 text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center dark:hover:bg-gray-800 dark:hover:text-white" data-modal-toggle="authentication-modal">
+                                            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg>
+                                        </button>
+                                        <div class="px-2 flex">
+                                            <div class="w-4/12">
+                                                <h2 v-text="tituloModal" class="text-sm font-bold text-gray-900 px-4 py-4"></h2>
+                                            </div>
+                                            <div class="w- 2/12 text-md py-4 text-red-600">Saldo: {{ formatPrice(form.saldo) }} </div>
+                                        </div>
+                                        <form>
+                                            <div class="bg-white px-4 pt-2 pb-4 sm:p-6 sm:pb-4">
+                                                <div class="">
+                                                    <section>
+                                                        <div class="mt-2 grid grid-cols-1 gap-y-6 sm:grid-cols-3 sm:gap-x-4">
+                                                            <div>
+                                                                <label class="block text-sm font-medium text-gray-700">Nombre</label>
+                                                                <div class="mt-1">
+                                                                    <input type="text" :disabled="verMode" :class="{'bg-blue-100' : verMode}" v-model="form.nombre" autocomplete="given-name" class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                                                                    <div v-if="$page.props.errors.nombre" class="text-red-500">{{ $page.props.errors.nombre }}</div>
+                                                                </div>
                                                             </div>
-                                                        </div>
 
-                                                        <div>
-                                                            <label class="block text-sm font-medium text-gray-700">Documento</label>
-                                                            <div class="mt-1">
-                                                                <input type="text" :verMode="editMode" :class="{'bg-blue-100' : verMode}" v-model="form.documento" autocomplete="postal-code" class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
-                                                                <div v-if="$page.props.errors.documento" class="text-red-500">{{ $page.props.errors.documento }}</div>
+                                                            <div>
+                                                                <label class="block text-sm font-medium text-gray-700">Apellido</label>
+                                                                <div class="mt-1">
+                                                                    <input type="text" :disabled="verMode" :class="{'bg-blue-100' : verMode}" v-model="form.apellido" autocomplete="family-name" class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                                                                    <div v-if="$page.props.errors.apellido" class="text-red-500">{{ $page.props.errors.apellido }}</div>
+                                                                </div>
                                                             </div>
-                                                        </div>
 
-                                                        <div>
-                                                            <label class="block text-sm font-medium text-gray-700">Username</label>
-                                                            <div class="mt-1">
-                                                                <input type="text" :disabled="verMode" :class="{'bg-blue-100' : verMode}" v-model="form.username" autocomplete="postal-code" class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
-                                                                <div v-if="$page.props.errors.username" class="text-red-500">{{ $page.props.errors.username }}</div>
+                                                            <div>
+                                                                <label class="block text-sm font-medium text-gray-700">Correo</label>
+                                                                <div class="mt-1">
+                                                                    <input type="text" :disabled="verMode" :class="{'bg-blue-100' : verMode}" v-model="form.correo" autocomplete="street-address" class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                                                                    <div v-if="$page.props.errors.correo" class="text-red-500">{{ $page.props.errors.correo }}</div>
+                                                                </div>
                                                             </div>
-                                                        </div>
+                                                            <div>
+                                                                <label class="block text-sm font-medium text-gray-700">Movil</label>
+                                                                <div class="mt-1">
+                                                                    <input type="text" :disabled="verMode" :class="{'bg-blue-100' : verMode}" v-model="form.movil" autocomplete="street-address" class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                                                                    <div v-if="$page.props.errors.movil" class="text-red-500">{{ $page.props.errors.movil }}</div>
+                                                                </div>
+                                                            </div>
 
-                                                        <div>
-                                                            <label class="block text-sm font-medium text-gray-700">Password</label>
-                                                            <div class="mt-1">
-                                                                <input type="password" v-if="!editMode" :disabled="verMode" :class="{'bg-blue-100' : verMode}" v-model="form.password" autocomplete="postal-code" class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
-                                                                <div v-if="$page.props.errors.password" class="text-red-500">{{ $page.props.errors.password }}</div>
+                                                            <div>
+                                                                <label class="block text-sm font-medium text-gray-700">Tipo documento</label>
+                                                                <div class="mt-1">
+                                                                    <select :disabled="verMode" :class="{'bg-blue-100' : verMode}" class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" v-model="form.idtipos_documento">
+                                                                        <option value="0" >Seleccione</option>
+                                                                        <option v-for="tipodoc in arrayTiposdocumento" :key="tipodoc.id" :value="tipodoc.id" v-text="tipodoc.nombre_corto"></option>
+                                                                    </select>
+                                                                    <div v-if="$page.props.errors.idtipos_documento" class="text-red-500">{{ $page.props.errors.idtipos_documento }}</div>
+                                                                </div>
+                                                            </div>
 
-                                                                <div class="flex items-center">
-                                                                    <input v-if="!verMode" checked v-model="form.cambiarpassword" type="checkbox" value="1" class="w-4 h-4 text-blue-600 bg-gray-100 rounded border-gray-300 focus:ring-blue-500 focus:ring-2">
-                                                                    <label v-if="!verMode" class="ml-2 text-sm font-medium text-gray-900">Solicitar cambio?</label>
-                                                                    <a href="#" @click="cambiarPass()" v-if="editMode">
-                                                                        <span class="ml-2 underline text-sm text-blue-600"> Cambiar Password</span>
-                                                                    </a>
+                                                            <div>
+                                                                <label class="block text-sm font-medium text-gray-700">Documento</label>
+                                                                <div class="mt-1">
+                                                                    <input type="text" :verMode="editMode" :class="{'bg-blue-100' : verMode}" v-model="form.documento" autocomplete="postal-code" class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                                                                    <div v-if="$page.props.errors.documento" class="text-red-500">{{ $page.props.errors.documento }}</div>
+                                                                </div>
+                                                            </div>
+
+                                                            <div>
+                                                                <label class="block text-sm font-medium text-gray-700">Username</label>
+                                                                <div class="mt-1">
+                                                                    <input type="text" :disabled="verMode" :class="{'bg-blue-100' : verMode}" v-model="form.username" autocomplete="postal-code" class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                                                                    <div v-if="$page.props.errors.username" class="text-red-500">{{ $page.props.errors.username }}</div>
+                                                                </div>
+                                                            </div>
+
+                                                            <div>
+                                                                <label class="block text-sm font-medium text-gray-700">Password</label>
+                                                                <div class="mt-1">
+                                                                    <input type="password" v-if="!editMode" :disabled="verMode" :class="{'bg-blue-100' : verMode}" v-model="form.password" autocomplete="postal-code" class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                                                                    <div v-if="$page.props.errors.password" class="text-red-500">{{ $page.props.errors.password }}</div>
+
+                                                                    <div class="flex items-center my-2">
+                                                                        <Toggle v-model="form.cambiarpassword" :disabled="verMode"/>
+                                                                        <label v-if="!verMode" class="ml-2 text-sm font-medium text-gray-900">Solicitar cambio?</label>
+                                                                        <a href="#" @click="cambiarPass()" v-if="editMode">
+                                                                            <span class="ml-2 underline text-sm text-blue-600"> Cambiar Password</span>
+                                                                        </a>
+
+                                                                    </div>
+                                                                    <div class="flex items-center my-2">
+                                                                        <Toggle v-model="form.bolsa" :disabled="verMode"/>
+                                                                        <label class="ml-2 text-sm font-medium text-gray-900">Usa bolsa?</label>
+                                                                    </div>
 
                                                                 </div>
+                                                            </div>
 
+                                                            <div>
+                                                                <label class="block text-sm font-medium text-gray-700">Teléfono</label>
+                                                                <div class="mt-1">
+                                                                    <input type="text" :disabled="verMode" :class="{'bg-blue-100' : verMode}" v-model="form.telefono" autocomplete="postal-code" class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                                                                    <div v-if="$page.props.errors.telefono" class="text-red-500">{{ $page.props.errors.telefono }}</div>
+                                                                </div>
                                                             </div>
-                                                        </div>
 
-                                                        <div>
-                                                            <label class="block text-sm font-medium text-gray-700">Teléfono</label>
-                                                            <div class="mt-1">
-                                                                <input type="text" :disabled="verMode" :class="{'bg-blue-100' : verMode}" v-model="form.telefono" autocomplete="postal-code" class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
-                                                                <div v-if="$page.props.errors.telefono" class="text-red-500">{{ $page.props.errors.telefono }}</div>
+                                                            <div>
+                                                                <label class="block text-sm font-medium text-gray-700">País</label>
+                                                                <div class="mt-1">
+                                                                    <select :disabled="verMode" :class="{'bg-blue-100' : verMode}" class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" v-model="form.idpais" @change="getDepartamentos()">
+                                                                        <option value="0" >Seleccione País</option>
+                                                                        <option v-for="pais in arrayPaises" :key="pais.id" :value="pais.id" v-text="pais.nombre"></option>
+                                                                    </select>
+                                                                    <div v-if="$page.props.errors.idpais" class="text-red-500">{{ $page.props.errors.idpais }}</div>
+                                                                </div>
                                                             </div>
-                                                        </div>
+                                                            <div>
+                                                                <label class="block text-sm font-medium text-gray-700">Departamento</label>
+                                                                <div class="mt-1">
+                                                                    <select :disabled="verMode" :class="{'bg-blue-100' : verMode}" class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" v-model="form.iddepartamento" @change="getCiudades">
+                                                                        <option value="0" >Seleccione departamento</option>
+                                                                        <option v-for="departamento in arrayDepartamentos" :key="departamento.id" :value="departamento.id" v-text="departamento.nombre"></option>
+                                                                    </select>
+                                                                    <div v-if="$page.props.errors.iddepartamento" class="text-red-500">{{ $page.props.errors.iddepartamento }}</div>
+                                                                </div>
+                                                            </div>
+                                                            <div>
+                                                                <label class="block text-sm font-medium text-gray-700">Ciudad</label>
+                                                                <div class="mt-1">
+                                                                    <select :disabled="verMode" :class="{'bg-blue-100' : verMode}" class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" v-model="form.idciudad">
+                                                                        <option value="0" >Seleccione Ciudad</option>
+                                                                        <option v-for="ciudad in arrayCiudades" :key="ciudad.id" :value="ciudad.id" v-text="ciudad.nombre"></option>
+                                                                    </select>
+                                                                    <div v-if="$page.props.errors.idciudad" class="text-red-500">{{ $page.props.errors.idciudad }}</div>
+                                                                </div>
+                                                            </div>
+                                                            <div>
+                                                                <label class="block text-sm font-medium text-gray-700">Dirección</label>
+                                                                <div class="mt-1">
+                                                                    <input type="email" :disabled="verMode" :class="{'bg-blue-100' : verMode}" v-model="form.direccion" autocomplete="email" class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                                                                    <div v-if="$page.props.errors.direccion" class="text-red-500">{{ $page.props.errors.direccion }}</div>
+                                                                </div>
+                                                            </div>
 
-                                                        <div>
-                                                            <label class="block text-sm font-medium text-gray-700">País</label>
-                                                            <div class="mt-1">
-                                                                <select :disabled="verMode" :class="{'bg-blue-100' : verMode}" class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" v-model="form.idpais" @change="getDepartamentos()">
-                                                                    <option value="0" >Seleccione País</option>
-                                                                    <option v-for="pais in arrayPaises" :key="pais.id" :value="pais.id" v-text="pais.nombre"></option>
-                                                                </select>
-                                                                <div v-if="$page.props.errors.idpais" class="text-red-500">{{ $page.props.errors.idpais }}</div>
+                                                            <div>
+                                                                <label class="block text-sm font-medium text-gray-700">Rol</label>
+                                                                <div class="mt-1">
+                                                                    <select :disabled="verMode" @change="getEmpresas()" :class="{'bg-blue-100' : verMode}" class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" v-model="form.idrol">
+                                                                        <option value="0" >Seleccione Rol</option>
+                                                                        <option v-show="rol.id == 5" v-for="rol in arrayRoles" :key="rol.id" :value="rol.id" v-text="rol.nombre"></option>
+                                                                    </select>
+                                                                    <div v-if="$page.props.errors.idrol" class="text-red-500">{{ $page.props.errors.idrol }}</div>
+                                                                </div>
                                                             </div>
-                                                        </div>
-                                                        <div>
-                                                            <label class="block text-sm font-medium text-gray-700">Departamento</label>
-                                                            <div class="mt-1">
-                                                                <select :disabled="verMode" :class="{'bg-blue-100' : verMode}" class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" v-model="form.iddepartamento" @change="getCiudades">
-                                                                    <option value="0" >Seleccione departamento</option>
-                                                                    <option v-for="departamento in arrayDepartamentos" :key="departamento.id" :value="departamento.id" v-text="departamento.nombre"></option>
-                                                                </select>
-                                                                <div v-if="$page.props.errors.iddepartamento" class="text-red-500">{{ $page.props.errors.iddepartamento }}</div>
-                                                            </div>
-                                                        </div>
-                                                        <div>
-                                                            <label class="block text-sm font-medium text-gray-700">Ciudad</label>
-                                                            <div class="mt-1">
-                                                                <select :disabled="verMode" :class="{'bg-blue-100' : verMode}" class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" v-model="form.idciudad">
-                                                                    <option value="0" >Seleccione Ciudad</option>
-                                                                    <option v-for="ciudad in arrayCiudades" :key="ciudad.id" :value="ciudad.id" v-text="ciudad.nombre"></option>
-                                                                </select>
-                                                                <div v-if="$page.props.errors.idciudad" class="text-red-500">{{ $page.props.errors.idciudad }}</div>
-                                                            </div>
-                                                        </div>
-                                                        <div>
-                                                            <label class="block text-sm font-medium text-gray-700">Dirección</label>
-                                                            <div class="mt-1">
-                                                                <input type="email" :disabled="verMode" :class="{'bg-blue-100' : verMode}" v-model="form.direccion" autocomplete="email" class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
-                                                                <div v-if="$page.props.errors.direccion" class="text-red-500">{{ $page.props.errors.direccion }}</div>
-                                                            </div>
-                                                        </div>
 
-                                                        <div>
-                                                            <label class="block text-sm font-medium text-gray-700">Rol</label>
-                                                            <div class="mt-1">
-                                                                <select :disabled="verMode" @change="getEmpresas()" :class="{'bg-blue-100' : verMode}" class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" v-model="form.idrol">
-                                                                    <option value="0" >Seleccione Rol</option>
-                                                                    <option v-show="rol.id == 5" v-for="rol in arrayRoles" :key="rol.id" :value="rol.id" v-text="rol.nombre"></option>
-                                                                </select>
-                                                                <div v-if="$page.props.errors.idrol" class="text-red-500">{{ $page.props.errors.idrol }}</div>
+                                                            <div>
+                                                                <label class="block text-sm font-medium text-gray-700">Empresa</label>
+                                                                <div class="mt-1">
+                                                                    <select :disabled="verMode" :class="{'bg-blue-100' : verMode}" class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" v-model="form.idempresa">
+                                                                        <option value="0" >Seleccione empresa</option>
+                                                                        <option v-for="empresa in arrayEmpresas" :key="empresa.id" :value="empresa.id" v-text="empresa.razon_social"></option>
+                                                                    </select>
+                                                                    <div v-if="$page.props.errors.idempresa" class="text-red-500">{{ $page.props.errors.idempresa }}</div>
+                                                                </div>
                                                             </div>
                                                         </div>
-
-                                                        <div>
-                                                            <label class="block text-sm font-medium text-gray-700">Empresa</label>
-                                                            <div class="mt-1">
-                                                                <select :disabled="verMode" :class="{'bg-blue-100' : verMode}" class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" v-model="form.idempresa">
-                                                                    <option value="0" >Seleccione empresa</option>
-                                                                    <option v-for="empresa in arrayEmpresas" :key="empresa.id" :value="empresa.id" v-text="empresa.razon_social"></option>
-                                                                </select>
-                                                                <div v-if="$page.props.errors.idempresa" class="text-red-500">{{ $page.props.errors.idempresa }}</div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </section>
+                                                    </section>
+                                                </div>
                                             </div>
-                                        </div>
-                                        <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
-                                            <span class="flex w-full rounded-md shadow-sm sm:ml-3 sm:w-auto">
-                                              <button v-show="newMode" @click="save(form)" wire:click.prevent="store()" type="button" class="inline-flex justify-center w-full rounded-md border border-transparent px-4 py-2 bg-green-600 text-base leading-6 font-medium text-white shadow-sm hover:bg-green-500 focus:outline-none focus:border-green-700 focus:shadow-outline-green transition ease-in-out duration-150 sm:text-sm sm:leading-5" >
-                                                Guardar
-                                              </button>
-                                            </span>
-                                            <span class="flex w-full rounded-md shadow-sm sm:ml-3 sm:w-auto">
-                                              <button v-show="editMode" @click="update(form)" wire:click.prevent="store()" type="button" class="inline-flex justify-center w-full rounded-md border border-transparent px-4 py-2 bg-green-600 text-base leading-6 font-medium text-white shadow-sm hover:bg-green-500 focus:outline-none focus:border-green-700 focus:shadow-outline-green transition ease-in-out duration-150 sm:text-sm sm:leading-5" >
-                                                Actualizar
-                                              </button>
-                                            </span>
-                                            <span class="mt-3 flex w-full rounded-md shadow-sm sm:mt-0 sm:w-auto">
+                                            <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+                                                <span class="flex w-full rounded-md shadow-sm sm:ml-3 sm:w-auto">
+                                                  <button v-show="newMode" @click="save(form)" wire:click.prevent="store()" type="button" class="inline-flex justify-center w-full rounded-md border border-transparent px-4 py-2 bg-green-600 text-base leading-6 font-medium text-white shadow-sm hover:bg-green-500 focus:outline-none focus:border-green-700 focus:shadow-outline-green transition ease-in-out duration-150 sm:text-sm sm:leading-5" >
+                                                    Guardar
+                                                  </button>
+                                                </span>
+                                                <span class="flex w-full rounded-md shadow-sm sm:ml-3 sm:w-auto">
+                                                  <button v-show="editMode" @click="update(form)" wire:click.prevent="store()" type="button" class="inline-flex justify-center w-full rounded-md border border-transparent px-4 py-2 bg-green-600 text-base leading-6 font-medium text-white shadow-sm hover:bg-green-500 focus:outline-none focus:border-green-700 focus:shadow-outline-green transition ease-in-out duration-150 sm:text-sm sm:leading-5" >
+                                                    Actualizar
+                                                  </button>
+                                                </span>
+                                                <span class="mt-3 flex w-full rounded-md shadow-sm sm:mt-0 sm:w-auto">
 
-                                          <button @click="closeModal()" type="button" class="inline-flex justify-center w-full rounded-md border border-gray-300 px-4 py-2 bg-white text-base leading-6 font-medium text-gray-700 shadow-sm hover:text-gray-500 focus:outline-none focus:border-blue-300 focus:shadow-outline-blue transition ease-in-out duration-150 sm:text-sm sm:leading-5">
-                                            Cancelar
-                                          </button>
-                                        </span>
+                                              <button @click="closeModal()" type="button" class="inline-flex justify-center w-full rounded-md border border-gray-300 px-4 py-2 bg-white text-base leading-6 font-medium text-gray-700 shadow-sm hover:text-gray-500 focus:outline-none focus:border-blue-300 focus:shadow-outline-blue transition ease-in-out duration-150 sm:text-sm sm:leading-5">
+                                                Cancelar
+                                              </button>
+                                            </span>
+                                            </div>
+                                        </form>
+                                    </section>
+                                    <!-- fin menu 1 -->
+
+                                    <!-- Seccion menu 2 Recargas -->
+                                    <section v-if="activetab ==='2'" >
+                                        <!-- Ventana modal Recargas -->
+                                        <!-- Main modal -->
+
+                                        <button type="button" @click="closeModal()" class="absolute top-3 right-2.5 text-gray-400 bg-transparent hover:bg-blue-200 hover:text-gray-900 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center dark:hover:bg-blue-800 dark:hover:text-white" data-modal-toggle="authentication-modal">
+                                            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg>
+                                        </button>
+                                        <div class="flex">
+                                            <h2 v-text="tituloModalDetalle" class="text-xl font-bold text-gray-900 px-4 py-4"></h2>
                                         </div>
-                                    </form>
+
+                                        <div class="bg-white px-4 pt-2 pb-4 ">
+
+                                            <section>
+                                                <div class="px-4">
+                                                    <form @submit.prevent="setRecargabyVendedor(formrecarga)">
+                                                        <div class="grid sm:grid-cols-2 sm:gap-2 px-4">
+                                                            <div class="relative z-0 w-full mb-6 group">
+                                                                <money3 v-model="formrecarga.valor" v-bind="configMoney" :disabled="verMode" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"></money3>
+                                                            </div>
+                                                            <div class="relative z-0 w-full mb-6 group">
+                                                                <select class="block py-2.5 px-3 w-full text-sm text-gray-900 rounded border-b-2 border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border-gray-600 peer" v-model="formrecarga.metodopago">
+                                                                    <option value="-" >Seleccione Método de pago</option>
+                                                                    <option value="1">Efectivo</option>
+                                                                    <option value="2">Tarjeta C/D</option>
+                                                                </select>
+                                                            </div>
+                                                        </div>
+                                                        <div class="flex mx-auto">
+                                                            <button type="button" @click="setRecargabyVendedor(formrecarga)" class="mx-auto text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-gray-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-gray-800">Recargar</button>
+                                                        </div>
+                                                    </form>
+                                                </div>
+                                            </section>
+                                            <section>
+                                                <div class="lg:px-4 md:px-2 sm:px-0 py-2 pb-6">
+                                                    <table class="table-fixed w-full">
+                                                        <thead>
+                                                        <tr class="bg-blue-100 hover:bg-blue-500 hover:text-gray-50">
+                                                            <th class="px-4 py-2 w-1/12 text-sm font-bold rounded-b">
+                                                                <button @click="" class="font-bold">
+                                                                    Fecha recarga
+                                                                    <div v-show="sortBy == 'loteria.nombre'">
+                                                                    <span v-show="!sortOrder">
+                                                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                                                                            <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+                                                                        </svg>
+                                                                    </span>
+                                                                        <span v-show="sortOrder">
+                                                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                                                                          <path fill-rule="evenodd" d="M14.707 12.707a1 1 0 01-1.414 0L10 9.414l-3.293 3.293a1 1 0 01-1.414-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 010 1.414z" clip-rule="evenodd" />
+                                                                        </svg>
+                                                                    </span>
+                                                                    </div>
+                                                                </button>
+                                                            </th>
+                                                            <th class="px-4 py-2 w-1/12 text-sm font-bold rounded-b">
+                                                                <button  class="font-bold">
+                                                                    Usuario
+                                                                    <div v-show="sortBy == 'serie'">
+                                                                    <span v-show="!sortOrder">
+                                                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                                                                            <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+                                                                        </svg>
+                                                                    </span>
+                                                                        <span v-show="sortOrder">
+                                                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                                                                          <path fill-rule="evenodd" d="M14.707 12.707a1 1 0 01-1.414 0L10 9.414l-3.293 3.293a1 1 0 01-1.414-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 010 1.414z" clip-rule="evenodd" />
+                                                                        </svg>
+                                                                    </span>
+                                                                    </div>
+                                                                </button>
+                                                            </th>
+                                                            <th class="px-4 py-2 w-1/12 text-sm font-bold rounded-b">
+                                                                <button  class="font-bold">
+                                                                    Valor
+                                                                    <div v-show="sortBy == 'serie'">
+                                                                    <span v-show="!sortOrder">
+                                                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                                                                            <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+                                                                        </svg>
+                                                                    </span>
+                                                                        <span v-show="sortOrder">
+                                                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                                                                          <path fill-rule="evenodd" d="M14.707 12.707a1 1 0 01-1.414 0L10 9.414l-3.293 3.293a1 1 0 01-1.414-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 010 1.414z" clip-rule="evenodd" />
+                                                                        </svg>
+                                                                    </span>
+                                                                    </div>
+                                                                </button>
+                                                            </th>
+                                                            <th class="px-4 py-2 w-1/12 text-sm font-bold rounded-b">
+                                                                <button  class="font-bold">
+                                                                    Método de pago
+                                                                    <div v-show="sortBy == 'serie'">
+                                                                    <span v-show="!sortOrder">
+                                                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                                                                            <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+                                                                        </svg>
+                                                                    </span>
+                                                                        <span v-show="sortOrder">
+                                                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                                                                          <path fill-rule="evenodd" d="M14.707 12.707a1 1 0 01-1.414 0L10 9.414l-3.293 3.293a1 1 0 01-1.414-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 010 1.414z" clip-rule="evenodd" />
+                                                                        </svg>
+                                                                    </span>
+                                                                    </div>
+                                                                </button>
+                                                            </th>
+                                                        </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                        <tr class="hover:bg-blue-100 text-center" text-sm v-if="arrayRecargas" v-for="(dato, id) in arrayRecargas.data" :key="id">
+                                                            <td class="border px-1 py-2 text-sm truncate" v-text="dateTimeFull(dato.updated_at)"></td>
+                                                            <td class="border px-1 py-2 text-sm truncate" v-text="dato.user.full_name"></td>
+                                                            <td class="border px-1 py-2 text-sm truncate" v-text="dato.valor"></td>
+                                                            <td class="border px-1 py-2 text-sm truncate" v-text="dato.metodopago == 1?'Efectivo':'Tarjeta C/D'"></td>
+                                                        </tr>
+                                                        <tr v-else>
+                                                            <td class="border px-4 py-2 text-xs text-center" colspan="4"> La consulta no obtuvo datos</td>
+                                                        </tr>
+                                                        </tbody>
+                                                    </table>
+                                                    <!-- Paginacion -->
+                                                    <section class="mt-6">
+                                                        <div v-if="arrayRecargas.links.length > 3">
+                                                            <div class="flex flex-wrap -mb-1">
+                                                                <template v-for="(link, p) in arrayRecargas.links" :key="p">
+                                                                    <div v-if="link.url === null" class="mr-1 mb-1 px-4 py-3 text-sm leading-4 text-gray-400 border rounded"
+                                                                         v-html="link.label" />
+                                                                    <button  v-else
+                                                                             class="mr-1 mb-1 px-4 py-3 text-sm leading-4 border rounded hover:bg-white focus:border-indigo-500 focus:text-indigo-500"
+                                                                             :class="{ 'bg-blue-700 text-white': link.active }"
+                                                                             v-on:click="this.cambiarPage(link.url, 'recargas', null, null, form.id)"
+                                                                             v-html="link.label" />
+                                                                </template>
+                                                            </div>
+                                                        </div>
+                                                    </section>
+                                                    <!-- Paginacion -->
+                                                </div>
+                                            </section>
+
+                                        </div>
+
+                                        <!-- Fin Ventana modal Documentos -->
+                                    </section>
+                                    <!-- fin menu 5 -->
 
                                 </div>
                             </div>
@@ -532,7 +774,7 @@ import moment from 'moment'
 import { QuillEditor } from '@vueup/vue-quill';
 import '@vueup/vue-quill/dist/vue-quill.snow.css';
 import { ref, onMounted } from 'vue';
-
+import { SemipolarSpinner } from 'epic-spinners'
 import { Money3Component } from 'v-money3'
 
 
@@ -557,6 +799,7 @@ export default {
         JetNavLink,
         Link,
         money3: Money3Component,
+        SemipolarSpinner
 
     },
     props:{
@@ -568,7 +811,23 @@ export default {
     },
     data() {
         return {
+            configMoney: {
+                masked: false,
+                prefix: '$ ',
+                suffix: '',
+                thousands: ',',
+                decimal: '.',
+                precision: 0,
+                disableNegative: false,
+                disabled: false,
+                min: null,
+                max: null,
+                allowBlank: false,
+                minimumNumberOfCharacters: 0,
+            },
+            loading: false,
             tituloModal: '',
+            activetab: '1',
             formpasswd: {
                 _token: usePage().props.value._token,
                 id: '',
@@ -597,8 +856,16 @@ export default {
                 camaracomercio: false,
                 rut: false,
                 url: false,
-                cambiarpassword: true
+                cambiarpassword: true,
+                changedpassword: null,
+                saldo: 0,
+                bolsa: 0,
             },
+            arrayRecargas: [],
+            formrecarga: {
+                valor: 0,
+                metodopago: 1,
+            }
         }
     },
     methods: {
@@ -626,8 +893,6 @@ export default {
             });
         },
         openModal: function (accion, data = []) {
-            this.isOpen = true;
-
             switch (accion) {
                 case 'registrar':
                 {
@@ -663,22 +928,23 @@ export default {
                     this.form.username = data['username'];
                     this.form.direccion = data['direccion'];
                     this.form.telefono = data['telefono'];
-                    this.getRoles();
-                    this.getPaises();
+                    this.form.saldo = data['saldo'];
                     this.form.idpais = data['idpais'];
+                    this.form.bolsa = data['bolsa'];
+                    this.form.changedpassword = data['changedpassword'];
                     this.getDepartamentos();
                     this.form.iddepartamento = data['iddepartamento'];
                     this.getCiudades();
                     this.form.idciudad = data['idciudad'];
-                    this.getTiposdocumento();
-                    this.getEmpresas();
+                    this.arrayRecargas = this.getRecargasbyVendedor(data['id']);
                     this.newMode = false;
                     this.verMode = true;
-                    this.editMode = false;
-                    break;
+                    this.editMode = false
+                    this.form.cambiarpassword = this.form.changedpassword?false:true;
                     break;
                 }
                 case 'actualizar': {
+                    this.loading = true;
                     this.form.id = data['id'];
                     this.tituloModal = 'Actualizar Usuario ' + data['username'];
                     this.form.idtipos_documento = data['idtipos_documento'];
@@ -692,22 +958,25 @@ export default {
                     this.form.username = data['username'];
                     this.form.direccion = data['direccion'];
                     this.form.telefono = data['telefono'];
-                    this.getRoles();
-                    this.getPaises();
+                    this.form.saldo = data['saldo'];
+                    this.form.changedpassword = data['changedpassword'];
+                    this.form.bolsa = data['bolsa'];
                     this.form.idpais = data['idpais'];
                     this.getDepartamentos();
                     this.form.iddepartamento = data['iddepartamento'];
                     this.getCiudades();
                     this.form.idciudad = data['idciudad'];
-                    this.getTiposdocumento();
-                    this.getEmpresas();
+                    this.arrayRecargas = this.getRecargasbyVendedor(data['id']);
                     this.newMode = false;
                     this.verMode = false;
                     this.editMode = true;
+                    this.loading = false;
+                    this.form.cambiarpassword = this.form.changedpassword?false:true;
                     break;
                 }
 
             }
+            this.isOpen = true;
         },
         closeModal: function () {
             this.isOpen = false;
@@ -775,7 +1044,7 @@ export default {
                     Swal.fire({
                         position: 'top-end',
                         icon: 'success',
-                        title: 'El usuario se ha actualizado!',
+                        title: 'El vendedor se ha actualizado!',
                         showConfirmButton: false,
                         timer: 1500
                     })
@@ -836,9 +1105,60 @@ export default {
                 fileLink.click();
             })
         },
+        getRecargasbyVendedor: async function (data) {
+            this.loading = true;
+            var url= '/users/getRecargasbyVendedor';
+            let res = await axios.get(url, {
+                params: {
+                    idvendedor: data
+                }
+            });
+            this.arrayRecargas = res.data.recargas;
+            this.loading = false;
+        },
+
+
+        setRecargabyVendedor: async function (data) {
+            this.loading = true;
+            var url= '/users/setRecargabyVendedor';
+
+            var formData = new FormData();
+            formData.append('idvendedor', this.form.id);
+            formData.append('metodopago', data.metodopago);
+            formData.append('valor', data.valor);
+            let res = await axios.post(url, formData);
+            if (res.data.codigo == 0) {
+                Swal.fire({
+                    position: 'top-end',
+                    icon: 'success',
+                    title: 'Se ha realizado la recarga satisfactoriamente',
+                    showConfirmButton: false,
+                    timer: 1500
+                })
+            } else {
+                Swal.fire({
+                    position: 'top-end',
+                    icon: 'error',
+                    title: res.data.mensaje,
+                    showConfirmButton: true,
+                })
+            }
+
+            this.activetab == 1
+            this.formrecarga.valor = 0;
+            this.formrecarga.metodopago = 1;
+            this.getUsers('', '', '');
+            this.closeModal();
+            this.loading = false;
+        },
+
 
     },
     created: function () {
+        this.getRoles();
+        this.getPaises();
+        this.getTiposdocumento();
+        this.getEmpresas();
         this.arrayData = this.vendedores;
     },
     mounted() {

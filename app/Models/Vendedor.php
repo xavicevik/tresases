@@ -38,7 +38,8 @@ class Vendedor extends Authenticatable implements Auditable
     protected $fillable = [
         'nombre', 'correo', 'username','password', 'apellido', 'idtipos_documento', 'idrol', 'estado',
         'documento', 'direccion', 'indicativo', 'idpais', 'iddepartamento', 'idciudad', 'observaciones',
-        'telefono', 'movil', 'isnatural', 'camaracomercio', 'rut', 'url', 'idempresa', 'changedpassword'
+        'telefono', 'movil', 'isnatural', 'camaracomercio', 'rut', 'url', 'idempresa', 'changedpassword',
+        'saldo', 'bolsa'
     ];
 
     /**
@@ -95,6 +96,10 @@ class Vendedor extends Authenticatable implements Auditable
 
     public function ciudad(){
         return $this->belongsTo(Ciudad::class, 'idciudad');
+    }
+
+    public function recargas() {
+        return $this->hasMany(Recarga::class, 'idvendedor');
     }
 
     public function AllPermissions(): Attribute {

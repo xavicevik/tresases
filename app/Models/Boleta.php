@@ -27,7 +27,9 @@ class Boleta extends Model implements Auditable
         'saldo',
         'codigo',
         'estado',
-        'estado_ant'
+        'estado_ant',
+        'metodopago',
+        'conciliado'
     ];
 
 

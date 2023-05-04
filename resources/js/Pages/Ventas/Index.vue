@@ -18,9 +18,6 @@
                                     Buscar Ventas
                                 </h1>
                             </div>
-                            <div v-if="$can('ventas-create')" class="pr-2 w-1/3 text-center">
-                                <Link :href="route('ventas.create')" class="bg-blue-500 text-xs  hover:bg-blue-700 text-white font-bold py-2 px-4 rounded ">Nueva venta</Link>
-                            </div>
                         </div>
 
                         <section>
@@ -56,9 +53,15 @@
                                     </div>
                                     <div class="grid xl:grid-cols-2 xl:gap-6">
                                         <div class="relative z-0 w-full mb-4 group">
-                                            <input type="text" v-model="form.comprobante" class="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border-blue-600 peer" placeholder=" " required />
+                                            <select class="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer" v-model="form.comprobante">
+                                                <option value="" >Seleccione</option>
+                                                <option value="1">Efectivo</option>
+                                                <option value="2">Tarjeta C/D</option>
+                                                <option value="3">Transferencia</option>
+                                                <option value="4">Bolsa</option>
+                                            </select>
                                             <label class="peer-focus:font-medium absolute text-sm text-gray-500 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:left-0 peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6">
-                                                Comprobante
+                                                Método de pago
                                             </label>
                                         </div>
                                         <div class="relative z-0 w-full mb-6 group">
@@ -98,6 +101,9 @@
                                         Vendedor
                                     </th>
                                     <th class="px-4 py-2 text-sm font-bold w-2/12 hover:bg-blue-500 hover:text-gray-50 rounded-b">
+                                        Método de pago
+                                    </th>
+                                    <th class="px-4 py-2 text-sm font-bold w-2/12 hover:bg-blue-500 hover:text-gray-50 rounded-b">
                                         Punto de venta
                                     </th>
                                     <th class="px-4 py-2 text-sm font-bold w-2/12 hover:bg-blue-500 hover:text-gray-50 rounded-b">
@@ -113,6 +119,7 @@
                                     <td class="border px-1 py-2 text-sm truncate" v-text="dato.id"></td>
                                     <td class="border px-1 py-2 text-sm truncate" v-text="formatPrice(dato.valorventa)"></td>
                                     <td class="border px-1 py-2 text-sm truncate" v-text="dato.vendedor.nombre"></td>
+                                    <td class="border px-1 py-2 text-sm truncate" v-text="(dato.comprobante==1)?'Efectivo':(dato.comprobante==2)?'Tarjeta C/D':(dato.comprobante==4)?'Bolsa':''"></td>
                                     <td class="border px-1 py-2 text-sm truncate" v-text="dato.puntoventa.nombre"></td>
                                     <td class="border px-1 py-2 text-sm truncate" v-text="dateTimeFull(dato.fechaventa)"></td>
                                     <td class="border px-2 py-2 text-sm truncate" v-if="dato.estado">

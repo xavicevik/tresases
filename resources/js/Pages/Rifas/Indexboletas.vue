@@ -176,6 +176,40 @@
                                     </th>
                                     <th class="px-4 py-2 text-sm font-bold hover:bg-blue-500 hover:text-gray-50 rounded-b w-1/12">
                                         <button @click="getCajas(buscar, 'id')" class="font-bold">
+                                            Método pago
+                                            <div v-show="sortBy == 'fechafin'">
+                                                <span v-show="!sortOrder">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                                                        <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+                                                    </svg>
+                                                </span>
+                                                <span v-show="sortOrder">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                                                      <path fill-rule="evenodd" d="M14.707 12.707a1 1 0 01-1.414 0L10 9.414l-3.293 3.293a1 1 0 01-1.414-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 010 1.414z" clip-rule="evenodd" />
+                                                    </svg>
+                                                </span>
+                                            </div>
+                                        </button>
+                                    </th>
+                                    <th class="px-4 py-2 text-sm font-bold hover:bg-blue-500 hover:text-gray-50 rounded-b w-1/12">
+                                        <button @click="getCajas(buscar, 'id')" class="font-bold">
+                                            Conciliado?
+                                            <div v-show="sortBy == 'fechafin'">
+                                                <span v-show="!sortOrder">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                                                        <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+                                                    </svg>
+                                                </span>
+                                                <span v-show="sortOrder">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                                                      <path fill-rule="evenodd" d="M14.707 12.707a1 1 0 01-1.414 0L10 9.414l-3.293 3.293a1 1 0 01-1.414-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 010 1.414z" clip-rule="evenodd" />
+                                                    </svg>
+                                                </span>
+                                            </div>
+                                        </button>
+                                    </th>
+                                    <th class="px-4 py-2 text-sm font-bold hover:bg-blue-500 hover:text-gray-50 rounded-b w-1/12">
+                                        <button @click="getCajas(buscar, 'id')" class="font-bold">
                                             Estado
                                             <div v-show="sortBy == 'fechafin'">
                                                 <span v-show="!sortOrder">
@@ -251,6 +285,18 @@
                                     <td class="border px-1 py-2 text-sm truncate w-1/12" v-text="dato.promocional"></td>
                                     <td v-if="this.idvendedor == 0" class="border px-1 py-2 text-sm truncate w-2/12" v-text="dato.vendedor?dato.vendedor.full_name:''"></td>
                                     <td class="border px-1 py-2 text-sm truncate w-3/12" v-text="dato.cliente?(dato.cliente.documento+'-'+dato.cliente.full_name):''"></td>
+                                    <td class="border px-1 py-2 text-sm truncate w-1/12" v-text="(dato.metodopago==1)?'Efectivo':(dato.metodopago==2)?'Tarjeta C/D':(dato.metodopago==4)?'Bolsa':''"></td>
+                                    <td class="border px-2 py-2 text-sm truncate w-1/12" v-if="dato.conciliado">
+                                        <span class="inline-flex px-2 text-sm font-semibold leading-5 text-green-800 bg-green-100 rounded-full">
+                                            Si
+                                        </span>
+                                    </td>
+                                    <td class="border px-2 py-2 text-sm truncate w-1/12" v-else>
+                                        <span class="inline-flex px-2 text-sm font-semibold leading-5 text-red-800 bg-red-100 rounded-full">
+                                            No
+                                        </span>
+                                    </td>
+
                                     <td class="border px-2 py-2 text-sm truncate w-1/12" v-if="dato.estado==1">
                                         <span class="inline-flex px-2 text-sm font-semibold leading-5 text-green-800 bg-green-100 rounded-full">
                                             Activo
@@ -369,6 +415,29 @@
                     </section>
                     <!-- Fin Tabla de contenido -->
 
+                    <!-- Ventana modal dirección de loading -->
+                    <!-- Main modal -->
+                    <section> <!-- Ventana modal -->
+                        <div class="fixed z-10 inset-0 overflow-y-auto ease-out duration-400" v-if="loading">
+                            <div class="items-end justify-center min-h-screen pt-10 px-2 pb-20 text-center sm:block sm:p-0">
+
+                                <div class="fixed inset-0 transition-opacity">
+                                    <div class="absolute inset-0 bg-blue-400 opacity-75"></div>
+                                </div>
+
+                                <!-- This element is to trick the browser into centering the modal contents. -->
+                                <span class="hidden inline-block align-middle h-screen"></span>
+                                <section>
+                                    <div class=" mt-10 w-full" id="app">
+                                        <semipolar-spinner class="mt-10 mx-auto" :animation-duration="2000" :size="85" color="#ff1d5e" />
+                                    </div>
+                                </section>
+
+
+                            </div>
+                        </div>
+                    </section>
+                    <!-- Fin Ventana modal dirección de loading -->
 
                 </div>
             </div>
@@ -393,12 +462,12 @@ import { ref, onMounted } from 'vue';
 
 import { Money3Component } from 'v-money3'
 
-
 import { Inertia } from '@inertiajs/inertia';
 import { Head, Link } from '@inertiajs/inertia-vue3';
 import JetNavLink from '@/Jetstream/NavLink.vue';
 import NavLink from "../../Jetstream/NavLink";
 import Input from "../../Jetstream/Input";
+import { SemipolarSpinner } from 'epic-spinners'
 
 export default {
 
@@ -414,7 +483,7 @@ export default {
         JetNavLink,
         Link,
         money3: Money3Component,
-
+        SemipolarSpinner
     },
     props:{
         idvendedor: 0,
@@ -426,6 +495,7 @@ export default {
     },
     data() {
         return {
+            loading: false,
             configMoney: {
                 masked: false,
                 prefix: '$ ',
@@ -479,6 +549,7 @@ export default {
     },
     methods: {
         BoletasExport: function (filtros = []) {
+            this.loading = true;
             let fecha = moment(new Date()).format('DDMMYYYY');
             var url= '/boletas/export';
             axios.get(url, {
@@ -496,6 +567,7 @@ export default {
 
                 fileLink.click();
             })
+            this.loading = false;
         },
     },
     created: function () {

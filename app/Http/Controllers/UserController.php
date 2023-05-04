@@ -541,7 +541,11 @@ class UserController extends Controller
             $r = new Request();
             $r->idsesion = $request->idsesion;
             $prepare = new VentaController();
-            $resultadoprepare = $prepare->preparePay($r);
+            if ($request->paymentmethod == 1 || $request->paymentmethod == 4) {
+                $resultadoprepare = $prepare->preparePayEfecty($r);
+            } else {
+                $resultadoprepare = $prepare->preparePay($r);
+            }
 
             DB::commit();
         } catch (Throwable $e){
@@ -639,6 +643,7 @@ class UserController extends Controller
                           'changedpassword' => $request->cambiarpassword?null:$mytime->toDateString(),
                           ]
                       );
+
         $user->saveOrFail();
 
         //$rol = Role::where('id', $user->idrol)->first();
@@ -695,6 +700,7 @@ class UserController extends Controller
                           'idciudad' => $request->idciudad,
                           'idempresa' => $request->idempresa,
                           'idrol' => $request->idrol,
+                          'bolsa' => $request->bolsa,
                           'idtipos_documento' => $request->idtipos_documento,
                           'documento' => $request->documento,
                           'changedpassword' => $request->cambiarpassword?null:$mytime->toDateString(),

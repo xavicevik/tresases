@@ -360,7 +360,7 @@
                                                                 <div v-if="$page.props.errors.password" class="text-red-500">{{ $page.props.errors.password }}</div>
 
                                                                 <div class="flex items-center">
-                                                                    <input v-if="!verMode" checked v-model="form.cambiarpassword" type="checkbox" value="1" class="w-4 h-4 text-blue-600 bg-gray-100 rounded border-gray-300 focus:ring-blue-500 focus:ring-2">
+                                                                    <Toggle v-model="form.cambiarpassword" :disabled="verMode"/>
                                                                     <label v-if="!verMode" class="ml-2 text-sm font-medium text-gray-900">Solicitar cambio?</label>
                                                                     <a href="#" @click="cambiarPass()" v-if="editMode">
                                                                         <span class="ml-2 underline text-sm text-blue-600"> Cambiar Password</span>
@@ -608,7 +608,8 @@ export default {
                 camaracomercio: false,
                 rut: false,
                 url: false,
-                cambiarpassword: true
+                cambiarpassword: true,
+                changedpassword: null,
             },
         }
     },
@@ -676,6 +677,8 @@ export default {
                     this.form.username = data['username'];
                     this.form.direccion = data['direccion'];
                     this.form.telefono = data['telefono'];
+                    this.form.changedpassword = data['changedpassword'];
+                    this.form.cambiarpassword = this.form.changedpassword?false:true;
                     this.getRoles();
                     this.getPaises();
                     this.getCiudades();
@@ -685,7 +688,6 @@ export default {
                     this.newMode = false;
                     this.verMode = true;
                     this.editMode = false;
-                    break;
                     break;
                 }
                 case 'actualizar': {
@@ -705,6 +707,8 @@ export default {
                     this.form.username = data['username'];
                     this.form.direccion = data['direccion'];
                     this.form.telefono = data['telefono'];
+                    this.form.changedpassword = data['changedpassword'];
+                    this.form.cambiarpassword = this.form.changedpassword?false:true;
                     this.getRoles();
                     this.getPaises();
                     this.getCiudades();

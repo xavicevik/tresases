@@ -351,6 +351,23 @@
                                     </th>
                                     <th class="px-4 py-2 text-sm font-bold hover:bg-blue-500 hover:text-gray-50 rounded-b">
                                         <button @click="getCajas(buscar, 'id')" class="font-bold">
+                                            Método pago
+                                            <div v-show="sortBy == 'fechafin'">
+                                                <span v-show="!sortOrder">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                                                        <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+                                                    </svg>
+                                                </span>
+                                                <span v-show="sortOrder">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                                                      <path fill-rule="evenodd" d="M14.707 12.707a1 1 0 01-1.414 0L10 9.414l-3.293 3.293a1 1 0 01-1.414-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 010 1.414z" clip-rule="evenodd" />
+                                                    </svg>
+                                                </span>
+                                            </div>
+                                        </button>
+                                    </th>
+                                    <th class="px-4 py-2 text-sm font-bold hover:bg-blue-500 hover:text-gray-50 rounded-b">
+                                        <button @click="getCajas(buscar, 'id')" class="font-bold">
                                             Recibo
                                         </button>
                                     </th>
@@ -363,6 +380,7 @@
                                     <td class="border px-1 py-2 text-sm truncate" :class="{ 'text-red-400':dato.valorventa < 0 }" v-text="formatPrice(dato.valorventa)"></td>
                                     <td class="border px-1 py-2 text-sm truncate" :class="{ 'text-red-400':-dato.comision < 0 }" v-text="formatPrice(-dato.comision)"></td>
                                     <td class="border px-1 py-2 text-sm truncate" v-text="dato.cantidad"></td>
+                                    <td class="border px-1 py-2 text-sm truncate" v-text="(dato.comprobante==1)?'Efectivo':(dato.comprobante==2)?'Tarjeta C/D':(dato.comprobante==4)?'Bolsa':''"></td>
                                     <td class="border px-1 py-2 text-sm truncate">
                                         <a :href="dato.urlrecibo" target="_blank" class="hover:bg-red-700 text-red-400 font-bold rounded" fill="none"
                                            viewBox="0 0 24 24" stroke="currentColor">

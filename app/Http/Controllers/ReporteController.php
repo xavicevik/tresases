@@ -118,9 +118,9 @@ class ReporteController extends Controller
                 $boletas = $boletas->where('boletas.estado', $filtros->estado);
             }
         }
-        $boletas = $boletas->select(DB::raw('vendedors.id, vendedors.nombre, vendedors.apellido, count(1) as cantidad, sum(pago) as pagado, sum(saldo) as saldo, getcomision(vendedors.id, -1) comision, (sum(pago) - getcomision(vendedors.id, -1)) entregado'))
+        $boletas = $boletas->select(DB::raw('vendedors.id, vendedors.nombre, vendedors.apellido, boletas.metodopago, count(1) as cantidad, sum(pago) as pagado, sum(boletas.saldo) as saldo, getcomision(vendedors.id, -1) comision, (sum(pago) - getcomision(vendedors.id, -1)) entregado'))
                             //->groupBy('boletas.idvendedor');
-                            ->groupBy('vendedors.id', 'vendedors.nombre', 'vendedors.apellido');
+                            ->groupBy('vendedors.id', 'vendedors.nombre', 'vendedors.apellido', 'boletas.metodopago');
 
         $resultado = DB::query()->from($boletas, 'a')->paginate(self::canPorPagina);
 
@@ -175,9 +175,9 @@ class ReporteController extends Controller
                 $boletas = $boletas->where('boletas.estado', $filtros->estado);
             }
         }
-        $boletas = $boletas->select(DB::raw('vendedors.id, vendedors.nombre, vendedors.apellido, count(1) as cantidad, sum(pago) as pagado, sum(saldo) as saldo, estados.nombre as estado, getcomision(vendedors.id, boletas.estado) comision, (sum(pago) - getcomision(vendedors.id, boletas.estado)) entregado'))
+        $boletas = $boletas->select(DB::raw('vendedors.id, vendedors.nombre, vendedors.apellido, boletas.metodopago, count(1) as cantidad, sum(pago) as pagado, sum(boletas.saldo) as saldo, estados.nombre as estado, getcomision(vendedors.id, boletas.estado) comision, (sum(pago) - getcomision(vendedors.id, boletas.estado)) entregado'))
                             //->groupBy('boletas.idvendedor', 'boletas.estado');
-                            ->groupBy('vendedors.id', 'vendedors.nombre', 'vendedors.apellido', 'boletas.estado', 'estados.nombre');
+                            ->groupBy('vendedors.id', 'vendedors.nombre', 'vendedors.apellido', 'boletas.estado', 'estados.nombre', 'boletas.metodopago');
 
         $queries = DB::getQueryLog();
         $resultado = DB::query()->from($boletas, 'a')->paginate(self::canPorPagina);

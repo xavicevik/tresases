@@ -8,7 +8,18 @@
         <div class="pt-2 w-full sm:w-3/4 mx-auto lg:px-8 md:px-4 sm:px-1">
             <div class="mx-auto 2xl:8">
                 <div class="relative bg-white border-2 border-blue-200 m-2 p-2 rounded-lg overflow-hidden shadow-xl sm:rounded-lg">
+
                     <!-- Fin Mensajes Flash -->
+                    <section>
+                        <div @click="cleanMessage()" mx-auto class="bg-teal-100 border-t-4 border-teal-500 rounded-b text-teal-900 px-4 py-3 shadow-md my-3" role="alert" v-show="$page.props.flash.message">
+                            <div class="flex">
+                                <div>
+                                    <p class="text-sm">{{ $page.props.flash.message }}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
                         <section v-if="loading">
                             <!-- validateRifa <form> -->
                             <div class="bg-white pb-1 mx-auto items-center w-full">
@@ -179,19 +190,21 @@
                                                 </div>
                                             </div>
                                         </div>
+                                        <div v-if="form.paymentmethod == 4">
+                                            <div class="w- 2/12 text-md py-4 text-red-600">Saldo: {{ formatPrice(vendedor.saldo) }} </div>
+                                        </div>
                                         <div class=" mt-5 mb-10 lg:mt-0">
                                             <div class="flex">
                                                 <h2 class="text-md font-bold text-gray-900">Forma de pago</h2>
                                             </div>
                                             <div class="mt-2 grid grid-cols-1 gap-y-6 sm:grid-cols-2 sm:gap-x-4">
                                                 <div class="flex items-center px-2 border border-gray-200 rounded">
-                                                    <input v-model="form.paymentmethod" checked type="radio" value="1" name="bordered-radio" class="mx-2 w-6 h-6 text-blue-800 bg-gray-100 border-gray-300 focus:ring-blue-500 focus:ring-2">
-
+                                                    <input v-model="form.paymentmethod" type="radio" value="2" name="bordered-radio" class="mx-2 w-6 h-6 text-blue-800 bg-gray-100 border-gray-300 focus:ring-blue-500 focus:ring-2">
                                                     <svg class="w-14 h-14"> style="enable-background:new 0 0 48 48;" version="1.1" viewBox="0 0 48 48" xml:space="preserve" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"><g id="Icons"><g><path d="M16.3872,34.6633l-6.71-10.09c-0.86-1.42-0.41-3.26,1.01-4.13l14.15-8.6    c1.42-0.86,3.26-0.41,4.13,1l3.68,6.06l1.18,2.11" style="fill:#F43735;"/><path d="M35.7572,36.5934h-16.569c-1.6568,0-3-1.3432-3-3V24.01c0-1.6568,1.3432-3,3-3h16.569    c1.6569,0,3,1.3432,3,3v9.5834C38.7572,35.2502,37.4141,36.5934,35.7572,36.5934z" style="fill:#F9F9F9;"/><rect height="3.1331" style="fill:#383838;" width="22.5712" x="16.1879" y="24.4404"/><g><line style="fill:none;stroke:#303030;stroke-width:0.5;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;" x1="36.6873" x2="34.0623" y1="31.6485" y2="31.6485"/><line style="fill:none;stroke:#303030;stroke-width:0.5;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;" x1="36.6873" x2="34.0623" y1="32.7735" y2="32.7735"/><line style="fill:none;stroke:#303030;stroke-width:0.5;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;" x1="36.6873" x2="34.0623" y1="33.9402" y2="33.9402"/></g><path d="M25.6898,29.138c-1.0925,0-2.0289,0.659-2.44,1.6c-0.4111-0.941-1.3475-1.6-2.44-1.6    c-1.4715,0-2.6642,1.1928-2.6642,2.6641c0,1.4714,1.1927,2.6642,2.6642,2.6642c1.0925,0,2.0289-0.6591,2.44-1.6001    c0.4111,0.941,1.3475,1.6001,2.44,1.6001c1.4714,0,2.6641-1.1928,2.6641-2.6642C28.3539,30.3308,27.1612,29.138,25.6898,29.138z" style="fill:#FFC601;"/><path d="    M35.7572,36.5934h-16.569c-1.6568,0-3-1.3432-3-3V24.01c0-1.6568,1.3432-3,3-3h16.569c1.6569,0,3,1.3432,3,3v9.5834    C38.7572,35.2502,37.4141,36.5934,35.7572,36.5934z" style="fill:none;stroke:#303030;stroke-width:0.5;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;"/><line style="fill:none;stroke:#303030;stroke-width:0.5;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;" x1="38.7591" x2="16.1879" y1="24.4404" y2="24.4404"/><line style="fill:none;stroke:#303030;stroke-width:0.5;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;" x1="38.7591" x2="16.1879" y1="27.5735" y2="27.5735"/><line style="fill:none;stroke:#303030;stroke-width:0.5;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;" x1="17.1372" x2="17.1272" y1="35.7833" y2="35.7733"/><path d="    M16.3872,34.6633l-6.71-10.09c-0.86-1.42-0.41-3.26,1.01-4.13l14.15-8.6c1.42-0.86,3.26-0.41,4.13,1l3.68,6.06l1.18,2.11" style="fill:none;stroke:#303030;stroke-width:0.5;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;"/><g><path d="     M11.5128,25.096c0,0-1.9506-2.1279-0.14779-3.5182l5.77659-3.5273" style="fill:none;stroke:#303030;stroke-width:0.5;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;"/><line style="fill:none;stroke:#303030;stroke-width:0.5;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;" x1="18.4377" x2="19.0404" y1="17.309" y2="16.8798"/><line style="fill:none;stroke:#303030;stroke-width:0.5;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;" x1="32.2411" x2="30.6115" y1="21.01" y2="18.3804"/></g><circle cx="20.79519" cy="31.80215" r="2.64959" style="fill:#F43735;"/></g></g></svg>
-                                                    <label class="py-2 ml-2 text-sm font-medium text-gray-900">Efectivo</label>
+                                                    <label class="py-2 ml-2 text-sm font-medium text-gray-900">Tarjeta C/D</label>
                                                 </div>
                                                 <div class="flex items-center px-4 border border-gray-200 rounded">
-                                                    <input v-model="form.paymentmethod" type="radio" value="2" name="bordered-radio" class="mx-2 w-6 h-6 text-blue-800 bg-gray-100 border-gray-300 focus:ring-blue-500">
+                                                    <input v-model="form.paymentmethod" type="radio" value="1" name="bordered-radio" class="mx-2 w-6 h-6 text-blue-800 bg-gray-100 border-gray-300 focus:ring-blue-500">
                                                     <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="48px" height="48px" viewBox="0 0 48 48"><g >
                                                         <path fill="#307730" d="M40,22H8c-0.55228,0-1-0.44772-1-1V6c0-0.55228,0.44772-1,1-1h32c0.55228,0,1,0.44772,1,1v15
 C41,21.55228,40.55228,22,40,22z"/>
@@ -203,7 +216,14 @@ C47,42.55225,46.55225,43,46,43z"/>
 C40.68628,22,38,19.31372,38,16z"/>
                                                         <circle fill="#4DA34D" cx="24" cy="28" r="7"/>
                                                     </g></svg>
-                                                    <label class="py-4 ml-2 text-sm font-medium text-gray-900">Tarjeta C/D</label>
+                                                    <label class="py-4 ml-2 text-sm font-medium text-gray-900">Efectivo</label>
+                                                </div>
+                                                <div class="flex items-center px-2 border border-gray-200 rounded">
+                                                    <input v-model="form.paymentmethod" type="radio" value="4" name="bordered-radio" class="mx-2 w-6 h-6 text-blue-800 bg-gray-100 border-gray-300 focus:ring-blue-500 focus:ring-2">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-8 h-8">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 00-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 00-16.536-1.84M7.5 14.25L5.106 5.272M6 20.25a.75.75 0 11-1.5 0 .75.75 0 011.5 0zm12.75 0a.75.75 0 11-1.5 0 .75.75 0 011.5 0z" />
+                                                    </svg>
+                                                    <label class="py-2 ml-2 text-sm font-medium text-gray-900">Bolsa</label>
                                                 </div>
                                             </div>
                                         </div>
@@ -255,7 +275,7 @@ C40.68628,22,38,19.31372,38,16z"/>
                                                     <legend class="sr-only">Payment type</legend>
                                                     <div class="p-2 space-y-4 sm:flex sm:items-center sm:space-y-0 sm:space-x-10">
                                                         <div class="flex items-center">
-                                                            <input v-model="form.paymentmethod" value="1" type="radio" checked class="px-2 focus:ring-indigo-500 h-4 w-4 text-indigo-600 border-gray-300">
+                                                            <input v-model="form.paymentmethod" value="1" type="radio" class="px-2 focus:ring-indigo-500 h-4 w-4 text-indigo-600 border-gray-300">
                                                             <svg class="px-2 w-10" style="enable-background:new 0 0 48 48;" version="1.1" viewBox="0 0 48 48" xml:space="preserve" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"><g id="Icons"><g><path d="M16.3872,34.6633l-6.71-10.09c-0.86-1.42-0.41-3.26,1.01-4.13l14.15-8.6    c1.42-0.86,3.26-0.41,4.13,1l3.68,6.06l1.18,2.11" style="fill:#F43735;"/><path d="M35.7572,36.5934h-16.569c-1.6568,0-3-1.3432-3-3V24.01c0-1.6568,1.3432-3,3-3h16.569    c1.6569,0,3,1.3432,3,3v9.5834C38.7572,35.2502,37.4141,36.5934,35.7572,36.5934z" style="fill:#F9F9F9;"/><rect height="3.1331" style="fill:#383838;" width="22.5712" x="16.1879" y="24.4404"/><g><line style="fill:none;stroke:#303030;stroke-width:0.5;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;" x1="36.6873" x2="34.0623" y1="31.6485" y2="31.6485"/><line style="fill:none;stroke:#303030;stroke-width:0.5;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;" x1="36.6873" x2="34.0623" y1="32.7735" y2="32.7735"/><line style="fill:none;stroke:#303030;stroke-width:0.5;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;" x1="36.6873" x2="34.0623" y1="33.9402" y2="33.9402"/></g><path d="M25.6898,29.138c-1.0925,0-2.0289,0.659-2.44,1.6c-0.4111-0.941-1.3475-1.6-2.44-1.6    c-1.4715,0-2.6642,1.1928-2.6642,2.6641c0,1.4714,1.1927,2.6642,2.6642,2.6642c1.0925,0,2.0289-0.6591,2.44-1.6001    c0.4111,0.941,1.3475,1.6001,2.44,1.6001c1.4714,0,2.6641-1.1928,2.6641-2.6642C28.3539,30.3308,27.1612,29.138,25.6898,29.138z" style="fill:#FFC601;"/><path d="    M35.7572,36.5934h-16.569c-1.6568,0-3-1.3432-3-3V24.01c0-1.6568,1.3432-3,3-3h16.569c1.6569,0,3,1.3432,3,3v9.5834    C38.7572,35.2502,37.4141,36.5934,35.7572,36.5934z" style="fill:none;stroke:#303030;stroke-width:0.5;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;"/><line style="fill:none;stroke:#303030;stroke-width:0.5;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;" x1="38.7591" x2="16.1879" y1="24.4404" y2="24.4404"/><line style="fill:none;stroke:#303030;stroke-width:0.5;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;" x1="38.7591" x2="16.1879" y1="27.5735" y2="27.5735"/><line style="fill:none;stroke:#303030;stroke-width:0.5;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;" x1="17.1372" x2="17.1272" y1="35.7833" y2="35.7733"/><path d="    M16.3872,34.6633l-6.71-10.09c-0.86-1.42-0.41-3.26,1.01-4.13l14.15-8.6c1.42-0.86,3.26-0.41,4.13,1l3.68,6.06l1.18,2.11" style="fill:none;stroke:#303030;stroke-width:0.5;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;"/><g><path d="     M11.5128,25.096c0,0-1.9506-2.1279-0.14779-3.5182l5.77659-3.5273" style="fill:none;stroke:#303030;stroke-width:0.5;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;"/><line style="fill:none;stroke:#303030;stroke-width:0.5;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;" x1="18.4377" x2="19.0404" y1="17.309" y2="16.8798"/><line style="fill:none;stroke:#303030;stroke-width:0.5;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;" x1="32.2411" x2="30.6115" y1="21.01" y2="18.3804"/></g><circle cx="20.79519" cy="31.80215" r="2.64959" style="fill:#F43735;"/></g></g></svg>
                                                             <label class="ml-3 block text-sm font-medium text-gray-700"> TC /TD </label>
                                                         </div>
@@ -363,7 +383,7 @@ C40.68628,22,38,19.31372,38,16z"/>
                                                 </div>
                                                 <div class="min-w-0 flex-1">
                                                     <h4 class="text-xs">
-                                                        <p class="mt-1 text-xs text-gray-900">{{ (form.paymentmethod==1)?'Efectivo':'Tarjeta' }}</p>
+                                                        <p class="mt-1 text-xs text-gray-900">{{ (form.paymentmethod==1)?'Efectivo':form.paymentmethod==2?'Tarjeta':'Bolsa' }}</p>
                                                     </h4>
                                                 </div>
                                             </li>
@@ -397,7 +417,7 @@ C40.68628,22,38,19.31372,38,16z"/>
                                 </div>
                                 <div class="text-right pr-2 ml-auto">
                                     <button type="button" @click="siguiente('pago')" class="text-white bg-red-600 hover:bg-red-800 font-medium rounded-lg text-sm px-2 py-2 text-center inline-flex items-center">
-                                        {{ (form.paymentmethod==1)?'Vender':'Pagar' }}
+                                        {{ (form.paymentmethod==1 || form.paymentmethod==4)?'Vender':'Pagar' }}
                                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
                                             <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
                                         </svg>
@@ -914,7 +934,7 @@ export default {
                 },
                 promocionales: [],
                 comprobante: null,
-                paymentmethod: 1,
+                paymentmethod: null,
                 valorpagar: 0,
                 reservas:[],
                 reserva: {
@@ -1288,7 +1308,8 @@ export default {
                             idsesion: this.session.id,
                             idtipos_documento: 1,
                             isnatural: 1,
-                            idempresa: 3
+                            idempresa: 3,
+                            paymentmethod: this.form.paymentmethod
                         }
                     }
                 );
@@ -1439,7 +1460,7 @@ export default {
                     console.log('stop loading...');
                     break;
                 case 'pago':
-                    if (this.form.paymentmethod == 1) {
+                    if (this.form.paymentmethod == 1 || this.form.paymentmethod == 4) {
                         this.ventaEfectivo();
                     } else {
                         this.validatePago();
@@ -1462,7 +1483,7 @@ export default {
                     this.saleState = 'checkout';
                     this.loading = false;
                     break;
-                defalt:
+                default:
                 break;
             }
         },
@@ -1515,7 +1536,7 @@ export default {
         },
         preparePay: function() {
             let status = false;
-            var url= '/ventas/preparePay';
+            var url= '/ventas/preparePayEfecty';
             axios.get(url, {
                 params: {
                     idsesion: this.session.id
@@ -1678,13 +1699,15 @@ export default {
             this.pushSessionDetail(this.session.id, boleta, 'del');
         },
         ventaEfectivo: async function () {
-            this.loading = true;
+            //this.loading = true;
             var url = '/ventas/reportpdfRegistroMov';
             let res = await axios.get(url, {
                 params: {
                     idsesion: this.session.id,
                     idcaja: this.caja.id,
-                    idpuntoventa: this.caja.idpuntoventa
+                    idpuntoventa: this.caja.idpuntoventa,
+                    paymentmethod: this.form.paymentmethod,
+                    conciliado: 0
                 }
             });
             Swal.fire({
@@ -1697,10 +1720,24 @@ export default {
             this.form.reservas = [];
             //this.getMovimientos();
             //this.closeModal();
+            //this.loading = false;
 
-            this.loading = false;
-            window.location.replace("/app/ventas/createvendedor");
-
+            Swal.fire({
+                title: 'Se ha registrado la venta satisfactoriamente',
+                text: "Desea continuar con otra venta?",
+                icon: 'success',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Si',
+                cancelButtonText: 'Volver'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    window.location.replace("/app/ventas/createvendedor");
+                } else {
+                    window.location.replace("/ventas");
+                }
+            })
         },
 
         iniciar: async function () {

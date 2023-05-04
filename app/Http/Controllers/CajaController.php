@@ -61,11 +61,14 @@ class CajaController extends Controller
                         ->with('puntoventa')
                         ->select('cajas.*', 'users.username');
         }
-
-        if (Auth::user()->idrol == 5) {
+        if (Auth::guard('vendedor')->user()?Auth::guard('vendedor')->user()->idrol == 5:0) {
             $cajas = $cajas->where('idpuntoventa', Session::get('puntodeventa'));
             $cajas = $cajas->paginate(self::canPorPagina);
-        } else {
+        } elseif (Auth::user()->idrol == 7) {
+            $cajas = $cajas->join('puntos_ventas', 'cajas.idpuntoventa', '=', 'puntos_ventas.id')
+                            ->where('puntos_ventas.idempresa', Auth::user()->idempresa);
+            $cajas = $cajas->paginate(self::canPorPagina);
+        }else {
             $cajas = $cajas->paginate(self::canPorPagina);
         }
 

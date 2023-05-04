@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Exports\BoletasExport;
 use App\Exports\VentasExport;
 use App\Imports\NumeroreservadoImport;
+use App\Models\Recarga;
 use \Illuminate\Http\Request;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
@@ -60,6 +61,7 @@ Route::get('/ventas/updateSession', [VentaController::class, 'updateSession'])->
 Route::get('/ventas/finishSession', [VentaController::class, 'finishSession'])->name('ventas.finishSession');
 Route::get('/ventas/anularVenta', [VentaController::class, 'anularVenta'])->name('ventas.anularVenta');
 Route::get('/ventas/preparePay', [VentaController::class, 'preparePay'])->name('ventas.preparePay');
+Route::get('/ventas/preparePayEfecty', [VentaController::class, 'preparePayEfecty'])->name('ventas.preparePayEfecty');
 Route::post('/ventas/successPay', [VentaController::class, 'successPay'])->name('ventas.successPay');
 Route::post('/ventas/failurePay', [VentaController::class, 'failurePay'])->name('ventas.failurePay');
 Route::post('/ventas/pendingPay', [VentaController::class, 'pendingPay'])->name('ventas.pendingPay');
@@ -141,6 +143,9 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'),'verified',]
     Route::put('/users/vendedor/{vendedor}', [UserController::class, 'updateVendedor'])->name('users.updateVendedor');
     Route::put('/users/cliente/{cliente}', [UserController::class, 'updateCliente'])->name('users.updateCliente');
     Route::get('/users/cliente/{cliente}', [UserController::class, 'showClient'])->name('users.showClient');
+    Route::get('/users/getRecargasbyVendedor', [RecargaController::class, 'getRecargasbyVendedor'])->name('users.getRecargasbyVendedor');
+    Route::post('/users/setRecargabyVendedor', [RecargaController::class, 'setRecargabyVendedor'])->name('users.setRecargabyVendedor');
+
 
 
     Route::post('/users/storeClienteMov', [UserController::class, 'storeClienteMov'])->name('users.storeClienteMov');
@@ -229,6 +234,12 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'),'verified',]
     Route::get('/reportes/ventavendedor', [ReporteController::class, 'ventavendedor'])->name('reportes.ventavendedor');
     Route::get('/reportes/ventagetDetalleVendedor', [ReporteController::class, 'ventagetDetalleVendedor'])->name('reportes.ventagetDetalleVendedor');
     Route::get('/reportes/resumenvendedores', [ReporteController::class, 'resumenvendedores'])->name('reportes.resumenvendedores');
+
+    Route::get('/conciliaciones', [ConciliacionController::class, 'index'])->name('conciliaciones.index');
+    Route::get('/conciliaciones/getBoletasbyVendedor', [ConciliacionController::class, 'getBoletasbyVendedor'])->name('conciliaciones.getBoletasbyVendedor');
+    Route::post('/conciliaciones', [ConciliacionController::class, 'store'])->name('conciliaciones.store');
+    Route::get('/conciliaciones/crear', [ConciliacionController::class, 'store'])->name('conciliaciones.store');
+    Route::get('/conciliaciones/getDetalleConciliacion', [ConciliacionController::class, 'getDetalleConciliacion'])->name('conciliaciones.getDetalleConciliacion');
 
 
     //});
