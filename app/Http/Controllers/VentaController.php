@@ -2166,7 +2166,8 @@ class VentaController extends Controller
         $pdf = app('dompdf.wrapper');
         $pdf->getDomPDF()->set_option("enable_php", true);
         //$pdf->setPaper('A4', 'landscape');
-        $paper_size = array(0,0,1079,800);
+        $paper_size = array(0,0,1241,945);
+        //$paper_size = array(0,0,1079,800);
         $pdf->setPaper($paper_size);
 
         switch ($boleta->idrifa) {
