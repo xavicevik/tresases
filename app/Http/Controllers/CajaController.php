@@ -28,7 +28,7 @@ use Laravel\Jetstream\Jetstream;
 
 class CajaController extends Controller
 {
-    const canPorPagina = 10;
+    const canPorPagina = 20;
     /**
      * Display a listing of the resource.
      *

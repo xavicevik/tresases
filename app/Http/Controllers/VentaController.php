@@ -2168,28 +2168,15 @@ class VentaController extends Controller
         //$pdf->setPaper('A4', 'landscape');
         $paper_size = array(0,0,1079,800);
         $pdf->setPaper($paper_size);
-        /*
-        switch ($boleta->idrifa) {
-            case config('app.idrifas.movilgo'):
-                $pdf->loadView('pdf.boleta', $data);
-                break;
-            case config('app.idrifas.cardoso'):
-                $pdf->loadView('pdf.boletacardoso', $data);
-                break;
-            case config('app.idrifas.taxia'):
-                $pdf->loadView('pdf.boletataxia', $data);
-                break;
-        }
-        */
 
         switch ($boleta->idrifa) {
-            case env('RIFAS_ID_MOVILGO', 4):
+            case 5:
                 $pdf->loadView('pdf.boleta', $data);
                 break;
-            case env('RIFAS_ID_CARDOSO', 7):
+            case 6:
                 $pdf->loadView('pdf.boletacardoso', $data);
                 break;
-            case env('RIFAS_ID_TAXIA', 6):
+            case 7:
                 $pdf->loadView('pdf.boletataxia', $data);
                 break;
         }

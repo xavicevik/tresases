@@ -170,7 +170,7 @@
                                             Cerrada
                                         </span>
                                     </td>
-                                    <td v-show="caja.id != 5 && caja.id != 13 && caja.id != 14" class="border px-2 py-2 mx-auto text-center flex items-center">
+                                    <td v-if="caja.id != 5 && caja.id != 14 && caja.id != 14 && caja.id != 20" class="border px-2 py-2 mx-auto text-center flex items-center">
                                         <button v-if="!caja.estado" @click="abrir(caja)" class="hover:bg-green-700 text-green-400 font-bold rounded" fill="none"
                                                 viewBox="0 0 24 24" stroke="currentColor">
                                             <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -184,6 +184,11 @@
                                             </svg>
                                         </button>
 
+                                    </td>
+                                    <td v-else class="border px-2 py-2 mx-auto text-center flex items-center">
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" />
+                                        </svg>
                                     </td>
                                 </tr>
                                 <tr v-else>
