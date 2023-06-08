@@ -218,10 +218,18 @@ class CajaController extends Controller
                       ->first();
         if (is_null($cajas)) {
             $status = true;
+            $iusuario = null;
+
+            if (Auth::guard('vendedor')->user()?Auth::guard('vendedor')->user()->idrol == 5:0) {
+                $iusuario = Auth::guard('vendedor')->user()->id;
+            } elseif (Auth::user()->idrol == 7) {
+                $iusuario = Auth::user()->id;
+            }
+
             $cajas = Caja::where('id', $request->id)
                 ->firstOrFail();
             $cajas->estado = 1;
-            $cajas->idvendedor = Auth::user()->id;
+            $cajas->idvendedor = $iusuario;
             $cajas->montoapertura = $request->montoapertura;
             $cajas->fechaapertura = $mytime->toDateTimeString();
             $cajas->fechacierre = null;

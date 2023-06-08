@@ -1075,11 +1075,11 @@ class VentaController extends Controller
                     ->where('numero', $reg->numero)
                     ->where('idvendedor', $request->idvendedor)
                     ->first();
-                $reg->comision = -$reg->valorpagado * ($concomision->comisionvendedor/100);
+                $reg->comision = -($reg->valorpagado * ($concomision->comisionvendedor/100));
                 $toatlcomision += $reg->comision;
                 $salida[] = $reg;
-                $totalventa += $boleta->valor;
-                $totalpagado += $reg->valorpagado;
+                $totalventa += -$boleta->valor;
+                $totalpagado += -$reg->valorpagado;
                 $boleta->pago = $boleta->pago - $reg->valorpagado;
                 $boleta->saldo = $boleta->valor - $boleta->pago;
 
@@ -1118,15 +1118,15 @@ class VentaController extends Controller
                 $detalleventa->valor = -$reg->valorpagado;
                 $detalleventa->idcliente = $idclientetmp;
                 $detalleventa->impuesto = 0;
-                $detalleventa->comision = -$reg->comision;
-                $detalleventa->valortotal = $boleta->valor;
+                $detalleventa->comision = $reg->comision;
+                $detalleventa->valortotal = -$boleta->valor;
                 $detalleventa->numero = $reg->numero;
                 $detalleventa->cantidad = 1;
                 $detalleventa->estado = self::anulado;
                 $detalleventa->save();
 
-                $reg->valorpagado = "$" . number_format($reg->valorpagado, 0, ".", ",");
-                $reg->comision = "$" . number_format($reg->comision, 0, ".", ",");
+                $reg->valorpagado = "-$" . number_format($reg->valorpagado, 0, ".", ",");
+                $reg->comision = "-$" . number_format($reg->comision, 0, ".", ",");
             }
             asort($salida);
             $recibo = new Recibo();
@@ -1142,15 +1142,15 @@ class VentaController extends Controller
             $comision = new Comision();
             $comision->idventa = $venta->id;
             $comision->idconfiguracion = $concomision->id;
-            $comision->valorventa = -$totalpagado;
-            $comision->comisionmayorista = -$totalpagado * ($concomision->comisionmayorista/100);
-            $comision->comisiondistribuidor = -$totalpagado * ($concomision->comisiondistribuidor/100);
-            $comision->comisionvendedor = -$totalpagado * ($concomision->comisionvendedor/100);
+            $comision->valorventa = $totalpagado;
+            $comision->comisionmayorista = $totalpagado * ($concomision->comisionmayorista/100);
+            $comision->comisiondistribuidor = $totalpagado * ($concomision->comisiondistribuidor/100);
+            $comision->comisionvendedor = $totalpagado * ($concomision->comisionvendedor/100);
             $comision->estado = true;
             $comision->save();
 
             $venta->comision = $comision->comisionmayorista + $comision->comisiondistribuidor + $comision->comisionvendedor;
-            $venta->valorventa = -$totalpagado;
+            $venta->valorventa = $totalpagado;
             $venta->valortotal = $totalventa;
             $venta->cantidad = sizeof($salida);
             $venta->save();

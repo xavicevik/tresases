@@ -92,7 +92,7 @@ export default {
                 } else if (entidad == 'detalles') {
                     this.arrayDetalles = respuesta.data;
                 } else if (entidad == 'users') {
-                    this.arrayDetalles = respuesta.users;
+                    this.arrayData = respuesta.users;
                 } else {
                     this.arrayData = respuesta.datos;
                 }
