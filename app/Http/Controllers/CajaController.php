@@ -220,11 +220,11 @@ class CajaController extends Controller
             $status = true;
             $iusuario = null;
 
-            if (Auth::guard('vendedor')->user()?Auth::guard('vendedor')->user()->idrol == 5:0) {
-                $iusuario = Auth::guard('vendedor')->user()->id;
-            } elseif (Auth::user()->idrol == 7) {
+            //if (Auth::guard('vendedor')->user()?Auth::guard('vendedor')->user()->idrol == 5:0) {
+            //    $iusuario = Auth::guard('vendedor')->user()->id;
+            //} else {
                 $iusuario = Auth::user()->id;
-            }
+            //}
 
             $cajas = Caja::where('id', $request->id)
                 ->firstOrFail();
