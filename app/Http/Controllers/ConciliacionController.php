@@ -6,6 +6,7 @@ use App\Models\Boleta;
 use App\Models\Caja;
 use App\Models\Conciliacion;
 use App\Models\DetalleConciliacion;
+use App\Models\Detalleventa;
 use App\Models\Historialcaja;
 use App\Models\Pago;
 use App\Models\Transaccion;
@@ -119,38 +120,67 @@ class ConciliacionController extends Controller
     }
 
     public function store(Request $request) {
-        $coniliacion = new Conciliacion();
-        $cant = 0;
-        $valor = 0;
-        $coniliacion->idvendedor = $request->idvendedor;
-        $coniliacion->idusuario = Auth::id();
-        $coniliacion->estado = 1;
-        $coniliacion->valor = $valor;
-        $coniliacion->cantidad = $cant;
-        $coniliacion->save();
+        try {
+            // Begin a transaction
+            DB::beginTransaction();
+            $coniliacion = new Conciliacion();
+            $cant = 0;
+            $valor = 0;
+            $neto = 0;
+            $coniliacion->idvendedor = $request->idvendedor;
+            $coniliacion->idusuario = Auth::id();
+            $coniliacion->estado = 1;
+            $coniliacion->valor = $valor;
+            $coniliacion->neto = $neto;
+            $coniliacion->cantidad = $cant;
+            $coniliacion->save();
 
-        foreach ($request->all() as $key => $value) {
-            if ($key != 'idvendedor') {
-                $boleta = Boleta::where('id', $key)->first();
-                $boleta->conciliado = true;
-                $boleta->save();
-                $valor += $boleta->valor;
-                $cant++;
+            $caja = Caja::where('tipo', 2)
+                ->join('puntos_ventas', 'puntos_ventas.id', 'cajas.idpuntoventa')
+                ->join('vendedors', 'puntos_ventas.idempresa', 'vendedors.idempresa')
+                ->where('vendedors.id', $request->idvendedor)
+                ->select('cajas.*')
+                ->first();
 
-                $detalle = new DetalleConciliacion();
-                $detalle->idconciliacion = $coniliacion->id;
-                $detalle->idboleta = $boleta->id;
-                $detalle->idusuario = Auth::id();
-                $detalle->idvendedor = $request->idvendedor;
-                $detalle->valor = $boleta->valor;
-                $detalle->estado = 1;
-                $detalle->save();
+            foreach ($request->all() as $key => $value) {
+                if ($key != 'idvendedor') {
+                    $boleta = Boleta::where('id', $key)->first();
+                    $boleta->conciliado = true;
+                    $boleta->save();
+
+                    $venta = Detalleventa::where('idboleta', $boleta->id)
+                                          ->where('estado', 3)
+                                          ->orderBy('updated_at', 'desc')
+                                          ->first();
+
+                    $valor += $venta->valor;
+                    $neto  += ($venta->valor - $venta->comision);
+                    $cant++;
+
+                    $detalle = new DetalleConciliacion();
+                    $detalle->idconciliacion = $coniliacion->id;
+                    $detalle->idboleta = $boleta->id;
+                    $detalle->idusuario = Auth::id();
+                    $detalle->idvendedor = $request->idvendedor;
+                    $detalle->valor = $venta->valor;
+                    $detalle->estado = 1;
+                    $detalle->neto = $venta->valor - $venta->comision;
+                    $detalle->save();
+                }
             }
-        }
-        $coniliacion->valor = $valor;
-        $coniliacion->cantidad = $cant;
-        $coniliacion->save();
+            $coniliacion->valor = $valor;
+            $coniliacion->neto = $neto;
+            $coniliacion->cantidad = $cant;
+            $coniliacion->save();
 
+            $caja->montocierre += $coniliacion->neto;
+            $caja->save();
+
+            DB::commit();
+        } catch (\Exception $e) {
+            DB::rollback();
+            dd($e);
+        }
 
         return redirect()->back()->with('message', 'Conciliación creada satifactoriamente');
     }

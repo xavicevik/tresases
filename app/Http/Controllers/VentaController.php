@@ -721,6 +721,7 @@ class VentaController extends Controller
                 $venta->valorventa = $totalpagado;
                 $venta->valortotal = $totalventa;
                 $venta->cantidad = sizeof($boletas);
+                $venta->comprobante = $request->paymentmethod;
                 $venta->save();
 
                 if ($request->paymentmethod == 4) {
@@ -729,8 +730,39 @@ class VentaController extends Controller
                     $vendedor->save();
                 }
 
-                $concepto = 2;
-                $descripcion = 'Pago en efectivo';
+                // pendiente el método de pago
+                switch ($request->paymentmethod) {
+                    case 2:
+                        $concepto = 4;
+                        $descripcion = 'Pago con tarjeta crédito/debito';
+                        $caja = Caja::where('id', $request->idcaja)->first();
+                        $caja->montocierre += ($venta->valorventa - $venta->comision);
+                        $caja->save();
+                        break;
+                    case 3:
+                        $concepto = 6;
+                        $descripcion = 'Pago con transferencia';
+                        $caja = Caja::where('id', $request->idcaja)->first();
+                        $caja->montocierre += ($venta->valorventa - $venta->comision);
+                        $caja->save();
+                        break;
+                    case 4:
+                        $concepto = 2;
+                        $descripcion = 'Pago con bolsa';
+                        $caja = Caja::where('id', $request->idcaja)->first();
+                        $caja->montocierre += ($venta->valorventa - $venta->comision);
+                        $caja->save();
+                        break;
+                    case 1:
+                        $concepto = 2;
+                        $descripcion = 'Pago en efectivo';
+                        break;
+                    default:
+                        $concepto = 0;
+                        $descripcion = '';
+                        break;
+                }
+
                 $signo = self::debito;
                 $impuesto = 0;
 
@@ -845,6 +877,7 @@ class VentaController extends Controller
             $totalventa = 0;
             $totalpagado = 0;
             $toatlcomision = 0;
+            $idcaja = 0;
             $mytime= Carbon::now('America/Bogota');
 
             $idsesion = $request->idsesion;
@@ -877,6 +910,13 @@ class VentaController extends Controller
                     ->get();
                 $concomision = $this->getSalesComision($session->idvendedor);
 
+                $caja = Caja::where('tipo', 2)
+                             ->join('puntos_ventas', 'puntos_ventas.id', 'cajas.idpuntoventa')
+                             ->join('vendedors', 'puntos_ventas.idempresa', 'vendedors.idempresa')
+                             ->where('vendedors.id', $session->idvendedor)
+                             ->select('cajas.*')
+                             ->first();
+
                 $venta = new Venta();
                 $venta->valorventa = 0;
                 $venta->impuesto = 0;
@@ -889,7 +929,7 @@ class VentaController extends Controller
                 $venta->fechaventa = $mytime->toDateTimeString();
                 $venta->comprobante = $request->comprobante;
                 $venta->estado = self::vendido;
-                $venta->transaccion = 5;//$request->idcaja;
+                $venta->transaccion = $caja->id;
                 $venta->save();
 
                 foreach ($boletas as $boleta){
@@ -960,19 +1000,24 @@ class VentaController extends Controller
                 $venta->save();
 
                 // pendiente el método de pago
-                $request->paymentmethod = self::tarjeta;
                 switch ($request->paymentmethod) {
                     case 2:
                         $concepto = 4;
                         $descripcion = 'Pago con tarjeta crédito/debito';
+                        $caja->montocierre += ($venta->valorventa - $venta->comision);
+                        $caja->save();
                         break;
                     case 3:
                         $concepto = 6;
                         $descripcion = 'Pago con transferencia';
+                        $caja->montocierre += ($venta->valorventa - $venta->comision);
+                        $caja->save();
                         break;
                     case 4:
                         $concepto = 2;
                         $descripcion = 'Pago con bolsa';
+                        $caja->montocierre += ($venta->valorventa - $venta->comision);
+                        $caja->save();
                         break;
                     case 1:
                         $concepto = 2;
@@ -1013,7 +1058,7 @@ class VentaController extends Controller
                 $pago->soporte = $request->comprobante;
                 $pago->idtransaccion = $transaccion->id;
                 $pago->idpuntoventa = $session->idpuntoventa;
-                $pago->idcaja = 1;//$request->idcaja;
+                $pago->idcaja = $caja->id;//$request->idcaja;
                 $pago->save();
 
                 DB::commit();

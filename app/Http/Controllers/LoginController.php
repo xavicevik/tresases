@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Actions\Fortify\PasswordValidationRules;
+use App\Models\Caja;
 use App\Models\Cliente;
 use App\Models\Puntoventa;
 use App\Models\User;
@@ -68,7 +69,13 @@ class LoginController extends Controller
 
         $rol = $roluser->union($rolvendedor)->union($rolcliente)->first();
         if (! is_null($rol) && $rol->idrol == 5) {
-            $puntosventa = Puntoventa::where('idempresa', $rol->idempresa)->get();
+            //$puntosventa = Puntoventa::where('idempresa', $rol->idempresa)->get();
+
+            $puntosventa = Puntoventa::where('idempresa', $rol->idempresa)
+                                    ->join('cajas', 'puntos_ventas.id', 'cajas.idpuntoventa')
+                                    ->where('cajas.tipo', 2)
+                                    ->select('puntos_ventas.*')
+                                    ->get();
         }
         if (! is_null($rol) && is_null($rol->changedpassword)) {
             /*

@@ -39,7 +39,7 @@ class Vendedor extends Authenticatable implements Auditable
         'nombre', 'correo', 'username','password', 'apellido', 'idtipos_documento', 'idrol', 'estado',
         'documento', 'direccion', 'indicativo', 'idpais', 'iddepartamento', 'idciudad', 'observaciones',
         'telefono', 'movil', 'isnatural', 'camaracomercio', 'rut', 'url', 'idempresa', 'changedpassword',
-        'saldo', 'bolsa'
+        'saldo', 'bolsa', 'efectivo'
     ];
 
     /**

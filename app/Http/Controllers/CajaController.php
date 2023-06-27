@@ -412,7 +412,7 @@ class CajaController extends Controller
         $cajascierre = Caja::where('tipo', 2)->get();
         foreach ($cajascierre as $cajas) {
             $cajas->estado = 0;
-            $cajas->montocierre = 0;
+            //$cajas->montocierre = 0;
             $cajas->fechacierre = $mytime->toDateTimeString();
             $cajas->save();
 

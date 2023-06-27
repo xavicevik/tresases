@@ -649,7 +649,7 @@ C40.68628,22,38,19.31372,38,16z"/>
                                                 </a>
                                             </div>
                                             <div class="items-center justify-center px-3 pt-10 border-none">
-                                                    <img v-show="form.idrifa.urlimagen1 != null" :src="'/storage/'+form.idrifa.urlimagen1" alt="image" class="mx-auto w-1/2"/>
+                                                    <img v-show="form.idrifa.urlimagen1 != null" :src="'/storage/'+form.idrifa.urlimagen1" alt="image" class="mx-auto w-1 sm:w-1/2"/>
                                             </div>
                                             <div class="pb-3 sm:inline-flex items-center justify-center h-10 px-3 pt-10 border-none">
                                                 <input type="checkbox" v-model="acceptTermns" value="1" class="px-2 w-6 h-6 text-red-600 rounded border-red-600 focus:ring-red-500 focus:ring-2">

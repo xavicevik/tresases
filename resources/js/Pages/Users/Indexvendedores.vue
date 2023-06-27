@@ -434,10 +434,17 @@
                                                                         </a>
 
                                                                     </div>
-                                                                    <div class="flex items-center my-2">
-                                                                        <Toggle v-model="form.bolsa" :disabled="verMode"/>
-                                                                        <label class="ml-2 text-sm font-medium text-gray-900">Usa bolsa?</label>
+                                                                    <div class="flex">
+                                                                        <div class="flex items-center my-2 mr-4">
+                                                                            <Toggle v-model="form.bolsa" :disabled="verMode"/>
+                                                                            <label class="ml-2 text-sm font-medium text-gray-900">Usa bolsa?</label>
+                                                                        </div>
+                                                                        <div class="flex items-center my-2">
+                                                                            <Toggle v-model="form.efectivo" :disabled="verMode"/>
+                                                                            <label class="ml-2 text-sm font-medium text-gray-900">Usa efectivo?</label>
+                                                                        </div>
                                                                     </div>
+
 
                                                                 </div>
                                                             </div>
@@ -860,6 +867,7 @@ export default {
                 changedpassword: null,
                 saldo: 0,
                 bolsa: 0,
+                efectivo: 0,
             },
             arrayRecargas: [],
             formrecarga: {
@@ -931,6 +939,7 @@ export default {
                     this.form.saldo = data['saldo'];
                     this.form.idpais = data['idpais'];
                     this.form.bolsa = data['bolsa'];
+                    this.form.efectivo = data['efectivo'];
                     this.form.changedpassword = data['changedpassword'];
                     this.getDepartamentos();
                     this.form.iddepartamento = data['iddepartamento'];
@@ -961,6 +970,7 @@ export default {
                     this.form.saldo = data['saldo'];
                     this.form.changedpassword = data['changedpassword'];
                     this.form.bolsa = data['bolsa'];
+                    this.form.efectivo = data['efectivo'];
                     this.form.idpais = data['idpais'];
                     this.getDepartamentos();
                     this.form.iddepartamento = data['iddepartamento'];

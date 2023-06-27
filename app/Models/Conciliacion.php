@@ -14,7 +14,8 @@ class Conciliacion extends Model
         'valor',
         'idusuario',
         'estado',
-        'cantidad'
+        'cantidad',
+        'neto'
     ];
 
     public function vendedor()

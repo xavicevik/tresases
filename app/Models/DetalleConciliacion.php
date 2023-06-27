@@ -14,7 +14,9 @@ class DetalleConciliacion extends Model
         'idconciliacion',
         'idboleta',
         'idusuario',
-        'estado'
+        'estado',
+        'valor',
+        'neto'
     ];
 
     public function vendedor()

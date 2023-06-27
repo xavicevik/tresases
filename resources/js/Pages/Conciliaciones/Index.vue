@@ -138,7 +138,24 @@
                                     </th>
                                     <th class="px-4 py-2 text-sm font-bold hover:bg-blue-500 hover:text-gray-50 rounded-b">
                                         <button @click="getCajas(buscar, 'id')" class="font-bold">
-                                            Valor
+                                            Valor Venta
+                                            <div v-show="sortBy == 'ciudad.precio'">
+                                                <span v-show="!sortOrder">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                                                        <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+                                                    </svg>
+                                                </span>
+                                                <span v-show="sortOrder">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                                                      <path fill-rule="evenodd" d="M14.707 12.707a1 1 0 01-1.414 0L10 9.414l-3.293 3.293a1 1 0 01-1.414-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 010 1.414z" clip-rule="evenodd" />
+                                                    </svg>
+                                                </span>
+                                            </div>
+                                        </button>
+                                    </th>
+                                    <th class="px-4 py-2 text-sm font-bold hover:bg-blue-500 hover:text-gray-50 rounded-b">
+                                        <button @click="getCajas(buscar, 'id')" class="font-bold">
+                                            Valor Neto
                                             <div v-show="sortBy == 'ciudad.precio'">
                                                 <span v-show="!sortOrder">
                                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
@@ -191,10 +208,11 @@
                                 </thead>
                                 <tbody>
                                 <tr class="text-center" @click="getDetalleConciliacion(dato.id)" text-sm v-if="arrayData.data" v-for="(dato, id) in arrayData.data" :key="id">
-                                    <td class="border px-1 py-2 text-sm truncate" v-text="dato.id"></td>
+                                    <td class="border px-1 py-2 text-sm truncate w-1/12" v-text="dato.id"></td>
                                     <td class="border px-1 py-2 text-sm truncate" v-text="dato.usuario.full_name"></td>
                                     <td class="border px-1 py-2 text-sm truncate" v-text="dato.vendedor.full_name"></td>
                                     <td class="border px-1 py-2 text-sm truncate" v-text="formatPrice(dato.valor)"></td>
+                                    <td class="border px-1 py-2 text-sm truncate" v-text="formatPrice(dato.neto)"></td>
                                     <td class="border px-1 py-2 text-sm truncate" v-text="dato.cantidad"></td>
                                     <td class="border px-1 py-2 text-sm truncate" v-text="dateTimeFull(dato.created_at)"></td>
 
@@ -285,7 +303,7 @@
                                             <table class="table-fixed w-full">
                                                 <thead>
                                                 <tr class="bg-gray-100">
-                                                    <th class="px-4 py-2 w-2/12 text-sm font-bold hover:bg-blue-500 hover:text-gray-50 rounded-b">
+                                                    <th class="px-4 py-2 w-1/12 text-sm font-bold hover:bg-blue-500 hover:text-gray-50 rounded-b">
                                                         Id
                                                     </th>
                                                     <th class="px-4 py-2 w-2/12 text-sm font-bold hover:bg-blue-500 hover:text-gray-50 rounded-b">
@@ -294,11 +312,8 @@
                                                     <th class="px-4 py-2 text-sm font-bold w-2/12 hover:bg-blue-500 hover:text-gray-50 rounded-b">
                                                         Valor
                                                     </th>
-                                                    <th class="px-4 py-2 text-sm font-bold w-2/12 hover:bg-blue-500 hover:text-gray-50 rounded-b">
+                                                    <th class="px-4 py-2 text-sm font-bold w-3/12 hover:bg-blue-500 hover:text-gray-50 rounded-b">
                                                         Rifa
-                                                    </th>
-                                                    <th class="px-4 py-2 text-sm font-bold w-2/12 hover:bg-blue-500 hover:text-gray-50 rounded-b">
-                                                        Método de pago
                                                     </th>
                                                     <th class="px-4 py-2 text-sm font-bold w-2/12 hover:bg-blue-500 hover:text-gray-50 rounded-b">
                                                         Fecha de venta
@@ -315,7 +330,6 @@
                                                     <td class="border px-2 py-2 text-sm truncate" v-text="dato.numero"></td>
                                                     <td class="border px-2 py-2 text-sm truncate" v-text="formatPrice(dato.valor)"></td>
                                                     <td class="border px-2 py-2 text-sm truncate" v-text="dato.rifa.titulo"></td>
-                                                    <td class="border px-2 py-2 text-sm truncate" v-text="dato.metodopago"></td>
                                                     <td class="border px-2 py-2 text-sm truncate" v-text="dateTime(dato.updated_at)"></td>
                                                     <td class="border px-2 py-2 mx-auto items-center justify-center">
                                                         <input type="checkbox"
@@ -379,10 +393,10 @@
                                             <table class="table-fixed w-full">
                                                 <thead>
                                                 <tr class="bg-gray-100">
-                                                    <th class="px-4 py-2 w-2/12 text-sm font-bold hover:bg-blue-500 hover:text-gray-50 rounded-b">
+                                                    <th class="px-4 py-2 w-1/12 text-sm font-bold hover:bg-blue-500 hover:text-gray-50 rounded-b">
                                                         Id
                                                     </th>
-                                                    <th class="px-4 py-2 w-2/12 text-sm font-bold hover:bg-blue-500 hover:text-gray-50 rounded-b">
+                                                    <th class="px-4 py-2 w-1/12 text-sm font-bold hover:bg-blue-500 hover:text-gray-50 rounded-b">
                                                         Número Boleta
                                                     </th>
                                                     <th class="px-4 py-2 text-sm font-bold w-2/12 hover:bg-blue-500 hover:text-gray-50 rounded-b">
@@ -394,6 +408,9 @@
                                                     <th class="px-4 py-2 text-sm font-bold w-2/12 hover:bg-blue-500 hover:text-gray-50 rounded-b">
                                                         Valor
                                                     </th>
+                                                    <th class="px-4 py-2 text-sm font-bold w-2/12 hover:bg-blue-500 hover:text-gray-50 rounded-b">
+                                                        Valor Neto
+                                                    </th>
                                                 </tr>
                                                 </thead>
                                                 <tbody>
@@ -403,6 +420,7 @@
                                                     <td class="border px-2 py-2 text-sm truncate" v-text="dato.vendedor.full_name"></td>
                                                     <td class="border px-2 py-2 text-sm truncate" v-text="dato.usuario.full_name"></td>
                                                     <td class="border px-2 py-2 text-sm truncate" v-text="formatPrice(dato.valor)"></td>
+                                                    <td class="border px-2 py-2 text-sm truncate" v-text="formatPrice(dato.neto)"></td>
                                                 </tr>
 
                                                 <tr v-else>

@@ -203,8 +203,8 @@
                                                     <svg class="w-14 h-14"> style="enable-background:new 0 0 48 48;" version="1.1" viewBox="0 0 48 48" xml:space="preserve" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"><g id="Icons"><g><path d="M16.3872,34.6633l-6.71-10.09c-0.86-1.42-0.41-3.26,1.01-4.13l14.15-8.6    c1.42-0.86,3.26-0.41,4.13,1l3.68,6.06l1.18,2.11" style="fill:#F43735;"/><path d="M35.7572,36.5934h-16.569c-1.6568,0-3-1.3432-3-3V24.01c0-1.6568,1.3432-3,3-3h16.569    c1.6569,0,3,1.3432,3,3v9.5834C38.7572,35.2502,37.4141,36.5934,35.7572,36.5934z" style="fill:#F9F9F9;"/><rect height="3.1331" style="fill:#383838;" width="22.5712" x="16.1879" y="24.4404"/><g><line style="fill:none;stroke:#303030;stroke-width:0.5;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;" x1="36.6873" x2="34.0623" y1="31.6485" y2="31.6485"/><line style="fill:none;stroke:#303030;stroke-width:0.5;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;" x1="36.6873" x2="34.0623" y1="32.7735" y2="32.7735"/><line style="fill:none;stroke:#303030;stroke-width:0.5;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;" x1="36.6873" x2="34.0623" y1="33.9402" y2="33.9402"/></g><path d="M25.6898,29.138c-1.0925,0-2.0289,0.659-2.44,1.6c-0.4111-0.941-1.3475-1.6-2.44-1.6    c-1.4715,0-2.6642,1.1928-2.6642,2.6641c0,1.4714,1.1927,2.6642,2.6642,2.6642c1.0925,0,2.0289-0.6591,2.44-1.6001    c0.4111,0.941,1.3475,1.6001,2.44,1.6001c1.4714,0,2.6641-1.1928,2.6641-2.6642C28.3539,30.3308,27.1612,29.138,25.6898,29.138z" style="fill:#FFC601;"/><path d="    M35.7572,36.5934h-16.569c-1.6568,0-3-1.3432-3-3V24.01c0-1.6568,1.3432-3,3-3h16.569c1.6569,0,3,1.3432,3,3v9.5834    C38.7572,35.2502,37.4141,36.5934,35.7572,36.5934z" style="fill:none;stroke:#303030;stroke-width:0.5;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;"/><line style="fill:none;stroke:#303030;stroke-width:0.5;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;" x1="38.7591" x2="16.1879" y1="24.4404" y2="24.4404"/><line style="fill:none;stroke:#303030;stroke-width:0.5;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;" x1="38.7591" x2="16.1879" y1="27.5735" y2="27.5735"/><line style="fill:none;stroke:#303030;stroke-width:0.5;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;" x1="17.1372" x2="17.1272" y1="35.7833" y2="35.7733"/><path d="    M16.3872,34.6633l-6.71-10.09c-0.86-1.42-0.41-3.26,1.01-4.13l14.15-8.6c1.42-0.86,3.26-0.41,4.13,1l3.68,6.06l1.18,2.11" style="fill:none;stroke:#303030;stroke-width:0.5;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;"/><g><path d="     M11.5128,25.096c0,0-1.9506-2.1279-0.14779-3.5182l5.77659-3.5273" style="fill:none;stroke:#303030;stroke-width:0.5;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;"/><line style="fill:none;stroke:#303030;stroke-width:0.5;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;" x1="18.4377" x2="19.0404" y1="17.309" y2="16.8798"/><line style="fill:none;stroke:#303030;stroke-width:0.5;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;" x1="32.2411" x2="30.6115" y1="21.01" y2="18.3804"/></g><circle cx="20.79519" cy="31.80215" r="2.64959" style="fill:#F43735;"/></g></g></svg>
                                                     <label class="py-2 ml-2 text-sm font-medium text-gray-900">Tarjeta C/D</label>
                                                 </div>
-                                                <!--
-                                                <div class="flex items-center px-4 border border-gray-200 rounded">
+
+                                                <div v-if="vendedor.efectivo" class="flex items-center px-4 border border-gray-200 rounded">
                                                     <input v-model="form.paymentmethod" type="radio" value="1" name="bordered-radio" class="mx-2 w-6 h-6 text-blue-800 bg-gray-100 border-gray-300 focus:ring-blue-500">
                                                     <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="48px" height="48px" viewBox="0 0 48 48"><g >
                                                         <path fill="#307730" d="M40,22H8c-0.55228,0-1-0.44772-1-1V6c0-0.55228,0.44772-1,1-1h32c0.55228,0,1,0.44772,1,1v15
@@ -220,14 +220,14 @@ C40.68628,22,38,19.31372,38,16z"/>
                                                     <label class="py-4 ml-2 text-sm font-medium text-gray-900">Efectivo</label>
                                                 </div>
 
-                                                <div class="flex items-center px-2 border border-gray-200 rounded">
+                                                <div v-if="vendedor.bolsa" class="flex items-center px-2 border border-gray-200 rounded">
                                                     <input v-model="form.paymentmethod" type="radio" value="4" name="bordered-radio" class="mx-2 w-6 h-6 text-blue-800 bg-gray-100 border-gray-300 focus:ring-blue-500 focus:ring-2">
                                                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-8 h-8">
                                                         <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 00-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 00-16.536-1.84M7.5 14.25L5.106 5.272M6 20.25a.75.75 0 11-1.5 0 .75.75 0 011.5 0zm12.75 0a.75.75 0 11-1.5 0 .75.75 0 011.5 0z" />
                                                     </svg>
                                                     <label class="py-2 ml-2 text-sm font-medium text-gray-900">Bolsa</label>
                                                 </div>
-                                                -->
+
                                             </div>
                                         </div>
 
@@ -710,7 +710,7 @@ C40.68628,22,38,19.31372,38,16z"/>
                                                 </a>
                                             </div>
                                             <div class="items-center justify-center px-3 pt-10 border-none">
-                                                    <img v-show="form.idrifa.urlimagen1 != null" :src="'/storage/'+form.idrifa.urlimagen1" alt="image" class="mx-auto w-1/2"/>
+                                                    <img v-show="form.idrifa.urlimagen1 != null" :src="'/storage/'+form.idrifa.urlimagen1" alt="image" class="mx-auto w-1 sm:w-1/2"/>
                                             </div>
                                             <div class="pb-3 sm:inline-flex items-center justify-center h-10 px-3 pt-10 border-none">
                                                 <input type="checkbox" v-model="acceptTermns" value="1" class="px-2 w-6 h-6 text-red-600 rounded border-red-600 focus:ring-red-500 focus:ring-2">
@@ -937,7 +937,7 @@ export default {
                 },
                 promocionales: [],
                 comprobante: null,
-                paymentmethod: null,
+                paymentmethod: 2,
                 valorpagar: 0,
                 reservas:[],
                 reserva: {
@@ -1702,7 +1702,8 @@ export default {
             this.pushSessionDetail(this.session.id, boleta, 'del');
         },
         ventaEfectivo: async function () {
-            //this.loading = true;
+            // Aplica tambien para bolsa
+            this.loading = true;
             var url = '/ventas/reportpdfRegistroMov';
             let res = await axios.get(url, {
                 params: {
@@ -1710,7 +1711,7 @@ export default {
                     idcaja: this.caja.id,
                     idpuntoventa: this.caja.idpuntoventa,
                     paymentmethod: this.form.paymentmethod,
-                    conciliado: 0
+                    conciliado: (this.form.paymentmethod == 4)?1:0,
                 }
             });
             Swal.fire({
@@ -1723,7 +1724,7 @@ export default {
             this.form.reservas = [];
             //this.getMovimientos();
             //this.closeModal();
-            //this.loading = false;
+            this.loading = false;
 
             Swal.fire({
                 title: 'Se ha registrado la venta satisfactoriamente',

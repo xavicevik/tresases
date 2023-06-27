@@ -701,6 +701,7 @@ class UserController extends Controller
                           'idempresa' => $request->idempresa,
                           'idrol' => $request->idrol,
                           'bolsa' => $request->bolsa,
+                          'efectivo' => $request->efectivo,
                           'idtipos_documento' => $request->idtipos_documento,
                           'documento' => $request->documento,
                           'changedpassword' => $request->cambiarpassword?null:$mytime->toDateString(),
