@@ -178,6 +178,7 @@ class UserController extends Controller
     {
         $buscar = $request->buscar;
         $filtros = json_decode($request->filtros);
+        $user = Auth::user();
 
         if ($request->has('sortBy') && $request->sortBy <> ''){
             $sortBy = $request->sortBy;
@@ -235,6 +236,9 @@ class UserController extends Controller
             }
         }
 
+        if (Auth::user()->idrol == 7) {
+            $vendedores = $vendedores->idempresa = Auth::user()->idempresa;
+        }
         $vendedores = $vendedores->paginate(self::canPorPagina);
 
         if ($request->has('ispage') && $request->ispage){

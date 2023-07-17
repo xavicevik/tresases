@@ -843,10 +843,14 @@ class VentaController extends Controller
                     $message1 = str_replace('%mayor%', $boleta->numero, $rifa->mensaje1);
                     $message1 = str_replace('%promocional%', $boleta->promocional, $message1);
                     $message1 = str_replace('%saldotxt%', $saldotxt, $message1);
+                    $urlboleta = url('storage') . '/boletas/boleta' . $boleta->idrifa . $boleta->codigo . '.pdf';
 
+                    if (!$rifa->fisica) {
+                        $message1 .= "  Boleta: $urlboleta";
+                    }
                     $this->sendSMS($to, $message1);
                     if ($saldo == 0) {
-                        $urlboleta = url('storage') . '/boletas/boleta' . $boleta->idrifa . $boleta->codigo . '.pdf';
+                        //$urlboleta = url('storage') . '/boletas/boleta' . $boleta->idrifa . $boleta->codigo . '.pdf';
                         $message2 = str_replace('%mayor%', $boleta->numero, $rifa->mensaje2);
                         $message2 = str_replace('%promocional%', $boleta->promocional, $message2);
                         if (!$rifa->fisica) {
@@ -1294,10 +1298,14 @@ class VentaController extends Controller
         $message1 = str_replace('%mayor%', $detalle->boleta->numero, $rifa->mensaje1);
         $message1 = str_replace('%promocional%', $detalle->boleta->promocional, $message1);
         $message1 = str_replace('%saldotxt%', $saldotxt, $message1);
+        $urlboleta = url('storage') . '/boletas/boleta' . $detalle->boleta->idrifa . $detalle->boleta->codigo . '.pdf';
 
+        if (!$rifa->fisica) {
+            $message1 .= "  Boleta: $urlboleta";
+        }
         $this->sendSMS($to, $message1);
         if ($saldo == 0) {
-            $urlboleta = url('storage') . '/boletas/boleta' . $detalle->boleta->idrifa . $detalle->boleta->codigo . '.pdf';
+            //$urlboleta = url('storage') . '/boletas/boleta' . $detalle->boleta->idrifa . $detalle->boleta->codigo . '.pdf';
             $message2 = str_replace('%mayor%', $detalle->boleta->numero, $rifa->mensaje2);
             $message2 = str_replace('%promocional%', $detalle->boleta->promocional, $message2);
             $message2 .= "  Boleta: $urlboleta";
@@ -1918,10 +1926,14 @@ class VentaController extends Controller
             $message1 = str_replace('%mayor%', $boleta->numero, $rifa->mensaje1);
             $message1 = str_replace('%promocional%', $boleta->promocional, $message1);
             $message1 = str_replace('%saldotxt%', $saldotxt, $message1);
+            $urlboleta = url('storage') . '/boletas/boleta' . $boleta->idrifa . $boleta->codigo . '.pdf';
 
+            if (!$rifa->fisica) {
+                $message1 .= "  Boleta: $urlboleta";
+            }
             $this->sendSMS($to, $message1);
             if ($saldo == 0) {
-                $urlboleta = url('storage') . '/boletas/boleta' . $boleta->idrifa . $boleta->codigo . '.pdf';
+                //$urlboleta = url('storage') . '/boletas/boleta' . $boleta->idrifa . $boleta->codigo . '.pdf';
                 $message2 = str_replace('%mayor%', $boleta->numero, $rifa->mensaje2);
                 $message2 = str_replace('%promocional%', $boleta->promocional, $message2);
                 $message2 .= "  Boleta: $urlboleta";
@@ -1975,10 +1987,14 @@ class VentaController extends Controller
                 $message1 = str_replace('%mayor%', $boleta->numero, $rifa->mensaje1);
                 $message1 = str_replace('%promocional%', $boleta->promocional, $message1);
                 $message1 = str_replace('%saldotxt%', $saldotxt, $message1);
+                $urlboleta = url('storage') . '/boletas/boleta' . $boleta->idrifa . $boleta->codigo . '.pdf';
 
+                if (!$rifa->fisica) {
+                    $message1 .= "  Boleta: $urlboleta";
+                }
                 $this->sendSMS($to, $message1);
                 if ($saldo == 0) {
-                    $urlboleta = url('storage') . '/boletas/boleta' . $boleta->idrifa . $boleta->codigo . '.pdf';
+                    //$urlboleta = url('storage') . '/boletas/boleta' . $boleta->idrifa . $boleta->codigo . '.pdf';
                     $message2 = str_replace('%mayor%', $boleta->numero, $rifa->mensaje2);
                     $message2 = str_replace('%promocional%', $boleta->promocional, $message2);
                     if (!$rifa->fisica) {
@@ -2166,10 +2182,14 @@ class VentaController extends Controller
                             $message1 = str_replace('%mayor%', $boleta->numero, $rifa->mensaje1);
                             $message1 = str_replace('%promocional%', $boleta->promocional, $message1);
                             $message1 = str_replace('%saldotxt%', $saldotxt, $message1);
+                            $urlboleta = url('storage') . '/boletas/boleta' . $boleta->idrifa . $boleta->codigo . '.pdf';
+
+                            if (!$rifa->fisica) {
+                                $message1 .= "  Boleta: $urlboleta";
+                            }
 
                             $this->sendSMS($to, $message1);
                             if ($saldo == 0) {
-                                $urlboleta = url('storage') . '/boletas/boleta' . $boleta->idrifa . $boleta->codigo . '.pdf';
                                 $message2 = str_replace('%mayor%', $boleta->numero, $rifa->mensaje2);
                                 $message2 = str_replace('%promocional%', $boleta->promocional, $message2);
                                 if (!$rifa->fisica) {
@@ -2224,6 +2244,9 @@ class VentaController extends Controller
                 break;
             case 7:
                 $pdf->loadView('pdf.boletataxia', $data);
+                break;
+            case 8:
+                $pdf->loadView('pdf.boleta', $data);
                 break;
         }
 
